@@ -1,3 +1,6 @@
+run:
+	deno run --allow-read --allow-net denoops/ddu/app.ts
+
 # For Development
 .PHONY: dev
 dev: deno vim
