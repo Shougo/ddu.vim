@@ -81,7 +81,7 @@ call dein#end()
 
 **Note:** Ddu.vim does not include any sources and filters.
 You must install them you want manually.
-You can search ddc plugins(sources and filters) from
+You can search ddu plugins(sources and filters) from
 [here](https://github.com/topics/ddu-vim).
 
 

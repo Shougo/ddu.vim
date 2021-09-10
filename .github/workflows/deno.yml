@@ -1,0 +1,68 @@
+name: deno
+
+env:
+  DENO_VERSION: 1.x
+  DENOPS_PATH: "./"
+
+on:
+  schedule:
+    - cron: "0 7 * * 0"
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deno-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@main
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Check Type
+        run: |
+          find denops -name "*.ts"| xargs deno test --unstable --no-run -A
+
+      - name: Check with deno lint
+        run: deno lint denops
+
+      - name: Check Format
+        run: |
+          deno fmt --check denops
+
+  deno-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@main
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Test
+        run: |
+          grep -rl Deno.test denops| xargs deno test --unstable -A
+        timeout-minutes: 5
+
+  vim-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install vim-vint
+
+      - name: Check with vint
+        run: |
+          vint --version && vint autoload
