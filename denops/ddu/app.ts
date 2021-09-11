@@ -1,8 +1,7 @@
-import { Denops, batch, vars } from "./deps.ts";
+import { batch, Denops, vars } from "./deps.ts";
 
 export async function main(denops: Denops) {
-  denops.dispatcher = {
-  };
+  denops.dispatcher = {};
 
   await batch(denops, async (denops: Denops) => {
     await vars.g.set(denops, "ddu#_initialized", 1);
