@@ -1,4 +1,4 @@
-*ddu.txt*	Dark deno powered UI framework for neovim/Vim8
+*ddu.txt*	Dark deno-powered UI framework for neovim/Vim8
 
 Version: 0.0
 Author: Shougo <Shougo.Matsu at gmail.com>
@@ -31,7 +31,7 @@ Compatibility		|ddu-compatibility|
 ==============================================================================
 INTRODUCTION						*ddu-introduction*
 
-*ddu* is the abbreviation of "dark deno powered UI".  It provides an
+*ddu* is the abbreviation of "dark deno-powered UI".  It provides an
 asynchronous fuzzy finder UI.
 
 If you don't want to configure plugins, you don't have to use the plugin.

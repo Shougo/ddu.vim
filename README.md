@@ -2,7 +2,7 @@
 
 Note: It is vaporware!!  You cannot use it yet.
 
-> Dark deno powered UI framework for neovim/Vim8
+> Dark deno-powered UI framework for neovim/Vim8
 
 If you don't want to configure plugins, you don't have to use the plugin.
 It does not work with zero configuration.  You can use other plugins.
@@ -11,7 +11,7 @@ It does not work with zero configuration.  You can use other plugins.
 
 Please read [help](doc/ddu.txt) for details.
 
-Ddu is the abbreviation of "dark deno powered UI". It provides an
+Ddu is the abbreviation of "dark deno-powered UI". It provides an
 extensible and asynchronous UI framework for neovim/Vim8.
 
 
@@ -97,6 +97,24 @@ Ddu.vim requires both Deno and denops.vim.
 ## Configuration
 
 ```vim
+" Set default sources
+call ddu#custom#patch_global({
+    \ 'sources': [{'name': 'file', 'params': {}}],
+    \ })
+
+" Call default sources
+call ddu#start({})
+
+" Set buffer-name specific configuration
+call ddu#custom#patch_buffer('files', {
+    \ 'sources': [
+    \   {'name': 'file', 'params': {}},
+    \   {'name': 'file_old', 'params': {}},
+    \ ],
+    \ })
+
+" Specify buffer name
+call ddu#start({'buffer_name': 'files'})
 ```
 
 See `:help ddu-options` for a complete list of options.
