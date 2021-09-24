@@ -69,6 +69,39 @@ FUNCTIONS 						*ddu-functions*
 
 CUSTOM FUNCTIONS 					*ddu-custom-functions*
 
+							*ddu#custom#alias()*
+ddu#custom#alias({type}, {alias-name}, {base-name})
+		Define {alias-name} alias based on {base-name}.
+		{type} must be "source" or "filter".
+		Note: It must be called before sources/filters initialization.
+>
+		call ddu#custom#alias('source', 'foo', 'file')
+		call ddu#custom#patch_global('sourceOptions', {
+		      \ 'file': {'mark': 'A'},
+		      \ 'foo': {'mark': 'foo'},
+		      \ })
+<
+						*ddu#custom#get_buffer()*
+ddu#custom#get_buffer()
+		Get current buffer specific options.
+
+						*ddu#custom#get_global()*
+ddu#custom#get_global()
+		Get global options.
+
+						*ddu#custom#patch_buffer()*
+ddu#custom#patch_buffer({buffer-name}, {option-name}, {value})
+ddu#custom#patch_buffer({buffer-name}, {dict})
+		Set local options for specific buffer.  The arguments are the
+		same as for |ddu#custom#patch_global()|.
+
+						*ddu#custom#patch_global()*
+ddu#custom#patch_global({option-name}, {value})
+ddu#custom#patch_global({dict})
+		Set {option-name} option to {value}.
+		If {dict} is available, the key is {option-name} and the value
+		is {value}. See |ddu-options| for available {option-name}.
+
 
 ==============================================================================
 EXAMPLES						*ddu-examples*
