@@ -9,6 +9,7 @@ CONTENTS						*ddu-contents*
 Introduction		|ddu-introduction|
 Install			|ddu-install|
 Interface		|ddu-interface|
+  Key mappings		  |ddu-key-mappings|
   Options		  |ddu-options|
   Functions		  |ddu-functions|
   Custom Functions	  |ddu-custom-functions|
@@ -58,8 +59,39 @@ https://github.com/topics/ddu-vim.
 ==============================================================================
 INTERFACE						*ddu-interface*
 
+
+------------------------------------------------------------------------------
+KEY MAPPINGS 						*ddu-key-mappings*
+
+
 ------------------------------------------------------------------------------
 OPTIONS	 						*ddu-options*
+
+						*ddu-option-autoAction*
+autoAction
+		When you select a candidate, it runs the action automatically.
+
+		Default: ""
+
+						*ddu-option-bufferName*
+bufferName
+		Specify the name of ddu buffer.
+
+		Default: "default"
+
+						*ddu-option-defaultAction*
+defaultAction
+		Specify the default action.
+		Note: It overwrites all default actions includes kind/source
+		default actions.
+
+		Default: "default"
+
+							*ddu-option-input*
+input
+		Specify an initial narrowing text.
+
+		Default: ""
 
 
 ------------------------------------------------------------------------------
