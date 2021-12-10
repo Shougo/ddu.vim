@@ -57,6 +57,8 @@ call plug#begin()
 Plug 'Shougo/ddu.vim'
 Plug 'vim-denops/denops.vim'
 
+" Install your UIs
+
 " Install your sources
 
 " Install your filters
@@ -72,6 +74,8 @@ call dein#begin()
 call dein#add('Shougo/ddu.vim')
 call dein#add('vim-denops/denops.vim')
 
+" Install your UIs
+
 " Install your sources
 
 " Install your filters
@@ -79,7 +83,7 @@ call dein#add('vim-denops/denops.vim')
 call dein#end()
 ```
 
-**Note:** Ddu.vim does not include any sources and filters.
+**Note:** Ddu.vim does not include any UIs, sources and filters.
 You must install them you want manually.
 You can search ddu plugins(sources and filters) from
 [here](https://github.com/topics/ddu-vim).
@@ -114,7 +118,7 @@ call ddu#custom#patch_buffer('files', {
     \ })
 
 " Specify buffer name
-call ddu#start({'buffer_name': 'files'})
+call ddu#start({'uiOptions': {'buffer_name': 'files'}})
 ```
 
 See `:help ddu-options` for a complete list of options.

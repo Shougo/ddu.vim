@@ -80,6 +80,7 @@ filterOptions
 						*ddu-option-filterParams*
 filterParams
 		It is a dictionary that maps filter names to its parameters.
+		See also |ddu-filter-params|.
 
 		Default: {}
 
@@ -98,6 +99,17 @@ sourceParams
 		See also |ddu-source-params|.
 
 		Default: {}
+
+							*ddu-option-sources*
+sources
+		It is a list of elements which are formatted as:
+>
+		"{'name': {source-name}, 'params': {source-params}}"
+<
+		Candidates from sources with smaller indexes will have smaller
+		indexes.
+
+		Default: []
 
 						*ddu-option-ui*
 ui
@@ -125,13 +137,9 @@ uiParams
 FUNCTIONS 						*ddu-functions*
 
 							*ddu#start()*
-ddu#start({sources}, {options})
+ddu#start({options})
 		Creates a new Ddu buffer.
 
-		{sources} is a list of elements which are formatted as:
->
-		"{'name': {source-name}, 'options': {source-options}}"
-<
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
 
@@ -174,14 +182,24 @@ ddu#custom#patch_global({dict})
 ==============================================================================
 EXAMPLES						*ddu-examples*
 >
-	" Call file source
-	call ddu#start([{'name': 'file'}])
-
-	" Call file source with source specific params
-	call ddu#start([{'name': 'file', 'params': {'cwd': getcwd()}}])
-
-	" Call file source with specific options
-	call ddu#start(['name': 'file'], {'uiOptions': {'input': 'foo'}})
+	" Set default sources
+	call ddu#custom#patch_global({
+	    \ 'sources': [{'name': 'file', 'params': {}}],
+	    \ })
+	
+	" Call default sources
+	call ddu#start({})
+	
+	" Set buffer-name specific configuration
+	call ddu#custom#patch_buffer('files', {
+	    \ 'sources': [
+	    \   {'name': 'file', 'params': {}},
+	    \   {'name': 'file_old', 'params': {}},
+	    \ ],
+	    \ })
+	
+	" Specify buffer name
+	call ddu#start({'uiOptions': {'buffer_name': 'files'}})
 <
 
 ==============================================================================
