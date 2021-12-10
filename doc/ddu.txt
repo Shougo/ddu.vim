@@ -14,6 +14,9 @@ Interface		|ddu-interface|
   Functions		  |ddu-functions|
   Custom Functions	  |ddu-custom-functions|
 Examples		|ddu-examples|
+UIs			|ddu-uis|
+  UI option	          |ddu-ui-options|
+  UI params	          |ddu-ui-params|
 Sources			|ddu-sources|
   Source option	          |ddu-source-options|
   Source params	          |ddu-source-params|
@@ -67,37 +70,70 @@ KEY MAPPINGS 						*ddu-key-mappings*
 ------------------------------------------------------------------------------
 OPTIONS	 						*ddu-options*
 
-						*ddu-option-autoAction*
-autoAction
-		When you select a candidate, it runs the action automatically.
+						*ddu-option-filterOptions*
+filterOptions
+		It is a dictionary that maps filter names to its options.
+		See also |ddu-filter-options|.
 
-		Default: ""
+		Default: {}
 
-						*ddu-option-bufferName*
-bufferName
-		Specify the name of ddu buffer.
+						*ddu-option-filterParams*
+filterParams
+		It is a dictionary that maps filter names to its parameters.
+
+		Default: {}
+
+						*ddu-option-sourceOptions*
+sourceOptions
+		It is a dictionary that maps source names to its options.  The
+		options with the name "_" is used as the options for all
+		sources.
+		See also |ddu-source-options|.
+
+		Default: {}
+
+						*ddu-option-sourceParams*
+sourceParams
+		It is a dictionary that maps source names to its parameters.
+		See also |ddu-source-params|.
+
+		Default: {}
+
+						*ddu-option-ui*
+ui
+		Specify UI name.
 
 		Default: "default"
 
-						*ddu-option-defaultAction*
-defaultAction
-		Specify the default action.
-		Note: It overwrites all default actions includes kind/source
-		default actions.
+						*ddu-option-uiOptions*
+uiOptions
+		It is a dictionary that maps UI names to its options.  The
+		options with the name "_" is used as the options for all
+		UIs.
+		See also |ddu-ui-options|.
 
-		Default: "default"
+		Default: {}
 
-							*ddu-option-input*
-input
-		Specify an initial narrowing text.
+						*ddu-option-uiParams*
+uiParams
+		It is a dictionary that maps UI names to its parameters.
+		See also |ddu-ui-params|.
 
-		Default: ""
-
+		Default: {}
 
 ------------------------------------------------------------------------------
 FUNCTIONS 						*ddu-functions*
 
+							*ddu#start()*
+ddu#start({sources}, {options})
+		Creates a new Ddu buffer.
 
+		{sources} is a list of elements which are formatted as:
+>
+		"{'name': {source-name}, 'options': {source-options}}"
+<
+		Refer to |ddu-options| about {options}.  If you skip a value,
+		it uses the default value.
 
 CUSTOM FUNCTIONS 					*ddu-custom-functions*
 
@@ -124,8 +160,8 @@ ddu#custom#get_global()
 						*ddu#custom#patch_buffer()*
 ddu#custom#patch_buffer({buffer-name}, {option-name}, {value})
 ddu#custom#patch_buffer({buffer-name}, {dict})
-		Set local options for specific buffer.  The arguments are the
-		same as for |ddu#custom#patch_global()|.
+		Set local options for specific |ddu-option-ui-bufferName|.
+		The arguments are the same as for |ddu#custom#patch_global()|.
 
 						*ddu#custom#patch_global()*
 ddu#custom#patch_global({option-name}, {value})
@@ -137,6 +173,65 @@ ddu#custom#patch_global({dict})
 
 ==============================================================================
 EXAMPLES						*ddu-examples*
+>
+	" Call file source
+	call ddu#start([{'name': 'file'}])
+
+	" Call file source with source specific params
+	call ddu#start([{'name': 'file', 'params': {'cwd': getcwd()}}])
+
+	" Call file source with specific options
+	call ddu#start(['name': 'file'], {'uiOptions': {'input': 'foo'}})
+<
+
+==============================================================================
+UIS							*ddu-uis*
+
+Note: The UIs are not bundled in ddu.vim.  You need to install them
+to use ddu.vim.  Please search them by https://github.com/topics/ddu-ui
+
+
+------------------------------------------------------------------------------
+UI OPTIONS						*ddu-ui-options*
+
+Note: The UIs cannot set default options for UI.  If the UI need
+to specify the recommended configuration, you should write it in the
+documentation instead.
+
+						*ddu-ui-option-autoAction*
+autoAction
+		When you select a candidate, it runs the action automatically.
+
+		Default: ""
+
+						*ddu-option-ui-bufferName*
+bufferName
+		Specify the name of ddu buffer.
+
+		Default: "default"
+
+						*ddu-ui-option-defaultAction*
+defaultAction
+		Specify the default action.
+		Note: It overwrites all default actions includes kind/source
+		default actions.
+
+		Default: "default"
+
+							*ddu-ui-option-input*
+input
+		Specify an initial narrowing text.
+
+		Default: ""
+
+
+------------------------------------------------------------------------------
+UI PARAMS					*ddu-ui-params*
+
+These are the parameters that each source can have.  You can select the
+behavior and tune the performance.
+
+Please read the UI documentation.
 
 
 ==============================================================================
