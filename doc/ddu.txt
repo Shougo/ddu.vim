@@ -23,6 +23,8 @@ Sources			|ddu-sources|
 Filters			|ddu-filters|
   Filter options	  |ddu-filter-options|
   Filter params		  |ddu-filter-params|
+Create UI		|ddu-create-ui|
+  UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
   Source attributes	  |ddu-source-attributes|
   Candidate attributes    |ddu-candidate-attributes|
@@ -295,6 +297,14 @@ Please read the filter documentation.
 
 
 ==============================================================================
+CREATE UI						*ddu-create-ui*
+
+
+------------------------------------------------------------------------------
+UI ATTRIBUTES						*ddu-ui-attributes*
+
+
+==============================================================================
 CREATE SOURCE						*ddu-create-source*
 
 
@@ -325,17 +335,16 @@ plugins.  You can donate money to help me!
    https://github.com/sponsors/Shougo
 
 
-Q: Why does ddu.vim not include any sources/matchers/sorters/converters?
+Q: Why does ddu.vim not include any UIs/sources/filters?
 
-A: Because I cannot determine the best default
-sources/matchers/sorters/converters.
+A: Because I cannot determine the best default UIs/sources/filters.
 Users use different environments/policy, etc...
 So ddu.vim should not define the defaults.
 You must define your defaults by configuration.
 ddu.vim does not conflict with your defaults.
 
 
-Q: Why do sources have no default options?
+Q: Why do UIs/sources/filters have no default options?
 
 A: Because users can customize sources perfectly.  If a source has the
 default, users have to check them.  It increases configuration cost.
