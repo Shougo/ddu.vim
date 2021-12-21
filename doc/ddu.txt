@@ -366,16 +366,16 @@ plugins.  You can donate money to help me!
    https://github.com/sponsors/Shougo
 
 
-Q: Why does ddu.vim not include any UIs/sources/filters?
+Q: Why does ddu.vim not include any UIs/sources/filters/kinds?
 
-A: Because I cannot determine the best default UIs/sources/filters.
+A: Because I cannot determine the best default UIs/sources/filters/kinds.
 Users use different environments/policy, etc...
 So ddu.vim should not define the defaults.
 You must define your defaults by configuration.
 ddu.vim does not conflict with your defaults.
 
 
-Q: Why do UIs/sources/filters have no default options?
+Q: Why do UIs/sources/filters/kinds have no default options?
 
 A: Because users can customize sources perfectly.  If a source has the
 default, users have to check them.  It increases configuration cost.

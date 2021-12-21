@@ -63,6 +63,8 @@ Plug 'vim-denops/denops.vim'
 
 " Install your filters
 
+" Install your kinds
+
 call plug#end()
 ```
 
@@ -80,10 +82,12 @@ call dein#add('vim-denops/denops.vim')
 
 " Install your filters
 
+" Install your kinds
+
 call dein#end()
 ```
 
-**Note:** Ddu.vim does not include any UIs, sources and filters.
+**Note:** Ddu.vim does not include any UIs, sources, filters and kinds.
 You must install them you want manually.
 You can search ddu plugins(sources and filters) from
 [here](https://github.com/topics/ddu-vim).
