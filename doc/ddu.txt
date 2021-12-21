@@ -23,6 +23,9 @@ Sources			|ddu-sources|
 Filters			|ddu-filters|
   Filter options	  |ddu-filter-options|
   Filter params		  |ddu-filter-params|
+Kinds			|ddu-kinds|
+  Kind options		  |ddu-kind-options|
+  Kind params		  |ddu-kind-params|
 Create UI		|ddu-create-ui|
   UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
@@ -30,6 +33,8 @@ Create source		|ddu-create-source|
   Candidate attributes    |ddu-candidate-attributes|
 Create filter		|ddu-create-filter|
   filter attributes	  |ddu-filter-attributes|
+Create kind		|ddu-create-kind|
+  kind attributes	  |ddu-kind-attributes|
 FAQ			|ddu-faq|
 Compatibility		|ddu-compatibility|
 
@@ -297,6 +302,24 @@ Please read the filter documentation.
 
 
 ==============================================================================
+KINDS							*ddu-kinds*
+
+
+------------------------------------------------------------------------------
+KIND OPTIONS						*ddu-kind-options*
+
+Undefined now
+
+------------------------------------------------------------------------------
+KIND PARAMS						*ddu-kind-params*
+
+These are the parameters that each kind can have.  You can select the
+behavior and tune the performance.
+
+Please read the kind documentation.
+
+
+==============================================================================
 CREATE UI						*ddu-create-ui*
 
 
@@ -322,6 +345,14 @@ CREATE FILTER						*ddu-create-filter*
 
 ------------------------------------------------------------------------------
 FILTER ATTRIBUTES				*ddu-filter-attributes*
+
+
+==============================================================================
+CREATE KIND						*ddu-create-kind*
+
+
+------------------------------------------------------------------------------
+KIND ATTRIBUTES						*ddu-kind-attributes*
 
 
 ==============================================================================
