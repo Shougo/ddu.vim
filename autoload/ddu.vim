@@ -8,6 +8,7 @@ let s:root_dir = fnamemodify(expand('<sfile>'), ':h:h')
 
 function! ddu#start() abort
   if exists('g:ddu#_initialized')
+    call ddu#_start()
     return
   endif
 
@@ -34,4 +35,18 @@ function! ddu#_register() abort
   call denops#plugin#register('ddu',
         \ denops#util#join_path(s:root_dir, 'denops', 'ddu', 'app.ts'),
         \ { 'mode': 'skip' })
+endfunction
+
+function! ddu#_denops_running() abort
+  return exists('g:loaded_denops')
+        \ && denops#server#status() ==# 'running'
+        \ && denops#plugin#is_loaded('ddu')
+endfunction
+
+function! ddu#_start() abort
+  if !ddu#_denops_running()
+    return
+  endif
+
+  call denops#request('ddu', 'start', [])
 endfunction

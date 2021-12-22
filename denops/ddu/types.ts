@@ -1,5 +1,7 @@
+export { BaseUi } from "./base/ui.ts";
 export { BaseSource } from "./base/source.ts";
 export { BaseFilter } from "./base/filter.ts";
+export { BaseKind } from "./base/kind.ts";
 
 export type SourceName = string;
 

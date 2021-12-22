@@ -1,10 +1,8 @@
 import { UiOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
-export type OnInitArguments<Params extends Record<string, unknown>> = {
+export type RedrawArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
-  uiOptions: UiOptions;
-  uiParams: Params;
 };
 
 export abstract class BaseUi<
@@ -15,7 +13,7 @@ export abstract class BaseUi<
 
   apiVersion = 1;
 
-  async onInit(_args: OnInitArguments<Params>): Promise<void> {}
+  async redraw(_args: RedrawArguments<Params>): Promise<void> {}
 
   abstract params(): Params;
 }

@@ -1,4 +1,5 @@
 import { batch, Denops, ensureObject, vars } from "./deps.ts";
+import { Ddu } from "./ddu.ts";
 
 type RegisterArg = {
   path: string;
@@ -7,6 +8,8 @@ type RegisterArg = {
 };
 
 export async function main(denops: Denops) {
+  const ddu: Ddu = new Ddu();
+
   denops.dispatcher = {
     async register(arg1: unknown): Promise<void> {
       const arg = arg1 as RegisterArg;
@@ -42,6 +45,9 @@ export async function main(denops: Denops) {
     getBuffer(): Promise<void> {
       return Promise.resolve();
     },
+    async start(arg1: unknown): Promise<void> {
+      await ddu.start(denops);
+    }
   };
 
   await batch(denops, async (denops: Denops) => {
