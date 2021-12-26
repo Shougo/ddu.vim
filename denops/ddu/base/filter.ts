@@ -1,5 +1,5 @@
 import {
-  Candidate,
+  DduCandidate,
   Context,
   DduOptions,
   FilterOptions,
@@ -21,7 +21,7 @@ export type FilterArguments<Params extends Record<string, unknown>> = {
   filterOptions: FilterOptions;
   filterParams: Params;
   completeStr: string;
-  candidates: Candidate[];
+  candidates: DduCandidate[];
 };
 
 export abstract class BaseFilter<Params extends Record<string, unknown>> {
@@ -32,7 +32,7 @@ export abstract class BaseFilter<Params extends Record<string, unknown>> {
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 
-  abstract filter({}: FilterArguments<Params>): Promise<Candidate[]>;
+  abstract filter({}: FilterArguments<Params>): Promise<DduCandidate[]>;
 
   abstract params(): Params;
 }

@@ -50,6 +50,5 @@ export type DduUserData = unknown;
 export type DduCandidate =
   & Candidate<DduUserData>
   & {
-    // TODO: remove placeholder
-    placeholder: void;
+    matcherKey: string;
   };

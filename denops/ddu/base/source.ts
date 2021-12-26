@@ -15,7 +15,7 @@ export type OnEventArguments<Params extends Record<string, unknown>> = {
   sourceParams: Params;
 };
 
-export type GatherCandidatesArguments<Params extends Record<string, unknown>> =
+export type GatherArguments<Params extends Record<string, unknown>> =
   {
     denops: Denops;
     context: Context;
@@ -37,8 +37,8 @@ export abstract class BaseSource<
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 
-  abstract gatherCandidates(
-    {}: GatherCandidatesArguments<Params>,
+  abstract gather(
+    {}: GatherArguments<Params>,
   ): Promise<Candidate<UserData>[]>;
 
   abstract params(): Params;

@@ -1,8 +1,9 @@
-import { UiOptions } from "../types.ts";
+import { DduCandidate, UiOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type RedrawArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
+  candidates: DduCandidate[];
 };
 
 export abstract class BaseUi<

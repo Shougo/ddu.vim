@@ -6,7 +6,10 @@ export class Ddu {
     denops: Denops,
   ): Promise<void> {
     const ui = new Ui();
-    await ui.redraw({ denops: denops });
+    await ui.redraw({
+      denops: denops,
+      candidates: [{ word: "foobar", matcherKey: "foobar" }],
+    });
   }
 }
 

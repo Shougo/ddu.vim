@@ -47,7 +47,7 @@ export async function main(denops: Denops) {
     },
     async start(arg1: unknown): Promise<void> {
       await ddu.start(denops);
-    }
+    },
   };
 
   await batch(denops, async (denops: Denops) => {

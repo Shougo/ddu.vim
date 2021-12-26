@@ -7,15 +7,22 @@
 let s:root_dir = fnamemodify(expand('<sfile>'), ':h:h')
 
 function! ddu#start() abort
+  if ddu#_init()
+    return
+  endif
+
+  call denops#plugin#wait('ddu')
+  call denops#request('ddu', 'start', [])
+endfunction
+function! ddu#_init() abort
   if exists('g:ddu#_initialized')
-    call ddu#_start()
     return
   endif
 
   if !has('patch-8.2.0662') && !has('nvim-0.5')
     call ddu#util#print_error(
           \ 'ddu requires Vim 8.2.0662+ or neovim 0.5.0+.')
-    return
+    return 1
   endif
 
   augroup ddu
@@ -41,12 +48,4 @@ function! ddu#_denops_running() abort
   return exists('g:loaded_denops')
         \ && denops#server#status() ==# 'running'
         \ && denops#plugin#is_loaded('ddu')
-endfunction
-
-function! ddu#_start() abort
-  if !ddu#_denops_running()
-    return
-  endif
-
-  call denops#request('ddu', 'start', [])
 endfunction
