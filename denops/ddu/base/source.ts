@@ -15,15 +15,14 @@ export type OnEventArguments<Params extends Record<string, unknown>> = {
   sourceParams: Params;
 };
 
-export type GatherArguments<Params extends Record<string, unknown>> =
-  {
-    denops: Denops;
-    context: Context;
-    options: DduOptions;
-    sourceOptions: SourceOptions;
-    sourceParams: Params;
-    completeStr: string;
-  };
+export type GatherArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  sourceOptions: SourceOptions;
+  sourceParams: Params;
+  completeStr: string;
+};
 
 export abstract class BaseSource<
   Params extends Record<string, unknown>,

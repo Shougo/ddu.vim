@@ -1,6 +1,6 @@
 import {
-  DduCandidate,
   Context,
+  DduCandidate,
   DduOptions,
   FilterOptions,
   SourceOptions,

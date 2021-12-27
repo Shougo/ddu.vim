@@ -51,7 +51,6 @@ export async function main(denops: Denops) {
   };
 
   await batch(denops, async (denops: Denops) => {
-    console.log("Hello!");
     await vars.g.set(denops, "ddu#_initialized", 1);
   });
 }
