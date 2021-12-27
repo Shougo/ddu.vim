@@ -3,6 +3,7 @@ import { DduItem, Item } from "./types.ts";
 import { Ui } from "../@ddu-uis/std.ts";
 import { Source } from "../@ddu-sources/file.ts";
 import { Filter } from "../@ddu-filters/matcher_substring.ts";
+import { Kind } from "../@ddu-kinds/file.ts";
 
 export class Ddu {
   async start(
@@ -38,6 +39,12 @@ export class Ddu {
   ): Promise<void> {
     console.log(actionName);
     console.log(items);
+
+    const kind = new Kind();
+
+    // Call action
+    const action = kind.actions[actionName];
+    await action({ denops: denops, items: items });
   }
 }
 

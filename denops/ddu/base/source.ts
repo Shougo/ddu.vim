@@ -29,10 +29,12 @@ export abstract class BaseSource<
   UserData extends unknown = unknown,
 > {
   name = "";
-  isBytePos = false;
+
   isInitialized = false;
 
   apiVersion = 1;
+
+  kind: string = "base";
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 

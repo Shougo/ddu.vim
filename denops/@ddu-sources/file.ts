@@ -3,6 +3,8 @@ import { Denops, fn } from "../ddu/deps.ts";
 import { join, resolve } from "https://deno.land/std@0.119.0/path/mod.ts";
 
 export class Source extends BaseSource<{}> {
+  kind = "file";
+
   async gather(args: {
     denops: Denops;
   }): Promise<Item<{}>[]> {
