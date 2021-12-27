@@ -1,4 +1,4 @@
-import { Candidate, Context, DduOptions, SourceOptions } from "../types.ts";
+import { Item, Context, DduOptions, SourceOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type OnInitArguments<Params extends Record<string, unknown>> = {
@@ -38,7 +38,7 @@ export abstract class BaseSource<
 
   abstract gather(
     {}: GatherArguments<Params>,
-  ): Promise<Candidate<UserData>[]>;
+  ): Promise<Item<UserData>[]>;
 
   abstract params(): Params;
 }

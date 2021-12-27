@@ -30,7 +30,7 @@ Create UI		|ddu-create-ui|
   UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
   Source attributes	  |ddu-source-attributes|
-  Candidate attributes    |ddu-candidate-attributes|
+  Item attributes    |ddu-item-attributes|
 Create filter		|ddu-create-filter|
   filter attributes	  |ddu-filter-attributes|
 Create kind		|ddu-create-kind|
@@ -113,7 +113,7 @@ sources
 >
 		"{'name': {source-name}, 'params': {source-params}}"
 <
-		Candidates from sources with smaller indexes will have smaller
+		Items from sources with smaller indexes will have smaller
 		indexes.
 
 		Default: []
@@ -225,7 +225,7 @@ documentation instead.
 
 						*ddu-ui-option-autoAction*
 autoAction
-		When you select a candidate, it runs the action automatically.
+		When you select a item, it runs the action automatically.
 
 		Default: ""
 
@@ -336,7 +336,7 @@ SOURCE ATTRIBUTES				*ddu-source-attributes*
 
 
 ------------------------------------------------------------------------------
-CANDIDATE ATTRIBUTES				*ddu-candidate-attributes*
+ITEM ATTRIBUTES						*ddu-item-attributes*
 
 
 ==============================================================================

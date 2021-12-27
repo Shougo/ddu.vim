@@ -1,12 +1,12 @@
-import { BaseUi, DduCandidate } from "../ddu/types.ts";
+import { BaseUi, DduItem } from "../ddu/types.ts";
 import { Denops, fn } from "../ddu/deps.ts";
 
 export class Ui extends BaseUi<{}> {
   async redraw(args: {
     denops: Denops;
-    candidates: DduCandidate[];
+    items: DduItem[];
   }): Promise<void> {
-    await fn.setline(args.denops, 1, args.candidates.map((c) => c.word));
+    await fn.setline(args.denops, 1, args.items.map((c) => c.word));
   }
 
   params(): {} {

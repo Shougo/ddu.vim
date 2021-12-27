@@ -1,5 +1,5 @@
 import { assertEquals, Denops } from "./deps.ts";
-import { Candidate } from "./types.ts";
+import { Item } from "./types.ts";
 import { Ui } from "../@ddu-uis/default.ts";
 import { Source } from "../@ddu-sources/file.ts";
 import { Filter } from "../@ddu-filters/matcher_substring.ts";
@@ -12,22 +12,22 @@ export class Ddu {
     const source = new Source();
     const filter = new Filter();
 
-    const sourceCandidates = await source.gather({ denops: denops });
-    const dduCandidates = sourceCandidates.map((c: Candidate) => (
+    const sourceItems = await source.gather({ denops: denops });
+    const dduItems = sourceItems.map((item: Item) => (
       {
-        ...c,
-        matcherKey: c.word,
+        ...item,
+        matcherKey: item.word,
       }
     ));
-    const filteredCandidates = await filter.filter({
+    const filteredItems = await filter.filter({
       denops: denops,
       completeStr: "",
-      candidates: dduCandidates,
+      items: dduItems,
     });
 
     await ui.redraw({
       denops: denops,
-      candidates: filteredCandidates,
+      items: filteredItems,
     });
   }
 }

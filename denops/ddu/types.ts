@@ -35,7 +35,7 @@ export type FilterOptions = {
   placeholder: void;
 };
 
-export type Candidate<
+export type Item<
   UserData extends unknown = unknown,
 > = {
   word: string;
@@ -47,8 +47,8 @@ export type Candidate<
 // For internal type
 export type DduUserData = unknown;
 
-export type DduCandidate =
-  & Candidate<DduUserData>
+export type DduItem =
+  & Item<DduUserData>
   & {
     matcherKey: string;
   };
