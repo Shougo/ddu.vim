@@ -1,4 +1,4 @@
-import { Item, Context, DduOptions, SourceOptions } from "../types.ts";
+import { Context, DduOptions, Item, SourceOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type OnInitArguments<Params extends Record<string, unknown>> = {

@@ -12,7 +12,7 @@ function! ddu#start() abort
   endif
 
   call denops#plugin#wait('ddu')
-  call denops#request('ddu', 'start', [])
+  call denops#request('ddu', 'start', [{}])
 endfunction
 function! ddu#_init() abort
   if exists('g:ddu#_initialized')
@@ -48,4 +48,13 @@ function! ddu#_denops_running() abort
   return exists('g:loaded_denops')
         \ && denops#server#status() ==# 'running'
         \ && denops#plugin#is_loaded('ddu')
+endfunction
+
+function! ddu#do_action(name, items) abort
+  if ddu#_init()
+    return
+  endif
+
+  call denops#plugin#wait('ddu')
+  call denops#request('ddu', 'doAction', [a:name, a:items])
 endfunction

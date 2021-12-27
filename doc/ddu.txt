@@ -150,6 +150,12 @@ ddu#start({options})
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
 
+							*ddu#do_action()*
+ddu#do_action({name}, {items})
+		Do the {name} action for {items}.
+
+		Note: It is for creating UI interface.
+
 CUSTOM FUNCTIONS 					*ddu-custom-functions*
 
 							*ddu#custom#alias()*

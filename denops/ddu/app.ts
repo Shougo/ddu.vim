@@ -1,4 +1,12 @@
-import { batch, Denops, ensureObject, vars } from "./deps.ts";
+import {
+  batch,
+  Denops,
+  ensureArray,
+  ensureObject,
+  ensureString,
+  vars,
+} from "./deps.ts";
+import { DduItem } from "./types.ts";
 import { Ddu } from "./ddu.ts";
 
 type RegisterArg = {
@@ -19,22 +27,26 @@ export async function main(denops: Denops) {
     },
     setGlobal(arg1: unknown): Promise<void> {
       ensureObject(arg1);
+
       const options = arg1 as Record<string, unknown>;
       return Promise.resolve();
     },
     setBuffer(arg1: unknown, arg2: unknown): Promise<void> {
       ensureObject(arg1);
+
       const options = arg1 as Record<string, unknown>;
       const name = arg2 as string;
       return Promise.resolve();
     },
     patchGlobal(arg1: unknown): Promise<void> {
       ensureObject(arg1);
+
       const options = arg1 as Record<string, unknown>;
       return Promise.resolve();
     },
     patchBuffer(arg1: unknown, arg2: unknown): Promise<void> {
       ensureObject(arg1);
+
       const options = arg1 as Record<string, unknown>;
       const name = arg2 as string;
       return Promise.resolve();
@@ -46,7 +58,17 @@ export async function main(denops: Denops) {
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {
+      ensureObject(arg1);
       await ddu.start(denops);
+    },
+    async doAction(arg1: unknown, arg2: unknown): Promise<void> {
+      ensureString(arg1);
+      ensureArray(arg2);
+
+      const actionName = arg1 as string;
+      const items = arg2 as DduItem[];
+
+      await ddu.doAction(denops, actionName, items);
     },
   };
 

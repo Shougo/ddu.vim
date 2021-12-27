@@ -1,5 +1,5 @@
 import { assertEquals, Denops } from "./deps.ts";
-import { Item } from "./types.ts";
+import { DduItem, Item } from "./types.ts";
 import { Ui } from "../@ddu-uis/std.ts";
 import { Source } from "../@ddu-sources/file.ts";
 import { Filter } from "../@ddu-filters/matcher_substring.ts";
@@ -29,6 +29,15 @@ export class Ddu {
       denops: denops,
       items: filteredItems,
     });
+  }
+
+  async doAction(
+    denops: Denops,
+    actionName: string,
+    items: DduItem[],
+  ): Promise<void> {
+    console.log(actionName);
+    console.log(items);
   }
 }
 
