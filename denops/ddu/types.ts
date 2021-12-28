@@ -36,19 +36,19 @@ export type FilterOptions = {
 };
 
 export type Item<
-  UserData extends unknown = unknown,
+  ActionData extends unknown = unknown,
 > = {
   word: string;
   abbr?: string;
   menu?: string;
-  "user_data"?: UserData;
+  action?: ActionData;
 };
 
 // For internal type
-export type DduUserData = unknown;
+export type DduActionData = unknown;
 
 export type DduItem =
-  & Item<DduUserData>
+  & Item<DduActionData>
   & {
     matcherKey: string;
   };
