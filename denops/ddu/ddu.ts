@@ -42,12 +42,12 @@ export class Ddu {
       completeStr: "",
     });
     const dduItems = sourceItems.map((item: Item) => {
-      const matcherKey = new Map(Object.entries(item)).get(
-        sourceOptions.matcherKey,
-      );
+      const matcherKey = (sourceOptions.matcherKey in item)
+        ? (item as Record<string, string>)[sourceOptions.matcherKey]
+        : item.word;
       return {
         ...item,
-        matcherKey: matcherKey ? matcherKey as string : item.word,
+        matcherKey: matcherKey,
       };
     });
     const filteredItems = await this.filters["matcher_substring"].filter({
