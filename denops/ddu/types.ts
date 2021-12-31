@@ -21,8 +21,7 @@ export type DduOptions = {
 };
 
 export type UiOptions = {
-  // TODO: add options and remove placeholder
-  placeholder: void;
+  bufName: string;
 };
 
 export type SourceOptions = {
