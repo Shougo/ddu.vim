@@ -1,7 +1,9 @@
 import { BaseFilter, DduItem } from "../ddu/types.ts";
 import { Denops } from "../ddu/deps.ts";
 
-export class Filter extends BaseFilter<{}> {
+type Params = Record<never, never>;
+
+export class Filter extends BaseFilter<Params> {
   filter(args: {
     denops: Denops;
     completeStr: string;
@@ -12,7 +14,7 @@ export class Filter extends BaseFilter<{}> {
     ));
   }
 
-  params(): {} {
+  params(): Params {
     return {};
   }
 }

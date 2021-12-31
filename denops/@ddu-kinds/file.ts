@@ -6,8 +6,10 @@ type ActionData = {
   path: string;
 };
 
-export class Kind extends BaseKind<{}> {
-  actions: Record<string, (args: ActionArguments<{}>) => Promise<void>> = {
+type Params = Record<never, never>;
+
+export class Kind extends BaseKind<Params> {
+  actions: Record<string, (args: ActionArguments<Params>) => Promise<void>> = {
     open: async (args: { denops: Denops; items: DduItem[] }) => {
       for (const item of args.items) {
         const action = item?.action as ActionData;
@@ -17,7 +19,7 @@ export class Kind extends BaseKind<{}> {
     },
   };
 
-  params(): {} {
+  params(): Params {
     return {};
   }
 }

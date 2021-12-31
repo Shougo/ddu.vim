@@ -34,7 +34,7 @@ export abstract class BaseSource<
 
   apiVersion = 1;
 
-  kind: string = "base";
+  kind = "base";
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 

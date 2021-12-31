@@ -12,12 +12,12 @@ export type Custom = {
 
 export type Context = {
   // TODO: add options and remove placeholder
-  placeholder: void;
+  placeholder?: unknown;
 };
 
 export type DduOptions = {
   // TODO: add options and remove placeholder
-  placeholder: void;
+  placeholder?: unknown;
 };
 
 export type UiOptions = {
@@ -26,12 +26,12 @@ export type UiOptions = {
 
 export type SourceOptions = {
   // TODO: add options and remove placeholder
-  placeholder: void;
+  placeholder?: unknown;
 };
 
 export type FilterOptions = {
   // TODO: add options and remove placeholder
-  placeholder: void;
+  placeholder?: unknown;
 };
 
 export type KindOptions = {

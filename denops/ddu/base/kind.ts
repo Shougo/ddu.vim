@@ -1,11 +1,12 @@
-import { Context, DduItem, DduOptions } from "../types.ts";
+import { Context, DduItem, DduOptions, KindOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type ActionArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
-  context?: Context;
-  options?: DduOptions;
-  kindParams?: Params;
+  context: Context;
+  options: DduOptions;
+  kindOptions: KindOptions;
+  kindParams: Params;
   items: DduItem[];
 };
 
@@ -23,6 +24,11 @@ export abstract class BaseKind<
   abstract params(): Params;
 }
 
-export function defaultUiParams(): Record<string, unknown> {
+export function defaultKindOptions(): KindOptions {
+  return {
+    defaultAction: "",
+  };
+}
+export function defaultKindParams(): Record<string, unknown> {
   return {};
 }

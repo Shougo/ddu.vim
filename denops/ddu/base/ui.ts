@@ -3,6 +3,8 @@ import { Denops } from "../deps.ts";
 
 export type RedrawArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
+  uiOptions: UiOptions;
+  uiParams: Params;
   items: DduItem[];
 };
 
@@ -21,7 +23,7 @@ export abstract class BaseUi<
 
 export function defaultUiOptions(): UiOptions {
   return {
-    placeholder: undefined,
+    bufferName: "default",
   };
 }
 

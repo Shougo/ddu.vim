@@ -6,7 +6,9 @@ type ActionData = {
   path: string;
 };
 
-export class Source extends BaseSource<{}> {
+type Params = Record<never, never>;
+
+export class Source extends BaseSource<Params> {
   kind = "file";
 
   async gather(args: {
@@ -30,7 +32,7 @@ export class Source extends BaseSource<{}> {
     return tree(resolve(await fn.getcwd(args.denops) as string, String(dir)));
   }
 
-  params(): {} {
+  params(): Params {
     return {};
   }
 }

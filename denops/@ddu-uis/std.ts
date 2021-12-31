@@ -1,7 +1,9 @@
 import { BaseUi, DduItem } from "../ddu/types.ts";
 import { Denops, fn, vars } from "../ddu/deps.ts";
 
-export class Ui extends BaseUi<{}> {
+type Params = Record<never, never>;
+
+export class Ui extends BaseUi<Params> {
   async redraw(args: {
     denops: Denops;
     items: DduItem[];
@@ -21,7 +23,7 @@ export class Ui extends BaseUi<{}> {
     );
   }
 
-  params(): {} {
+  params(): Params {
     return {};
   }
 }
