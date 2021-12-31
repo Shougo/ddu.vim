@@ -17,7 +17,7 @@ export class Ui extends BaseUi<{}> {
     await args.denops.cmd(`buffer ${bufnr}`);
     await vars.b.set(args.denops, "ddu_ui_std_items", args.items);
     await args.denops.cmd(
-      "nnoremap <buffer><silent> <CR> <Cmd>call ddu#ui#std#do_action('open')<CR>",
+      "nnoremap <buffer><silent> <CR> <Cmd>call ddu#ui#std#do_action('default')<CR>",
     );
   }
 

@@ -45,6 +45,10 @@ export class Ddu {
     const kind = new Kind();
 
     // Call action
+    if (actionName == "default") {
+      // Use default action
+      actionName = "open";
+    }
     const action = kind.actions[actionName];
     await action({ denops: denops, items: items });
   }
