@@ -12,7 +12,8 @@ import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
 import { Ui } from "../@ddu-uis/std.ts";
-import { Source } from "../@ddu-sources/file.ts";
+import { Source as File } from "../@ddu-sources/file.ts";
+import { Source as FileRec } from "../@ddu-sources/file_rec.ts";
 import { Filter } from "../@ddu-filters/matcher_substring.ts";
 import { Kind } from "../@ddu-kinds/file.ts";
 
@@ -24,7 +25,8 @@ export class Ddu {
 
   constructor() {
     this.uis["std"] = new Ui();
-    this.sources["file"] = new Source();
+    this.sources["file"] = new File();
+    this.sources["file_rec"] = new FileRec();
     this.filters["matcher_substring"] = new Filter();
     this.kinds["file"] = new Kind();
   }
@@ -33,7 +35,7 @@ export class Ddu {
     denops: Denops,
   ): Promise<void> {
     const sourceOptions = defaultSourceOptions();
-    const sourceItems = await this.sources["file"].gather({
+    const sourceItems = await this.sources["file_rec"].gather({
       denops: denops,
       context: {},
       options: {},
