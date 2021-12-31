@@ -41,31 +41,44 @@ export class Ddu {
       sourceParams: defaultSourceParams(),
       completeStr: "",
     });
-    const dduItems = sourceItems.map((item: Item) => {
-      const matcherKey = (sourceOptions.matcherKey in item)
-        ? (item as Record<string, string>)[sourceOptions.matcherKey]
-        : item.word;
-      return {
-        ...item,
-        matcherKey: matcherKey,
-      };
-    });
-    const filteredItems = await this.filters["matcher_substring"].filter({
-      denops: denops,
-      context: {},
-      options: {},
-      sourceOptions: defaultSourceOptions(),
-      filterOptions: defaultFilterOptions(),
-      filterParams: defaultFilterParams(),
-      completeStr: "",
-      items: dduItems,
-    });
 
-    await this.uis["std"].redraw({
-      denops: denops,
-      uiOptions: defaultUiOptions(),
-      uiParams: defaultUiParams(),
-      items: filteredItems,
+    let dduItems: DduItem[] = [];
+
+    const reader = sourceItems.getReader();
+    reader.read().then(async ({done, value}) => {
+      if (!value || done) {
+        return;
+      }
+
+      const newItems = value.map((item: Item) => {
+        const matcherKey = (sourceOptions.matcherKey in item)
+          ? (item as Record<string, string>)[sourceOptions.matcherKey]
+          : item.word;
+          return {
+            ...item,
+            matcherKey: matcherKey,
+          };
+      });
+
+      dduItems = dduItems.concat(newItems);
+
+      const filteredItems = await this.filters["matcher_substring"].filter({
+        denops: denops,
+        context: {},
+        options: {},
+        sourceOptions: defaultSourceOptions(),
+        filterOptions: defaultFilterOptions(),
+        filterParams: defaultFilterParams(),
+        completeStr: "",
+        items: dduItems,
+      });
+
+      await this.uis["std"].redraw({
+        denops: denops,
+        uiOptions: defaultUiOptions(),
+        uiParams: defaultUiParams(),
+        items: filteredItems,
+      });
     });
   }
 

@@ -13,7 +13,7 @@ export class Source extends BaseSource<Params> {
 
   async gather(args: {
     denops: Denops;
-  }): Promise<Item<ActionData>[]> {
+  }): Promise<ReadableStream<Item<ActionData>[]>> {
     const tree = async (root: string) => {
       const items: Item<ActionData>[] = [];
       for await (const entry of Deno.readDir(root)) {
@@ -28,8 +28,16 @@ export class Source extends BaseSource<Params> {
       return items;
     };
 
-    const dir = ".";
-    return tree(resolve(await fn.getcwd(args.denops) as string, String(dir)));
+    return new ReadableStream({
+      async start(controller) {
+        const dir = ".";
+
+        controller.enqueue(
+          await tree(resolve(await fn.getcwd(args.denops) as string, String(dir))),
+        );
+        controller.close();
+      },
+    });
   }
 
   params(): Params {
