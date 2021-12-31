@@ -50,11 +50,11 @@ function! ddu#_denops_running() abort
         \ && denops#plugin#is_loaded('ddu')
 endfunction
 
-function! ddu#do_action(name, items) abort
+function! ddu#do_action(name, items, options) abort
   if ddu#_init()
     return
   endif
 
   call denops#plugin#wait('ddu')
-  call denops#request('ddu', 'doAction', [a:name, a:items])
+  call denops#request('ddu', 'doAction', [a:name, a:items, a:options])
 endfunction

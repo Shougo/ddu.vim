@@ -36,9 +36,11 @@ export class Ddu {
     denops: Denops,
     actionName: string,
     items: DduItem[],
+    options: unknown,
   ): Promise<void> {
     console.log(actionName);
     console.log(items);
+    console.log(options);
 
     const kind = new Kind();
 

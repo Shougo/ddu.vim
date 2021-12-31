@@ -61,14 +61,16 @@ export async function main(denops: Denops) {
       ensureObject(arg1);
       await ddu.start(denops);
     },
-    async doAction(arg1: unknown, arg2: unknown): Promise<void> {
+    async doAction(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
       ensureString(arg1);
       ensureArray(arg2);
+      ensureObject(arg3);
 
       const actionName = arg1 as string;
       const items = arg2 as DduItem[];
+      const options = arg3;
 
-      await ddu.doAction(denops, actionName, items);
+      await ddu.doAction(denops, actionName, items, options);
     },
   };
 
