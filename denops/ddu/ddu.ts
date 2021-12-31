@@ -32,20 +32,24 @@ export class Ddu {
   async start(
     denops: Denops,
   ): Promise<void> {
+    const sourceOptions = defaultSourceOptions();
     const sourceItems = await this.sources["file"].gather({
       denops: denops,
       context: {},
       options: {},
-      sourceOptions: defaultSourceOptions(),
+      sourceOptions: sourceOptions,
       sourceParams: defaultSourceParams(),
       completeStr: "",
     });
-    const dduItems = sourceItems.map((item: Item) => (
-      {
+    const dduItems = sourceItems.map((item: Item) => {
+      const matcherKey = new Map(Object.entries(item)).get(
+        sourceOptions.matcherKey,
+      );
+      return {
         ...item,
-        matcherKey: item.word,
-      }
-    ));
+        matcherKey: matcherKey ? matcherKey as string : item.word,
+      };
+    });
     const filteredItems = await this.filters["matcher_substring"].filter({
       denops: denops,
       context: {},

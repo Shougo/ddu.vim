@@ -47,7 +47,7 @@ export abstract class BaseSource<
 
 export function defaultSourceOptions(): SourceOptions {
   return {
-    placeholder: undefined,
+    matcherKey: "word",
   };
 }
 

@@ -25,8 +25,7 @@ export type UiOptions = {
 };
 
 export type SourceOptions = {
-  // TODO: add options and remove placeholder
-  placeholder?: unknown;
+  matcherKey: string;
 };
 
 export type FilterOptions = {
