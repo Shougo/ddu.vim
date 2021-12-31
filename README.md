@@ -122,7 +122,7 @@ call ddu#custom#patch_buffer('files', {
     \ })
 
 " Specify buffer name
-call ddu#start({'uiOptions': {'buffer_name': 'files'}})
+call ddu#start({'uiOptions': {'bufferName': 'files'}})
 ```
 
 See `:help ddu-options` for a complete list of options.

@@ -212,7 +212,7 @@ EXAMPLES						*ddu-examples*
 	    \ })
 	
 	" Specify buffer name
-	call ddu#start({'uiOptions': {'buffer_name': 'files'}})
+	call ddu#start({'uiOptions': {'bufferName': 'files'}})
 <
 
 ==============================================================================
