@@ -5,9 +5,9 @@ type Params = Record<never, never>;
 
 export class Ui extends BaseUi<Params> {
   async redraw(args: {
-    denops: Denops,
-    uiOptions: UiOptions,
-    items: DduItem[],
+    denops: Denops;
+    uiOptions: UiOptions;
+    items: DduItem[];
   }): Promise<void> {
     const bufferName = `ddu-std-${args.uiOptions.bufferName}`;
     let bufnr;

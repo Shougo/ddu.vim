@@ -38,7 +38,9 @@ export class Source extends BaseSource<Params> {
         const dir = ".";
 
         controller.enqueue(
-          await tree(resolve(await fn.getcwd(args.denops) as string, String(dir))),
+          await tree(
+            resolve(await fn.getcwd(args.denops) as string, String(dir)),
+          ),
         );
         controller.close();
       },

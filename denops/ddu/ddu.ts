@@ -5,6 +5,7 @@ import {
   BaseSource,
   BaseUi,
   DduItem,
+  defaultDduOptions,
   Item,
 } from "./types.ts";
 import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
@@ -34,54 +35,57 @@ export class Ddu {
   async start(
     denops: Denops,
   ): Promise<void> {
-    const sourceOptions = defaultSourceOptions();
-    const sourceItems = await this.sources["file_rec"].gather({
-      denops: denops,
-      context: {},
-      options: {},
-      sourceOptions: sourceOptions,
-      sourceParams: defaultSourceParams(),
-      completeStr: "",
-    });
-
+    const options = defaultDduOptions();
     let dduItems: DduItem[] = [];
 
-    const reader = sourceItems.getReader();
-    reader.read().then(async ({done, value}) => {
-      if (!value || done) {
-        return;
-      }
+    for (const sourceName of options.sources) {
+      const sourceOptions = defaultSourceOptions();
+      const sourceItems = await this.sources[sourceName].gather({
+        denops: denops,
+        context: {},
+        options: options,
+        sourceOptions: sourceOptions,
+        sourceParams: defaultSourceParams(),
+        completeStr: "",
+      });
 
-      const newItems = value.map((item: Item) => {
-        const matcherKey = (sourceOptions.matcherKey in item)
-          ? (item as Record<string, string>)[sourceOptions.matcherKey]
-          : item.word;
+      const reader = sourceItems.getReader();
+      reader.read().then(async ({ done, value }) => {
+        if (!value || done) {
+          return;
+        }
+
+        const newItems = value.map((item: Item) => {
+          const matcherKey = (sourceOptions.matcherKey in item)
+            ? (item as Record<string, string>)[sourceOptions.matcherKey]
+            : item.word;
           return {
             ...item,
             matcherKey: matcherKey,
           };
-      });
+        });
 
-      dduItems = dduItems.concat(newItems);
+        dduItems = dduItems.concat(newItems);
 
-      const filteredItems = await this.filters["matcher_substring"].filter({
-        denops: denops,
-        context: {},
-        options: {},
-        sourceOptions: defaultSourceOptions(),
-        filterOptions: defaultFilterOptions(),
-        filterParams: defaultFilterParams(),
-        completeStr: "",
-        items: dduItems,
-      });
+        const filteredItems = await this.filters["matcher_substring"].filter({
+          denops: denops,
+          context: {},
+          options: options,
+          sourceOptions: defaultSourceOptions(),
+          filterOptions: defaultFilterOptions(),
+          filterParams: defaultFilterParams(),
+          completeStr: "",
+          items: dduItems,
+        });
 
-      await this.uis["std"].redraw({
-        denops: denops,
-        uiOptions: defaultUiOptions(),
-        uiParams: defaultUiParams(),
-        items: filteredItems,
+        await this.uis["std"].redraw({
+          denops: denops,
+          uiOptions: defaultUiOptions(),
+          uiParams: defaultUiParams(),
+          items: filteredItems,
+        });
       });
-    });
+    }
   }
 
   async doAction(

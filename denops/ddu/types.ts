@@ -16,8 +16,7 @@ export type Context = {
 };
 
 export type DduOptions = {
-  // TODO: add options and remove placeholder
-  placeholder?: unknown;
+  sources: string[];
 };
 
 export type UiOptions = {
@@ -54,3 +53,9 @@ export type DduItem =
   & {
     matcherKey: string;
   };
+
+export function defaultDduOptions(): DduOptions {
+  return {
+    sources: ["file_rec"],
+  };
+}
