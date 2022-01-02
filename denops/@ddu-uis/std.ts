@@ -20,6 +20,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
+    await fn.deletebufline(args.denops, bufnr, 1, "$");
     await fn.setbufline(args.denops, bufnr, 1, args.items.map((c) => c.word));
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 0);
     await fn.setbufvar(args.denops, bufnr, "&modified", 0);
