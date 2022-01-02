@@ -17,6 +17,10 @@ export type Context = {
 
 export type DduOptions = {
   sources: string[];
+  filterOptions: Record<string, Partial<FilterOptions>>;
+  filterParams: Record<string, Partial<Record<string, unknown>>>;
+  sourceOptions: Record<SourceName, Partial<SourceOptions>>;
+  sourceParams: Record<SourceName, Partial<Record<string, unknown>>>;
 };
 
 export type UiOptions = {
@@ -53,9 +57,3 @@ export type DduItem =
   & {
     matcherKey: string;
   };
-
-export function defaultDduOptions(): DduOptions {
-  return {
-    sources: ["file_rec"],
-  };
-}

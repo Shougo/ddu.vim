@@ -6,8 +6,9 @@ import {
   ensureString,
   vars,
 } from "./deps.ts";
-import { DduItem } from "./types.ts";
+import { DduItem, DduOptions } from "./types.ts";
 import { Ddu } from "./ddu.ts";
+import { ContextBuilder } from "./context.ts";
 
 type RegisterArg = {
   path: string;
@@ -17,18 +18,14 @@ type RegisterArg = {
 
 export async function main(denops: Denops) {
   const ddu: Ddu = new Ddu();
+  const contextBuilder = new ContextBuilder();
 
   denops.dispatcher = {
-    async register(arg1: unknown): Promise<void> {
-      const arg = arg1 as RegisterArg;
-    },
-    alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
-      return Promise.resolve();
-    },
     setGlobal(arg1: unknown): Promise<void> {
       ensureObject(arg1);
 
       const options = arg1 as Record<string, unknown>;
+      contextBuilder.setGlobal(options);
       return Promise.resolve();
     },
     setBuffer(arg1: unknown, arg2: unknown): Promise<void> {
@@ -36,12 +33,14 @@ export async function main(denops: Denops) {
 
       const options = arg1 as Record<string, unknown>;
       const name = arg2 as string;
+      contextBuilder.setBuffer(name, options);
       return Promise.resolve();
     },
     patchGlobal(arg1: unknown): Promise<void> {
       ensureObject(arg1);
 
       const options = arg1 as Record<string, unknown>;
+      contextBuilder.patchGlobal(options);
       return Promise.resolve();
     },
     patchBuffer(arg1: unknown, arg2: unknown): Promise<void> {
@@ -49,17 +48,21 @@ export async function main(denops: Denops) {
 
       const options = arg1 as Record<string, unknown>;
       const name = arg2 as string;
+      contextBuilder.patchBuffer(name, options);
       return Promise.resolve();
     },
-    getGlobal(): Promise<void> {
-      return Promise.resolve();
+    getGlobal(): Promise<Partial<DduOptions>> {
+      return Promise.resolve(contextBuilder.getGlobal());
     },
-    getBuffer(): Promise<void> {
-      return Promise.resolve();
+    getBuffer(): Promise<Partial<DduOptions>> {
+      return Promise.resolve(contextBuilder.getBuffer());
     },
     async start(arg1: unknown): Promise<void> {
       ensureObject(arg1);
-      await ddu.start(denops);
+
+      const userOptions = arg1 as Record<string, unknown>;
+      const options = contextBuilder.get(userOptions);
+      await ddu.start(denops, options);
     },
     async doAction(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
       ensureString(arg1);

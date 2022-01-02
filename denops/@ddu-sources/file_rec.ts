@@ -11,9 +11,9 @@ type Params = Record<never, never>;
 export class Source extends BaseSource<Params> {
   kind = "file";
 
-  async gather(args: {
+  gather(args: {
     denops: Denops;
-  }): Promise<ReadableStream<Item<ActionData>[]>> {
+  }): ReadableStream<Item<ActionData>[]> {
     const tree = async (root: string) => {
       let items: Item<ActionData>[] = [];
       for await (const entry of Deno.readDir(root)) {

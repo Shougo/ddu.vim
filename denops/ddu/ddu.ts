@@ -5,9 +5,10 @@ import {
   BaseSource,
   BaseUi,
   DduItem,
-  defaultDduOptions,
+  DduOptions,
   Item,
 } from "./types.ts";
+import { defaultDduOptions } from "./context.ts";
 import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
 import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
@@ -34,8 +35,8 @@ export class Ddu {
 
   async start(
     denops: Denops,
+    options: DduOptions,
   ): Promise<void> {
-    const options = defaultDduOptions();
     let dduItems: DduItem[] = [];
 
     for (const sourceName of options.sources) {
@@ -107,7 +108,7 @@ export class Ddu {
     await action({
       denops: denops,
       context: {},
-      options: {},
+      options: defaultDduOptions(),
       kindOptions: defaultKindOptions(),
       kindParams: defaultKindParams(),
       items: items,

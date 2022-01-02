@@ -6,13 +6,13 @@
 
 let s:root_dir = fnamemodify(expand('<sfile>'), ':h:h')
 
-function! ddu#start() abort
+function! ddu#start(...) abort
   if ddu#_init()
     return
   endif
 
   call denops#plugin#wait('ddu')
-  call denops#request('ddu', 'start', [{}])
+  call denops#request('ddu', 'start', [get(a:000, 0, {})])
 endfunction
 function! ddu#_init() abort
   if exists('g:ddu#_initialized')

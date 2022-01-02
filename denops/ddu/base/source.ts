@@ -40,7 +40,7 @@ export abstract class BaseSource<
 
   abstract gather(
     {}: GatherArguments<Params>,
-  ): Promise<ReadableStream<Item<UserData>[]>>;
+  ): ReadableStream<Item<UserData>[]>;
 
   abstract params(): Params;
 }
