@@ -35,11 +35,10 @@ export class Source extends BaseSource<Params> {
 
     return new ReadableStream({
       async start(controller) {
-        const dir = ".";
+        const dir = await fn.getcwd(args.denops) as string;
 
         controller.enqueue(
-          await tree(
-            resolve(await fn.getcwd(args.denops) as string, String(dir)),
+          await tree(resolve(dir, dir),
           ),
         );
         controller.close();

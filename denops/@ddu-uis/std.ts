@@ -19,10 +19,15 @@ export class Ui extends BaseUi<Params> {
       await fn.bufload(args.denops, bufnr);
     }
 
-    await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
     await fn.setbufvar(args.denops, bufnr, "&filetype", "ddu-std");
+
+    await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
     await fn.deletebufline(args.denops, bufnr, 1, "$");
-    await fn.setbufline(args.denops, bufnr, 1, args.items.map((c) => c.word));
+
+    // Note: Use only 1000 items
+    const items = args.items.slice(0, 1000);
+    await fn.setbufline(args.denops, bufnr, 1, items.map((c) => c.word));
+
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 0);
     await fn.setbufvar(args.denops, bufnr, "&modified", 0);
 
