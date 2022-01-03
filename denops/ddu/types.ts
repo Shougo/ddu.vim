@@ -16,11 +16,15 @@ export type Context = {
 };
 
 export type DduOptions = {
-  sources: string[];
   filterOptions: Record<string, Partial<FilterOptions>>;
   filterParams: Record<string, Partial<Record<string, unknown>>>;
+  kindOptions: Record<string, Partial<KindOptions>>;
+  kindParams: Record<string, Partial<Record<string, unknown>>>;
   sourceOptions: Record<SourceName, Partial<SourceOptions>>;
   sourceParams: Record<SourceName, Partial<Record<string, unknown>>>;
+  sources: string[];
+  uiOptions: Record<string, Partial<UiOptions>>;
+  uiParams: Record<string, Partial<Record<string, unknown>>>;
 };
 
 export type UiOptions = {

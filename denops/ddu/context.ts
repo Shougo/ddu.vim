@@ -31,11 +31,15 @@ export function foldMerge<T>(
 
 export function defaultDduOptions(): DduOptions {
   return {
-    sources: [],
     filterOptions: {},
     filterParams: {},
+    kindOptions: {},
+    kindParams: {},
     sourceOptions: {},
     sourceParams: {},
+    sources: [],
+    uiOptions: {},
+    uiParams: {},
   };
 }
 
@@ -125,12 +129,14 @@ class Custom {
   global: Partial<DduOptions> = {};
   buffer: Record<string, Partial<DduOptions>> = {};
 
-  get(options: Record<string, unknown>): DduOptions {
-    const buffer =
-      ("bufferName" in options && this.buffer[options.bufferName as string]) ||
-      {};
-    return foldMerge(mergeDduOptions, defaultDduOptions, [
+  get(userOptions: Record<string, unknown>): DduOptions {
+    const options = foldMerge(mergeDduOptions, defaultDduOptions, [
       this.global,
+      userOptions,
+    ]);
+    const bufferName = options.uiOptions.bufferName as string;
+    const buffer = this.buffer[bufferName] || {};
+    return foldMerge(mergeDduOptions, defaultDduOptions, [
       buffer,
       options,
     ]);
