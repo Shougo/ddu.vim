@@ -246,33 +246,36 @@ Deno.test("mergeDduOptions", () => {
       },
     })
     .patchBuffer("foo", {});
-  assertEquals(custom.get({
-    uiOptions: {
-      bufferName: "foo",
-    },
-  }), {
-    ...defaultDduOptions(),
-    filterOptions: {},
-    filterParams: {
-      "matcher_head": {
-        foo: 3,
+  assertEquals(
+    custom.get({
+      uiOptions: {
+        bufferName: "foo",
       },
-      "foo": {
-        max: 200,
+    }),
+    {
+      ...defaultDduOptions(),
+      filterOptions: {},
+      filterParams: {
+        "matcher_head": {
+          foo: 3,
+        },
+        "foo": {
+          max: 200,
+        },
       },
-    },
-    kindOptions: {},
-    kindParams: {},
-    sourceOptions: {},
-    sourceParams: {
-      "file": {
-        maxSize: 300,
+      kindOptions: {},
+      kindParams: {},
+      sourceOptions: {},
+      sourceParams: {
+        "file": {
+          maxSize: 300,
+        },
       },
+      sources: ["file", "foo"],
+      uiOptions: {
+        bufferName: "foo",
+      },
+      uiParams: {},
     },
-    sources: ["file", "foo"],
-    uiOptions: {
-      bufferName: "foo",
-    },
-    uiParams: {},
-  });
+  );
 });
