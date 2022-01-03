@@ -137,8 +137,9 @@ class Custom {
     const bufferName = options.uiOptions.bufferName as string;
     const buffer = this.buffer[bufferName] || {};
     return foldMerge(mergeDduOptions, defaultDduOptions, [
+      this.global,
       buffer,
-      options,
+      userOptions,
     ]);
   }
 
@@ -245,16 +246,13 @@ Deno.test("mergeDduOptions", () => {
       },
     })
     .patchBuffer("foo", {});
-  assertEquals(custom.get({}), {
-    ...defaultDduOptions(),
-    sources: ["file", "foo"],
-    sourceOptions: {},
-    filterOptions: {},
-    sourceParams: {
-      "file": {
-        maxSize: 300,
-      },
+  assertEquals(custom.get({
+    uiOptions: {
+      bufferName: "foo",
     },
+  }), {
+    ...defaultDduOptions(),
+    filterOptions: {},
     filterParams: {
       "matcher_head": {
         foo: 3,
@@ -263,40 +261,18 @@ Deno.test("mergeDduOptions", () => {
         max: 200,
       },
     },
-  });
-  assertEquals(custom.get({}), {
-    ...defaultDduOptions(),
-    sources: [],
+    kindOptions: {},
+    kindParams: {},
     sourceOptions: {},
-    filterOptions: {},
     sourceParams: {
       "file": {
         maxSize: 300,
       },
     },
-    filterParams: {
-      "matcher_head": {
-        foo: 2,
-      },
-    },
-  });
-  assertEquals(custom.get({}), {
-    ...defaultDduOptions(),
     sources: ["file", "foo"],
-    sourceOptions: {},
-    filterOptions: {},
-    sourceParams: {
-      "file": {
-        maxSize: 300,
-      },
+    uiOptions: {
+      bufferName: "foo",
     },
-    filterParams: {
-      "matcher_head": {
-        foo: 3,
-      },
-      "foo": {
-        max: 200,
-      },
-    },
+    uiParams: {},
   });
 });
