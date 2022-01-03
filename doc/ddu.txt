@@ -213,6 +213,12 @@ EXAMPLES						*ddu-examples*
 	
 	" Specify buffer name
 	call ddu#start({'uiOptions': {'bufferName': 'files'}})
+
+	autocmd FileType ddu-std call s:ddu_my_settings()
+	function! s:denite_my_settings() abort
+	  nnoremap <buffer><silent> <CR>
+	  \ <Cmd>call ddu#ui#std#do_action('default')<CR>
+	endfunction
 <
 
 ==============================================================================
