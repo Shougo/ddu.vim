@@ -22,17 +22,21 @@ export class Ui extends BaseUi<Params> {
     await fn.setbufvar(args.denops, bufnr, "&filetype", "ddu-std");
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
-    await fn.deletebufline(args.denops, bufnr, 1, "$");
 
     // Note: Use only 1000 items
     const items = args.items.slice(0, 1000);
-    await fn.setbufline(args.denops, bufnr, 1, items.map((c) => c.word));
 
-    await fn.setbufvar(args.denops, bufnr, "&modifiable", 0);
-    await fn.setbufvar(args.denops, bufnr, "&modified", 0);
+    const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
+    if (ids.length == 0) {
+      await args.denops.cmd(`buffer ${bufnr}`);
+    }
 
-    await args.denops.cmd(`buffer ${bufnr}`);
-    await vars.b.set(args.denops, "ddu_ui_std_items", items);
+    // Update main buffer
+    await args.denops.call("ddu#ui#std#update_buffer",
+                           bufnr, items.map((c) => c.word));
+
+    // Open filter window
+    await args.denops.call("ddu#ui#std#filter#_open", "");
   }
 
   params(): Params {

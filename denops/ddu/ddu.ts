@@ -39,6 +39,8 @@ export class Ddu {
     denops: Denops,
     options: DduOptions,
   ): Promise<void> {
+    this.items = [];
+
     for (const sourceName of options.sources) {
       const sourceOptions = defaultSourceOptions();
       const sourceItems = this.sources[sourceName].gather({
