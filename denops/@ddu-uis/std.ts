@@ -32,7 +32,7 @@ export class Ui extends BaseUi<Params> {
     await fn.setbufvar(args.denops, bufnr, "&modified", 0);
 
     await args.denops.cmd(`buffer ${bufnr}`);
-    await vars.b.set(args.denops, "ddu_ui_std_items", args.items);
+    await vars.b.set(args.denops, "ddu_ui_std_items", items);
   }
 
   params(): Params {

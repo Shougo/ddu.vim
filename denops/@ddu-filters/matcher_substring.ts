@@ -6,11 +6,11 @@ type Params = Record<never, never>;
 export class Filter extends BaseFilter<Params> {
   filter(args: {
     denops: Denops;
-    completeStr: string;
+    input: string;
     items: DduItem[];
   }): Promise<DduItem[]> {
     return Promise.resolve(args.items.filter(
-      (item) => item.matcherKey.includes(args.completeStr),
+      (item) => item.matcherKey.includes(args.input),
     ));
   }
 

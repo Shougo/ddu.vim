@@ -24,6 +24,8 @@ export class Ddu {
   private sources: Record<string, BaseSource<Record<string, unknown>>> = {};
   private filters: Record<string, BaseFilter<Record<string, unknown>>> = {};
   private kinds: Record<string, BaseKind<Record<string, unknown>>> = {};
+  private items: DduItem[] = [];
+  private options: DduOptions = defaultDduOptions();
 
   constructor() {
     this.uis["std"] = new Ui();
@@ -37,17 +39,15 @@ export class Ddu {
     denops: Denops,
     options: DduOptions,
   ): Promise<void> {
-    let dduItems: DduItem[] = [];
-
     for (const sourceName of options.sources) {
       const sourceOptions = defaultSourceOptions();
-      const sourceItems = await this.sources[sourceName].gather({
+      const sourceItems = this.sources[sourceName].gather({
         denops: denops,
         context: {},
         options: options,
         sourceOptions: sourceOptions,
         sourceParams: defaultSourceParams(),
-        completeStr: "",
+        input: "",
       });
 
       const reader = sourceItems.getReader();
@@ -66,27 +66,34 @@ export class Ddu {
           };
         });
 
-        dduItems = dduItems.concat(newItems);
+        this.items = this.items.concat(newItems);
 
-        const filteredItems = await this.filters["matcher_substring"].filter({
-          denops: denops,
-          context: {},
-          options: options,
-          sourceOptions: defaultSourceOptions(),
-          filterOptions: defaultFilterOptions(),
-          filterParams: defaultFilterParams(),
-          completeStr: "",
-          items: dduItems,
-        });
-
-        await this.uis["std"].redraw({
-          denops: denops,
-          uiOptions: defaultUiOptions(),
-          uiParams: defaultUiParams(),
-          items: filteredItems,
-        });
+        await this.narrow(denops, "");
       });
     }
+  }
+
+  async narrow(
+    denops: Denops,
+    input: string,
+  ): Promise<void> {
+    const filteredItems = await this.filters["matcher_substring"].filter({
+      denops: denops,
+      context: {},
+      options: this.options,
+      sourceOptions: defaultSourceOptions(),
+      filterOptions: defaultFilterOptions(),
+      filterParams: defaultFilterParams(),
+      input: input,
+      items: this.items,
+    });
+
+    await this.uis["std"].redraw({
+      denops: denops,
+      uiOptions: defaultUiOptions(),
+      uiParams: defaultUiParams(),
+      items: filteredItems,
+    });
   }
 
   async doAction(

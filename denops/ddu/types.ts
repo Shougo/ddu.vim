@@ -29,6 +29,7 @@ export type DduOptions = {
 
 export type UiOptions = {
   bufferName: string;
+  input: string;
 };
 
 export type SourceOptions = {

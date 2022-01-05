@@ -21,7 +21,7 @@ export type GatherArguments<Params extends Record<string, unknown>> = {
   options: DduOptions;
   sourceOptions: SourceOptions;
   sourceParams: Params;
-  completeStr: string;
+  input: string;
 };
 
 export abstract class BaseSource<

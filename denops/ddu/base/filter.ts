@@ -20,7 +20,7 @@ export type FilterArguments<Params extends Record<string, unknown>> = {
   sourceOptions: SourceOptions;
   filterOptions: FilterOptions;
   filterParams: Params;
-  completeStr: string;
+  input: string;
   items: DduItem[];
 };
 
