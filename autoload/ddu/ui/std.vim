@@ -11,6 +11,4 @@ function! ddu#ui#std#update_buffer(bufnr, items) abort
 
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
-
-  call setbufvar(a:bufnr, 'ddu_ui_std_items', a:items)
 endfunction

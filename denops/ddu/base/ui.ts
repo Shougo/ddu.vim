@@ -24,6 +24,7 @@ export abstract class BaseUi<
 export function defaultUiOptions(): UiOptions {
   return {
     bufferName: "default",
+    input: "",
   };
 }
 

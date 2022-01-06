@@ -1,5 +1,5 @@
 import { BaseUi, DduItem, UiOptions } from "../ddu/types.ts";
-import { Denops, fn, vars } from "../ddu/deps.ts";
+import { Denops, fn } from "../ddu/deps.ts";
 
 type Params = Record<never, never>;
 
@@ -32,8 +32,13 @@ export class Ui extends BaseUi<Params> {
     }
 
     // Update main buffer
-    await args.denops.call("ddu#ui#std#update_buffer",
-                           bufnr, items.map((c) => c.word));
+    await args.denops.call(
+      "ddu#ui#std#update_buffer",
+      bufnr,
+      items.map((c) => c.word),
+    );
+
+    await fn.setbufvar(args.denops, bufnr, "ddu_ui_std_items", items);
 
     // Open filter window
     await args.denops.call("ddu#ui#std#filter#_open", "");

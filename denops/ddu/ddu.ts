@@ -35,6 +35,7 @@ export class Ddu {
     this.kinds["file"] = new Kind();
   }
 
+  // deno-lint-ignore require-await
   async start(
     denops: Denops,
     options: DduOptions,
@@ -53,12 +54,15 @@ export class Ddu {
       });
 
       const reader = sourceItems.getReader();
-      reader.read().then(async ({ done, value }) => {
-        if (!value || done) {
+
+      const readChunk = async (
+        v: ReadableStreamReadResult<Item<unknown>[]>,
+      ) => {
+        if (!v.value || v.done) {
           return;
         }
 
-        const newItems = value.map((item: Item) => {
+        const newItems = v.value.map((item: Item) => {
           const matcherKey = (sourceOptions.matcherKey in item)
             ? (item as Record<string, string>)[sourceOptions.matcherKey]
             : item.word;
@@ -71,7 +75,11 @@ export class Ddu {
         this.items = this.items.concat(newItems);
 
         await this.narrow(denops, "");
-      });
+
+        reader.read().then(readChunk);
+      };
+
+      reader.read().then(readChunk);
     }
   }
 
