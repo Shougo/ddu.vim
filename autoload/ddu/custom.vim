@@ -8,16 +8,16 @@ function! ddu#custom#patch_global(key_or_dict, ...) abort
   let dict = s:normalize_key_or_dict(a:key_or_dict, get(a:000, 0, ''))
   call s:notify('patchGlobal', [dict])
 endfunction
-function! ddu#custom#patch_buffer(name, key_or_dict, ...) abort
+function! ddu#custom#patch_local(name, key_or_dict, ...) abort
   let dict = s:normalize_key_or_dict(a:key_or_dict, get(a:000, 0, ''))
-  call s:notify('patchBuffer', [dict, a:name])
+  call s:notify('patchLocal', [dict, a:name])
 endfunction
 
 function! ddu#custom#set_global(dict) abort
   call s:notify('setGlobal', [a:dict])
 endfunction
-function! ddu#custom#set_buffer(name, dict) abort
-  call s:notify('setBuffer', [a:dict, a:name])
+function! ddu#custom#set_local(name, dict) abort
+  call s:notify('setLocal', [a:dict, a:name])
 endfunction
 
 function! ddu#custom#alias(type, alias, base) abort
@@ -38,12 +38,12 @@ function! ddu#custom#get_global() abort
 
   return denops#request('ddu', 'getGlobal', [])
 endfunction
-function! ddu#custom#get_buffer() abort
+function! ddu#custom#get_local() abort
   if !ddu#_denops_running()
     return {}
   endif
 
-  return denops#request('ddu', 'getBuffer', [])
+  return denops#request('ddu', 'getLocal', [])
 endfunction
 
 function! s:notify(method, args) abort

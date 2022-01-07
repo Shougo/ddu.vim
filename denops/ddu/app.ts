@@ -28,12 +28,12 @@ export async function main(denops: Denops) {
       contextBuilder.setGlobal(options);
       return Promise.resolve();
     },
-    setBuffer(arg1: unknown, arg2: unknown): Promise<void> {
+    setLocal(arg1: unknown, arg2: unknown): Promise<void> {
       ensureObject(arg1);
 
       const options = arg1 as Record<string, unknown>;
       const name = arg2 as string;
-      contextBuilder.setBuffer(name, options);
+      contextBuilder.setLocal(name, options);
       return Promise.resolve();
     },
     patchGlobal(arg1: unknown): Promise<void> {
@@ -43,19 +43,19 @@ export async function main(denops: Denops) {
       contextBuilder.patchGlobal(options);
       return Promise.resolve();
     },
-    patchBuffer(arg1: unknown, arg2: unknown): Promise<void> {
+    patchLocal(arg1: unknown, arg2: unknown): Promise<void> {
       ensureObject(arg1);
 
       const options = arg1 as Record<string, unknown>;
       const name = arg2 as string;
-      contextBuilder.patchBuffer(name, options);
+      contextBuilder.patchLocal(name, options);
       return Promise.resolve();
     },
     getGlobal(): Promise<Partial<DduOptions>> {
       return Promise.resolve(contextBuilder.getGlobal());
     },
-    getBuffer(): Promise<Partial<DduOptions>> {
-      return Promise.resolve(contextBuilder.getBuffer());
+    getLocal(): Promise<Partial<DduOptions>> {
+      return Promise.resolve(contextBuilder.getLocal());
     },
     async start(arg1: unknown): Promise<void> {
       ensureObject(arg1);

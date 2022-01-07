@@ -113,16 +113,16 @@ call ddu#custom#patch_global({
 " Call default sources
 call ddu#start({})
 
-" Set buffer-name specific configuration
-call ddu#custom#patch_buffer('files', {
+" Set name specific configuration
+call ddu#custom#patch_local('files', {
     \ 'sources': [
     \   {'name': 'file', 'params': {}},
     \   {'name': 'file_old', 'params': {}},
     \ ],
     \ })
 
-" Specify buffer name
-call ddu#start({'uiOptions': {'bufferName': 'files'}})
+" Specify name
+call ddu#start({'name': 'files'})
 ```
 
 See `:help ddu-options` for a complete list of options.

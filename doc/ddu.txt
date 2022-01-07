@@ -91,6 +91,12 @@ filterParams
 
 		Default: {}
 
+						*ddu-option-name*
+name
+		Specify the name.
+
+		Default: "default"
+
 						*ddu-option-sourceOptions*
 sourceOptions
 		It is a dictionary that maps source names to its options.  The
@@ -174,19 +180,13 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
 		      \ 'foo': {'mark': 'foo'},
 		      \ })
 <
-						*ddu#custom#get_buffer()*
-ddu#custom#get_buffer()
-		Get current buffer specific options.
-
 						*ddu#custom#get_global()*
 ddu#custom#get_global()
 		Get global options.
 
-						*ddu#custom#patch_buffer()*
-ddu#custom#patch_buffer({buffer-name}, {option-name}, {value})
-ddu#custom#patch_buffer({buffer-name}, {dict})
-		Set local options for specific |ddu-option-ui-bufferName|.
-		The arguments are the same as for |ddu#custom#patch_global()|.
+						*ddu#custom#get_local()*
+ddu#custom#get_local()
+		Get current buffer specific options.
 
 						*ddu#custom#patch_global()*
 ddu#custom#patch_global({option-name}, {value})
@@ -194,6 +194,12 @@ ddu#custom#patch_global({dict})
 		Set {option-name} option to {value}.
 		If {dict} is available, the key is {option-name} and the value
 		is {value}. See |ddu-options| for available {option-name}.
+
+						*ddu#custom#patch_local()*
+ddu#custom#patch_local({buffer-name}, {option-name}, {value})
+ddu#custom#patch_local({buffer-name}, {dict})
+		Set local options for specific |ddu-option-name|.
+		The arguments are the same as for |ddu#custom#patch_global()|.
 
 
 ==============================================================================
@@ -208,7 +214,7 @@ EXAMPLES						*ddu-examples*
 	call ddu#start({})
 	
 	" Set buffer-name specific configuration
-	call ddu#custom#patch_buffer('files', {
+	call ddu#custom#patch_local('files', {
 	    \ 'sources': [
 	    \   {'name': 'file', 'params': {}},
 	    \   {'name': 'file_old', 'params': {}},
@@ -216,7 +222,7 @@ EXAMPLES						*ddu-examples*
 	    \ })
 	
 	" Specify buffer name
-	call ddu#start({'uiOptions': {'bufferName': 'files'}})
+	call ddu#start({'name': 'files'})
 
 	autocmd FileType ddu-std call s:ddu_my_settings()
 	function! s:denite_my_settings() abort
@@ -244,12 +250,6 @@ autoAction
 		When you select a item, it runs the action automatically.
 
 		Default: ""
-
-						*ddu-option-ui-bufferName*
-bufferName
-		Specify the name of ddu buffer.
-
-		Default: "default"
 
 						*ddu-ui-option-defaultAction*
 defaultAction

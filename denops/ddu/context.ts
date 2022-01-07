@@ -35,6 +35,7 @@ export function defaultDduOptions(): DduOptions {
     filterParams: {},
     kindOptions: {},
     kindParams: {},
+    name: "default",
     sourceOptions: {},
     sourceParams: {},
     sources: [],
@@ -127,18 +128,18 @@ function patchDduOptions(
 // Customization by end users
 class Custom {
   global: Partial<DduOptions> = {};
-  buffer: Record<string, Partial<DduOptions>> = {};
+  local: Record<string, Partial<DduOptions>> = {};
 
   get(userOptions: Record<string, unknown>): DduOptions {
     const options = foldMerge(mergeDduOptions, defaultDduOptions, [
       this.global,
       userOptions,
     ]);
-    const bufferName = options.uiOptions.bufferName as string;
-    const buffer = this.buffer[bufferName] || {};
+    const name = options.name;
+    const local = this.local[name] || {};
     return foldMerge(mergeDduOptions, defaultDduOptions, [
       this.global,
-      buffer,
+      local,
       userOptions,
     ]);
   }
@@ -147,17 +148,17 @@ class Custom {
     this.global = options;
     return this;
   }
-  setBuffer(bufferName: string, options: Partial<DduOptions>): Custom {
-    this.buffer[bufferName] = options;
+  setLocal(name: string, options: Partial<DduOptions>): Custom {
+    this.local[name] = options;
     return this;
   }
   patchGlobal(options: Partial<DduOptions>): Custom {
     this.global = patchDduOptions(this.global, options);
     return this;
   }
-  patchBuffer(bufferName: string, options: Partial<DduOptions>): Custom {
-    this.buffer[bufferName] = patchDduOptions(
-      this.buffer[bufferName] || {},
+  patchLocal(name: string, options: Partial<DduOptions>): Custom {
+    this.local[name] = patchDduOptions(
+      this.local[name] || {},
       options,
     );
     return this;
@@ -174,22 +175,22 @@ export class ContextBuilder {
   getGlobal(): Partial<DduOptions> {
     return this.custom.global;
   }
-  getBuffer(): Record<number, Partial<DduOptions>> {
-    return this.custom.buffer;
+  getLocal(): Record<number, Partial<DduOptions>> {
+    return this.custom.local;
   }
 
   setGlobal(options: Partial<DduOptions>) {
     this.custom.setGlobal(options);
   }
-  setBuffer(bufferName: string, options: Partial<DduOptions>) {
-    this.custom.setBuffer(bufferName, options);
+  setLocal(name: string, options: Partial<DduOptions>) {
+    this.custom.setLocal(name, options);
   }
 
   patchGlobal(options: Partial<DduOptions>) {
     this.custom.patchGlobal(options);
   }
-  patchBuffer(bufferName: string, options: Partial<DduOptions>) {
-    this.custom.patchBuffer(bufferName, options);
+  patchLocal(name: string, options: Partial<DduOptions>) {
+    this.custom.patchLocal(name, options);
   }
 }
 
@@ -234,7 +235,7 @@ Deno.test("mergeDduOptions", () => {
         },
       },
     })
-    .setBuffer("foo", {
+    .setLocal("foo", {
       sources: [{ name: "file" }, { name: "foo" }],
       filterParams: {
         "matcher_head": {
@@ -245,12 +246,10 @@ Deno.test("mergeDduOptions", () => {
         },
       },
     })
-    .patchBuffer("foo", {});
+    .patchLocal("foo", {});
   assertEquals(
     custom.get({
-      uiOptions: {
-        bufferName: "foo",
-      },
+      name: "foo",
     }),
     {
       ...defaultDduOptions(),
@@ -265,6 +264,7 @@ Deno.test("mergeDduOptions", () => {
       },
       kindOptions: {},
       kindParams: {},
+      name: "foo",
       sourceOptions: {},
       sourceParams: {
         "file": {
@@ -272,9 +272,7 @@ Deno.test("mergeDduOptions", () => {
         },
       },
       sources: [{ name: "file" }, { name: "foo" }],
-      uiOptions: {
-        bufferName: "foo",
-      },
+      uiOptions: {},
       uiParams: {},
     },
   );

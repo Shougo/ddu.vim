@@ -26,6 +26,7 @@ export type DduOptions = {
   filterParams: Record<string, Partial<Record<string, unknown>>>;
   kindOptions: Record<string, Partial<KindOptions>>;
   kindParams: Record<string, Partial<Record<string, unknown>>>;
+  name: string;
   sourceOptions: Record<SourceName, Partial<SourceOptions>>;
   sourceParams: Record<SourceName, Partial<Record<string, unknown>>>;
   sources: Source[];
@@ -34,7 +35,6 @@ export type DduOptions = {
 };
 
 export type UiOptions = {
-  bufferName: string;
   input: string;
 };
 

@@ -100,6 +100,7 @@ export class Ddu {
 
     await this.uis["std"].redraw({
       denops: denops,
+      options: this.options,
       uiOptions: defaultUiOptions(),
       uiParams: defaultUiParams(),
       items: filteredItems,

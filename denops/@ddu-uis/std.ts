@@ -1,4 +1,4 @@
-import { BaseUi, DduItem, UiOptions } from "../ddu/types.ts";
+import { BaseUi, DduItem, DduOptions, UiOptions } from "../ddu/types.ts";
 import { Denops, fn } from "../ddu/deps.ts";
 
 type Params = Record<never, never>;
@@ -6,10 +6,11 @@ type Params = Record<never, never>;
 export class Ui extends BaseUi<Params> {
   async redraw(args: {
     denops: Denops;
+    options: DduOptions;
     uiOptions: UiOptions;
     items: DduItem[];
   }): Promise<void> {
-    const bufferName = `ddu-std-${args.uiOptions.bufferName}`;
+    const bufferName = `ddu-std-${args.options.name}`;
     let bufnr;
     if (await fn.bufexists(args.denops, bufferName)) {
       bufnr = await fn.bufnr(args.denops, bufferName);
