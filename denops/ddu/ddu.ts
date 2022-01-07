@@ -42,9 +42,9 @@ export class Ddu {
   ): Promise<void> {
     this.items = [];
 
-    for (const sourceName of options.sources) {
+    for (const source of options.sources) {
       const sourceOptions = defaultSourceOptions();
-      const sourceItems = this.sources[sourceName].gather({
+      const sourceItems = this.sources[source.name].gather({
         denops: denops,
         context: {},
         options: options,

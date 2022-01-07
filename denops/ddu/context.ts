@@ -196,7 +196,7 @@ export class ContextBuilder {
 Deno.test("patchDduOptions", () => {
   const custom = (new Custom())
     .setGlobal({
-      sources: ["file"],
+      sources: [{ name: "file" }],
       sourceParams: {
         "file": {
           maxSize: 300,
@@ -204,7 +204,7 @@ Deno.test("patchDduOptions", () => {
       },
     })
     .patchGlobal({
-      sources: ["file", "baz"],
+      sources: [{ name: "file" }, { name: "baz" }],
       sourceParams: {
         "baz": {
           foo: "bar",
@@ -212,7 +212,7 @@ Deno.test("patchDduOptions", () => {
       },
     });
   assertEquals(custom.global, {
-    sources: ["file", "baz"],
+    sources: [{ name: "file" }, { name: "baz" }],
     sourceParams: {
       "file": {
         maxSize: 300,
@@ -227,7 +227,7 @@ Deno.test("patchDduOptions", () => {
 Deno.test("mergeDduOptions", () => {
   const custom = (new Custom())
     .setGlobal({
-      sources: ["file"],
+      sources: [{ name: "file" }],
       sourceParams: {
         "file": {
           maxSize: 300,
@@ -235,7 +235,7 @@ Deno.test("mergeDduOptions", () => {
       },
     })
     .setBuffer("foo", {
-      sources: ["file", "foo"],
+      sources: [{ name: "file" }, { name: "foo" }],
       filterParams: {
         "matcher_head": {
           foo: 3,
@@ -271,7 +271,7 @@ Deno.test("mergeDduOptions", () => {
           maxSize: 300,
         },
       },
-      sources: ["file", "foo"],
+      sources: [{ name: "file" }, { name: "foo" }],
       uiOptions: {
         bufferName: "foo",
       },

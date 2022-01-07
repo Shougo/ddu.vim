@@ -111,7 +111,11 @@ sourceParams
 sources
 		It is a list of elements which are formatted as:
 >
-		"{'name': {source-name}, 'params': {source-params}}"
+		{
+		    'name': {source-name},
+		    'options': {source-options},
+		    'params': {source-params},
+		}
 <
 		Items from sources with smaller indexes will have smaller
 		indexes.

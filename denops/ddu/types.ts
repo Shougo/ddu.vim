@@ -15,6 +15,12 @@ export type Context = {
   placeholder?: unknown;
 };
 
+export type Source = {
+  name: string;
+  options?: SourceOptions;
+  params?: Record<string, unknown>;
+};
+
 export type DduOptions = {
   filterOptions: Record<string, Partial<FilterOptions>>;
   filterParams: Record<string, Partial<Record<string, unknown>>>;
@@ -22,7 +28,7 @@ export type DduOptions = {
   kindParams: Record<string, Partial<Record<string, unknown>>>;
   sourceOptions: Record<SourceName, Partial<SourceOptions>>;
   sourceParams: Record<SourceName, Partial<Record<string, unknown>>>;
-  sources: string[];
+  sources: Source[];
   uiOptions: Record<string, Partial<UiOptions>>;
   uiParams: Record<string, Partial<Record<string, unknown>>>;
 };
