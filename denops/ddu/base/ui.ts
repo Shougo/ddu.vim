@@ -24,7 +24,7 @@ export abstract class BaseUi<
 
 export function defaultUiOptions(): UiOptions {
   return {
-    input: "",
+    defaultAction: "default",
   };
 }
 

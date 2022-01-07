@@ -91,6 +91,12 @@ filterParams
 
 		Default: {}
 
+							*ddu-option-input*
+input
+		Specify an initial narrowing text.
+
+		Default: ""
+
 						*ddu-option-name*
 name
 		Specify the name.
@@ -258,12 +264,6 @@ defaultAction
 		default actions.
 
 		Default: "default"
-
-							*ddu-ui-option-input*
-input
-		Specify an initial narrowing text.
-
-		Default: ""
 
 
 ------------------------------------------------------------------------------

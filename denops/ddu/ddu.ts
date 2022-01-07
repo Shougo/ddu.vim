@@ -41,13 +41,14 @@ export class Ddu {
     options: DduOptions,
   ): Promise<void> {
     this.items = [];
+    this.options = options;
 
     for (const source of options.sources) {
       const sourceOptions = defaultSourceOptions();
       const sourceItems = this.sources[source.name].gather({
         denops: denops,
         context: {},
-        options: options,
+        options: this.options,
         sourceOptions: sourceOptions,
         sourceParams: defaultSourceParams(),
         input: "",
@@ -74,7 +75,7 @@ export class Ddu {
 
         this.items = this.items.concat(newItems);
 
-        await this.narrow(denops, "");
+        await this.narrow(denops, this.options.input);
 
         reader.read().then(readChunk);
       };
