@@ -1,6 +1,7 @@
 let g:ddu#ui#std#_filter_bufnr = -1
+let g:ddu#ui#std#_filter_name = ''
 
-function! ddu#ui#std#filter#_open(input) abort
+function! ddu#ui#std#filter#_open(name, input) abort
   let ids = win_findbuf(g:ddu#ui#std#_filter_bufnr)
   if !empty(ids)
     call win_gotoid(ids[0])
@@ -30,6 +31,7 @@ function! ddu#ui#std#filter#_open(input) abort
   startinsert!
 
   let g:ddu#ui#std#_filter_prev_input = getline('.')
+  let g:ddu#ui#std#_filter_name = a:name
 endfunction
 
 function! s:init_buffer() abort
@@ -88,7 +90,7 @@ function! s:update() abort
 
   let g:ddu#ui#std#_filter_prev_input = input
 
-  call ddu#narrow(input)
+  call ddu#narrow(g:ddu#ui#std#_filter_name, input)
 endfunction
 
 function! s:quit(force_quit) abort

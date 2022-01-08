@@ -17,8 +17,15 @@ type RegisterArg = {
 };
 
 export async function main(denops: Denops) {
-  const ddu: Ddu = new Ddu();
+  const ddus: Record<string, Ddu> = {};
   const contextBuilder = new ContextBuilder();
+
+  const getDdu = (name: string) => {
+    if (!(name in ddus)) {
+      ddus[name] = new Ddu();
+    }
+    return ddus[name];
+  };
 
   denops.dispatcher = {
     setGlobal(arg1: unknown): Promise<void> {
@@ -62,23 +69,37 @@ export async function main(denops: Denops) {
 
       const userOptions = arg1 as Record<string, unknown>;
       const options = contextBuilder.get(userOptions);
+
+      const ddu = getDdu(options.name);
       await ddu.start(denops, options);
     },
-    async narrow(arg1: unknown): Promise<void> {
+    async narrow(arg1: unknown, arg2: unknown): Promise<void> {
       ensureString(arg1);
+      ensureString(arg2);
 
-      const input = arg1 as string;
+      const name = arg1 as string;
+      const input = arg2 as string;
+
+      const ddu = getDdu(name);
       await ddu.narrow(denops, input);
     },
-    async doAction(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
+    async doAction(
+      arg1: unknown,
+      arg2: unknown,
+      arg3: unknown,
+      arg4: unknown,
+    ): Promise<void> {
       ensureString(arg1);
-      ensureArray(arg2);
-      ensureObject(arg3);
+      ensureString(arg2);
+      ensureArray(arg3);
+      ensureObject(arg4);
 
-      const actionName = arg1 as string;
-      const items = arg2 as DduItem[];
-      const options = arg3;
+      const name = arg1 as string;
+      const actionName = arg2 as string;
+      const items = arg3 as DduItem[];
+      const options = arg4;
 
+      const ddu = getDdu(name);
       await ddu.doAction(denops, actionName, items, options);
     },
   };

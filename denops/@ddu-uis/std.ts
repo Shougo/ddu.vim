@@ -40,9 +40,14 @@ export class Ui extends BaseUi<Params> {
     );
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_std_items", items);
+    await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
 
     // Open filter window
-    await args.denops.call("ddu#ui#std#filter#_open", args.options.input);
+    await args.denops.call(
+      "ddu#ui#std#filter#_open",
+      args.options.name,
+      args.options.input,
+    );
   }
 
   params(): Params {
