@@ -1,6 +1,6 @@
 # ddu.vim
 
-Note: It is vaporware!!  You cannot use it yet.
+Note: It is alpha version!!  You should not use it yet.
 
 > Dark deno-powered UI framework for neovim/Vim8
 
