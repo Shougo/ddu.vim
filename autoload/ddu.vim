@@ -1,9 +1,3 @@
-"=============================================================================
-" FILE: ddu.vim
-" AUTHOR: Shougo Matsushita <Shougo.Matsu at gmail.com>
-" License: MIT license
-"=============================================================================
-
 function! ddu#start(...) abort
   call ddu#_request('start', [get(a:000, 0, {})])
 endfunction
