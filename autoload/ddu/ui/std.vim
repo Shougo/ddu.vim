@@ -1,8 +1,6 @@
-function! ddu#ui#std#do_action(name, ...) abort
-  let options = get(a:000, 0, {})
-  call ddu#do_action(
-        \ b:ddu_ui_name, a:name,
-        \ [b:ddu_ui_std_items[line('.') - 1]], options)
+function! ddu#ui#std#do_map(name, ...) abort
+  call ddu#ui_action(
+        \ b:ddu_ui_name, a:name, get(a:000, 0, {}))
 endfunction
 
 function! ddu#ui#std#update_buffer(bufnr, items) abort

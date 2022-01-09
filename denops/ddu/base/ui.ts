@@ -1,4 +1,4 @@
-import { DduItem, DduOptions, UiOptions } from "../types.ts";
+import { Context, DduItem, DduOptions, UiOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type RedrawArguments<Params extends Record<string, unknown>> = {
@@ -7,6 +7,15 @@ export type RedrawArguments<Params extends Record<string, unknown>> = {
   uiOptions: UiOptions;
   uiParams: Params;
   items: DduItem[];
+};
+
+export type ActionArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+  actionParams: unknown;
 };
 
 export abstract class BaseUi<
@@ -18,6 +27,9 @@ export abstract class BaseUi<
   apiVersion = 1;
 
   async redraw(_args: RedrawArguments<Params>): Promise<void> {}
+
+  actions: Record<string, (args: ActionArguments<Params>) => Promise<void>> =
+    {};
 
   abstract params(): Params;
 }

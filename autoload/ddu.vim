@@ -4,13 +4,11 @@ endfunction
 function! ddu#narrow(name, input) abort
   call ddu#_notify('narrow', [a:name, a:input])
 endfunction
-function! ddu#ui_action(name, action, options) abort
-  call ddu#_request('ddu', 'uiAction',
-        \ [a:name, a:action, a:options])
+function! ddu#ui_action(name, action, params) abort
+  call ddu#_request('uiAction', [a:name, a:action, a:params])
 endfunction
-function! ddu#do_action(name, action, items, options) abort
-  call ddu#_request('ddu', 'doAction',
-        \ [a:name, a:action, a:items, a:options])
+function! ddu#do_action(name, action, items, params) abort
+  call ddu#_request('doAction', [a:name, a:action, a:items, a:params])
 endfunction
 
 function! ddu#_request(name, args) abort

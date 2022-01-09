@@ -10,12 +10,6 @@ import { DduItem, DduOptions } from "./types.ts";
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder } from "./context.ts";
 
-type RegisterArg = {
-  path: string;
-  name: string;
-  type: "source" | "filter";
-};
-
 export async function main(denops: Denops) {
   const ddus: Record<string, Ddu> = {};
   const contextBuilder = new ContextBuilder();
@@ -83,6 +77,22 @@ export async function main(denops: Denops) {
       const ddu = getDdu(name);
       await ddu.narrow(denops, input);
     },
+    async uiAction(
+      arg1: unknown,
+      arg2: unknown,
+      arg3: unknown,
+    ): Promise<void> {
+      ensureString(arg1);
+      ensureString(arg2);
+      ensureObject(arg3);
+
+      const name = arg1 as string;
+      const actionName = arg2 as string;
+      const params = arg3;
+
+      const ddu = getDdu(name);
+      await ddu.uiAction(denops, actionName, params);
+    },
     async doAction(
       arg1: unknown,
       arg2: unknown,
@@ -97,10 +107,10 @@ export async function main(denops: Denops) {
       const name = arg1 as string;
       const actionName = arg2 as string;
       const items = arg3 as DduItem[];
-      const options = arg4;
+      const params = arg4;
 
       const ddu = getDdu(name);
-      await ddu.doAction(denops, actionName, items, options);
+      await ddu.doAction(denops, actionName, items, params);
     },
   };
 

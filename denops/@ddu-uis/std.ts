@@ -1,9 +1,17 @@
 import { BaseUi, DduItem, DduOptions, UiOptions } from "../ddu/types.ts";
 import { Denops, fn } from "../ddu/deps.ts";
+import { ActionArguments } from "../ddu/base/ui.ts";
+
+type DoActionParams = {
+  name?: string;
+  params?: unknown;
+};
 
 type Params = Record<never, never>;
 
 export class Ui extends BaseUi<Params> {
+  private items: DduItem[] = [];
+
   async redraw(args: {
     denops: Denops;
     options: DduOptions;
@@ -39,7 +47,7 @@ export class Ui extends BaseUi<Params> {
       items.map((c) => c.word),
     );
 
-    await fn.setbufvar(args.denops, bufnr, "ddu_ui_std_items", items);
+    this.items = items;
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
 
     // Open filter window
@@ -49,6 +57,25 @@ export class Ui extends BaseUi<Params> {
       args.options.input,
     );
   }
+
+  actions: Record<string, (args: ActionArguments<Params>) => Promise<void>> = {
+    doAction: async (args: {
+      denops: Denops;
+      options: DduOptions;
+      actionParams: unknown;
+    }) => {
+      const idx = (await fn.line(args.denops, ".")) - 1;
+      const item = this.items[idx];
+      const params = args.actionParams as DoActionParams;
+      await args.denops.call(
+        "ddu#do_action",
+        args.options.name,
+        params.name ?? "default",
+        [item],
+        params.params ?? {},
+      );
+    },
+  };
 
   params(): Params {
     return {};

@@ -121,17 +121,28 @@ export class Ddu {
     });
   }
 
+  async uiAction(
+    denops: Denops,
+    actionName: string,
+    params: unknown,
+  ): Promise<void> {
+    const action = this.uis["std"].actions[actionName];
+    await action({
+      denops: denops,
+      context: {},
+      options: defaultDduOptions(),
+      uiOptions: defaultUiOptions(),
+      uiParams: defaultUiParams(),
+      actionParams: params,
+    });
+  }
+
   async doAction(
     denops: Denops,
     actionName: string,
     items: DduItem[],
-    options: unknown,
+    params: unknown,
   ): Promise<void> {
-    console.log(actionName);
-    console.log(items);
-    console.log(options);
-
-    // Call action
     if (actionName == "default") {
       // Use default action
       actionName = "open";
@@ -143,6 +154,7 @@ export class Ddu {
       options: defaultDduOptions(),
       kindOptions: defaultKindOptions(),
       kindParams: defaultKindParams(),
+      actionParams: params,
       items: items,
     });
   }

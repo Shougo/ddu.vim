@@ -7,6 +7,7 @@ export type ActionArguments<Params extends Record<string, unknown>> = {
   options: DduOptions;
   kindOptions: KindOptions;
   kindParams: Params;
+  actionParams: unknown;
   items: DduItem[];
 };
 
