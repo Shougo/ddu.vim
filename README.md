@@ -123,6 +123,9 @@ call ddu#custom#patch_local('files', {
 
 " Specify name
 call ddu#start({'name': 'files'})
+
+" Specify source with params
+call ddu#start([{'name': 'file_rec', 'params': {'path': expand('~')}}])
 ```
 
 See `:help ddu-options` for a complete list of options.

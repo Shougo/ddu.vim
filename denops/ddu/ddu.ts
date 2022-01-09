@@ -8,6 +8,7 @@ import {
   DduOptions,
   Item,
   SourceOptions,
+  UserSource,
 } from "./types.ts";
 import {
   defaultDduOptions,
@@ -42,14 +43,21 @@ export class Ddu {
     denops: Denops,
     options: DduOptions,
   ): Promise<void> {
-    await this.autoload(denops, ["file", "file_rec"], ["matcher_substring"]);
+    await this.autoload(denops, options.sources.map((s) => s.name), [
+      "matcher_substring",
+    ]);
 
     this.items = [];
     this.options = options;
 
     for (const userSource of options.sources) {
       const source = this.sources[userSource.name];
-      const [sourceOptions, sourceParams] = sourceArgs(options, source);
+      const [sourceOptions, sourceParams] = sourceArgs(
+        options,
+        userSource,
+        source,
+      );
+      console.log(sourceParams);
       const sourceItems = source.gather({
         denops: denops,
         context: {},
@@ -242,20 +250,22 @@ function sourceArgs<
   UserData extends unknown,
 >(
   options: DduOptions,
+  userSource: UserSource,
   source: BaseSource<Params, UserData>,
 ): [SourceOptions, Record<string, unknown>] {
   const o = foldMerge(
     mergeSourceOptions,
     defaultSourceOptions,
-    [options.sourceOptions["_"], options.sourceOptions[source.name]],
+    [
+      options.sourceOptions["_"],
+      options.sourceOptions[source.name],
+      userSource.options,
+    ],
   );
   const p = foldMerge(mergeSourceParams, defaultSourceParams, [
     source.params ? source.params() : null,
     options.sourceParams[source.name],
+    userSource.params,
   ]);
   return [o, p];
 }
-
-Deno.test("test", () => {
-  assertEquals(1, 1);
-});
