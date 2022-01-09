@@ -269,3 +269,7 @@ function sourceArgs<
   ]);
   return [o, p];
 }
+
+Deno.test("test", () => {
+  assertEquals(1, 1);
+});
