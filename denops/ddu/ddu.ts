@@ -1,4 +1,4 @@
-import { assertEquals, Denops } from "./deps.ts";
+import { assertEquals, Denops, fn, op, parse, toFileUrl } from "./deps.ts";
 import {
   BaseFilter,
   BaseKind,
@@ -7,16 +7,19 @@ import {
   DduItem,
   DduOptions,
   Item,
+  SourceOptions,
 } from "./types.ts";
-import { defaultDduOptions } from "./context.ts";
+import {
+  defaultDduOptions,
+  foldMerge,
+  mergeSourceOptions,
+  mergeSourceParams,
+} from "./context.ts";
 import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
 import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
 import { Ui } from "../@ddu-uis/std.ts";
-import { Source as File } from "../@ddu-sources/file.ts";
-import { Source as FileRec } from "../@ddu-sources/file_rec.ts";
-import { Filter } from "../@ddu-filters/matcher_substring.ts";
 import { Kind } from "../@ddu-kinds/file.ts";
 
 export class Ddu {
@@ -24,33 +27,35 @@ export class Ddu {
   private sources: Record<string, BaseSource<Record<string, unknown>>> = {};
   private filters: Record<string, BaseFilter<Record<string, unknown>>> = {};
   private kinds: Record<string, BaseKind<Record<string, unknown>>> = {};
+  private aliasSources: Record<string, string> = {};
+  private aliasFilters: Record<string, string> = {};
+  private checkPaths: Record<string, boolean> = {};
   private items: DduItem[] = [];
   private options: DduOptions = defaultDduOptions();
 
   constructor() {
     this.uis["std"] = new Ui();
-    this.sources["file"] = new File();
-    this.sources["file_rec"] = new FileRec();
-    this.filters["matcher_substring"] = new Filter();
     this.kinds["file"] = new Kind();
   }
 
-  // deno-lint-ignore require-await
   async start(
     denops: Denops,
     options: DduOptions,
   ): Promise<void> {
+    await this.autoload(denops, ["file", "file_rec"], ["matcher_substring"]);
+
     this.items = [];
     this.options = options;
 
-    for (const source of options.sources) {
-      const sourceOptions = defaultSourceOptions();
-      const sourceItems = this.sources[source.name].gather({
+    for (const userSource of options.sources) {
+      const source = this.sources[userSource.name];
+      const [sourceOptions, sourceParams] = sourceArgs(options, source);
+      const sourceItems = source.gather({
         denops: denops,
         context: {},
         options: this.options,
         sourceOptions: sourceOptions,
-        sourceParams: defaultSourceParams(),
+        sourceParams: sourceParams,
         input: "",
       });
 
@@ -133,6 +138,122 @@ export class Ddu {
       items: items,
     });
   }
+
+  async registerSource(path: string, name: string) {
+    this.checkPaths[path] = true;
+
+    const mod = await import(toFileUrl(path).href);
+
+    const addSource = (name: string) => {
+      const source = new mod.Source();
+      source.name = name;
+      this.sources[source.name] = source;
+    };
+
+    addSource(name);
+
+    // Check alias
+    const aliases = Object.keys(this.aliasSources).filter(
+      (k) => this.aliasSources[k] == name,
+    );
+    for (const alias of aliases) {
+      addSource(alias);
+    }
+  }
+
+  async registerFilter(path: string, name: string) {
+    this.checkPaths[path] = true;
+
+    const mod = await import(toFileUrl(path).href);
+
+    const addFilter = (name: string) => {
+      const filter = new mod.Filter();
+      filter.name = name;
+      this.filters[filter.name] = filter;
+    };
+
+    addFilter(name);
+
+    // Check alias
+    const aliases = Object.keys(this.aliasFilters).filter(
+      (k) => this.aliasFilters[k] == name,
+    );
+    for (const alias of aliases) {
+      addFilter(alias);
+    }
+  }
+
+  async autoload(
+    denops: Denops,
+    sourceNames: string[],
+    filterNames: string[],
+  ): Promise<string[]> {
+    if (sourceNames.length == 0 && filterNames.length == 0) {
+      return Promise.resolve([]);
+    }
+
+    const runtimepath = await op.runtimepath.getGlobal(denops);
+
+    async function globpath(
+      searches: string[],
+      files: string[],
+    ): Promise<string[]> {
+      let paths: string[] = [];
+      for (const search of searches) {
+        for (const file of files) {
+          paths = paths.concat(
+            await fn.globpath(
+              denops,
+              runtimepath,
+              search + file + ".ts",
+              1,
+              1,
+            ) as string[],
+          );
+        }
+      }
+
+      return Promise.resolve(paths);
+    }
+
+    const sources = (await globpath(
+      ["denops/@ddu-sources/"],
+      sourceNames.map((file) => this.aliasSources[file] ?? file),
+    )).filter((path) => !(path in this.checkPaths));
+
+    const filters = (await globpath(
+      ["denops/@ddu-filters/"],
+      filterNames.map((file) => this.aliasFilters[file] ?? file),
+    )).filter((path) => !(path in this.checkPaths));
+
+    await Promise.all(sources.map(async (path) => {
+      await this.registerSource(path, parse(path).name);
+    }));
+    await Promise.all(filters.map(async (path) => {
+      await this.registerFilter(path, parse(path).name);
+    }));
+
+    return Promise.resolve(sources.concat(filters));
+  }
+}
+
+function sourceArgs<
+  Params extends Record<string, unknown>,
+  UserData extends unknown,
+>(
+  options: DduOptions,
+  source: BaseSource<Params, UserData>,
+): [SourceOptions, Record<string, unknown>] {
+  const o = foldMerge(
+    mergeSourceOptions,
+    defaultSourceOptions,
+    [options.sourceOptions["_"], options.sourceOptions[source.name]],
+  );
+  const p = foldMerge(mergeSourceParams, defaultSourceParams, [
+    source.params ? source.params() : null,
+    options.sourceParams[source.name],
+  ]);
+  return [o, p];
 }
 
 Deno.test("test", () => {
