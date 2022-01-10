@@ -13,19 +13,19 @@ endfunction
 
 function! ddu#_request(name, args) abort
   if ddu#_init()
-    return
+    return {}
   endif
 
   call denops#plugin#wait('ddu')
-  call denops#request('ddu', a:name, a:args)
+  return denops#request('ddu', a:name, a:args)
 endfunction
 function! ddu#_notify(name, args) abort
   if ddu#_init()
-    return
+    return {}
   endif
 
   call denops#plugin#wait('ddu')
-  call denops#notify('ddu', a:name, a:args)
+  return denops#notify('ddu', a:name, a:args)
 endfunction
 
 function! ddu#_init() abort

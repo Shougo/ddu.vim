@@ -8,7 +8,7 @@ import {
 } from "./deps.ts";
 import { DduItem, DduOptions } from "./types.ts";
 import { Ddu } from "./ddu.ts";
-import { ContextBuilder } from "./context.ts";
+import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
 export async function main(denops: Denops) {
   const ddus: Record<string, Ddu> = {};
@@ -57,6 +57,9 @@ export async function main(denops: Denops) {
     },
     getLocal(): Promise<Partial<DduOptions>> {
       return Promise.resolve(contextBuilder.getLocal());
+    },
+    getDefaultOptions(): Promise<Partial<DduOptions>> {
+      return Promise.resolve(defaultDduOptions());
     },
     async start(arg1: unknown): Promise<void> {
       ensureObject(arg1);

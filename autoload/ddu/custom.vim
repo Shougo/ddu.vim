@@ -26,18 +26,13 @@ endfunction
 
 " This should be called manually, so wait until dduReady by the user himself.
 function! ddu#custom#get_global() abort
-  if !ddu#_denops_running()
-    return {}
-  endif
-
-  return denops#request('ddu', 'getGlobal', [])
+  return ddu#_request('getGlobal', [])
 endfunction
 function! ddu#custom#get_local() abort
-  if !ddu#_denops_running()
-    return {}
-  endif
-
-  return denops#request('ddu', 'getLocal', [])
+  return ddu#_request('getLocal', [])
+endfunction
+function! ddu#custom#get_default_options() abort
+  return ddu#_request('getDefaultOptions', [])
 endfunction
 
 function! s:notify(method, args) abort

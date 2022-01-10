@@ -57,7 +57,6 @@ export class Ddu {
         userSource,
         source,
       );
-      console.log(sourceParams);
       const sourceItems = source.gather({
         denops: denops,
         context: {},
