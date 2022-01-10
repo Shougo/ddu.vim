@@ -402,6 +402,11 @@ A: Because users can customize sources perfectly.  If a source has the
 default, users have to check them.  It increases configuration cost.
 The config should work as users config.
 
+Q: I want to use commands like denite.nvim
+
+A: You can use ddu-commands.vim.
+https://github.com/Shougo/ddu-commands.vim
+
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
