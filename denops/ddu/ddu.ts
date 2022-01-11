@@ -43,9 +43,7 @@ export class Ddu {
     denops: Denops,
     options: DduOptions,
   ): Promise<void> {
-    await this.autoload(denops, options.sources.map((s) => s.name), [
-      "matcher_substring",
-    ]);
+    await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
     this.items = [];
     this.options = options;
@@ -100,6 +98,8 @@ export class Ddu {
     denops: Denops,
     input: string,
   ): Promise<void> {
+    await this.autoload(denops, "filter", ["matcher_substring"]);
+
     const filteredItems = await this.filters["matcher_substring"].filter({
       denops: denops,
       context: {},
@@ -204,10 +204,10 @@ export class Ddu {
 
   async autoload(
     denops: Denops,
-    sourceNames: string[],
-    filterNames: string[],
+    type: "source" | "filter",
+    names: string[],
   ): Promise<string[]> {
-    if (sourceNames.length == 0 && filterNames.length == 0) {
+    if (names.length == 0) {
       return Promise.resolve([]);
     }
 
@@ -235,24 +235,31 @@ export class Ddu {
       return Promise.resolve(paths);
     }
 
-    const sources = (await globpath(
-      ["denops/@ddu-sources/"],
-      sourceNames.map((file) => this.aliasSources[file] ?? file),
-    )).filter((path) => !(path in this.checkPaths));
+    if (type == "source") {
+      const paths = (await globpath(
+        ["denops/@ddu-sources/"],
+        names.map((file) => this.aliasSources[file] ?? file),
+      )).filter((path) => !(path in this.checkPaths));
 
-    const filters = (await globpath(
-      ["denops/@ddu-filters/"],
-      filterNames.map((file) => this.aliasFilters[file] ?? file),
-    )).filter((path) => !(path in this.checkPaths));
+      await Promise.all(paths.map(async (path) => {
+        await this.registerSource(path, parse(path).name);
+      }));
 
-    await Promise.all(sources.map(async (path) => {
-      await this.registerSource(path, parse(path).name);
-    }));
-    await Promise.all(filters.map(async (path) => {
-      await this.registerFilter(path, parse(path).name);
-    }));
+      return Promise.resolve(paths);
+    } else if (type == "filter") {
+      const paths = (await globpath(
+        ["denops/@ddu-filters/"],
+        names.map((file) => this.aliasFilters[file] ?? file),
+      )).filter((path) => !(path in this.checkPaths));
 
-    return Promise.resolve(sources.concat(filters));
+      await Promise.all(paths.map(async (path) => {
+        await this.registerFilter(path, parse(path).name);
+      }));
+
+      return Promise.resolve(paths);
+    }
+
+    return Promise.resolve([]);
   }
 }
 
