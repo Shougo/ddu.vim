@@ -20,8 +20,6 @@ import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
 import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
-import { Ui } from "../@ddu-uis/std.ts";
-import { Kind } from "../@ddu-kinds/file.ts";
 
 export class Ddu {
   private uis: Record<string, BaseUi<Record<string, unknown>>> = {};
@@ -33,11 +31,6 @@ export class Ddu {
   private checkPaths: Record<string, boolean> = {};
   private items: DduItem[] = [];
   private options: DduOptions = defaultDduOptions();
-
-  constructor() {
-    this.uis["std"] = new Ui();
-    this.kinds["file"] = new Kind();
-  }
 
   async start(
     denops: Denops,
@@ -111,6 +104,8 @@ export class Ddu {
       items: this.items,
     });
 
+    await this.autoload(denops, "ui", ["std"]);
+
     await this.uis["std"].redraw({
       denops: denops,
       options: this.options,
@@ -125,6 +120,8 @@ export class Ddu {
     actionName: string,
     params: unknown,
   ): Promise<void> {
+    await this.autoload(denops, "ui", ["std"]);
+
     const action = this.uis["std"].actions[actionName];
     await action({
       denops: denops,
@@ -146,6 +143,9 @@ export class Ddu {
       // Use default action
       actionName = "open";
     }
+
+    await this.autoload(denops, "kind", ["file"]);
+
     const action = this.kinds["file"].actions[actionName];
     await action({
       denops: denops,
@@ -156,6 +156,20 @@ export class Ddu {
       actionParams: params,
       items: items,
     });
+  }
+
+  async registerUI(path: string, name: string) {
+    this.checkPaths[path] = true;
+
+    const mod = await import(toFileUrl(path).href);
+
+    const addUI = (name: string) => {
+      const ui = new mod.Ui();
+      ui.name = name;
+      this.uis[ui.name] = ui;
+    };
+
+    addUI(name);
   }
 
   async registerSource(path: string, name: string) {
@@ -202,9 +216,23 @@ export class Ddu {
     }
   }
 
+  async registerKind(path: string, name: string) {
+    this.checkPaths[path] = true;
+
+    const mod = await import(toFileUrl(path).href);
+
+    const addKind = (name: string) => {
+      const kind = new mod.Kind();
+      kind.name = name;
+      this.kinds[kind.name] = kind;
+    };
+
+    addKind(name);
+  }
+
   async autoload(
     denops: Denops,
-    type: "source" | "filter",
+    type: "ui" | "source" | "filter" | "kind",
     names: string[],
   ): Promise<string[]> {
     if (names.length == 0) {
@@ -235,7 +263,18 @@ export class Ddu {
       return Promise.resolve(paths);
     }
 
-    if (type == "source") {
+    if (type == "ui") {
+      const paths = (await globpath(
+        ["denops/@ddu-uis/"],
+        names,
+      )).filter((path) => !(path in this.checkPaths));
+
+      await Promise.all(paths.map(async (path) => {
+        await this.registerUI(path, parse(path).name);
+      }));
+
+      return Promise.resolve(paths);
+    } else if (type == "source") {
       const paths = (await globpath(
         ["denops/@ddu-sources/"],
         names.map((file) => this.aliasSources[file] ?? file),
@@ -254,6 +293,17 @@ export class Ddu {
 
       await Promise.all(paths.map(async (path) => {
         await this.registerFilter(path, parse(path).name);
+      }));
+
+      return Promise.resolve(paths);
+    } else if (type == "kind") {
+      const paths = (await globpath(
+        ["denops/@ddu-kinds/"],
+        names,
+      )).filter((path) => !(path in this.checkPaths));
+
+      await Promise.all(paths.map(async (path) => {
+        await this.registerKind(path, parse(path).name);
       }));
 
       return Promise.resolve(paths);
