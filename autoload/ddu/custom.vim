@@ -18,7 +18,7 @@ function! ddu#custom#alias(type, alias, base) abort
   if ddu#_denops_running()
     call denops#notify('ddu', 'alias', [a:type, a:alias, a:base])
   else
-    execute printf('autocmd User dduReady call ' .
+    execute printf('autocmd User DDUReady call ' .
           \ 'denops#notify("ddu", "alias", ["%s", "%s", "%s"])',
           \ a:type, a:alias, a:base)
   endif
@@ -39,7 +39,7 @@ function! s:notify(method, args) abort
   if ddu#_denops_running()
     call denops#notify('ddu', a:method, a:args)
   else
-    execute printf('autocmd User dduReady call ' .
+    execute printf('autocmd User DDUReady call ' .
           \ 'denops#notify("ddu", "%s", %s)',
           \ a:method, string(a:args))
   endif

@@ -40,6 +40,7 @@ export function defaultDduOptions(): DduOptions {
     sourceOptions: {},
     sourceParams: {},
     sources: [],
+    ui: "",
     uiOptions: {},
     uiParams: {},
   };

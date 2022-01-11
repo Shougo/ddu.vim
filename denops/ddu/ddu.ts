@@ -104,9 +104,16 @@ export class Ddu {
       items: this.items,
     });
 
-    await this.autoload(denops, "ui", ["std"]);
+    await this.autoload(denops, "ui", [this.options.ui]);
+    if (!this.uis[this.options.ui]) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid ui is detected: "${this.options.ui}"`,
+      );
+      return;
+    }
 
-    await this.uis["std"].redraw({
+    await this.uis[this.options.ui].redraw({
       denops: denops,
       options: this.options,
       uiOptions: defaultUiOptions(),
@@ -120,9 +127,16 @@ export class Ddu {
     actionName: string,
     params: unknown,
   ): Promise<void> {
-    await this.autoload(denops, "ui", ["std"]);
+    await this.autoload(denops, "ui", [this.options.ui]);
+    if (!this.uis[this.options.ui]) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid ui is detected: "${this.options.ui}"`,
+      );
+      return;
+    }
 
-    const action = this.uis["std"].actions[actionName];
+    const action = this.uis[this.options.ui].actions[actionName];
     await action({
       denops: denops,
       context: {},

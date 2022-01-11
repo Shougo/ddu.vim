@@ -31,6 +31,7 @@ export type DduOptions = {
   sourceOptions: Record<SourceName, Partial<SourceOptions>>;
   sourceParams: Record<SourceName, Partial<Record<string, unknown>>>;
   sources: UserSource[];
+  ui: string;
   uiOptions: Record<string, Partial<UiOptions>>;
   uiParams: Record<string, Partial<Record<string, unknown>>>;
 };

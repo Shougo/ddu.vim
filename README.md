@@ -105,27 +105,32 @@ Ddu.vim requires both Deno and denops.vim.
 ## Configuration
 
 ```vim
-" Set default sources
+" You must set the default ui in the first
 call ddu#custom#patch_global({
-    \ 'sources': [{'name': 'file', 'params': {}}],
+    \ 'ui': 'std',
     \ })
+
+" Set default sources
+"call ddu#custom#patch_global({
+"    \ 'sources': [{'name': 'file', 'params': {}}],
+"    \ })
 
 " Call default sources
-call ddu#start({})
+"call ddu#start({})
 
 " Set name specific configuration
-call ddu#custom#patch_local('files', {
-    \ 'sources': [
-    \   {'name': 'file', 'params': {}},
-    \   {'name': 'file_old', 'params': {}},
-    \ ],
-    \ })
+"call ddu#custom#patch_local('files', {
+"    \ 'sources': [
+"    \   {'name': 'file', 'params': {}},
+"    \   {'name': 'file_old', 'params': {}},
+"    \ ],
+"    \ })
 
 " Specify name
-call ddu#start({'name': 'files'})
+"call ddu#start({'name': 'files'})
 
 " Specify source with params
-call ddu#start([{'name': 'file_rec', 'params': {'path': expand('~')}}])
+"call ddu#start([{'name': 'file_rec', 'params': {'path': expand('~')}}])
 ```
 
 See `:help ddu-options` for a complete list of options.

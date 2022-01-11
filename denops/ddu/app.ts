@@ -119,5 +119,6 @@ export async function main(denops: Denops) {
 
   await batch(denops, async (denops: Denops) => {
     await vars.g.set(denops, "ddu#_initialized", 1);
+    await denops.cmd("doautocmd <nomodeline> User DDUReady");
   });
 }
