@@ -69,4 +69,5 @@ export type DduItem =
   & Item<DduActionData>
   & {
     matcherKey: string;
+    __sourceName: string;
   };

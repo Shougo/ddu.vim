@@ -73,6 +73,7 @@ export class Ddu {
           return {
             ...item,
             matcherKey: matcherKey,
+            __sourceName: source.name,
           };
         });
 
@@ -158,9 +159,20 @@ export class Ddu {
       actionName = "open";
     }
 
-    await this.autoload(denops, "kind", ["file"]);
+    const kinds = [
+      ...new Set(items.map((item) => this.sources[item.__sourceName].kind)),
+    ];
+    if (kinds.length != 1) {
+      await denops.call(
+        "ddu#util#print_error",
+        `You must not mix multiple kinds: "${kinds}"`,
+      );
+      return;
+    }
 
-    const action = this.kinds["file"].actions[actionName];
+    await this.autoload(denops, "kind", kinds);
+
+    const action = this.kinds[kinds[0]].actions[actionName];
     await action({
       denops: denops,
       context: {},
