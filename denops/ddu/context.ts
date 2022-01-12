@@ -1,5 +1,10 @@
 import { assertEquals } from "./deps.ts";
-import { DduOptions, FilterOptions, SourceOptions } from "./types.ts";
+import {
+  DduOptions,
+  FilterOptions,
+  SourceOptions,
+  UiOptions,
+} from "./types.ts";
 
 // where
 // T: Object
@@ -16,8 +21,11 @@ function partialOverwrite<T>(a: Partial<T>, b: Partial<T>): Partial<T> {
 function overwrite<T>(a: T, b: Partial<T>): T {
   return { ...a, ...b };
 }
+export const mergeUiOptions: Merge<UiOptions> = overwrite;
 export const mergeSourceOptions: Merge<SourceOptions> = overwrite;
 export const mergeFilterOptions: Merge<FilterOptions> = overwrite;
+
+export const mergeUiParams: Merge<Record<string, unknown>> = overwrite;
 export const mergeSourceParams: Merge<Record<string, unknown>> = overwrite;
 export const mergeFilterParams: Merge<Record<string, unknown>> = overwrite;
 

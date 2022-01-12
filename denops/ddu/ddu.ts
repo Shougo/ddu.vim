@@ -8,6 +8,7 @@ import {
   DduOptions,
   Item,
   SourceOptions,
+  UiOptions,
   UserSource,
 } from "./types.ts";
 import {
@@ -15,6 +16,8 @@ import {
   foldMerge,
   mergeSourceOptions,
   mergeSourceParams,
+  mergeUiOptions,
+  mergeUiParams,
 } from "./context.ts";
 import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
 import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
@@ -88,6 +91,22 @@ export class Ddu {
     }
   }
 
+  private async getUi(
+    denops: Denops,
+  ): Promise<BaseUi<Record<string, unknown>>> {
+    await this.autoload(denops, "ui", [this.options.ui]);
+    if (!this.uis[this.options.ui]) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid ui is detected: "${this.options.ui}"`,
+      );
+      return Promise.reject();
+    }
+
+    const ui = this.uis[this.options.ui];
+    return Promise.resolve(ui);
+  }
+
   async narrow(
     denops: Denops,
     input: string,
@@ -105,20 +124,18 @@ export class Ddu {
       items: this.items,
     });
 
-    await this.autoload(denops, "ui", [this.options.ui]);
-    if (!this.uis[this.options.ui]) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Invalid ui is detected: "${this.options.ui}"`,
-      );
-      return;
-    }
+    const ui = await this.getUi(denops);
+    const [uiOptions, uiParams] = uiArgs(
+      this.options,
+      ui,
+    );
+    await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
-    await this.uis[this.options.ui].redraw({
+    await ui.redraw({
       denops: denops,
       options: this.options,
-      uiOptions: defaultUiOptions(),
-      uiParams: defaultUiParams(),
+      uiOptions: uiOptions,
+      uiParams: uiParams,
       items: filteredItems,
     });
   }
@@ -128,22 +145,20 @@ export class Ddu {
     actionName: string,
     params: unknown,
   ): Promise<void> {
-    await this.autoload(denops, "ui", [this.options.ui]);
-    if (!this.uis[this.options.ui]) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Invalid ui is detected: "${this.options.ui}"`,
-      );
-      return;
-    }
+    const ui = await this.getUi(denops);
+    const [uiOptions, uiParams] = uiArgs(
+      this.options,
+      ui,
+    );
+    await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
     const action = this.uis[this.options.ui].actions[actionName];
     await action({
       denops: denops,
       context: {},
-      options: defaultDduOptions(),
-      uiOptions: defaultUiOptions(),
-      uiParams: defaultUiParams(),
+      options: this.options,
+      uiOptions: uiOptions,
+      uiParams: uiParams,
       actionParams: params,
     });
   }
@@ -362,6 +377,53 @@ function sourceArgs<
     userSource.params,
   ]);
   return [o, p];
+}
+
+function uiArgs<
+  Params extends Record<string, unknown>,
+>(
+  options: DduOptions,
+  ui: BaseUi<Params>,
+): [UiOptions, Record<string, unknown>] {
+  const o = foldMerge(
+    mergeUiOptions,
+    defaultUiOptions,
+    [
+      options.uiOptions["_"],
+      options.uiOptions[ui.name],
+    ],
+  );
+  const p = foldMerge(mergeUiParams, defaultUiParams, [
+    ui.params ? ui.params() : null,
+    options.uiParams[ui.name],
+  ]);
+  return [o, p];
+}
+
+async function checkUiOnInit(
+  ui: BaseUi<Record<string, unknown>>,
+  denops: Denops,
+  uiOptions: UiOptions,
+  uiParams: Record<string, unknown>,
+) {
+  if (ui.isInitialized) {
+    return;
+  }
+
+  try {
+    await ui.onInit({
+      denops,
+      uiOptions,
+      uiParams,
+    });
+
+    ui.isInitialized = true;
+  } catch (e: unknown) {
+    console.error(
+      `[ddc.vim] ui: ${ui.name} "onInit()" is failed`,
+    );
+    console.error(e);
+  }
 }
 
 Deno.test("test", () => {
