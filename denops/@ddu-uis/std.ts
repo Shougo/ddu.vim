@@ -16,6 +16,7 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
     options: DduOptions;
     uiOptions: UiOptions;
+    uiParams: Params;
     items: DduItem[];
   }): Promise<void> {
     const bufferName = `ddu-std-${args.options.name}`;
@@ -24,11 +25,8 @@ export class Ui extends BaseUi<Params> {
       bufnr = await fn.bufnr(args.denops, bufferName);
     } else {
       // Initialize buffer
-      bufnr = await fn.bufadd(args.denops, bufferName);
-      await fn.bufload(args.denops, bufnr);
+      bufnr = await this.initBuffer(args.denops, bufferName);
     }
-
-    await fn.setbufvar(args.denops, bufnr, "&filetype", "ddu-std");
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
 
@@ -79,5 +77,25 @@ export class Ui extends BaseUi<Params> {
 
   params(): Params {
     return {};
+  }
+
+  private async initBuffer(
+    denops: Denops,
+    bufferName: string,
+  ): Promise<number> {
+    const bufnr = await fn.bufadd(denops, bufferName);
+    await fn.bufload(denops, bufnr);
+
+    denops.cmd(
+      `syntax match deniteSelectedLine /^[*].*/` +
+        " contains=deniteConcealedMark",
+    );
+    denops.cmd(
+      `syntax match deniteConcealedMark /^[ *]/` +
+        " conceal contained",
+    );
+    await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
+
+    return Promise.resolve(bufnr);
   }
 }
