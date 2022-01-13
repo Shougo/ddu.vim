@@ -1,4 +1,4 @@
-import { Context, DduItem, DduOptions, UiOptions } from "../types.ts";
+import { DduItem, DduOptions, UiOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type OnInitArguments<Params extends Record<string, unknown>> = {
@@ -17,7 +17,6 @@ export type RedrawArguments<Params extends Record<string, unknown>> = {
 
 export type ActionArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
-  context: Context;
   options: DduOptions;
   uiOptions: UiOptions;
   uiParams: Params;

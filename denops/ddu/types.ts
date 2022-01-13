@@ -10,11 +10,6 @@ export type Custom = {
   option: DduOptions;
 };
 
-export type Context = {
-  // TODO: add options and remove placeholder
-  placeholder?: unknown;
-};
-
 export type UserSource = {
   name: string;
   options?: SourceOptions;

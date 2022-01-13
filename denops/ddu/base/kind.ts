@@ -1,9 +1,8 @@
-import { Context, DduItem, DduOptions, KindOptions } from "../types.ts";
+import { DduItem, DduOptions, KindOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type ActionArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
-  context: Context;
   options: DduOptions;
   kindOptions: KindOptions;
   kindParams: Params;

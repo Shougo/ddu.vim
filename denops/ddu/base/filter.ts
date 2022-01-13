@@ -1,10 +1,4 @@
-import {
-  Context,
-  DduItem,
-  DduOptions,
-  FilterOptions,
-  SourceOptions,
-} from "../types.ts";
+import { DduItem, DduOptions, FilterOptions, SourceOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type OnInitArguments<Params extends Record<string, unknown>> = {
@@ -15,7 +9,6 @@ export type OnInitArguments<Params extends Record<string, unknown>> = {
 
 export type FilterArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
-  context: Context;
   options: DduOptions;
   sourceOptions: SourceOptions;
   filterOptions: FilterOptions;

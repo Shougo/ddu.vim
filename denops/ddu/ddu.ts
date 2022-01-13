@@ -32,7 +32,7 @@ export class Ddu {
   private aliasSources: Record<string, string> = {};
   private aliasFilters: Record<string, string> = {};
   private checkPaths: Record<string, boolean> = {};
-  private items: DduItem[] = [];
+  private items: Record<string, DduItem[]> = {};
   private options: DduOptions = defaultDduOptions();
 
   async start(
@@ -41,10 +41,13 @@ export class Ddu {
   ): Promise<void> {
     await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
-    this.items = [];
     this.options = options;
 
+    let index = 0;
     for (const userSource of options.sources) {
+      const currentIndex = index;
+      this.items[currentIndex] = [];
+
       const source = this.sources[userSource.name];
       const [sourceOptions, sourceParams] = sourceArgs(
         options,
@@ -53,7 +56,6 @@ export class Ddu {
       );
       const sourceItems = source.gather({
         denops: denops,
-        context: {},
         options: this.options,
         sourceOptions: sourceOptions,
         sourceParams: sourceParams,
@@ -80,7 +82,8 @@ export class Ddu {
           };
         });
 
-        this.items = this.items.concat(newItems);
+        // Update items
+        this.items[currentIndex] = this.items[currentIndex].concat(newItems);
 
         await this.narrow(denops, this.options.input);
 
@@ -88,6 +91,7 @@ export class Ddu {
       };
 
       reader.read().then(readChunk);
+      index++;
     }
   }
 
@@ -107,22 +111,34 @@ export class Ddu {
     return Promise.resolve(ui);
   }
 
-  async narrow(
+  async filterItems(
     denops: Denops,
     input: string,
-  ): Promise<void> {
+    index: number,
+  ): Promise<DduItem[]> {
     await this.autoload(denops, "filter", ["matcher_substring"]);
 
-    const filteredItems = await this.filters["matcher_substring"].filter({
+    return await this.filters["matcher_substring"].filter({
       denops: denops,
-      context: {},
       options: this.options,
       sourceOptions: defaultSourceOptions(),
       filterOptions: defaultFilterOptions(),
       filterParams: defaultFilterParams(),
       input: input,
-      items: this.items,
+      items: this.items[index],
     });
+  }
+
+  async narrow(
+    denops: Denops,
+    input: string,
+  ): Promise<void> {
+    let items: DduItem[] = [];
+    let index = 0;
+    for (const _ of this.options.sources) {
+      items = items.concat(await this.filterItems(denops, input, index));
+      index++;
+    }
 
     const ui = await this.getUi(denops);
     const [uiOptions, uiParams] = uiArgs(
@@ -136,7 +152,7 @@ export class Ddu {
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
-      items: filteredItems,
+      items: items,
     });
   }
 
@@ -155,7 +171,6 @@ export class Ddu {
     const action = this.uis[this.options.ui].actions[actionName];
     await action({
       denops: denops,
-      context: {},
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
@@ -190,7 +205,6 @@ export class Ddu {
     const action = this.kinds[kinds[0]].actions[actionName];
     await action({
       denops: denops,
-      context: {},
       options: defaultDduOptions(),
       kindOptions: defaultKindOptions(),
       kindParams: defaultKindParams(),
