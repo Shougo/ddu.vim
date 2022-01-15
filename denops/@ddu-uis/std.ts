@@ -12,12 +12,18 @@ type Params = Record<never, never>;
 export class Ui extends BaseUi<Params> {
   private items: DduItem[] = [];
 
+  refreshItems(args: {
+    items: DduItem[];
+  }): void {
+    // Note: Use only 1000 items
+    this.items = args.items.slice(0, 1000);
+  }
+
   async redraw(args: {
     denops: Denops;
     options: DduOptions;
     uiOptions: UiOptions;
     uiParams: Params;
-    items: DduItem[];
   }): Promise<void> {
     const bufferName = `ddu-std-${args.options.name}`;
     let bufnr;
@@ -30,9 +36,6 @@ export class Ui extends BaseUi<Params> {
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
 
-    // Note: Use only 1000 items
-    const items = args.items.slice(0, 1000);
-
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     if (ids.length == 0) {
       await args.denops.cmd(`buffer ${bufnr}`);
@@ -42,10 +45,9 @@ export class Ui extends BaseUi<Params> {
     await args.denops.call(
       "ddu#ui#std#update_buffer",
       bufnr,
-      items.map((c) => c.word),
+      this.items.map((c) => c.word),
     );
 
-    this.items = items;
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
 
     // Open filter window
