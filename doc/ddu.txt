@@ -365,6 +365,16 @@ SOURCE ATTRIBUTES				*ddu-source-attributes*
 ------------------------------------------------------------------------------
 ITEM ATTRIBUTES						*ddu-item-attributes*
 
+					*ddu-item-attribute-word*
+word		(String)			(Required)
+		The word of a item. It is used for matching inputs.
+
+					*ddu-item-attribute-display*
+display		(String)			(Optional)
+		The string displayed in Ddu buffer.  If it is omitted, word
+		attribute is used instead.  It is not used for matching
+		inputs.
+
 
 ==============================================================================
 CREATE FILTER						*ddu-create-filter*
