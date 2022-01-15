@@ -7,7 +7,10 @@ export type OnInitArguments<Params extends Record<string, unknown>> = {
   uiParams: Params;
 };
 
-export type RefreshItemsArguments = {
+export type RefreshItemsArguments<Params extends Record<string, unknown>> = {
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
   items: DduItem[];
 };
 
@@ -36,7 +39,7 @@ export abstract class BaseUi<
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 
-  refreshItems(_args: RefreshItemsArguments): void {}
+  refreshItems(_args: RefreshItemsArguments<Params>): void {}
 
   async redraw(_args: RedrawArguments<Params>): Promise<void> {}
 

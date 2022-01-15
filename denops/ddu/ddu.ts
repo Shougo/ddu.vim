@@ -147,7 +147,12 @@ export class Ddu {
     );
     await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
-    ui.refreshItems({ items: items });
+    ui.refreshItems({
+      options: this.options,
+      uiOptions: uiOptions,
+      uiParams: uiParams,
+      items: items,
+    });
 
     await ui.redraw({
       denops: denops,
