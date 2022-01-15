@@ -52,8 +52,7 @@ export type Item<
   ActionData extends unknown = unknown,
 > = {
   word: string;
-  abbr?: string;
-  menu?: string;
+  display?: string;
   action?: ActionData;
 };
 
