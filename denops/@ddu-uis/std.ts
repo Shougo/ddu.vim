@@ -1,4 +1,10 @@
-import { BaseUi, DduItem, DduOptions, UiOptions } from "../ddu/types.ts";
+import {
+  ActionFlags,
+  BaseUi,
+  DduItem,
+  DduOptions,
+  UiOptions,
+} from "../ddu/types.ts";
 import { Denops, fn } from "../ddu/deps.ts";
 import { ActionArguments } from "../ddu/base/ui.ts";
 
@@ -58,7 +64,10 @@ export class Ui extends BaseUi<Params> {
     );
   }
 
-  actions: Record<string, (args: ActionArguments<Params>) => Promise<void>> = {
+  actions: Record<
+    string,
+    (args: ActionArguments<Params>) => Promise<ActionFlags>
+  > = {
     doAction: async (args: {
       denops: Denops;
       options: DduOptions;
@@ -74,6 +83,8 @@ export class Ui extends BaseUi<Params> {
         [item],
         params.params ?? {},
       );
+
+      return Promise.resolve(ActionFlags.None);
     },
   };
 

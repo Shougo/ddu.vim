@@ -1,4 +1,4 @@
-import { DduItem, DduOptions, UiOptions } from "../types.ts";
+import { ActionFlags, DduItem, DduOptions, UiOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type OnInitArguments<Params extends Record<string, unknown>> = {
@@ -43,8 +43,10 @@ export abstract class BaseUi<
 
   async redraw(_args: RedrawArguments<Params>): Promise<void> {}
 
-  actions: Record<string, (args: ActionArguments<Params>) => Promise<void>> =
-    {};
+  actions: Record<
+    string,
+    (args: ActionArguments<Params>) => Promise<ActionFlags>
+  > = {};
 
   abstract params(): Params;
 }

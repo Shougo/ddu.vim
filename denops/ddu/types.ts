@@ -65,3 +65,9 @@ export type DduItem =
     matcherKey: string;
     __sourceName: string;
   };
+
+export enum ActionFlags {
+  None = 0,
+  RefreshItems = 1 << 0,
+  Redraw = 1 << 1,
+}
