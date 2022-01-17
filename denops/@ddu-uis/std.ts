@@ -130,16 +130,32 @@ export class Ui extends BaseUi<Params> {
   ): Promise<number> {
     const bufnr = await fn.bufadd(denops, bufferName);
     await fn.bufload(denops, bufnr);
+    await denops.cmd(`buffer ${bufnr}`);
+    const winid = await fn.win_getid(denops);
 
-    denops.cmd(
-      `syntax match deniteSelectedLine /^[*].*/` +
-        " contains=deniteConcealedMark",
+    // Set options
+    await fn.setwinvar(denops, winid, "&conceallevel", 3);
+    await fn.setwinvar(denops, winid, "&concealcursor", "inv");
+
+    // Highlights
+    await denops.cmd(
+      "highlight default link dduStdSelectedLine Statement",
     );
-    denops.cmd(
-      `syntax match deniteConcealedMark /^[ *]/` +
+
+    await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
+
+    await denops.cmd(
+      `syntax match dduStdNormalLine /^[ ].*/` +
+        " contains=dduStdConcealedMark",
+    );
+    await denops.cmd(
+      `syntax match dduStdSelectedLine /^[*].*/` +
+        " contains=dduStdConcealedMark",
+    );
+    await denops.cmd(
+      `syntax match dduStdConcealedMark /^[ *]/` +
         " conceal contained",
     );
-    await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
 
     return Promise.resolve(bufnr);
   }

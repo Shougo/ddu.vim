@@ -140,6 +140,6 @@ See `:help ddu-options` for a complete list of options.
 
 ## Plans
 
-- [ ] Select multiple items
+- [x] Select multiple items
 - [ ] Line/Column jump
 - [ ] Improve UI behavior
