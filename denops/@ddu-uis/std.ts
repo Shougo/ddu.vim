@@ -17,12 +17,14 @@ type Params = Record<never, never>;
 
 export class Ui extends BaseUi<Params> {
   private items: DduItem[] = [];
+  private selectedItems: Set<number> = new Set();
 
   refreshItems(args: {
     items: DduItem[];
   }): void {
     // Note: Use only 1000 items
     this.items = args.items.slice(0, 1000);
+    this.selectedItems.clear();
   }
 
   async redraw(args: {
@@ -51,7 +53,9 @@ export class Ui extends BaseUi<Params> {
     await args.denops.call(
       "ddu#ui#std#update_buffer",
       bufnr,
-      this.items.map((c) => c.word),
+      this.items.map(
+        (c, i) => `${this.selectedItems.has(i) ? "*" : " "}${c.word}`,
+      ),
     );
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
@@ -85,6 +89,20 @@ export class Ui extends BaseUi<Params> {
       );
 
       return Promise.resolve(ActionFlags.None);
+    },
+    toggleSelectItem: async (args: {
+      denops: Denops;
+      options: DduOptions;
+      actionParams: unknown;
+    }) => {
+      const idx = (await fn.line(args.denops, ".")) - 1;
+      if (this.selectedItems.has(idx)) {
+        this.selectedItems.delete(idx);
+      } else {
+        this.selectedItems.add(idx);
+      }
+
+      return Promise.resolve(ActionFlags.Redraw);
     },
   };
 

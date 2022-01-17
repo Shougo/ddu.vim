@@ -1,5 +1,6 @@
 import { assertEquals, Denops, fn, op, parse, toFileUrl } from "./deps.ts";
 import {
+  ActionFlags,
   BaseFilter,
   BaseKind,
   BaseSource,
@@ -33,6 +34,7 @@ export class Ddu {
   private aliasFilters: Record<string, string> = {};
   private checkPaths: Record<string, boolean> = {};
   private items: Record<string, DduItem[]> = {};
+  private input = "";
   private options: DduOptions = defaultDduOptions();
 
   async start(
@@ -42,6 +44,7 @@ export class Ddu {
     await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
     this.options = options;
+    this.input = this.options.input;
 
     let index = 0;
     for (const userSource of options.sources) {
@@ -59,7 +62,7 @@ export class Ddu {
         options: this.options,
         sourceOptions: sourceOptions,
         sourceParams: sourceParams,
-        input: "",
+        input: this.input,
       });
 
       const reader = sourceItems.getReader();
@@ -85,7 +88,7 @@ export class Ddu {
         // Update items
         this.items[currentIndex] = this.items[currentIndex].concat(newItems);
 
-        await this.narrow(denops, this.options.input);
+        await this.narrow(denops, this.input);
 
         reader.read().then(readChunk);
       };
@@ -111,7 +114,7 @@ export class Ddu {
     return Promise.resolve(ui);
   }
 
-  async filterItems(
+  private async filterItems(
     denops: Denops,
     input: string,
     index: number,
@@ -133,10 +136,13 @@ export class Ddu {
     denops: Denops,
     input: string,
   ): Promise<void> {
+    // Update current input
+    this.input = input;
+
     let items: DduItem[] = [];
     let index = 0;
     for (const _ of this.options.sources) {
-      items = items.concat(await this.filterItems(denops, input, index));
+      items = items.concat(await this.filterItems(denops, this.input, index));
       index++;
     }
 
@@ -175,13 +181,24 @@ export class Ddu {
     await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
     const action = this.uis[this.options.ui].actions[actionName];
-    await action({
+    const flags = await action({
       denops: denops,
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
       actionParams: params,
     });
+
+    if (flags & ActionFlags.RefreshItems) {
+      await this.narrow(denops, this.input);
+    } else if (flags & ActionFlags.Redraw) {
+      await ui.redraw({
+        denops: denops,
+        options: this.options,
+        uiOptions: uiOptions,
+        uiParams: uiParams,
+      });
+    }
   }
 
   async doAction(
