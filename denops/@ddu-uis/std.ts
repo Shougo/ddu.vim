@@ -16,6 +16,7 @@ type DoActionParams = {
 type Params = Record<never, never>;
 
 export class Ui extends BaseUi<Params> {
+  private filterBufnr = -1;
   private items: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
 
@@ -60,12 +61,19 @@ export class Ui extends BaseUi<Params> {
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
 
-    // Open filter window
-    await args.denops.call(
-      "ddu#ui#std#filter#_open",
-      args.options.name,
-      args.options.input,
-    );
+    const filterIds = await fn.win_findbuf(
+      args.denops,
+      this.filterBufnr,
+    ) as number[];
+    if (filterIds.length == 0) {
+      // Open filter window
+      this.filterBufnr = await args.denops.call(
+        "ddu#ui#std#filter#_open",
+        args.options.name,
+        args.options.input,
+        this.filterBufnr,
+      ) as number;
+    }
   }
 
   actions: Record<
@@ -77,14 +85,20 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       actionParams: unknown;
     }) => {
-      const idx = (await fn.line(args.denops, ".")) - 1;
-      const item = this.items[idx];
+      let items: DduItem[];
+      if (this.selectedItems.size == 0) {
+        const idx = (await fn.line(args.denops, ".")) - 1;
+        items = [this.items[idx]];
+      } else {
+        items = [...this.selectedItems].map((i) => this.items[i]);
+      }
+
       const params = args.actionParams as DoActionParams;
       await args.denops.call(
         "ddu#do_action",
         args.options.name,
         params.name ?? "default",
-        [item],
+        items,
         params.params ?? {},
       );
 

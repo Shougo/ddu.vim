@@ -1,15 +1,13 @@
-let g:ddu#ui#std#_filter_bufnr = -1
 let g:ddu#ui#std#_filter_name = ''
 
-function! ddu#ui#std#filter#_open(name, input) abort
-  let ids = win_findbuf(g:ddu#ui#std#_filter_bufnr)
+function! ddu#ui#std#filter#_open(name, input, bufnr) abort
+  let ids = win_findbuf(a:bufnr)
   if !empty(ids)
     call win_gotoid(ids[0])
     call cursor(line('$'), 0)
   else
     silent execute 'split' 'ddu-std-filter'
     let g:ddu#ui#std#_filter_winid = win_getid()
-    let g:ddu#ui#std#_filter_bufnr = bufnr('%')
 
     call s:init_buffer()
 
@@ -32,6 +30,7 @@ function! ddu#ui#std#filter#_open(name, input) abort
 
   let g:ddu#ui#std#_filter_prev_input = getline('.')
   let g:ddu#ui#std#_filter_name = a:name
+  return bufnr('%')
 endfunction
 
 function! s:init_buffer() abort
