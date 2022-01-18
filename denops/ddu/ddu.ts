@@ -116,20 +116,35 @@ export class Ddu {
 
   private async filterItems(
     denops: Denops,
-    input: string,
+    userSource: UserSource,
     index: number,
+    input: string,
   ): Promise<DduItem[]> {
-    await this.autoload(denops, "filter", ["matcher_substring"]);
+    const source = this.sources[userSource.name];
+    const [sourceOptions, _] = sourceArgs(
+      this.options,
+      userSource,
+      source,
+    );
 
-    return await this.filters["matcher_substring"].filter({
-      denops: denops,
-      options: this.options,
-      sourceOptions: defaultSourceOptions(),
-      filterOptions: defaultFilterOptions(),
-      filterParams: defaultFilterParams(),
-      input: input,
-      items: this.items[index],
-    });
+    const filters = sourceOptions.matchers.concat(sourceOptions.sorters).concat(
+      sourceOptions.converters,
+    );
+    await this.autoload(denops, "filter", filters);
+
+    let items = this.items[index];
+    for (const filterName of filters) {
+      items = await this.filters[filterName].filter({
+        denops: denops,
+        options: this.options,
+        sourceOptions: sourceOptions,
+        filterOptions: defaultFilterOptions(),
+        filterParams: defaultFilterParams(),
+        input: input,
+        items: items,
+      });
+    }
+    return items;
   }
 
   async narrow(
@@ -141,8 +156,15 @@ export class Ddu {
 
     let items: DduItem[] = [];
     let index = 0;
-    for (const _ of this.options.sources) {
-      items = items.concat(await this.filterItems(denops, this.input, index));
+    for (const userSource of this.options.sources) {
+      items = items.concat(
+        await this.filterItems(
+          denops,
+          userSource,
+          index,
+          this.input,
+        ),
+      );
       index++;
     }
 

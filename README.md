@@ -110,6 +110,15 @@ call ddu#custom#patch_global({
     \ 'ui': 'std',
     \ })
 
+" Specify matcher.
+call ddu#custom#patch_global({
+    \   'sourceOptions': {
+    \     '_': {
+    \       'matchers': ['matcher_substring'],
+    \     },
+    \   }
+    \ })
+
 " Set default sources
 "call ddu#custom#patch_global({
 "    \ 'sources': [{'name': 'file', 'params': {}}],

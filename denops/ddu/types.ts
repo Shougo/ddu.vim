@@ -36,7 +36,10 @@ export type UiOptions = {
 };
 
 export type SourceOptions = {
+  converters: string[];
   matcherKey: string;
+  matchers: string[];
+  sorters: string[];
 };
 
 export type FilterOptions = {

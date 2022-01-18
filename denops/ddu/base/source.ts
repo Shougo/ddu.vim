@@ -45,7 +45,10 @@ export abstract class BaseSource<
 
 export function defaultSourceOptions(): SourceOptions {
   return {
+    converters: [],
     matcherKey: "word",
+    matchers: [],
+    sorters: [],
   };
 }
 
