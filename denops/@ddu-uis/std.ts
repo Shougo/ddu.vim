@@ -13,7 +13,9 @@ type DoActionParams = {
   params?: unknown;
 };
 
-type Params = Record<never, never>;
+type Params = {
+  startFilter: boolean;
+};
 
 export class Ui extends BaseUi<Params> {
   private filterBufnr = -1;
@@ -65,8 +67,7 @@ export class Ui extends BaseUi<Params> {
       args.denops,
       this.filterBufnr,
     ) as number[];
-    if (filterIds.length == 0) {
-      // Open filter window
+    if (filterIds.length == 0 && args.uiParams.startFilter) {
       this.filterBufnr = await args.denops.call(
         "ddu#ui#std#filter#_open",
         args.options.name,
@@ -118,10 +119,25 @@ export class Ui extends BaseUi<Params> {
 
       return Promise.resolve(ActionFlags.Redraw);
     },
+    openFilterWindow: async (args: {
+      denops: Denops;
+      options: DduOptions;
+      actionParams: unknown;
+    }) => {
+      this.filterBufnr = await args.denops.call(
+        "ddu#ui#std#filter#_open",
+        args.options.name,
+        args.options.input,
+        this.filterBufnr,
+      ) as number;
+      return Promise.resolve(ActionFlags.None);
+    },
   };
 
   params(): Params {
-    return {};
+    return {
+      startFilter: false,
+    };
   }
 
   private async initBuffer(

@@ -432,6 +432,7 @@ function sourceArgs<
   );
   const p = foldMerge(mergeSourceParams, defaultSourceParams, [
     source.params ? source.params() : null,
+    options.sourceParams["_"],
     options.sourceParams[source.name],
     userSource.params,
   ]);
@@ -454,6 +455,7 @@ function uiArgs<
   );
   const p = foldMerge(mergeUiParams, defaultUiParams, [
     ui.params ? ui.params() : null,
+    options.uiParams["_"],
     options.uiParams[ui.name],
   ]);
   return [o, p];
