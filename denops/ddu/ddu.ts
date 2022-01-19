@@ -5,6 +5,7 @@ import {
   BaseKind,
   BaseSource,
   BaseUi,
+  DduExtType,
   DduItem,
   DduOptions,
   Item,
@@ -24,8 +25,6 @@ import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
 import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
-
-type DduExtType = "ui" | "source" | "filter" | "kind";
 
 export class Ddu {
   private uis: Record<string, BaseUi<Record<string, unknown>>> = {};
