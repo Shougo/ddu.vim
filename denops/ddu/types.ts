@@ -39,6 +39,7 @@ export type UiOptions = {
 
 export type SourceOptions = {
   converters: string[];
+  ignoreCase: boolean;
   matcherKey: string;
   matchers: string[];
   sorters: string[];

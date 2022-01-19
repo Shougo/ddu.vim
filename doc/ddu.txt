@@ -313,6 +313,12 @@ Note: The sources cannot set default options for source.  If the source need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
+				    	*ddu-source-option-ignoreCase*
+ignoreCase		(boolean)
+		If it is True, ddu ignores case.
+
+		Default: v:false
+
 
 ------------------------------------------------------------------------------
 SOURCE PARAMS					*ddu-source-params*
