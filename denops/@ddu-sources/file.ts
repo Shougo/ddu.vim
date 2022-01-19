@@ -6,13 +6,16 @@ type ActionData = {
   path: string;
 };
 
-type Params = Record<never, never>;
+type Params = {
+  path: string;
+};
 
 export class Source extends BaseSource<Params> {
   kind = "file";
 
   gather(args: {
     denops: Denops;
+    sourceParams: Params;
   }): ReadableStream<Item<ActionData>[]> {
     return new ReadableStream({
       async start(controller) {
@@ -41,7 +44,10 @@ export class Source extends BaseSource<Params> {
           return items;
         };
 
-        const dir = await fn.getcwd(args.denops) as string;
+        let dir = args.sourceParams.path;
+        if (dir == "") {
+          dir = await fn.getcwd(args.denops) as string;
+        }
 
         controller.enqueue(
           await tree(resolve(dir, dir)),
@@ -53,6 +59,8 @@ export class Source extends BaseSource<Params> {
   }
 
   params(): Params {
-    return {};
+    return {
+      path: "",
+    };
   }
 }
