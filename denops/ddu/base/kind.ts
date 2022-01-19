@@ -1,4 +1,4 @@
-import { DduItem, DduOptions, KindOptions } from "../types.ts";
+import { ActionFlags, DduItem, DduOptions, KindOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type ActionArguments<Params extends Record<string, unknown>> = {
@@ -18,8 +18,10 @@ export abstract class BaseKind<
 
   apiVersion = 1;
 
-  actions: Record<string, (args: ActionArguments<Params>) => Promise<void>> =
-    {};
+  actions: Record<
+    string,
+    (args: ActionArguments<Params>) => Promise<ActionFlags>
+  > = {};
 
   abstract params(): Params;
 }

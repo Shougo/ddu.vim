@@ -130,6 +130,7 @@ export class Ui extends BaseUi<Params> {
         args.options.input,
         this.filterBufnr,
       ) as number;
+
       return Promise.resolve(ActionFlags.None);
     },
   };
