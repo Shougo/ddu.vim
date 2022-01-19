@@ -25,13 +25,19 @@ import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
 
+type DduExtType = "ui" | "source" | "filter" | "kind";
+
 export class Ddu {
   private uis: Record<string, BaseUi<Record<string, unknown>>> = {};
   private sources: Record<string, BaseSource<Record<string, unknown>>> = {};
   private filters: Record<string, BaseFilter<Record<string, unknown>>> = {};
   private kinds: Record<string, BaseKind<Record<string, unknown>>> = {};
-  private aliasSources: Record<string, string> = {};
-  private aliasFilters: Record<string, string> = {};
+  private aliases: Record<DduExtType, Record<string, string>> = {
+    ui: {},
+    source: {},
+    filter: {},
+    kind: {},
+  };
   private checkPaths: Record<string, boolean> = {};
   private items: Record<string, DduItem[]> = {};
   private input = "";
@@ -258,81 +264,60 @@ export class Ddu {
     });
   }
 
-  async registerUI(path: string, name: string) {
+  async register(type: DduExtType, path: string, name: string) {
+    if (path in this.checkPaths) {
+      return;
+    }
     this.checkPaths[path] = true;
 
     const mod = await import(toFileUrl(path).href);
 
-    const addUI = (name: string) => {
-      const ui = new mod.Ui();
-      ui.name = name;
-      this.uis[ui.name] = ui;
-    };
+    let add;
+    switch (type) {
+      case "ui":
+        add = (name: string) => {
+          const ui = new mod.Ui();
+          ui.name = name;
+          this.uis[ui.name] = ui;
+        };
+        break;
+      case "source":
+        add = (name: string) => {
+          const source = new mod.Source();
+          source.name = name;
+          this.sources[source.name] = source;
+        };
+        break;
+      case "filter":
+        add = (name: string) => {
+          const filter = new mod.Filter();
+          filter.name = name;
+          this.filters[filter.name] = filter;
+        };
+        break;
+      case "kind":
+        add = (name: string) => {
+          const kind = new mod.Kind();
+          kind.name = name;
+          this.kinds[kind.name] = kind;
+        };
+        break;
+    }
 
-    addUI(name);
-  }
-
-  async registerSource(path: string, name: string) {
-    this.checkPaths[path] = true;
-
-    const mod = await import(toFileUrl(path).href);
-
-    const addSource = (name: string) => {
-      const source = new mod.Source();
-      source.name = name;
-      this.sources[source.name] = source;
-    };
-
-    addSource(name);
+    add(name);
 
     // Check alias
-    const aliases = Object.keys(this.aliasSources).filter(
-      (k) => this.aliasSources[k] == name,
+    const aliases = Object.keys(this.aliases[type]).filter(
+      (k) => this.aliases[type][k] == name,
     );
     for (const alias of aliases) {
-      addSource(alias);
+      add(alias);
     }
-  }
-
-  async registerFilter(path: string, name: string) {
-    this.checkPaths[path] = true;
-
-    const mod = await import(toFileUrl(path).href);
-
-    const addFilter = (name: string) => {
-      const filter = new mod.Filter();
-      filter.name = name;
-      this.filters[filter.name] = filter;
-    };
-
-    addFilter(name);
-
-    // Check alias
-    const aliases = Object.keys(this.aliasFilters).filter(
-      (k) => this.aliasFilters[k] == name,
-    );
-    for (const alias of aliases) {
-      addFilter(alias);
-    }
-  }
-
-  async registerKind(path: string, name: string) {
-    this.checkPaths[path] = true;
-
-    const mod = await import(toFileUrl(path).href);
-
-    const addKind = (name: string) => {
-      const kind = new mod.Kind();
-      kind.name = name;
-      this.kinds[kind.name] = kind;
-    };
-
-    addKind(name);
   }
 
   async autoload(
     denops: Denops,
-    type: "ui" | "source" | "filter" | "kind",
+    type: DduExtType,
     names: string[],
   ): Promise<string[]> {
     if (names.length == 0) {
@@ -363,53 +348,16 @@ export class Ddu {
       return Promise.resolve(paths);
     }
 
-    if (type == "ui") {
-      const paths = (await globpath(
-        ["denops/@ddu-uis/"],
-        names,
-      )).filter((path) => !(path in this.checkPaths));
+    const paths = await globpath(
+      [`denops/@ddu-${type}s/`],
+      names.map((file) => this.aliases[type][file] ?? file),
+    );
 
-      await Promise.all(paths.map(async (path) => {
-        await this.registerUI(path, parse(path).name);
-      }));
+    await Promise.all(paths.map(async (path) => {
+      await this.register(type, path, parse(path).name);
+    }));
 
-      return Promise.resolve(paths);
-    } else if (type == "source") {
-      const paths = (await globpath(
-        ["denops/@ddu-sources/"],
-        names.map((file) => this.aliasSources[file] ?? file),
-      )).filter((path) => !(path in this.checkPaths));
-
-      await Promise.all(paths.map(async (path) => {
-        await this.registerSource(path, parse(path).name);
-      }));
-
-      return Promise.resolve(paths);
-    } else if (type == "filter") {
-      const paths = (await globpath(
-        ["denops/@ddu-filters/"],
-        names.map((file) => this.aliasFilters[file] ?? file),
-      )).filter((path) => !(path in this.checkPaths));
-
-      await Promise.all(paths.map(async (path) => {
-        await this.registerFilter(path, parse(path).name);
-      }));
-
-      return Promise.resolve(paths);
-    } else if (type == "kind") {
-      const paths = (await globpath(
-        ["denops/@ddu-kinds/"],
-        names,
-      )).filter((path) => !(path in this.checkPaths));
-
-      await Promise.all(paths.map(async (path) => {
-        await this.registerKind(path, parse(path).name);
-      }));
-
-      return Promise.resolve(paths);
-    }
-
-    return Promise.resolve([]);
+    return Promise.resolve(paths);
   }
 }
 
