@@ -1,10 +1,7 @@
 import { BaseSource, Item } from "../ddu/types.ts";
 import { Denops, fn } from "../ddu/deps.ts";
 import { join, resolve } from "https://deno.land/std@0.120.0/path/mod.ts";
-
-type ActionData = {
-  path: string;
-};
+import { ActionData } from "../@ddu-kinds/file.ts";
 
 type Params = {
   path: string;

@@ -7,6 +7,10 @@ export type DduExtType = "ui" | "source" | "filter" | "kind";
 
 export type SourceName = string;
 
+export type Context = {
+  bufNr: number;
+};
+
 export type Custom = {
   source: Record<SourceName, SourceOptions>;
   option: DduOptions;

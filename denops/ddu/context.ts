@@ -1,5 +1,6 @@
-import { assertEquals } from "./deps.ts";
+import { assertEquals, Denops, fn } from "./deps.ts";
 import {
+  Context,
   DduOptions,
   FilterOptions,
   SourceOptions,
@@ -35,6 +36,12 @@ export function foldMerge<T>(
   partials: (null | undefined | Partial<T>)[],
 ): T {
   return partials.map((x) => x || {}).reduce(merge, def());
+}
+
+export function defaultContext(): Context {
+  return {
+    bufNr: 0,
+  };
 }
 
 export function defaultDduOptions(): DduOptions {
@@ -178,8 +185,16 @@ class Custom {
 export class ContextBuilder {
   private custom: Custom = new Custom();
 
-  get(options: Record<string, unknown>): DduOptions {
-    return this.custom.get(options);
+  async get(
+    denops: Denops,
+    options: Record<string, unknown>,
+  ): Promise<[Context, DduOptions]> {
+    return [
+      {
+        bufNr: await fn.bufnr(denops, "%"),
+      },
+      this.custom.get(options),
+    ];
   }
 
   getGlobal(): Partial<DduOptions> {

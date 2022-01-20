@@ -5,6 +5,7 @@ import {
   BaseKind,
   BaseSource,
   BaseUi,
+  Context,
   DduExtType,
   DduItem,
   DduOptions,
@@ -14,6 +15,7 @@ import {
   UserSource,
 } from "./types.ts";
 import {
+  defaultContext,
   defaultDduOptions,
   foldMerge,
   mergeSourceOptions,
@@ -40,14 +42,17 @@ export class Ddu {
   private checkPaths: Record<string, boolean> = {};
   private items: Record<string, DduItem[]> = {};
   private input = "";
+  private context: Context = defaultContext();
   private options: DduOptions = defaultDduOptions();
 
   async start(
     denops: Denops,
+    context: Context,
     options: DduOptions,
   ): Promise<void> {
     await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
+    this.context = context;
     this.options = options;
     this.input = this.options.input;
 
@@ -64,6 +69,7 @@ export class Ddu {
       );
       const sourceItems = source.gather({
         denops: denops,
+        context: this.context,
         options: this.options,
         sourceOptions: sourceOptions,
         sourceParams: sourceParams,

@@ -65,10 +65,10 @@ export async function main(denops: Denops) {
       ensureObject(arg1);
 
       const userOptions = arg1 as Record<string, unknown>;
-      const options = contextBuilder.get(userOptions);
+      const [context, options] = await contextBuilder.get(denops, userOptions);
 
       const ddu = getDdu(options.name);
-      await ddu.start(denops, options);
+      await ddu.start(denops, context, options);
     },
     async narrow(arg1: unknown, arg2: unknown): Promise<void> {
       ensureString(arg1);

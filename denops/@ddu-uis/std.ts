@@ -37,13 +37,10 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
   }): Promise<void> {
     const bufferName = `ddu-std-${args.options.name}`;
-    let bufnr;
-    if (await fn.bufexists(args.denops, bufferName)) {
-      bufnr = await fn.bufnr(args.denops, bufferName);
-    } else {
-      // Initialize buffer
-      bufnr = await this.initBuffer(args.denops, bufferName);
-    }
+    const exists = await fn.bufexists(args.denops, bufferName);
+    const bufnr = exists
+      ? await fn.bufnr(args.denops, bufferName)
+      : await this.initBuffer(args.denops, bufferName);
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
 

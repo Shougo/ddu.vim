@@ -1,4 +1,4 @@
-import { DduOptions, Item, SourceOptions } from "../types.ts";
+import { Context, DduOptions, Item, SourceOptions } from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type OnInitArguments<Params extends Record<string, unknown>> = {
@@ -16,6 +16,7 @@ export type OnEventArguments<Params extends Record<string, unknown>> = {
 
 export type GatherArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
+  context: Context;
   options: DduOptions;
   sourceOptions: SourceOptions;
   sourceParams: Params;
