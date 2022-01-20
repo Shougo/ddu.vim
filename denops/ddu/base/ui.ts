@@ -29,6 +29,14 @@ export type RedrawArguments<Params extends Record<string, unknown>> = {
   uiParams: Params;
 };
 
+export type QuitArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+};
+
 export type ActionArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
   context: Context;
@@ -51,6 +59,8 @@ export abstract class BaseUi<
   refreshItems(_args: RefreshItemsArguments<Params>): void {}
 
   async redraw(_args: RedrawArguments<Params>): Promise<void> {}
+
+  async quit(_args: QuitArguments<Params>): Promise<void> {}
 
   actions: Record<
     string,

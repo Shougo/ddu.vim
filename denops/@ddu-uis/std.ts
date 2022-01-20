@@ -19,6 +19,7 @@ type Params = {
 };
 
 export class Ui extends BaseUi<Params> {
+  private bufnr = -1;
   private filterBufnr = -1;
   private items: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
@@ -38,9 +39,8 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
   }): Promise<void> {
     const bufferName = `ddu-std-${args.options.name}`;
-    const exists = await fn.bufexists(args.denops, bufferName);
-    const bufnr = exists
-      ? await fn.bufnr(args.denops, bufferName)
+    const bufnr = this.bufnr > 0
+      ? this.bufnr
       : await this.initBuffer(args.denops, bufferName);
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
@@ -59,6 +59,11 @@ export class Ui extends BaseUi<Params> {
           await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
           break;
       }
+    }
+
+    if (this.bufnr <= 0) {
+      // Highlights must be initialized when not exists
+      await this.initHighlights(args.denops, bufnr);
     }
 
     // Update main buffer
@@ -84,6 +89,8 @@ export class Ui extends BaseUi<Params> {
         this.filterBufnr,
       ) as number;
     }
+
+    this.bufnr = bufnr;
   }
 
   actions: Record<
@@ -157,7 +164,13 @@ export class Ui extends BaseUi<Params> {
   ): Promise<number> {
     const bufnr = await fn.bufadd(denops, bufferName);
     await fn.bufload(denops, bufnr);
-    await denops.cmd(`buffer ${bufnr}`);
+    return Promise.resolve(bufnr);
+  }
+
+  private async initHighlights(
+    denops: Denops,
+    bufnr: number,
+  ): Promise<void> {
     const winid = await fn.win_getid(denops);
 
     // Set options
@@ -168,8 +181,6 @@ export class Ui extends BaseUi<Params> {
     await denops.cmd(
       "highlight default link dduStdSelectedLine Statement",
     );
-
-    await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
 
     await denops.cmd(
       `syntax match dduStdNormalLine /^[ ].*/` +
@@ -184,6 +195,6 @@ export class Ui extends BaseUi<Params> {
         " conceal contained",
     );
 
-    return Promise.resolve(bufnr);
+    await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
   }
 }

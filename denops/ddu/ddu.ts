@@ -111,7 +111,9 @@ export class Ddu {
 
   private async getUi(
     denops: Denops,
-  ): Promise<BaseUi<Record<string, unknown>>> {
+  ): Promise<
+    [BaseUi<Record<string, unknown>>, UiOptions, Record<string, unknown>]
+  > {
     await this.autoload(denops, "ui", [this.options.ui]);
     if (!this.uis[this.options.ui]) {
       await denops.call(
@@ -122,7 +124,13 @@ export class Ddu {
     }
 
     const ui = this.uis[this.options.ui];
-    return Promise.resolve(ui);
+    const [uiOptions, uiParams] = uiArgs(
+      this.options,
+      ui,
+    );
+    await checkUiOnInit(ui, denops, uiOptions, uiParams);
+
+    return Promise.resolve([ui, uiOptions, uiParams]);
   }
 
   private async filterItems(
@@ -179,12 +187,7 @@ export class Ddu {
       index++;
     }
 
-    const ui = await this.getUi(denops);
-    const [uiOptions, uiParams] = uiArgs(
-      this.options,
-      ui,
-    );
-    await checkUiOnInit(ui, denops, uiOptions, uiParams);
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
 
     ui.refreshItems({
       context: this.context,
@@ -208,14 +211,9 @@ export class Ddu {
     actionName: string,
     params: unknown,
   ): Promise<void> {
-    const ui = await this.getUi(denops);
-    const [uiOptions, uiParams] = uiArgs(
-      this.options,
-      ui,
-    );
-    await checkUiOnInit(ui, denops, uiOptions, uiParams);
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
 
-    const action = this.uis[this.options.ui].actions[actionName];
+    const action = ui.actions[actionName];
     const flags = await action({
       denops: denops,
       context: this.context,
