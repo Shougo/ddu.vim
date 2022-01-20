@@ -263,7 +263,7 @@ export class Ddu {
     await this.autoload(denops, "kind", kinds);
 
     const action = this.kinds[kinds[0]].actions[actionName];
-    await action({
+    const flags = await action({
       denops: denops,
       options: defaultDduOptions(),
       kindOptions: defaultKindOptions(),
@@ -271,6 +271,10 @@ export class Ddu {
       actionParams: params,
       items: items,
     });
+
+    if (flags & ActionFlags.None) {
+      // Quit UI
+    }
   }
 
   async register(type: DduExtType, path: string, name: string) {

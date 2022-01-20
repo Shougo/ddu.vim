@@ -15,6 +15,7 @@ type DoActionParams = {
 
 type Params = {
   startFilter: boolean;
+  split: "horizontal" | "vertical" | "no";
 };
 
 export class Ui extends BaseUi<Params> {
@@ -46,7 +47,18 @@ export class Ui extends BaseUi<Params> {
 
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     if (ids.length == 0) {
-      await args.denops.cmd(`buffer ${bufnr}`);
+      switch (args.uiParams.split) {
+        default:
+        case "horizontal":
+          await args.denops.cmd(`silent keepalt sbuffer ${bufnr}`);
+          break;
+        case "vertical":
+          await args.denops.cmd(`silent keepalt vertical sbuffer ${bufnr}`);
+          break;
+        case "no":
+          await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
+          break;
+      }
     }
 
     // Update main buffer
@@ -134,6 +146,7 @@ export class Ui extends BaseUi<Params> {
 
   params(): Params {
     return {
+      split: "horizontal",
       startFilter: false,
     };
   }
