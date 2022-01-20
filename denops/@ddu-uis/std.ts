@@ -93,6 +93,25 @@ export class Ui extends BaseUi<Params> {
     this.bufnr = bufnr;
   }
 
+  async quit(args: {
+    denops: Denops;
+    options: DduOptions;
+    uiOptions: UiOptions;
+    uiParams: Params;
+  }): Promise<void> {
+    if (this.bufnr <= 0) {
+      return;
+    }
+
+    const ids = await fn.win_findbuf(args.denops, this.bufnr) as number[];
+    if (ids.length == 0) {
+      return;
+    }
+
+    await fn.win_gotoid(args.denops, ids[0]);
+    await args.denops.cmd("close!");
+  }
+
   actions: Record<
     string,
     (args: ActionArguments<Params>) => Promise<ActionFlags>
