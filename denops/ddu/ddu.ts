@@ -187,6 +187,7 @@ export class Ddu {
     await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
     ui.refreshItems({
+      context: this.context,
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
@@ -195,6 +196,7 @@ export class Ddu {
 
     await ui.redraw({
       denops: denops,
+      context: this.context,
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
@@ -216,6 +218,7 @@ export class Ddu {
     const action = this.uis[this.options.ui].actions[actionName];
     const flags = await action({
       denops: denops,
+      context: this.context,
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
@@ -227,6 +230,7 @@ export class Ddu {
     } else if (flags & ActionFlags.Redraw) {
       await ui.redraw({
         denops: denops,
+        context: this.context,
         options: this.options,
         uiOptions: uiOptions,
         uiParams: uiParams,

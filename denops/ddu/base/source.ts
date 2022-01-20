@@ -7,13 +7,6 @@ export type OnInitArguments<Params extends Record<string, unknown>> = {
   sourceParams: Params;
 };
 
-export type OnEventArguments<Params extends Record<string, unknown>> = {
-  denops: Denops;
-  options: DduOptions;
-  sourceOptions: SourceOptions;
-  sourceParams: Params;
-};
-
 export type GatherArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
   context: Context;
