@@ -96,8 +96,6 @@ export class Ui extends BaseUi<Params> {
   async quit(args: {
     denops: Denops;
     options: DduOptions;
-    uiOptions: UiOptions;
-    uiParams: Params;
   }): Promise<void> {
     if (this.bufnr <= 0) {
       return;
@@ -105,6 +103,7 @@ export class Ui extends BaseUi<Params> {
 
     const ids = await fn.win_findbuf(args.denops, this.bufnr) as number[];
     if (ids.length == 0) {
+      await args.denops.cmd(`buffer ${this.bufnr}`);
       return;
     }
 
@@ -143,7 +142,6 @@ export class Ui extends BaseUi<Params> {
     toggleSelectItem: async (args: {
       denops: Denops;
       options: DduOptions;
-      actionParams: unknown;
     }) => {
       const idx = (await fn.line(args.denops, ".")) - 1;
       if (this.selectedItems.has(idx)) {
@@ -157,7 +155,6 @@ export class Ui extends BaseUi<Params> {
     openFilterWindow: async (args: {
       denops: Denops;
       options: DduOptions;
-      actionParams: unknown;
     }) => {
       this.filterBufnr = await args.denops.call(
         "ddu#ui#std#filter#_open",
@@ -166,6 +163,13 @@ export class Ui extends BaseUi<Params> {
         this.filterBufnr,
       ) as number;
 
+      return Promise.resolve(ActionFlags.None);
+    },
+    quit: async (args: {
+      denops: Denops;
+      options: DduOptions;
+    }) => {
+      await this.quit({ denops: args.denops, options: args.options});
       return Promise.resolve(ActionFlags.None);
     },
   };
