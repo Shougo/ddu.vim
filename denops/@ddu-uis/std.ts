@@ -71,7 +71,10 @@ export class Ui extends BaseUi<Params> {
       "ddu#ui#std#update_buffer",
       bufnr,
       this.items.map(
-        (c, i) => `${this.selectedItems.has(i) ? "*" : " "}${c.word}`,
+        (c, i) =>
+          `${this.selectedItems.has(i) ? "*" : " "}${
+            c.display ? c.display : c.word
+          }`,
       ),
     );
 
@@ -169,7 +172,7 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
       options: DduOptions;
     }) => {
-      await this.quit({ denops: args.denops, options: args.options});
+      await this.quit({ denops: args.denops, options: args.options });
       return Promise.resolve(ActionFlags.None);
     },
   };
