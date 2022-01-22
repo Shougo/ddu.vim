@@ -257,18 +257,6 @@ EXAMPLES						*ddu-examples*
 	"call ddu#start([
 	"\ {'name': 'file_rec', 'params': {'path': expand('~')}}
 	"\ ])
-
-	autocmd FileType ddu-std call s:ddu_my_settings()
-	function! s:ddu_my_settings() abort
-	  nnoremap <buffer><silent> <CR>
-	  \ <Cmd>call ddu#ui#std#do_map('doAction', {'name' : 'default'})<CR>
-	  nnoremap <buffer><silent> <Space>
-	  \ <Cmd>call ddu#ui#std#do_map('toggleSelectItem')<CR>
-	  nnoremap <buffer><silent> i
-	  \ <Cmd>call ddu#ui#std#do_map('openFilterWindow')<CR>
-	  nnoremap <buffer><silent> q
-	  \ <Cmd>call ddu#ui#std#do_map('quit')<CR>
-	endfunction
 <
 
 ==============================================================================
