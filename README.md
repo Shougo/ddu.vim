@@ -140,7 +140,9 @@ call ddu#custom#patch_global({
 " Specify source with params
 " Note: file_rec source
 " https://github.com/Shougo/ddu-source-file_rec
-"call ddu#start([{'name': 'file_rec', 'params': {'path': expand('~')}}])
+"call ddu#start({'sources': [
+"    \ {'name': 'file_rec', 'params': {'path': expand('~')}}
+"    \ ]})
 ```
 
 See `:help ddu-options` for a complete list of options.
