@@ -106,11 +106,15 @@ Ddu.vim requires both Deno and denops.vim.
 
 ```vim
 " You must set the default ui in the first
+" Note: std ui
+" https://github.com/Shougo/ddu-ui-std
 call ddu#custom#patch_global({
     \ 'ui': 'std',
     \ })
 
 " Specify matcher.
+" Note: matcher_substring filter
+" https://github.com/Shougo/ddu-filter-matcher_substring
 call ddu#custom#patch_global({
     \   'sourceOptions': {
     \     '_': {
@@ -120,6 +124,8 @@ call ddu#custom#patch_global({
     \ })
 
 " Set default sources
+" Note: file source
+" https://github.com/Shougo/ddu-source-file
 "call ddu#custom#patch_global({
 "    \ 'sources': [{'name': 'file', 'params': {}}],
 "    \ })
@@ -139,6 +145,8 @@ call ddu#custom#patch_global({
 "call ddu#start({'name': 'files'})
 
 " Specify source with params
+" Note: file_rec source
+" https://github.com/Shougo/ddu-source-file_rec
 "call ddu#start([{'name': 'file_rec', 'params': {'path': expand('~')}}])
 ```
 
