@@ -1,6 +1,6 @@
 import { BaseSource, Context, Item } from "../ddu/types.ts";
 import { Denops, fn } from "../ddu/deps.ts";
-import { ActionData } from "../@ddu-kinds/file.ts";
+import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.1.0/file.ts#^";
 
 type Params = Record<never, never>;
 
