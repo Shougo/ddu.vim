@@ -61,6 +61,15 @@ export class Ddu {
       const currentIndex = index;
       this.items[currentIndex] = [];
 
+      if (!this.sources[userSource.name]) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid source is detected: ${userSource.name}`,
+        );
+
+        continue;
+      }
+
       const source = this.sources[userSource.name];
       const [sourceOptions, sourceParams] = sourceArgs(
         options,
@@ -153,6 +162,15 @@ export class Ddu {
 
     let items = this.items[index];
     for (const filterName of filters) {
+      if (!this.filters[filterName]) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid filter is detected: ${filterName}`,
+        );
+
+        continue;
+      }
+
       items = await this.filters[filterName].filter({
         denops: denops,
         options: this.options,
@@ -270,7 +288,17 @@ export class Ddu {
       uiParams: uiParams,
     });
 
-    const action = this.kinds[kinds[0]].actions[actionName];
+    const kind = kinds[0];
+    if (!this.kinds[kind]) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid kind is detected: ${kind}`,
+      );
+
+      return;
+    }
+
+    const action = this.kinds[kind].actions[actionName];
     await action({
       denops: denops,
       options: defaultDduOptions(),
