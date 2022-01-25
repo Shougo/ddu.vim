@@ -209,6 +209,7 @@ export class Ddu {
     // Update current input
     this.input = input;
     this.context.done = true;
+    this.context.maxItems = 0;
 
     let allItems: DduItem[] = [];
     let index = 0;
