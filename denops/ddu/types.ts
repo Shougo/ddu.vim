@@ -10,6 +10,7 @@ export type SourceName = string;
 export type Context = {
   bufNr: number;
   done: boolean;
+  maxItems: number;
 };
 
 export type Custom = {

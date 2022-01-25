@@ -164,7 +164,7 @@ export class Ddu {
     userSource: UserSource,
     index: number,
     input: string,
-  ): Promise<[boolean, DduItem[]]> {
+  ): Promise<[boolean, number, DduItem[]]> {
     const source = this.sources[userSource.name];
     const [sourceOptions, _] = sourceArgs(
       this.options,
@@ -178,6 +178,7 @@ export class Ddu {
     await this.autoload(denops, "filter", filters);
 
     let items = this.gatherStates[index].items;
+    const maxItems = items.length;
     for (const filterName of filters) {
       if (!this.filters[filterName]) {
         await denops.call(
@@ -198,7 +199,7 @@ export class Ddu {
         items: items,
       });
     }
-    return [this.gatherStates[index].done, items];
+    return [this.gatherStates[index].done, maxItems, items];
   }
 
   async narrow(
@@ -212,7 +213,7 @@ export class Ddu {
     let allItems: DduItem[] = [];
     let index = 0;
     for (const userSource of this.options.sources) {
-      const [done, items] = await this.filterItems(
+      const [done, maxItems, items] = await this.filterItems(
         denops,
         userSource,
         index,
@@ -220,6 +221,7 @@ export class Ddu {
       );
       allItems = allItems.concat(items);
       this.context.done = done && this.context.done;
+      this.context.maxItems += maxItems;
 
       index++;
     }

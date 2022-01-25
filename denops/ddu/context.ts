@@ -42,6 +42,7 @@ export function defaultContext(): Context {
   return {
     bufNr: 0,
     done: false,
+    maxItems: 0,
   };
 }
 
@@ -192,8 +193,8 @@ export class ContextBuilder {
   ): Promise<[Context, DduOptions]> {
     return [
       {
+        ...defaultContext(),
         bufNr: await fn.bufnr(denops, "%"),
-        done: false,
       },
       this.custom.get(options),
     ];
