@@ -41,6 +41,7 @@ export function foldMerge<T>(
 export function defaultContext(): Context {
   return {
     bufNr: 0,
+    done: false,
   };
 }
 
@@ -192,6 +193,7 @@ export class ContextBuilder {
     return [
       {
         bufNr: await fn.bufnr(denops, "%"),
+        done: false,
       },
       this.custom.get(options),
     ];

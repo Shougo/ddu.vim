@@ -9,6 +9,7 @@ export type SourceName = string;
 
 export type Context = {
   bufNr: number;
+  done: boolean;
 };
 
 export type Custom = {

@@ -28,6 +28,11 @@ import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
 
+type GatherState = {
+  items: DduItem[];
+  done: boolean;
+};
+
 export class Ddu {
   private uis: Record<string, BaseUi<Record<string, unknown>>> = {};
   private sources: Record<string, BaseSource<Record<string, unknown>>> = {};
@@ -40,7 +45,7 @@ export class Ddu {
     kind: {},
   };
   private checkPaths: Record<string, boolean> = {};
-  private items: Record<string, DduItem[]> = {};
+  private gatherStates: Record<string, GatherState> = {};
   private input = "";
   private context: Context = defaultContext();
   private options: DduOptions = defaultDduOptions();
@@ -59,7 +64,10 @@ export class Ddu {
     let index = 0;
     for (const userSource of options.sources) {
       const currentIndex = index;
-      this.items[currentIndex] = [];
+      this.gatherStates[currentIndex] = {
+        items: [],
+        done: false,
+      };
 
       if (!this.sources[userSource.name]) {
         await denops.call(
@@ -90,7 +98,11 @@ export class Ddu {
       const readChunk = async (
         v: ReadableStreamReadResult<Item<unknown>[]>,
       ) => {
+        const state = this.gatherStates[currentIndex];
+
         if (!v.value || v.done) {
+          state.done = true;
+          await this.narrow(denops, this.input);
           return;
         }
 
@@ -106,9 +118,14 @@ export class Ddu {
         });
 
         // Update items
-        this.items[currentIndex] = this.items[currentIndex].concat(newItems);
+        if (state.items.length != 0) {
+          state.items = state.items.concat(newItems);
 
-        await this.narrow(denops, this.input);
+          // Note: skip first update for narrowing
+          await this.narrow(denops, this.input);
+        } else {
+          state.items = newItems;
+        }
 
         reader.read().then(readChunk);
       };
@@ -147,7 +164,7 @@ export class Ddu {
     userSource: UserSource,
     index: number,
     input: string,
-  ): Promise<DduItem[]> {
+  ): Promise<[boolean, DduItem[]]> {
     const source = this.sources[userSource.name];
     const [sourceOptions, _] = sourceArgs(
       this.options,
@@ -160,7 +177,7 @@ export class Ddu {
     );
     await this.autoload(denops, "filter", filters);
 
-    let items = this.items[index];
+    let items = this.gatherStates[index].items;
     for (const filterName of filters) {
       if (!this.filters[filterName]) {
         await denops.call(
@@ -181,7 +198,7 @@ export class Ddu {
         items: items,
       });
     }
-    return items;
+    return [this.gatherStates[index].done, items];
   }
 
   async narrow(
@@ -190,18 +207,20 @@ export class Ddu {
   ): Promise<void> {
     // Update current input
     this.input = input;
+    this.context.done = true;
 
-    let items: DduItem[] = [];
+    let allItems: DduItem[] = [];
     let index = 0;
     for (const userSource of this.options.sources) {
-      items = items.concat(
-        await this.filterItems(
-          denops,
-          userSource,
-          index,
-          this.input,
-        ),
+      const [done, items] = await this.filterItems(
+        denops,
+        userSource,
+        index,
+        this.input,
       );
+      allItems = allItems.concat(items);
+      this.context.done = done && this.context.done;
+
       index++;
     }
 
@@ -212,7 +231,7 @@ export class Ddu {
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
-      items: items,
+      items: allItems,
     });
 
     await ui.redraw({
