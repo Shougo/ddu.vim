@@ -54,6 +54,7 @@ export function defaultDduOptions(): DduOptions {
     kindParams: {},
     input: "",
     name: "default",
+    resume: false,
     sourceOptions: {},
     sourceParams: {},
     sources: [],

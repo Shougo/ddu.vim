@@ -68,7 +68,7 @@ export async function main(denops: Denops) {
       const [context, options] = await contextBuilder.get(denops, userOptions);
 
       const ddu = getDdu(options.name);
-      await ddu.start(denops, context, options);
+      await ddu.start(denops, context, options, userOptions);
     },
     async narrow(arg1: unknown, arg2: unknown): Promise<void> {
       ensureString(arg1);

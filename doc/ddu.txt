@@ -103,6 +103,14 @@ name
 
 		Default: "default"
 
+							*ddu-option-resume*
+resume
+		Reuse the previous state.  If none exist, a new denite
+		state is created.
+		Note: Uses |ddu-option-name| to search for previous state.
+
+		Default: v:false
+
 						*ddu-option-sourceOptions*
 sourceOptions
 		It is a dictionary that maps source names to its options.  The

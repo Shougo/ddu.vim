@@ -49,17 +49,34 @@ export class Ddu {
   private input = "";
   private context: Context = defaultContext();
   private options: DduOptions = defaultDduOptions();
+  private initialized = false;
 
   async start(
     denops: Denops,
     context: Context,
     options: DduOptions,
+    userOptions: Record<string, unknown>,
   ): Promise<void> {
     await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
     this.context = context;
-    this.options = options;
-    this.input = this.options.input;
+
+    if (this.initialized && userOptions?.resume) {
+      // Note: sources must not overwrite
+      userOptions.sources = this.options.sources;
+      this.options = Object.assign(this.options, userOptions);
+
+      if (userOptions?.input) {
+        this.input = userOptions.input as string;
+      }
+
+      // Redraw
+      await this.narrow(denops, this.input);
+      return;
+    } else {
+      this.options = options;
+      this.input = this.options.input;
+    }
 
     let index = 0;
     for (const userSource of options.sources) {
@@ -133,6 +150,8 @@ export class Ddu {
       reader.read().then(readChunk);
       index++;
     }
+
+    this.initialized = true;
   }
 
   private async getUi(
