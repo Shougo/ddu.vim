@@ -32,6 +32,7 @@ export type DduOptions = {
   kindOptions: Record<string, Partial<KindOptions>>;
   kindParams: Record<string, Partial<Record<string, unknown>>>;
   name: string;
+  refresh: boolean;
   resume: boolean;
   sourceOptions: Record<SourceName, Partial<SourceOptions>>;
   sourceParams: Record<SourceName, Partial<Record<string, unknown>>>;

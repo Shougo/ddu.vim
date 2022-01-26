@@ -74,9 +74,11 @@ export class Ddu {
         this.input = userOptions.input as string;
       }
 
-      // Redraw
-      await this.narrow(denops, this.input);
-      return;
+      if (!userOptions?.refresh) {
+        // Redraw
+        await this.narrow(denops, this.input);
+        return;
+      }
     } else {
       this.options = options;
       this.input = this.options.input;

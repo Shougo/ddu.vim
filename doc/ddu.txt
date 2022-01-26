@@ -103,6 +103,10 @@ name
 
 		Default: "default"
 
+							*ddu-option-refresh*
+refresh
+		Refresh the items when |ddu-option-resume|.
+
 							*ddu-option-resume*
 resume
 		Reuse the previous state.  If none exist, a new denite
@@ -443,7 +447,7 @@ A: Because users can customize sources perfectly.  If a source has the
 default, users have to check them.  It increases configuration cost.
 The config should work as users config.
 
-Q: I want to use commands like denite.nvim
+Q: I want to use ":Ddu" command like ":Denite" in denite.nvim
 
 A: You can use ddu-commands.vim.
 https://github.com/Shougo/ddu-commands.vim
