@@ -18,6 +18,7 @@ import {
   defaultContext,
   defaultDduOptions,
   foldMerge,
+  mergeDduOptions,
   mergeSourceOptions,
   mergeSourceParams,
   mergeUiOptions,
@@ -64,6 +65,10 @@ export class Ddu {
     if (this.initialized && userOptions?.resume) {
       // Note: sources must not overwrite
       userOptions.sources = this.options.sources;
+      this.options = foldMerge(mergeDduOptions, defaultDduOptions, [
+        this.options,
+        userOptions,
+      ]);
 
       if (userOptions?.input) {
         this.input = userOptions.input as string;

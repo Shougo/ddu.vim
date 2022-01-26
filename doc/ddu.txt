@@ -108,7 +108,6 @@ resume
 		Reuse the previous state.  If none exist, a new denite
 		state is created.
 		Note: Uses |ddu-option-name| to search for previous state.
-		Note: Most options are ignored when reuse the state.
 
 		Default: v:false
 
