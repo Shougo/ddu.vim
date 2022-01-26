@@ -64,7 +64,6 @@ export class Ddu {
     if (this.initialized && userOptions?.resume) {
       // Note: sources must not overwrite
       userOptions.sources = this.options.sources;
-      this.options = Object.assign(this.options, userOptions);
 
       if (userOptions?.input) {
         this.input = userOptions.input as string;
@@ -228,6 +227,7 @@ export class Ddu {
     // Update current input
     this.input = input;
     this.context.done = true;
+    this.context.input = input;
     this.context.maxItems = 0;
 
     let allItems: DduItem[] = [];

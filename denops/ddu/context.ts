@@ -42,6 +42,7 @@ export function defaultContext(): Context {
   return {
     bufNr: 0,
     done: false,
+    input: "",
     maxItems: 0,
   };
 }
