@@ -94,30 +94,54 @@ export function mergeDduOptions(
   b: Partial<DduOptions>,
 ): DduOptions {
   const overwritten: DduOptions = overwrite(a, b);
+  const partialMergeUiOptions = partialOverwrite;
+  const partialMergeUiParams = partialOverwrite;
   const partialMergeSourceOptions = partialOverwrite;
   const partialMergeSourceParams = partialOverwrite;
   const partialMergeFilterOptions = partialOverwrite;
   const partialMergeFilterParams = partialOverwrite;
+  const partialMergeKindOptions = partialOverwrite;
+  const partialMergeKindParams = partialOverwrite;
   return Object.assign(overwritten, {
+    uiOptions: migrateEachKeys(
+      partialMergeUiOptions,
+      a.uiOptions,
+      b.uiOptions,
+    ) || {},
+    uiParams: migrateEachKeys(
+      partialMergeUiParams,
+      a.uiParams,
+      b.uiParams,
+    ) || {},
     sourceOptions: migrateEachKeys(
       partialMergeSourceOptions,
       a.sourceOptions,
       b.sourceOptions,
-    ) || {},
-    filterOptions: migrateEachKeys(
-      partialMergeFilterOptions,
-      a.filterOptions,
-      b.filterOptions,
     ) || {},
     sourceParams: migrateEachKeys(
       partialMergeSourceParams,
       a.sourceParams,
       b.sourceParams,
     ) || {},
+    filterOptions: migrateEachKeys(
+      partialMergeFilterOptions,
+      a.filterOptions,
+      b.filterOptions,
+    ) || {},
     filterParams: migrateEachKeys(
       partialMergeFilterParams,
       a.filterParams,
       b.filterParams,
+    ) || {},
+    kindOptions: migrateEachKeys(
+      partialMergeKindOptions,
+      a.kindOptions,
+      b.kindOptions,
+    ) || {},
+    kindParams: migrateEachKeys(
+      partialMergeKindParams,
+      a.kindParams,
+      b.kindParams,
     ) || {},
   });
 }
