@@ -76,7 +76,7 @@ export class Ddu {
 
       if (!userOptions?.refresh) {
         // Redraw
-        await this.narrow(denops, this.input);
+        await this.redraw(denops, this.input);
         return;
       }
     } else {
@@ -85,7 +85,7 @@ export class Ddu {
     }
 
     let index = 0;
-    for (const userSource of options.sources) {
+    for (const userSource of this.options.sources) {
       const currentIndex = index;
       this.gatherStates[currentIndex] = {
         items: [],
@@ -125,7 +125,7 @@ export class Ddu {
 
         if (!v.value || v.done) {
           state.done = true;
-          await this.narrow(denops, this.input);
+          await this.redraw(denops, this.input);
           return;
         }
 
@@ -145,7 +145,7 @@ export class Ddu {
           state.items = state.items.concat(newItems);
 
           // Note: skip first update for narrowing
-          await this.narrow(denops, this.input);
+          await this.redraw(denops, this.input);
         } else {
           state.items = newItems;
         }
@@ -227,7 +227,7 @@ export class Ddu {
     return [this.gatherStates[index].done, maxItems, items];
   }
 
-  async narrow(
+  async redraw(
     denops: Denops,
     input: string,
   ): Promise<void> {
@@ -290,7 +290,7 @@ export class Ddu {
     });
 
     if (flags & ActionFlags.RefreshItems) {
-      await this.narrow(denops, this.input);
+      await this.redraw(denops, this.input);
     } else if (flags & ActionFlags.Redraw) {
       await ui.redraw({
         denops: denops,

@@ -97,7 +97,7 @@ input
 
 		Default: ""
 
-						*ddu-option-name*
+							*ddu-option-name*
 name
 		Specify the name.
 
@@ -184,6 +184,18 @@ ddu#do_action({name}, {items})
 		Do the {name} action for {items}.
 
 		Note: It is for creating UI interface.
+
+							*ddu#redraw()*
+ddu#redraw({name}[, {opt}])
+		Redraw the UI.
+		Note: It does not refresh items.
+
+		{name} is specified ddu name(|ddu-option-name|).
+
+		{opt} is the options.  The options below are available:
+
+		input				(string)
+		Specify narrowing text.
 
 CUSTOM FUNCTIONS 					*ddu-custom-functions*
 
@@ -455,6 +467,9 @@ https://github.com/Shougo/ddu-commands.vim
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2022.01.27
+* Rename ddu#narrow() to ddu#redraw().
 
 2022.01.22
 * Split all uis/sources/filters/kinds.  You need to install and specify them

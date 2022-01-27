@@ -70,15 +70,20 @@ export async function main(denops: Denops) {
       const ddu = getDdu(options.name);
       await ddu.start(denops, context, options, userOptions);
     },
-    async narrow(arg1: unknown, arg2: unknown): Promise<void> {
+    async redraw(arg1: unknown, arg2: unknown): Promise<void> {
       ensureString(arg1);
-      ensureString(arg2);
+      ensureObject(arg2);
 
       const name = arg1 as string;
-      const input = arg2 as string;
+      const opt = arg2 as {
+        input?: string,
+      };
+      if (!opt.input) {
+        opt.input = "";
+      }
 
       const ddu = getDdu(name);
-      await ddu.narrow(denops, input);
+      await ddu.redraw(denops, opt.input);
     },
     async uiAction(
       arg1: unknown,

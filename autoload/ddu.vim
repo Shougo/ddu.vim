@@ -1,8 +1,8 @@
 function! ddu#start(...) abort
   call ddu#_request('start', [get(a:000, 0, {})])
 endfunction
-function! ddu#narrow(name, input) abort
-  call ddu#_notify('narrow', [a:name, a:input])
+function! ddu#redraw(name, ...) abort
+  call ddu#_notify('redraw', [a:name, get(a:000, 0, {})])
 endfunction
 function! ddu#ui_action(name, action, params) abort
   call ddu#_request('uiAction', [a:name, a:action, a:params])
