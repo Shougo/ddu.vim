@@ -3,6 +3,7 @@ import {
   Context,
   DduOptions,
   FilterOptions,
+  KindOptions,
   SourceOptions,
   UiOptions,
 } from "./types.ts";
@@ -25,10 +26,12 @@ function overwrite<T>(a: T, b: Partial<T>): T {
 export const mergeUiOptions: Merge<UiOptions> = overwrite;
 export const mergeSourceOptions: Merge<SourceOptions> = overwrite;
 export const mergeFilterOptions: Merge<FilterOptions> = overwrite;
+export const mergeKindOptions: Merge<KindOptions> = overwrite;
 
 export const mergeUiParams: Merge<Record<string, unknown>> = overwrite;
 export const mergeSourceParams: Merge<Record<string, unknown>> = overwrite;
 export const mergeFilterParams: Merge<Record<string, unknown>> = overwrite;
+export const mergeKindParams: Merge<Record<string, unknown>> = overwrite;
 
 export function foldMerge<T>(
   merge: Merge<T>,

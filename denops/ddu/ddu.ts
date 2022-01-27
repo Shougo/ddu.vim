@@ -9,7 +9,9 @@ import {
   DduExtType,
   DduItem,
   DduOptions,
+  FilterOptions,
   Item,
+  KindOptions,
   SourceOptions,
   UiOptions,
   UserSource,
@@ -19,6 +21,10 @@ import {
   defaultDduOptions,
   foldMerge,
   mergeDduOptions,
+  mergeFilterOptions,
+  mergeFilterParams,
+  mergeKindOptions,
+  mergeKindParams,
   mergeSourceOptions,
   mergeSourceParams,
   mergeUiOptions,
@@ -205,7 +211,8 @@ export class Ddu {
     let items = this.gatherStates[index].items;
     const maxItems = items.length;
     for (const filterName of filters) {
-      if (!this.filters[filterName]) {
+      const filter = this.filters[filterName];
+      if (!filter) {
         await denops.call(
           "ddu#util#print_error",
           `Invalid filter is detected: ${filterName}`,
@@ -214,12 +221,14 @@ export class Ddu {
         continue;
       }
 
-      items = await this.filters[filterName].filter({
+      const [filterOptions, filterParams] = filterArgs(this.options, filter);
+
+      items = await filter.filter({
         denops: denops,
         options: this.options,
         sourceOptions: sourceOptions,
-        filterOptions: defaultFilterOptions(),
-        filterParams: defaultFilterParams(),
+        filterOptions: filterOptions,
+        filterParams: filterParams,
         input: input,
         items: items,
       });
@@ -336,22 +345,25 @@ export class Ddu {
       uiParams: uiParams,
     });
 
-    const kind = kinds[0];
-    if (!this.kinds[kind]) {
+    const kindName = kinds[0];
+    const kind = this.kinds[kindName];
+    if (!kind) {
       await denops.call(
         "ddu#util#print_error",
-        `Invalid kind is detected: ${kind}`,
+        `Invalid kind is detected: ${kindName}`,
       );
 
       return;
     }
 
-    const action = this.kinds[kind].actions[actionName];
+    const [kindOptions, kindParams] = kindArgs(this.options, kind);
+
+    const action = kind.actions[actionName];
     await action({
       denops: denops,
-      options: defaultDduOptions(),
-      kindOptions: defaultKindOptions(),
-      kindParams: defaultKindParams(),
+      options: this.options,
+      kindOptions: kindOptions,
+      kindParams: kindParams,
       actionParams: params,
       items: items,
     });
@@ -454,6 +466,28 @@ export class Ddu {
   }
 }
 
+function uiArgs<
+  Params extends Record<string, unknown>,
+>(
+  options: DduOptions,
+  ui: BaseUi<Params>,
+): [UiOptions, Record<string, unknown>] {
+  const o = foldMerge(
+    mergeUiOptions,
+    defaultUiOptions,
+    [
+      options.uiOptions["_"],
+      options.uiOptions[ui.name],
+    ],
+  );
+  const p = foldMerge(mergeUiParams, defaultUiParams, [
+    ui.params ? ui.params() : null,
+    options.uiParams["_"],
+    options.uiParams[ui.name],
+  ]);
+  return [o, p];
+}
+
 function sourceArgs<
   Params extends Record<string, unknown>,
   UserData extends unknown,
@@ -480,24 +514,46 @@ function sourceArgs<
   return [o, p];
 }
 
-function uiArgs<
+function filterArgs<
   Params extends Record<string, unknown>,
 >(
   options: DduOptions,
-  ui: BaseUi<Params>,
-): [UiOptions, Record<string, unknown>] {
+  filter: BaseFilter<Params>,
+): [FilterOptions, Record<string, unknown>] {
   const o = foldMerge(
-    mergeUiOptions,
-    defaultUiOptions,
+    mergeFilterOptions,
+    defaultFilterOptions,
     [
-      options.uiOptions["_"],
-      options.uiOptions[ui.name],
+      options.filterOptions["_"],
+      options.filterOptions[filter.name],
     ],
   );
-  const p = foldMerge(mergeUiParams, defaultUiParams, [
-    ui.params ? ui.params() : null,
-    options.uiParams["_"],
-    options.uiParams[ui.name],
+  const p = foldMerge(mergeFilterParams, defaultFilterParams, [
+    filter.params ? filter.params() : null,
+    options.sourceParams["_"],
+    options.sourceParams[filter.name],
+  ]);
+  return [o, p];
+}
+
+function kindArgs<
+  Params extends Record<string, unknown>,
+>(
+  options: DduOptions,
+  kind: BaseKind<Params>,
+): [KindOptions, Record<string, unknown>] {
+  const o = foldMerge(
+    mergeKindOptions,
+    defaultKindOptions,
+    [
+      options.kindOptions["_"],
+      options.kindOptions[kind.name],
+    ],
+  );
+  const p = foldMerge(mergeKindParams, defaultKindParams, [
+    kind.params ? kind.params() : null,
+    options.sourceParams["_"],
+    options.sourceParams[kind.name],
   ]);
   return [o, p];
 }

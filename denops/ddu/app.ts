@@ -76,7 +76,7 @@ export async function main(denops: Denops) {
 
       const name = arg1 as string;
       const opt = arg2 as {
-        input?: string,
+        input?: string;
       };
       if (!opt.input) {
         opt.input = "";
