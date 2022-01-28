@@ -82,7 +82,7 @@ export class Ddu {
 
       if (!userOptions?.refresh) {
         // Redraw
-        await this.redraw(denops, this.input);
+        await this.redraw(denops);
         return;
       }
     } else {
@@ -90,6 +90,14 @@ export class Ddu {
       this.input = this.options.input;
     }
 
+    this.refresh(denops);
+
+    this.initialized = true;
+  }
+
+  async refresh(
+    denops: Denops,
+  ): Promise<void> {
     let index = 0;
     for (const userSource of this.options.sources) {
       const currentIndex = index;
@@ -109,7 +117,7 @@ export class Ddu {
 
       const source = this.sources[userSource.name];
       const [sourceOptions, sourceParams] = sourceArgs(
-        options,
+        this.options,
         userSource,
         source,
       );
@@ -131,7 +139,7 @@ export class Ddu {
 
         if (!v.value || v.done) {
           state.done = true;
-          await this.redraw(denops, this.input);
+          await this.redraw(denops);
           return;
         }
 
@@ -151,7 +159,7 @@ export class Ddu {
           state.items = state.items.concat(newItems);
 
           // Note: skip first update for narrowing
-          await this.redraw(denops, this.input);
+          await this.redraw(denops);
         } else {
           state.items = newItems;
         }
@@ -162,88 +170,14 @@ export class Ddu {
       reader.read().then(readChunk);
       index++;
     }
-
-    this.initialized = true;
-  }
-
-  private async getUi(
-    denops: Denops,
-  ): Promise<
-    [BaseUi<Record<string, unknown>>, UiOptions, Record<string, unknown>]
-  > {
-    await this.autoload(denops, "ui", [this.options.ui]);
-    if (!this.uis[this.options.ui]) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Invalid ui is detected: "${this.options.ui}"`,
-      );
-      return Promise.reject();
-    }
-
-    const ui = this.uis[this.options.ui];
-    const [uiOptions, uiParams] = uiArgs(
-      this.options,
-      ui,
-    );
-    await checkUiOnInit(ui, denops, uiOptions, uiParams);
-
-    return Promise.resolve([ui, uiOptions, uiParams]);
-  }
-
-  private async filterItems(
-    denops: Denops,
-    userSource: UserSource,
-    index: number,
-    input: string,
-  ): Promise<[boolean, number, DduItem[]]> {
-    const source = this.sources[userSource.name];
-    const [sourceOptions, _] = sourceArgs(
-      this.options,
-      userSource,
-      source,
-    );
-
-    const filters = sourceOptions.matchers.concat(sourceOptions.sorters).concat(
-      sourceOptions.converters,
-    );
-    await this.autoload(denops, "filter", filters);
-
-    let items = this.gatherStates[index].items;
-    const maxItems = items.length;
-    for (const filterName of filters) {
-      const filter = this.filters[filterName];
-      if (!filter) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Invalid filter is detected: ${filterName}`,
-        );
-
-        continue;
-      }
-
-      const [filterOptions, filterParams] = filterArgs(this.options, filter);
-
-      items = await filter.filter({
-        denops: denops,
-        options: this.options,
-        sourceOptions: sourceOptions,
-        filterOptions: filterOptions,
-        filterParams: filterParams,
-        input: input,
-        items: items,
-      });
-    }
-    return [this.gatherStates[index].done, maxItems, items];
   }
 
   async redraw(
     denops: Denops,
-    input: string,
   ): Promise<void> {
     // Update current input
-    this.input = input;
     this.context.done = true;
-    this.context.input = input;
+    this.context.input = this.input;
     this.context.maxItems = 0;
 
     let allItems: DduItem[] = [];
@@ -299,7 +233,7 @@ export class Ddu {
     });
 
     if (flags & ActionFlags.RefreshItems) {
-      await this.redraw(denops, this.input);
+      await this.refresh(denops);
     } else if (flags & ActionFlags.Redraw) {
       await ui.redraw({
         denops: denops,
@@ -463,6 +397,80 @@ export class Ddu {
     }));
 
     return Promise.resolve(paths);
+  }
+
+  setInput(input: string) {
+    this.input = input;
+  }
+
+  private async getUi(
+    denops: Denops,
+  ): Promise<
+    [BaseUi<Record<string, unknown>>, UiOptions, Record<string, unknown>]
+  > {
+    await this.autoload(denops, "ui", [this.options.ui]);
+    if (!this.uis[this.options.ui]) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid ui is detected: "${this.options.ui}"`,
+      );
+      return Promise.reject();
+    }
+
+    const ui = this.uis[this.options.ui];
+    const [uiOptions, uiParams] = uiArgs(
+      this.options,
+      ui,
+    );
+    await checkUiOnInit(ui, denops, uiOptions, uiParams);
+
+    return Promise.resolve([ui, uiOptions, uiParams]);
+  }
+
+  private async filterItems(
+    denops: Denops,
+    userSource: UserSource,
+    index: number,
+    input: string,
+  ): Promise<[boolean, number, DduItem[]]> {
+    const source = this.sources[userSource.name];
+    const [sourceOptions, _] = sourceArgs(
+      this.options,
+      userSource,
+      source,
+    );
+
+    const filters = sourceOptions.matchers.concat(sourceOptions.sorters).concat(
+      sourceOptions.converters,
+    );
+    await this.autoload(denops, "filter", filters);
+
+    let items = this.gatherStates[index].items;
+    const maxItems = items.length;
+    for (const filterName of filters) {
+      const filter = this.filters[filterName];
+      if (!filter) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid filter is detected: ${filterName}`,
+        );
+
+        continue;
+      }
+
+      const [filterOptions, filterParams] = filterArgs(this.options, filter);
+
+      items = await filter.filter({
+        denops: denops,
+        options: this.options,
+        sourceOptions: sourceOptions,
+        filterOptions: filterOptions,
+        filterParams: filterParams,
+        input: input,
+        items: items,
+      });
+    }
+    return [this.gatherStates[index].done, maxItems, items];
   }
 }
 

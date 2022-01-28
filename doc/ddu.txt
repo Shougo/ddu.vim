@@ -172,13 +172,6 @@ uiParams
 ------------------------------------------------------------------------------
 FUNCTIONS 						*ddu-functions*
 
-							*ddu#start()*
-ddu#start({options})
-		Creates a new Ddu buffer.
-
-		Refer to |ddu-options| about {options}.  If you skip a value,
-		it uses the default value.
-
 							*ddu#do_action()*
 ddu#do_action({name}, {items})
 		Do the {name} action for {items}.
@@ -196,6 +189,16 @@ ddu#redraw({name}[, {opt}])
 
 		input				(string)
 		Specify narrowing text.
+
+		refreshItems			(boolean)
+		If it is true, refresh current items.
+
+							*ddu#start()*
+ddu#start({options})
+		Creates a new Ddu buffer.
+
+		Refer to |ddu-options| about {options}.  If you skip a value,
+		it uses the default value.
 
 CUSTOM FUNCTIONS 					*ddu-custom-functions*
 

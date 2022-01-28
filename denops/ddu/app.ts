@@ -77,13 +77,20 @@ export async function main(denops: Denops) {
       const name = arg1 as string;
       const opt = arg2 as {
         input?: string;
+        refreshItems?: boolean;
       };
-      if (!opt.input) {
-        opt.input = "";
-      }
 
       const ddu = getDdu(name);
-      await ddu.redraw(denops, opt.input);
+
+      if (opt?.input) {
+        ddu.setInput(opt.input);
+      }
+
+      if (opt?.refreshItems) {
+        await ddu.refresh(denops);
+      } else {
+        await ddu.redraw(denops);
+      }
     },
     async uiAction(
       arg1: unknown,
