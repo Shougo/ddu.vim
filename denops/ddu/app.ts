@@ -108,7 +108,7 @@ export async function main(denops: Denops) {
       const ddu = getDdu(name);
       await ddu.uiAction(denops, actionName, params);
     },
-    async doAction(
+    async itemAction(
       arg1: unknown,
       arg2: unknown,
       arg3: unknown,
@@ -125,7 +125,7 @@ export async function main(denops: Denops) {
       const params = arg4;
 
       const ddu = getDdu(name);
-      await ddu.doAction(denops, actionName, items, params);
+      await ddu.itemAction(denops, actionName, items, params);
     },
   };
 

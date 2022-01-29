@@ -7,8 +7,8 @@ endfunction
 function! ddu#ui_action(name, action, params) abort
   call ddu#_request('uiAction', [a:name, a:action, a:params])
 endfunction
-function! ddu#do_action(name, action, items, params) abort
-  call ddu#_request('doAction', [a:name, a:action, a:items, a:params])
+function! ddu#item_action(name, action, items, params) abort
+  call ddu#_request('itemAction', [a:name, a:action, a:items, a:params])
 endfunction
 
 function! ddu#_request(name, args) abort

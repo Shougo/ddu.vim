@@ -245,7 +245,7 @@ export class Ddu {
     }
   }
 
-  async doAction(
+  async itemAction(
     denops: Denops,
     actionName: string,
     items: DduItem[],
