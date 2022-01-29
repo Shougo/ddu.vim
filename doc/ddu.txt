@@ -172,8 +172,8 @@ uiParams
 ------------------------------------------------------------------------------
 FUNCTIONS 						*ddu-functions*
 
-							*ddu#do_action()*
-ddu#do_action({name}, {items})
+							*ddu#item_action()*
+ddu#item_action({name}, {items})
 		Do the {name} action for {items}.
 
 		Note: It is for creating UI interface.
@@ -470,6 +470,9 @@ https://github.com/Shougo/ddu-commands.vim
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2022.01.29
+* Rename ddu#do_action() to ddu#item_action().
 
 2022.01.27
 * Rename ddu#narrow() to ddu#redraw().
