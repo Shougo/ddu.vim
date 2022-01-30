@@ -74,8 +74,8 @@ export class Ddu {
 
       this.updateOptions(userOptions);
 
-      if (userOptions?.input) {
-        this.input = userOptions.input as string;
+      if (userOptions?.input != null) {
+        this.setInput(userOptions.input as string);
       }
 
       if (!userOptions?.refresh) {
@@ -85,7 +85,7 @@ export class Ddu {
       }
     } else {
       this.options = options;
-      this.input = this.options.input;
+      this.setInput(this.options.input);
     }
 
     this.refresh(denops);
