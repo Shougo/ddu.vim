@@ -193,6 +193,9 @@ ddu#redraw({name}[, {opt}])
 		refreshItems			(boolean)
 		If it is true, refresh current items.
 
+		updateOptions			(dictionary)
+		Overwrites options. Refer to |ddu-options| about options.
+
 							*ddu#start()*
 ddu#start({options})
 		Creates a new Ddu buffer.

@@ -71,10 +71,8 @@ export class Ddu {
     if (this.initialized && userOptions?.resume) {
       // Note: sources must not overwrite
       userOptions.sources = this.options.sources;
-      this.options = foldMerge(mergeDduOptions, defaultDduOptions, [
-        this.options,
-        userOptions,
-      ]);
+
+      this.updateOptions(userOptions);
 
       if (userOptions?.input) {
         this.input = userOptions.input as string;
@@ -401,6 +399,13 @@ export class Ddu {
 
   setInput(input: string) {
     this.input = input;
+  }
+
+  updateOptions(userOptions: Record<string, unknown>) {
+    this.options = foldMerge(mergeDduOptions, defaultDduOptions, [
+      this.options,
+      userOptions,
+    ]);
   }
 
   private async getUi(

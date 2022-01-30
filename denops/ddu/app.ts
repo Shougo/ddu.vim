@@ -78,6 +78,7 @@ export async function main(denops: Denops) {
       const opt = arg2 as {
         input?: string;
         refreshItems?: boolean;
+        updateOptions?: Record<string, unknown>;
       };
 
       const ddu = getDdu(name);
@@ -86,7 +87,11 @@ export async function main(denops: Denops) {
         ddu.setInput(opt.input);
       }
 
-      if (opt?.refreshItems) {
+      if (opt?.updateOptions) {
+        ddu.updateOptions(opt.updateOptions);
+      }
+
+      if (opt?.refreshItems || opt?.updateOptions) {
         await ddu.refresh(denops);
       } else {
         await ddu.redraw(denops);
