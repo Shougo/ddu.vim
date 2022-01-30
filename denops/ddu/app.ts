@@ -82,7 +82,7 @@ export async function main(denops: Denops) {
 
       const ddu = getDdu(name);
 
-      if (opt?.input) {
+      if (opt.input != null) {
         ddu.setInput(opt.input);
       }
 
