@@ -63,12 +63,20 @@ export type KindOptions = {
   defaultAction: string;
 };
 
+export type ItemHighlight = {
+  name: string;
+  "hl_group": string;
+  col: number;
+  width: number;
+};
+
 export type Item<
   ActionData extends unknown = unknown,
 > = {
   word: string;
   display?: string;
   action?: ActionData;
+  highlights?: ItemHighlight[];
 };
 
 // For internal type

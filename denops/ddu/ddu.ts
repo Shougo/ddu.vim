@@ -143,7 +143,9 @@ export class Ddu {
 
         const newItems = v.value.map((item: Item) => {
           const matcherKey = (sourceOptions.matcherKey in item)
-            ? (item as Record<string, string>)[sourceOptions.matcherKey]
+            ? (item as Record<string, unknown>)[
+              sourceOptions.matcherKey
+            ] as string
             : item.word;
           return {
             ...item,

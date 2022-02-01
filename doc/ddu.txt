@@ -1,6 +1,6 @@
 *ddu.txt*	Dark deno-powered UI framework for neovim/Vim8
 
-Version: 0.3
+Version: 0.4
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
@@ -412,9 +412,9 @@ SOURCE ATTRIBUTES				*ddu-source-attributes*
 ------------------------------------------------------------------------------
 ITEM ATTRIBUTES						*ddu-item-attributes*
 
-					*ddu-item-attribute-word*
-word		(String)			(Required)
-		The word of a item. It is used for matching inputs.
+					*ddu-item-attribute-action*
+action		(List)			(Optional)
+		The dictionary of actions.
 
 					*ddu-item-attribute-display*
 display		(String)			(Optional)
@@ -422,6 +422,25 @@ display		(String)			(Optional)
 		attribute is used instead.  It is not used for matching
 		inputs.
 
+					*ddu-item-attribute-highlights*
+highlights	(List)			(Optional)
+		The list of highlight.
+
+		name				(string)
+		The highlight name.
+
+		hl_group			(string)
+		|:highlight| group.  Please see |highlight-groups|.
+
+		col				(number)
+		The highlight start column.
+
+		width				(number)
+		The highlight end width.
+
+					*ddu-item-attribute-word*
+word		(String)			(Required)
+		The word of a item. It is used for matching inputs.
 
 ==============================================================================
 CREATE FILTER						*ddu-create-filter*
