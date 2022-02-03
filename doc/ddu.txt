@@ -1,6 +1,6 @@
 *ddu.txt*	Dark deno-powered UI framework for neovim/Vim8
 
-Version: 0.5
+Version: 0.6
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
@@ -52,7 +52,7 @@ It does not work with zero configuration.  You can use other plugins.
 ==============================================================================
 INSTALL							*ddu-install*
 
-Note: ddu.vim requires Neovim (0.5.0+) or Vim8.2.0662+ (latest is
+Note: ddu.vim requires Neovim (0.6.0+) or Vim8.2.0662+ (latest is
 recommended).
 
 Please install both Deno and "denops.vim".
@@ -492,6 +492,9 @@ https://github.com/Shougo/ddu-commands.vim
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2022.02.04
+* neovim 0.6 is required.
 
 2022.01.29
 * Rename ddu#do_action() to ddu#item_action().

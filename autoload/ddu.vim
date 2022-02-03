@@ -33,9 +33,9 @@ function! ddu#_init() abort
     return
   endif
 
-  if !has('patch-8.2.0662') && !has('nvim-0.5')
+  if !has('patch-8.2.0662') && !has('nvim-0.6')
     call ddu#util#print_error(
-          \ 'ddu requires Vim 8.2.0662+ or neovim 0.5.0+.')
+          \ 'ddu requires Vim 8.2.0662+ or neovim 0.6.0+.')
     return 1
   endif
 
