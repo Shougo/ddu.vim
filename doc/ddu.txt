@@ -242,11 +242,22 @@ ddu#custom#patch_local({buffer-name}, {dict})
 ==============================================================================
 EXAMPLES						*ddu-examples*
 >
-	" You must set the default ui in the first
+	" You must set the default ui.
 	" Note: std ui
 	" https://github.com/Shougo/ddu-ui-std
 	call ddu#custom#patch_global({
 	    \ 'ui': 'std',
+	    \ })
+
+	" You must set the default action.
+	" Note: file kind
+	" https://github.com/Shougo/ddu-kind-file
+	call ddu#custom#patch_global({
+	    \   'kindOptions': {
+	    \     'file': {
+	    \       'defaultAction': 'open',
+	    \     },
+	    \   }
 	    \ })
 
 	" Specify matcher.
@@ -312,8 +323,7 @@ autoAction
 						*ddu-ui-option-defaultAction*
 defaultAction
 		Specify the default action.
-		Note: It overwrites all default actions includes kind/source
-		default actions.
+		Note: It overwrites kind/source default actions.
 
 		Default: "default"
 
@@ -341,11 +351,47 @@ Note: The sources cannot set default options for source.  If the source need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
+				    		*ddu-source-option-converters*
+converters		(string[])
+		It is a list of registered filter names to change items
+		attributes.
+		Items will be processed in the order you specify here.
+
+		Default: []
+
+					*ddu-source-option-defaultAction*
+defaultAction
+		Specify the default action.
+		Note: It overwrites kind default actions.
+
+		Default: ""
+
 				    	*ddu-source-option-ignoreCase*
 ignoreCase		(boolean)
 		If it is True, ddu ignores case.
 
 		Default: v:false
+
+						*ddu-source-option-matcherKey*
+matcherKey		(string)
+		Matcher compare key for items.
+
+		Default: "word"
+
+				    		*ddu-source-option-matchers*
+matchers		(string[])
+		It is a list of registered filter names to filter items
+		by user input.
+		Items will be processed in the order you specify here.
+
+		Default: []
+
+				    		*ddu-source-option-sorters*
+sorters			(string[])
+		It is a list of registered filter names to sort items.
+		Items will be processed in the order you specify here.
+
+		Default: []
 
 
 ------------------------------------------------------------------------------
@@ -382,7 +428,12 @@ KINDS							*ddu-kinds*
 ------------------------------------------------------------------------------
 KIND OPTIONS						*ddu-kind-options*
 
-Undefined now
+				    	*ddu-kind-option-defaultAction*
+defaultAction	(string)
+		Specify the default action.
+
+		Default: ""
+
 
 ------------------------------------------------------------------------------
 KIND PARAMS						*ddu-kind-params*
@@ -495,6 +546,7 @@ COMPATIBILITY						*ddu-compatibility*
 
 2022.02.04
 * neovim 0.6 is required.
+* Users must set default kind.
 
 2022.01.29
 * Rename ddu#do_action() to ddu#item_action().

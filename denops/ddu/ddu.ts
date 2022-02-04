@@ -107,7 +107,7 @@ export class Ddu {
       if (!this.sources[userSource.name]) {
         await denops.call(
           "ddu#util#print_error",
-          `Invalid source is detected: ${userSource.name}`,
+          `Invalid source: ${userSource.name}`,
         );
 
         continue;
@@ -251,13 +251,12 @@ export class Ddu {
     items: DduItem[],
     params: unknown,
   ): Promise<void> {
-    if (actionName == "default") {
-      // Use default action
-      actionName = "open";
-    }
+    const sources = [
+      ...new Set(items.map((item) => this.sources[item.__sourceName])),
+    ];
 
     const kinds = [
-      ...new Set(items.map((item) => this.sources[item.__sourceName].kind)),
+      ...new Set(sources.map((source) => source.kind)),
     ];
     if (kinds.length != 1) {
       await denops.call(
@@ -269,6 +268,53 @@ export class Ddu {
 
     await this.autoload(denops, "kind", kinds);
 
+    const kindName = kinds[0];
+    const kind = this.kinds[kindName];
+    if (!kind) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid kind: ${kindName}`,
+      );
+
+      return;
+    }
+
+    const [kindOptions, kindParams] = kindArgs(this.options, kind);
+
+    // Get default action
+    if (actionName == "default") {
+      // Use source default action
+      const [sourceOptions, _] = sourceArgs(
+        this.options,
+        null,
+        sources[0],
+      );
+      actionName = sourceOptions.defaultAction;
+
+      if (actionName == "") {
+        // Use kind default action
+        actionName = kindOptions.defaultAction;
+      }
+
+      if (actionName == "") {
+        await denops.call(
+          "ddu#util#print_error",
+          `The default action is not defined for the items`,
+        );
+
+        return;
+      }
+    }
+
+    if (!kind.actions[actionName]) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid action: ${actionName}`,
+      );
+
+      return;
+    }
+
     // Quit UI before action
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     await ui.quit({
@@ -278,19 +324,6 @@ export class Ddu {
       uiOptions: uiOptions,
       uiParams: uiParams,
     });
-
-    const kindName = kinds[0];
-    const kind = this.kinds[kindName];
-    if (!kind) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Invalid kind is detected: ${kindName}`,
-      );
-
-      return;
-    }
-
-    const [kindOptions, kindParams] = kindArgs(this.options, kind);
 
     const action = kind.actions[actionName];
     await action({
@@ -419,7 +452,7 @@ export class Ddu {
     if (!this.uis[this.options.ui]) {
       await denops.call(
         "ddu#util#print_error",
-        `Invalid ui is detected: "${this.options.ui}"`,
+        `Invalid ui: "${this.options.ui}"`,
       );
       return Promise.reject();
     }
@@ -459,7 +492,7 @@ export class Ddu {
       if (!filter) {
         await denops.call(
           "ddu#util#print_error",
-          `Invalid filter is detected: ${filterName}`,
+          `Invalid filter: ${filterName}`,
         );
 
         continue;
@@ -496,7 +529,7 @@ function uiArgs<
     ],
   );
   const p = foldMerge(mergeUiParams, defaultUiParams, [
-    ui.params ? ui.params() : null,
+    ui.params(),
     options.uiParams["_"],
     options.uiParams[ui.name],
   ]);
@@ -508,7 +541,7 @@ function sourceArgs<
   UserData extends unknown,
 >(
   options: DduOptions,
-  userSource: UserSource,
+  userSource: UserSource | null,
   source: BaseSource<Params, UserData>,
 ): [SourceOptions, Record<string, unknown>] {
   const o = foldMerge(
@@ -517,14 +550,14 @@ function sourceArgs<
     [
       options.sourceOptions["_"],
       options.sourceOptions[source.name],
-      userSource.options,
+      userSource?.options,
     ],
   );
   const p = foldMerge(mergeSourceParams, defaultSourceParams, [
-    source.params ? source.params() : null,
+    source?.params(),
     options.sourceParams["_"],
     options.sourceParams[source.name],
-    userSource.params,
+    userSource?.params,
   ]);
   return [o, p];
 }
@@ -544,7 +577,7 @@ function filterArgs<
     ],
   );
   const p = foldMerge(mergeFilterParams, defaultFilterParams, [
-    filter.params ? filter.params() : null,
+    filter?.params(),
     options.sourceParams["_"],
     options.sourceParams[filter.name],
   ]);
@@ -566,7 +599,7 @@ function kindArgs<
     ],
   );
   const p = foldMerge(mergeKindParams, defaultKindParams, [
-    kind.params ? kind.params() : null,
+    kind?.params(),
     options.sourceParams["_"],
     options.sourceParams[kind.name],
   ]);

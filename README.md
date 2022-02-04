@@ -98,11 +98,22 @@ Ddu.vim requires both Deno and denops.vim.
 ## Configuration
 
 ```vim
-" You must set the default ui in the first
+" You must set the default ui.
 " Note: std ui
 " https://github.com/Shougo/ddu-ui-std
 call ddu#custom#patch_global({
     \ 'ui': 'std',
+    \ })
+
+" You must set the default action.
+" Note: file kind
+" https://github.com/Shougo/ddu-kind-file
+call ddu#custom#patch_global({
+    \   'kindOptions': {
+    \     'file': {
+    \       'defaultAction': 'open',
+    \     },
+    \   }
     \ })
 
 " Specify matcher.

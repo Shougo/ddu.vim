@@ -40,6 +40,7 @@ export abstract class BaseSource<
 export function defaultSourceOptions(): SourceOptions {
   return {
     converters: [],
+    defaultAction: "",
     ignoreCase: false,
     matcherKey: "word",
     matchers: [],
