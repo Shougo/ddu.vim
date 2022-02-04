@@ -2,6 +2,7 @@ export { BaseUi } from "./base/ui.ts";
 export { BaseSource } from "./base/source.ts";
 export { BaseFilter } from "./base/filter.ts";
 export { BaseKind } from "./base/kind.ts";
+import { Denops } from "./deps.ts";
 
 export type DduExtType = "ui" | "source" | "filter" | "kind";
 
@@ -89,6 +90,15 @@ export type DduItem =
     matcherKey: string;
     __sourceName: string;
   };
+
+export type ActionArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
+  options: DduOptions;
+  kindOptions: KindOptions;
+  kindParams: Params;
+  actionParams: unknown;
+  items: DduItem[];
+};
 
 export enum ActionFlags {
   None = 0,

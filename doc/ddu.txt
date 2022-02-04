@@ -1,6 +1,6 @@
 *ddu.txt*	Dark deno-powered UI framework for neovim/Vim8
 
-Version: 0.6
+Version: 0.7
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
@@ -175,6 +175,7 @@ FUNCTIONS 						*ddu-functions*
 							*ddu#item_action()*
 ddu#item_action({name}, {items})
 		Do the {name} action for {items}.
+		Note: You cannot mix multiple kinds/sources.
 
 		Note: It is for creating UI interface.
 
@@ -547,6 +548,7 @@ COMPATIBILITY						*ddu-compatibility*
 2022.02.04
 * neovim 0.6 is required.
 * Users must set default kind.
+* Cannot mix multiple kinds/sources for item action.
 
 2022.01.29
 * Rename ddu#do_action() to ddu#item_action().

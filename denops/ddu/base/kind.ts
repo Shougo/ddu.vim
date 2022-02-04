@@ -1,14 +1,4 @@
-import { ActionFlags, DduItem, DduOptions, KindOptions } from "../types.ts";
-import { Denops } from "../deps.ts";
-
-export type ActionArguments<Params extends Record<string, unknown>> = {
-  denops: Denops;
-  options: DduOptions;
-  kindOptions: KindOptions;
-  kindParams: Params;
-  actionParams: unknown;
-  items: DduItem[];
-};
+import { ActionArguments, ActionFlags, KindOptions } from "../types.ts";
 
 export abstract class BaseKind<
   Params extends Record<string, unknown>,

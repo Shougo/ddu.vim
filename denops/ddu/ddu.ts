@@ -254,6 +254,15 @@ export class Ddu {
     const sources = [
       ...new Set(items.map((item) => this.sources[item.__sourceName])),
     ];
+    if (sources.length != 1) {
+      await denops.call(
+        "ddu#util#print_error",
+        `You must not mix multiple sources items: "${
+          sources.map((source) => source.name)
+        }"`,
+      );
+      return;
+    }
 
     const kinds = [
       ...new Set(sources.map((source) => source.kind)),
@@ -306,7 +315,8 @@ export class Ddu {
       }
     }
 
-    if (!kind.actions[actionName]) {
+    const actions = Object.assign(kind.actions, sources[0].actions);
+    if (!actions[actionName]) {
       await denops.call(
         "ddu#util#print_error",
         `Invalid action: ${actionName}`,
@@ -325,8 +335,7 @@ export class Ddu {
       uiParams: uiParams,
     });
 
-    const action = kind.actions[actionName];
-    await action({
+    await actions[actionName]({
       denops: denops,
       options: this.options,
       kindOptions: kindOptions,

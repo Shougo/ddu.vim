@@ -1,4 +1,11 @@
-import { Context, DduOptions, Item, SourceOptions } from "../types.ts";
+import {
+  ActionArguments,
+  ActionFlags,
+  Context,
+  DduOptions,
+  Item,
+  SourceOptions,
+} from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type OnInitArguments<Params extends Record<string, unknown>> = {
@@ -27,6 +34,11 @@ export abstract class BaseSource<
   apiVersion = 1;
 
   kind = "base";
+
+  actions: Record<
+    string,
+    (args: ActionArguments<Params>) => Promise<ActionFlags>
+  > = {};
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 
