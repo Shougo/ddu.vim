@@ -104,4 +104,5 @@ export enum ActionFlags {
   None = 0,
   RefreshItems = 1 << 0,
   Redraw = 1 << 1,
+  Persist = 1 << 2,
 }
