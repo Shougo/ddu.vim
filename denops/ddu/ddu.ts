@@ -34,6 +34,7 @@ import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
 import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
+import { Lock } from "https://deno.land/x/async@v1.1.5/mod.ts";
 
 type GatherState = {
   items: DduItem[];
@@ -57,6 +58,7 @@ export class Ddu {
   private context: Context = defaultContext();
   private options: DduOptions = defaultDduOptions();
   private initialized = false;
+  private lock = new Lock();
 
   async start(
     denops: Denops,
@@ -137,6 +139,9 @@ export class Ddu {
 
         if (!v.value || v.done) {
           state.done = true;
+          if (state.items.length == 0) {
+            await this.redraw(denops);
+          }
           return;
         }
 
@@ -204,12 +209,15 @@ export class Ddu {
       items: allItems,
     });
 
-    await ui.redraw({
-      denops: denops,
-      context: this.context,
-      options: this.options,
-      uiOptions: uiOptions,
-      uiParams: uiParams,
+    // Note: redraw must be locked
+    await this.lock.with(async() => {
+      await ui.redraw({
+        denops: denops,
+        context: this.context,
+        options: this.options,
+        uiOptions: uiOptions,
+        uiParams: uiParams,
+      });
     });
   }
 
