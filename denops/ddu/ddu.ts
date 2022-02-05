@@ -137,7 +137,6 @@ export class Ddu {
 
         if (!v.value || v.done) {
           state.done = true;
-          await this.redraw(denops);
           return;
         }
 
@@ -157,12 +156,11 @@ export class Ddu {
         // Update items
         if (state.items.length != 0) {
           state.items = state.items.concat(newItems);
-
-          // Note: skip first update for narrowing
-          await this.redraw(denops);
         } else {
           state.items = newItems;
         }
+
+        await this.redraw(denops);
 
         reader.read().then(readChunk);
       };
