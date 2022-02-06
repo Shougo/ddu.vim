@@ -90,6 +90,8 @@ export class Ddu {
       this.setInput(this.options.input);
     }
 
+    this.initialized = false;
+
     this.refresh(denops);
 
     this.initialized = true;
@@ -121,6 +123,15 @@ export class Ddu {
         userSource,
         source,
       );
+
+      if (!this.initialized) {
+        await source.onInit({
+          denops,
+          sourceOptions,
+          sourceParams,
+        });
+      }
+
       const sourceItems = source.gather({
         denops: denops,
         context: this.context,
