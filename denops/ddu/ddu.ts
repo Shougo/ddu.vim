@@ -341,7 +341,7 @@ export class Ddu {
       uiParams: uiParams,
     });
 
-    await actions[actionName]({
+    const flags = await actions[actionName]({
       denops: denops,
       options: this.options,
       kindOptions: kindOptions,
@@ -349,6 +349,18 @@ export class Ddu {
       actionParams: params,
       items: items,
     });
+
+    if (flags & ActionFlags.RefreshItems) {
+      await this.refresh(denops);
+    } else if (flags & ActionFlags.Persist) {
+      await ui.redraw({
+        denops: denops,
+        context: this.context,
+        options: this.options,
+        uiOptions: uiOptions,
+        uiParams: uiParams,
+      });
+    }
   }
 
   async register(type: DduExtType, path: string, name: string) {
