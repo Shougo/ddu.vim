@@ -210,7 +210,7 @@ export class Ddu {
     });
 
     // Note: redraw must be locked
-    await this.lock.with(async() => {
+    await this.lock.with(async () => {
       await ui.redraw({
         denops: denops,
         context: this.context,

@@ -315,12 +315,6 @@ Note: The UIs cannot set default options for UI.  If the UI need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
-						*ddu-ui-option-autoAction*
-autoAction
-		When you select a item, it runs the action automatically.
-
-		Default: ""
-
 						*ddu-ui-option-defaultAction*
 defaultAction
 		Specify the default action.
