@@ -92,7 +92,6 @@ export class Ddu {
     }
 
     this.initialized = false;
-    this.finished = false;
 
     this.refresh(denops);
 
@@ -102,6 +101,8 @@ export class Ddu {
   async refresh(
     denops: Denops,
   ): Promise<void> {
+    this.finished = false;
+
     let index = 0;
     for (const userSource of this.options.sources) {
       const currentIndex = index;
