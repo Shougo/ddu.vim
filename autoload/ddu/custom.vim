@@ -21,13 +21,7 @@ function! ddu#custom#set_local(name, dict) abort
 endfunction
 
 function! ddu#custom#alias(type, alias, base) abort
-  if ddu#_denops_running()
-    call denops#notify('ddu', 'alias', [a:type, a:alias, a:base])
-  else
-    execute printf('autocmd User DDUReady call ' .
-          \ 'denops#notify("ddu", "alias", ["%s", "%s", "%s"])',
-          \ a:type, a:alias, a:base)
-  endif
+  call s:notify('alias', [a:type, a:alias, a:base])
 endfunction
 
 " This should be called manually, so wait until dduReady by the user himself.
