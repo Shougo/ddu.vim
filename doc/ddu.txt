@@ -1,6 +1,5 @@
 *ddu.txt*	Dark deno-powered UI framework for neovim/Vim8
 
-Version: 0.7
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
