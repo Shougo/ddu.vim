@@ -474,6 +474,10 @@ export class Ddu {
     this.input = input;
   }
 
+  getOptions() {
+    return this.options;
+  }
+
   updateOptions(userOptions: Record<string, unknown>) {
     this.options = foldMerge(mergeDduOptions, defaultDduOptions, [
       this.options,

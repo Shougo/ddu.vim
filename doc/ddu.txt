@@ -169,6 +169,10 @@ uiParams
 
 		Default: {}
 
+							*ddu-option-volatile*
+volatile
+		Refresh items when |ddu#redraw()|.
+
 ------------------------------------------------------------------------------
 FUNCTIONS 						*ddu-functions*
 

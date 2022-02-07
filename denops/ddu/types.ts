@@ -41,6 +41,7 @@ export type DduOptions = {
   ui: string;
   uiOptions: Record<string, Partial<UiOptions>>;
   uiParams: Record<string, Partial<Record<string, unknown>>>;
+  volatile: boolean;
 };
 
 export type UiOptions = {

@@ -91,7 +91,10 @@ export async function main(denops: Denops) {
         ddu.updateOptions(opt.updateOptions);
       }
 
-      if (opt?.refreshItems || opt?.updateOptions) {
+      if (
+        ddu.getOptions().volatile ||
+        opt?.refreshItems || opt?.updateOptions
+      ) {
         await ddu.refresh(denops);
       } else {
         await ddu.redraw(denops);
