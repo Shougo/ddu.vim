@@ -18,6 +18,7 @@ export abstract class BaseKind<
 
 export function defaultKindOptions(): KindOptions {
   return {
+    actions: {},
     defaultAction: "",
   };
 }

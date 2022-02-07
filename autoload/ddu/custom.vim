@@ -24,6 +24,25 @@ function! ddu#custom#alias(type, alias, base) abort
   call s:notify('alias', [a:type, a:alias, a:base])
 endfunction
 
+let s:custom_actions = {}
+function! ddu#custom#action(type, source_kind_name, action_name, func) abort
+  let dict = {}
+
+  for key in denite#util#split(a:source_kind_name)
+    let dict[key] = { 'actions': {} }
+    let dict[key].actions[a:action_name] = string(a:func)
+    let s:custom_actions[string(a:func)] = a:func
+  endfor
+
+  call s:notify('patchGlobal', [
+        \ a:type ==# 'source' ?
+        \ { 'sourceOptions': dict } : { 'kindOptions': dict }
+        \ ])
+endfunction
+function! ddu#custom#_call_action(name, args) abort
+  return call(s:custom_actions[a:name], [a:args])
+endfunction
+
 " This should be called manually, so wait until dduReady by the user himself.
 function! ddu#custom#get_global() abort
   return ddu#_request('getGlobal', [])

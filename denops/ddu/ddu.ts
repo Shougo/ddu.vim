@@ -152,7 +152,7 @@ export class Ddu {
 
         if (!v.value || v.done) {
           state.done = true;
-          if (!this.finished && state.items.length == 0) {
+          if (!this.finished) {
             await this.redraw(denops);
           }
           return;
@@ -174,14 +174,13 @@ export class Ddu {
         // Update items
         if (state.items.length != 0) {
           state.items = state.items.concat(newItems);
+          await this.redraw(denops);
         } else {
           state.items = newItems;
         }
 
         if (this.finished) {
           reader.cancel();
-        } else {
-          await this.redraw(denops);
         }
 
         reader.read().then(readChunk);
@@ -342,34 +341,60 @@ export class Ddu {
       }
     }
 
-    const actions = Object.assign(kind.actions, sources[0].actions);
-    if (!actions[actionName]) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Invalid action: ${actionName}`,
-      );
+    const [sourceOptions, _] = sourceArgs(this.options, null, sources[0]);
 
-      return;
-    }
-
-    // Quit UI before action
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    await ui.quit({
-      denops: denops,
-      context: this.context,
-      options: this.options,
-      uiOptions: uiOptions,
-      uiParams: uiParams,
-    });
 
-    const flags = await actions[actionName]({
-      denops: denops,
-      options: this.options,
-      kindOptions: kindOptions,
-      kindParams: kindParams,
-      actionParams: params,
-      items: items,
-    });
+    let flags: ActionFlags;
+    if (sourceOptions.actions[actionName] || kindOptions.actions[actionName]) {
+      const action = sourceOptions.actions[actionName]
+        ? sourceOptions.actions[actionName]
+        : kindOptions.actions[actionName];
+
+      // Quit UI before action
+      await ui.quit({
+        denops: denops,
+        context: this.context,
+        options: this.options,
+        uiOptions: uiOptions,
+        uiParams: uiParams,
+      });
+
+      flags = await denops.call("ddu#custom#_call_action", action, {
+        options: this.options,
+        actionParams: params,
+        items: items,
+      }) as ActionFlags;
+    } else {
+      const action =
+        Object.assign(kind.actions, sources[0].actions)[actionName];
+      if (!action) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid action: ${actionName}`,
+        );
+
+        return;
+      }
+
+      // Quit UI before action
+      await ui.quit({
+        denops: denops,
+        context: this.context,
+        options: this.options,
+        uiOptions: uiOptions,
+        uiParams: uiParams,
+      });
+
+      flags = await action({
+        denops: denops,
+        options: this.options,
+        kindOptions: kindOptions,
+        kindParams: kindParams,
+        actionParams: params,
+        items: items,
+      });
+    }
 
     if (flags & ActionFlags.RefreshItems) {
       await this.refresh(denops);

@@ -49,6 +49,7 @@ export type UiOptions = {
 };
 
 export type SourceOptions = {
+  actions: Record<string, string>;
   converters: string[];
   defaultAction: string;
   ignoreCase: boolean;
@@ -63,6 +64,7 @@ export type FilterOptions = {
 };
 
 export type KindOptions = {
+  actions: Record<string, string>;
   defaultAction: string;
 };
 

@@ -216,6 +216,18 @@ ddu#start({options})
 
 CUSTOM FUNCTIONS 					*ddu-custom-functions*
 
+							*ddu#custom#action()*
+ddu#custom#action({type}, {source-kind-name}, {action-name}, {func})
+		Define {action-name} action for {source-kind-name}.
+		{type} must be "source" or "filter".
+		{source-kind-name} is source or kind name.
+		{func} must be a |Funcref| or the name of a function.
+>
+		call ddu#custom#action('kind', 'file', 'test',
+		    \ { args -> execute('let g:foo = 1') })
+		call ddu#custom#action('source', 'file_old', 'test2',
+		    \ { args -> execute('let g:bar = 1') })
+<
 							*ddu#custom#alias()*
 ddu#custom#alias({type}, {alias-name}, {base-name})
 		Define {alias-name} alias based on {base-name}.

@@ -156,22 +156,43 @@ function patchDduOptions(
   b: Partial<DduOptions>,
 ): Partial<DduOptions> {
   const overwritten: Partial<DduOptions> = { ...a, ...b };
+
+  const uo = migrateEachKeys(
+    partialOverwrite,
+    a.uiOptions,
+    b.uiOptions,
+  );
+  if (uo) overwritten.uiOptions = uo;
+
   const so = migrateEachKeys(
     partialOverwrite,
     a.sourceOptions,
     b.sourceOptions,
   );
   if (so) overwritten.sourceOptions = so;
+
   const fo = migrateEachKeys(
     partialOverwrite,
     a.filterOptions,
     b.filterOptions,
   );
   if (fo) overwritten.filterOptions = fo;
+
+  const ko = migrateEachKeys(
+    partialOverwrite,
+    a.kindOptions,
+    b.kindOptions,
+  );
+  if (ko) overwritten.kindOptions = ko;
+
+  const up = migrateEachKeys(partialOverwrite, a.uiParams, b.uiParams);
+  if (up) overwritten.uiParams = up;
   const sp = migrateEachKeys(partialOverwrite, a.sourceParams, b.sourceParams);
   if (sp) overwritten.sourceParams = sp;
   const fp = migrateEachKeys(partialOverwrite, a.filterParams, b.filterParams);
   if (fp) overwritten.filterParams = fp;
+  const kp = migrateEachKeys(partialOverwrite, a.kindParams, b.kindParams);
+  if (kp) overwritten.kindParams = kp;
   return overwritten;
 }
 

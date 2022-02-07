@@ -129,3 +129,7 @@ function! ddu#util#open(filename) abort
     throw 'Not supported.'
   endif
 endfunction
+
+function! ddu#util#split(string) abort
+  return split(a:string, '\s*,\s*')
+endfunction
