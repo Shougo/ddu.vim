@@ -99,10 +99,10 @@ Ddu.vim requires both Deno and denops.vim.
 
 ```vim
 " You must set the default ui.
-" Note: std ui
-" https://github.com/Shougo/ddu-ui-std
+" Note: ff ui
+" https://github.com/Shougo/ddu-ui-ff
 call ddu#custom#patch_global({
-    \ 'ui': 'std',
+    \ 'ui': 'ff',
     \ })
 
 " You must set the default action.
