@@ -4,6 +4,9 @@ endfunction
 function! ddu#redraw(name, ...) abort
   call ddu#_notify('redraw', [a:name, get(a:000, 0, {})])
 endfunction
+function! ddu#quit(name) abort
+  call ddu#_notify('quit', [a:name])
+endfunction
 function! ddu#ui_action(name, action, params) abort
   call ddu#_request('uiAction', [a:name, a:action, a:params])
 endfunction

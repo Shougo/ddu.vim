@@ -100,6 +100,14 @@ export async function main(denops: Denops) {
         await ddu.redraw(denops);
       }
     },
+    // deno-lint-ignore require-await
+    async quit(arg1: unknown): Promise<void> {
+      const name = arg1 as string;
+
+      const ddu = getDdu(name);
+
+      ddu.quit();
+    },
     async uiAction(
       arg1: unknown,
       arg2: unknown,

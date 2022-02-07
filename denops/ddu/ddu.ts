@@ -58,6 +58,7 @@ export class Ddu {
   private context: Context = defaultContext();
   private options: DduOptions = defaultDduOptions();
   private initialized = false;
+  private finished = false;
   private lock = new Lock();
 
   async start(
@@ -91,6 +92,7 @@ export class Ddu {
     }
 
     this.initialized = false;
+    this.finished = false;
 
     this.refresh(denops);
 
@@ -150,7 +152,7 @@ export class Ddu {
 
         if (!v.value || v.done) {
           state.done = true;
-          if (state.items.length == 0) {
+          if (!this.finished && state.items.length == 0) {
             await this.redraw(denops);
           }
           return;
@@ -176,7 +178,11 @@ export class Ddu {
           state.items = newItems;
         }
 
-        await this.redraw(denops);
+        if (this.finished) {
+          reader.cancel();
+        } else {
+          await this.redraw(denops);
+        }
 
         reader.read().then(readChunk);
       };
@@ -230,6 +236,10 @@ export class Ddu {
         uiParams: uiParams,
       });
     });
+  }
+
+  quit() {
+    this.finished = true;
   }
 
   async uiAction(

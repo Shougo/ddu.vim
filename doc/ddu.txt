@@ -183,6 +183,12 @@ ddu#item_action({name}, {items})
 
 		Note: It is for creating UI interface.
 
+							*ddu#quit()*
+ddu#quit({name})
+		Quit the ddu.
+
+		{name} is specified ddu name(|ddu-option-name|).
+
 							*ddu#redraw()*
 ddu#redraw({name}[, {opt}])
 		Redraw the UI.
@@ -203,7 +209,7 @@ ddu#redraw({name}[, {opt}])
 
 							*ddu#start()*
 ddu#start({options})
-		Creates a new Ddu buffer.
+		Creates a new Ddu.
 
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
