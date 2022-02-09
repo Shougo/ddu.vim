@@ -6,7 +6,7 @@ import {
   ensureString,
   vars,
 } from "./deps.ts";
-import { DduItem, DduOptions } from "./types.ts";
+import { DduEvent, DduItem, DduOptions } from "./types.ts";
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
@@ -100,13 +100,20 @@ export async function main(denops: Denops) {
         await ddu.redraw(denops);
       }
     },
-    // deno-lint-ignore require-await
-    async quit(arg1: unknown): Promise<void> {
+    async event(arg1: unknown, arg2: unknown): Promise<void> {
+      ensureString(arg1);
+      ensureString(arg2);
+
       const name = arg1 as string;
+      const event = arg2 as DduEvent;
 
       const ddu = getDdu(name);
 
-      ddu.quit();
+      if (event == "close" || event == "cancel") {
+        ddu.quit();
+      }
+
+      await ddu.onEvent(denops, event);
     },
     async uiAction(
       arg1: unknown,

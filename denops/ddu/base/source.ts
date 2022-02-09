@@ -2,6 +2,7 @@ import {
   ActionArguments,
   ActionFlags,
   Context,
+  DduEvent,
   DduOptions,
   Item,
   SourceOptions,
@@ -12,6 +13,13 @@ export type OnInitArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
   sourceOptions: SourceOptions;
   sourceParams: Params;
+};
+
+export type OnEventArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
+  sourceOptions: SourceOptions;
+  sourceParams: Params;
+  event: DduEvent;
 };
 
 export type GatherArguments<Params extends Record<string, unknown>> = {
@@ -31,7 +39,7 @@ export abstract class BaseSource<
 
   isInitialized = false;
 
-  apiVersion = 1;
+  apiVersion = 2;
 
   kind = "base";
 
@@ -41,6 +49,8 @@ export abstract class BaseSource<
   > = {};
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
+
+  async onEvent(_args: OnEventArguments<Params>): Promise<void> {}
 
   abstract gather(
     {}: GatherArguments<Params>,

@@ -6,6 +6,8 @@ import { Denops } from "./deps.ts";
 
 export type DduExtType = "ui" | "source" | "filter" | "kind";
 
+export type DduEvent = "close" | "cancel";
+
 export type SourceName = string;
 
 export type Context = {

@@ -6,6 +6,7 @@ import {
   BaseSource,
   BaseUi,
   Context,
+  DduEvent,
   DduExtType,
   DduItem,
   DduOptions,
@@ -175,7 +176,9 @@ export class Ddu {
         // Update items
         if (state.items.length != 0) {
           state.items = state.items.concat(newItems);
-          await this.redraw(denops);
+          if (!this.finished) {
+            await this.redraw(denops);
+          }
         } else {
           state.items = newItems;
         }
@@ -236,6 +239,32 @@ export class Ddu {
         uiParams: uiParams,
       });
     });
+  }
+
+  async onEvent(
+    denops: Denops,
+    event: DduEvent,
+  ): Promise<void> {
+    for (const userSource of this.options.sources) {
+      const source = this.sources[userSource.name];
+      const [sourceOptions, sourceParams] = sourceArgs(
+        this.options,
+        userSource,
+        source,
+      );
+
+      // The source may not have "onEvent"
+      if (!source.onEvent) {
+        continue;
+      }
+
+      await source.onEvent({
+        denops,
+        sourceOptions,
+        sourceParams,
+        event,
+      });
+    }
   }
 
   quit() {

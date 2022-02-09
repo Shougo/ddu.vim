@@ -8,7 +8,6 @@ CONTENTS						*ddu-contents*
 Introduction		|ddu-introduction|
 Install			|ddu-install|
 Interface		|ddu-interface|
-  Key mappings		  |ddu-key-mappings|
   Options		  |ddu-options|
   Functions		  |ddu-functions|
   Custom Functions	  |ddu-custom-functions|
@@ -67,10 +66,6 @@ https://github.com/topics/ddu-vim.
 
 ==============================================================================
 INTERFACE						*ddu-interface*
-
-
-------------------------------------------------------------------------------
-KEY MAPPINGS 						*ddu-key-mappings*
 
 
 ------------------------------------------------------------------------------
@@ -175,18 +170,23 @@ volatile
 ------------------------------------------------------------------------------
 FUNCTIONS 						*ddu-functions*
 
+							*ddu#quit()*
+ddu#event({name}, {event})
+		Call the ddu event handler.
+
+		{name} is specified ddu name(|ddu-option-name|).
+
+		{event} is the event name string.
+
+			"cancel": After cancel the UI
+			"close": After close the UI
+
 							*ddu#item_action()*
 ddu#item_action({name}, {items})
 		Do the {name} action for {items}.
 		Note: You cannot mix multiple kinds/sources.
 
 		Note: It is for creating UI interface.
-
-							*ddu#quit()*
-ddu#quit({name})
-		Quit the ddu.
-
-		{name} is specified ddu name(|ddu-option-name|).
 
 							*ddu#redraw()*
 ddu#redraw({name}[, {opt}])
@@ -559,6 +559,9 @@ https://github.com/Shougo/ddu-commands.vim
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2022.02.09
+* Replace ddu#quit() to ddu#event().
 
 2022.02.04
 * neovim 0.6 is required.
