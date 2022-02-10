@@ -377,9 +377,8 @@ export class Ddu {
 
     let flags: ActionFlags;
     if (sourceOptions.actions[actionName] || kindOptions.actions[actionName]) {
-      const action = sourceOptions.actions[actionName]
-        ? sourceOptions.actions[actionName]
-        : kindOptions.actions[actionName];
+      const action = sourceOptions.actions[actionName] ??
+        kindOptions.actions[actionName];
 
       // Quit UI before action
       await ui.quit({
