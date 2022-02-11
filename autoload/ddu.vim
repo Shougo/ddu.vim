@@ -13,6 +13,9 @@ endfunction
 function! ddu#item_action(name, action, items, params) abort
   call ddu#_request('itemAction', [a:name, a:action, a:items, a:params])
 endfunction
+function! ddu#pop(name) abort
+  call ddu#_notify('pop', [a:name])
+endfunction
 
 function! ddu#_request(name, args) abort
   if ddu#_init()

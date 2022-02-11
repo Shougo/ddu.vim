@@ -11,14 +11,31 @@ import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
 export async function main(denops: Denops) {
-  const ddus: Record<string, Ddu> = {};
+  const ddus: Record<string, Ddu[]> = {};
   const contextBuilder = new ContextBuilder();
 
   const getDdu = (name: string) => {
-    if (!(name in ddus)) {
-      ddus[name] = new Ddu();
+    if (!ddus[name]) {
+      ddus[name] = [];
     }
-    return ddus[name];
+    if (ddus[name].length == 0) {
+      ddus[name].push(new Ddu());
+    }
+    return ddus[name].slice(-1)[0];
+  };
+  const pushDdu = (name: string) => {
+    if (!ddus[name]) {
+      ddus[name] = [];
+    }
+    ddus[name].push(new Ddu());
+    return ddus[name].slice(-1)[0];
+  };
+  const popDdu = (name: string) => {
+    if (!ddus[name]) {
+      ddus[name] = [];
+    }
+
+    return ddus[name].length == 0 ? null : ddus[name].pop();
   };
 
   denops.dispatcher = {
@@ -67,7 +84,7 @@ export async function main(denops: Denops) {
       const userOptions = arg1 as Record<string, unknown>;
       const [context, options] = await contextBuilder.get(denops, userOptions);
 
-      const ddu = getDdu(options.name);
+      const ddu = options.push ? pushDdu(options.name) : getDdu(options.name);
       await ddu.start(denops, context, options, userOptions);
     },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
@@ -114,6 +131,35 @@ export async function main(denops: Denops) {
       }
 
       await ddu.onEvent(denops, event);
+    },
+    async pop(arg1: unknown): Promise<void> {
+      ensureString(arg1);
+
+      const name = arg1 as string;
+
+      const currentDdu = popDdu(name);
+      if (!currentDdu) {
+        return;
+      }
+
+      if (ddus[name].length == 0) {
+        // Quit current ddu
+        currentDdu.quit();
+        await currentDdu.onEvent(denops, "cancel");
+        return;
+      }
+
+      // Resume previous ddu state
+      const userOptions = {
+        refresh: true,
+        resume: true,
+      };
+      const [context, options] = await contextBuilder.get(
+        denops,
+        userOptions,
+      );
+      const ddu = getDdu(name);
+      await ddu.start(denops, context, options, userOptions);
     },
     async uiAction(
       arg1: unknown,

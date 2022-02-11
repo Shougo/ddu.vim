@@ -97,6 +97,11 @@ name
 
 		Default: "default"
 
+							*ddu-option-push*
+push
+		Save the current ddu state and create new ddu state.
+		Note: The state can be restored by |ddu#pop()|.
+
 							*ddu-option-refresh*
 refresh
 		Refresh the items when |ddu-option-resume|.
@@ -187,6 +192,12 @@ ddu#item_action({name}, {items})
 		Note: You cannot mix multiple kinds/sources.
 
 		Note: It is for creating UI interface.
+
+							*ddu#pop()*
+ddu#pop({name})
+		Restore the previous state.
+		If the state is empty, "cancel" the current ddu.
+		Note The previous state is saved by |ddu-option-push|.
 
 							*ddu#redraw()*
 ddu#redraw({name}[, {opt}])
