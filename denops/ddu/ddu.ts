@@ -706,8 +706,8 @@ function kindArgs<
   );
   const p = foldMerge(mergeKindParams, defaultKindParams, [
     kind?.params(),
-    options.sourceParams["_"],
-    options.sourceParams[kind.name],
+    options.kindParams["_"],
+    options.kindParams[kind.name],
   ]);
   return [o, p];
 }
