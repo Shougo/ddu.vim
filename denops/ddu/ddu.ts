@@ -684,8 +684,8 @@ function filterArgs<
   );
   const p = foldMerge(mergeFilterParams, defaultFilterParams, [
     filter?.params(),
-    options.sourceParams["_"],
-    options.sourceParams[filter.name],
+    options.filterParams["_"],
+    options.filterParams[filter.name],
   ]);
   return [o, p];
 }
