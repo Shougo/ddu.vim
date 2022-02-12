@@ -7,14 +7,17 @@ endfunction
 function! ddu#event(name, event) abort
   call ddu#_request('event', [a:name, a:event])
 endfunction
+function! ddu#pop(name) abort
+  call ddu#_notify('pop', [a:name])
+endfunction
 function! ddu#ui_action(name, action, params) abort
   call ddu#_request('uiAction', [a:name, a:action, a:params])
 endfunction
 function! ddu#item_action(name, action, items, params) abort
   call ddu#_request('itemAction', [a:name, a:action, a:items, a:params])
 endfunction
-function! ddu#pop(name) abort
-  call ddu#_notify('pop', [a:name])
+function! ddu#get_item_actions(name, items) abort
+  call ddu#_request('getItemActions', [a:name, a:items])
 endfunction
 
 function! ddu#_request(name, args) abort

@@ -204,6 +204,19 @@ export async function main(denops: Denops) {
       const ddu = getDdu(name);
       await ddu.itemAction(denops, actionName, items, params);
     },
+    async getItemActions(
+      arg1: unknown,
+      arg2: unknown,
+    ): Promise<void> {
+      ensureString(arg1);
+      ensureArray(arg2);
+
+      const name = arg1 as string;
+      const items = arg2 as DduItem[];
+
+      const ddu = getDdu(name);
+      await ddu.getItemActions(denops, items);
+    },
   };
 
   await batch(denops, async (denops: Denops) => {

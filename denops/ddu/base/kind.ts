@@ -1,4 +1,4 @@
-import { ActionArguments, ActionFlags, KindOptions } from "../types.ts";
+import { Actions, KindOptions } from "../types.ts";
 
 export abstract class BaseKind<
   Params extends Record<string, unknown>,
@@ -8,10 +8,7 @@ export abstract class BaseKind<
 
   apiVersion = 1;
 
-  actions: Record<
-    string,
-    (args: ActionArguments<Params>) => Promise<ActionFlags>
-  > = {};
+  actions: Actions<Params> = {};
 
   abstract params(): Params;
 }

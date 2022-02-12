@@ -106,6 +106,11 @@ export type ActionArguments<Params extends Record<string, unknown>> = {
   items: DduItem[];
 };
 
+export type Actions<Params extends Record<string, unknown>> = Record<
+  string,
+  (args: ActionArguments<Params>) => Promise<ActionFlags>
+>;
+
 export enum ActionFlags {
   None = 0,
   RefreshItems = 1 << 0,

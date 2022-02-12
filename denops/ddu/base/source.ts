@@ -1,6 +1,5 @@
 import {
-  ActionArguments,
-  ActionFlags,
+  Actions,
   Context,
   DduEvent,
   DduOptions,
@@ -43,10 +42,7 @@ export abstract class BaseSource<
 
   kind = "base";
 
-  actions: Record<
-    string,
-    (args: ActionArguments<Params>) => Promise<ActionFlags>
-  > = {};
+  actions: Actions<Params> = {};
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 

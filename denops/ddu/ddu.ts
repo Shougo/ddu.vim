@@ -1,6 +1,7 @@
 import { assertEquals, Denops, fn, op, parse, toFileUrl } from "./deps.ts";
 import {
   ActionFlags,
+  Actions,
   BaseFilter,
   BaseKind,
   BaseSource,
@@ -303,6 +304,57 @@ export class Ddu {
     }
   }
 
+  async getItemActions(
+    denops: Denops,
+    items: DduItem[],
+  ): Promise<Actions<Record<string, unknown>>> {
+    const sources = [
+      ...new Set(items.map((item) => this.sources[item.__sourceName])),
+    ];
+    if (sources.length != 1) {
+      await denops.call(
+        "ddu#util#print_error",
+        `You must not mix multiple sources items: "${
+          sources.map((source) => source.name)
+        }"`,
+      );
+      return {};
+    }
+
+    const kinds = [
+      ...new Set(sources.map((source) => source.kind)),
+    ];
+    if (kinds.length != 1) {
+      await denops.call(
+        "ddu#util#print_error",
+        `You must not mix multiple kinds: "${kinds}"`,
+      );
+      return {};
+    }
+
+    await this.autoload(denops, "kind", kinds);
+
+    const kindName = kinds[0];
+    const kind = this.kinds[kindName];
+    if (!kind) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid kind: ${kindName}`,
+      );
+
+      return {};
+    }
+
+    const [kindOptions, _1] = kindArgs(this.options, kind);
+    const [sourceOptions, _2] = sourceArgs(this.options, null, sources[0]);
+
+    return Object.assign(
+      kind.actions,
+      kindOptions.actions,
+      sources[0].actions,
+      sourceOptions.actions,
+    );
+  }
   async itemAction(
     denops: Denops,
     actionName: string,
