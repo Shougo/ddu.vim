@@ -81,10 +81,18 @@ export async function main(denops: Denops) {
     async start(arg1: unknown): Promise<void> {
       ensureObject(arg1);
 
-      const userOptions = arg1 as Record<string, unknown>;
+      let userOptions = arg1 as Record<string, unknown>;
       const [context, options] = await contextBuilder.get(denops, userOptions);
 
-      const ddu = options.push ? pushDdu(options.name) : getDdu(options.name);
+      let ddu = getDdu(options.name);
+
+      if (options.push) {
+        const prevDdu = ddu;
+        ddu = pushDdu(options.name);
+        // Extends previous options
+        userOptions = Object.assign(prevDdu.getUserOptions(), userOptions);
+      }
+
       await ddu.start(denops, context, options, userOptions);
     },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {

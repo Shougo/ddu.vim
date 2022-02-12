@@ -58,6 +58,7 @@ export class Ddu {
   private input = "";
   private context: Context = defaultContext();
   private options: DduOptions = defaultDduOptions();
+  private userOptions: Record<string, unknown> = {};
   private initialized = false;
   private finished = false;
   private lock = new Lock();
@@ -71,6 +72,7 @@ export class Ddu {
     await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
     this.context = context;
+    this.userOptions = userOptions;
 
     if (this.initialized && userOptions?.resume) {
       // Note: sources must not overwrite
@@ -540,6 +542,10 @@ export class Ddu {
 
   getOptions() {
     return this.options;
+  }
+
+  getUserOptions() {
+    return this.userOptions;
   }
 
   updateOptions(userOptions: Record<string, unknown>) {
