@@ -1,5 +1,5 @@
 import {
-  ActionFlags,
+  Actions,
   Context,
   DduItem,
   DduOptions,
@@ -62,10 +62,7 @@ export abstract class BaseUi<
 
   async quit(_args: QuitArguments<Params>): Promise<void> {}
 
-  actions: Record<
-    string,
-    (args: ActionArguments<Params>) => Promise<ActionFlags>
-  > = {};
+  actions: Actions<Params> = {};
 
   abstract params(): Params;
 }
