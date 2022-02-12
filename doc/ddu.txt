@@ -186,10 +186,19 @@ ddu#event({name}, {event})
 			"cancel": After cancel the UI
 			"close": After close the UI
 
-							*ddu#item_action()*
-ddu#item_action({name}, {items})
-		Do the {name} action for {items}.
+						*ddu#get_item_actions()*
+ddu#get_item_actions({name}, {items})
+		Get the {name} actions for {items}.
 		Note: You cannot mix multiple kinds/sources.
+
+							*ddu#item_action()*
+ddu#item_action({name}, {action}, {items}, {params})
+		Do the {action} action for {items}.
+		Note: You cannot mix multiple kinds/sources.
+
+		{name} is specified ddu name(|ddu-option-name|).
+
+		{params} is action params.
 
 		Note: It is for creating UI interface.
 
@@ -202,7 +211,6 @@ ddu#pop({name})
 							*ddu#redraw()*
 ddu#redraw({name}[, {opt}])
 		Redraw the UI.
-		Note: It does not refresh items.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
