@@ -307,7 +307,7 @@ export class Ddu {
   async getItemActions(
     denops: Denops,
     items: DduItem[],
-  ): Promise<Actions<Record<string, unknown>>> {
+  ): Promise<Actions<Record<string, unknown>> | null> {
     const sources = [
       ...new Set(items.map((item) => this.sources[item.__sourceName])),
     ];
@@ -318,8 +318,9 @@ export class Ddu {
           sources.map((source) => source.name)
         }"`,
       );
-      return {};
+      return null;
     }
+    const source = sources[0];
 
     const kinds = [
       ...new Set(sources.map((source) => source.kind)),
@@ -329,7 +330,7 @@ export class Ddu {
         "ddu#util#print_error",
         `You must not mix multiple kinds: "${kinds}"`,
       );
-      return {};
+      return null;
     }
 
     await this.autoload(denops, "kind", kinds);
@@ -341,75 +342,53 @@ export class Ddu {
         "ddu#util#print_error",
         `Invalid kind: ${kindName}`,
       );
-
-      return {};
+      return null;
     }
 
     const [kindOptions, _1] = kindArgs(this.options, kind);
-    const [sourceOptions, _2] = sourceArgs(this.options, null, sources[0]);
+    const [sourceOptions, _2] = sourceArgs(this.options, null, source);
 
     return Object.assign(
       kind.actions,
       kindOptions.actions,
-      sources[0].actions,
+      source.actions,
       sourceOptions.actions,
     );
   }
+
   async itemAction(
     denops: Denops,
     actionName: string,
     items: DduItem[],
     params: unknown,
   ): Promise<void> {
+    const actions = await this.getItemActions(denops, items);
+    if (!actions) {
+      // Error
+      return;
+    }
+
     const sources = [
       ...new Set(items.map((item) => this.sources[item.__sourceName])),
     ];
-    if (sources.length != 1) {
-      await denops.call(
-        "ddu#util#print_error",
-        `You must not mix multiple sources items: "${
-          sources.map((source) => source.name)
-        }"`,
-      );
-      return;
-    }
+
+    const [sourceOptions, _] = sourceArgs(
+      this.options,
+      null,
+      sources[0],
+    );
 
     const kinds = [
       ...new Set(sources.map((source) => source.kind)),
     ];
-    if (kinds.length != 1) {
-      await denops.call(
-        "ddu#util#print_error",
-        `You must not mix multiple kinds: "${kinds}"`,
-      );
-      return;
-    }
-
-    await this.autoload(denops, "kind", kinds);
-
     const kindName = kinds[0];
     const kind = this.kinds[kindName];
-    if (!kind) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Invalid kind: ${kindName}`,
-      );
-
-      return;
-    }
 
     const [kindOptions, kindParams] = kindArgs(this.options, kind);
 
     // Get default action
     if (actionName == "default") {
-      // Use source default action
-      const [sourceOptions, _] = sourceArgs(
-        this.options,
-        null,
-        sources[0],
-      );
       actionName = sourceOptions.defaultAction;
-
       if (actionName == "") {
         // Use kind default action
         actionName = kindOptions.defaultAction;
@@ -420,55 +399,38 @@ export class Ddu {
           "ddu#util#print_error",
           `The default action is not defined for the items`,
         );
-
         return;
       }
     }
 
-    const [sourceOptions, _] = sourceArgs(this.options, null, sources[0]);
+    const action = actions[actionName];
+    if (!action) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid action: ${actionName}`,
+      );
+      return;
+    }
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
 
+    // Quit UI before action
+    await ui.quit({
+      denops: denops,
+      context: this.context,
+      options: this.options,
+      uiOptions: uiOptions,
+      uiParams: uiParams,
+    });
+
     let flags: ActionFlags;
     if (sourceOptions.actions[actionName] || kindOptions.actions[actionName]) {
-      const action = sourceOptions.actions[actionName] ??
-        kindOptions.actions[actionName];
-
-      // Quit UI before action
-      await ui.quit({
-        denops: denops,
-        context: this.context,
-        options: this.options,
-        uiOptions: uiOptions,
-        uiParams: uiParams,
-      });
-
       flags = await denops.call("ddu#custom#_call_action", action, {
         options: this.options,
         actionParams: params,
         items: items,
       }) as ActionFlags;
     } else {
-      const action =
-        Object.assign(kind.actions, sources[0].actions)[actionName];
-      if (!action) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Invalid action: ${actionName}`,
-        );
-
-        return;
-      }
-
-      // Quit UI before action
-      await ui.quit({
-        denops: denops,
-        context: this.context,
-        options: this.options,
-        uiOptions: uiOptions,
-        uiParams: uiParams,
-      });
-
       flags = await action({
         denops: denops,
         options: this.options,

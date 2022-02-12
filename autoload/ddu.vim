@@ -17,7 +17,7 @@ function! ddu#item_action(name, action, items, params) abort
   call ddu#_request('itemAction', [a:name, a:action, a:items, a:params])
 endfunction
 function! ddu#get_item_actions(name, items) abort
-  call ddu#_request('getItemActions', [a:name, a:items])
+  return ddu#_request('getItemActions', [a:name, a:items])
 endfunction
 
 function! ddu#_request(name, args) abort

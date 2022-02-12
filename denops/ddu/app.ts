@@ -207,7 +207,7 @@ export async function main(denops: Denops) {
     async getItemActions(
       arg1: unknown,
       arg2: unknown,
-    ): Promise<void> {
+    ): Promise<string[]> {
       ensureString(arg1);
       ensureArray(arg2);
 
@@ -215,7 +215,8 @@ export async function main(denops: Denops) {
       const items = arg2 as DduItem[];
 
       const ddu = getDdu(name);
-      await ddu.getItemActions(denops, items);
+      const actions = await ddu.getItemActions(denops, items);
+      return actions ? Object.keys(actions) : [];
     },
   };
 
