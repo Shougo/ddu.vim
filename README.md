@@ -1,6 +1,6 @@
 # ddu.vim
 
-Note: It is alpha version yet. You can test the features.
+Note: It is beta version. You can test the features.
 
 > Dark deno-powered UI framework for neovim/Vim8
 
