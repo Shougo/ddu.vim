@@ -188,6 +188,8 @@ export class Ddu {
 
         if (this.finished) {
           reader.cancel();
+          // Note: Must return after cancel()
+          return;
         }
 
         reader.read().then(readChunk);
