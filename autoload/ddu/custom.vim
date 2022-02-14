@@ -28,7 +28,7 @@ let s:custom_actions = {}
 function! ddu#custom#action(type, source_kind_name, action_name, func) abort
   let dict = {}
 
-  for key in denite#util#split(a:source_kind_name)
+  for key in ddu#util#split(a:source_kind_name)
     let dict[key] = { 'actions': {} }
     let dict[key].actions[a:action_name] = string(a:func)
     let s:custom_actions[string(a:func)] = a:func

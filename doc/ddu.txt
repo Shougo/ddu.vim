@@ -108,7 +108,7 @@ refresh
 
 							*ddu-option-resume*
 resume
-		Reuse the previous state.  If none exist, a new denite
+		Reuse the previous state.  If none exist, a new ddu
 		state is created.
 		Note: Uses |ddu-option-name| to search for previous state.
 
