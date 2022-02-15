@@ -47,6 +47,7 @@ export function defaultContext(): Context {
     done: false,
     input: "",
     maxItems: 0,
+    winId: 0,
   };
 }
 
@@ -248,6 +249,7 @@ export class ContextBuilder {
       {
         ...defaultContext(),
         bufNr: await fn.bufnr(denops, "%"),
+        winId: await fn.win_getid(denops) as number,
       },
       this.custom.get(options),
     ];

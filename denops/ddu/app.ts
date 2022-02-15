@@ -6,13 +6,19 @@ import {
   ensureString,
   vars,
 } from "./deps.ts";
-import { DduEvent, DduItem, DduOptions } from "./types.ts";
+import { DduExtType, DduEvent, DduItem, DduOptions } from "./types.ts";
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
 export async function main(denops: Denops) {
   const ddus: Record<string, Ddu[]> = {};
   const contextBuilder = new ContextBuilder();
+  const aliases: Record<DduExtType, Record<string, string>> = {
+    ui: {},
+    source: {},
+    filter: {},
+    kind: {},
+  };
 
   const getDdu = (name: string) => {
     if (!ddus[name]) {
@@ -78,6 +84,18 @@ export async function main(denops: Denops) {
     getDefaultOptions(): Promise<Partial<DduOptions>> {
       return Promise.resolve(defaultDduOptions());
     },
+    alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
+      ensureString(arg1);
+      ensureString(arg2);
+      ensureString(arg3);
+
+      const extType = arg1 as DduExtType;
+      const alias = arg2 as string;
+      const base = arg3 as string;
+
+      aliases[extType][alias] = base;
+      return Promise.resolve();
+    },
     async start(arg1: unknown): Promise<void> {
       ensureObject(arg1);
 
@@ -93,7 +111,7 @@ export async function main(denops: Denops) {
         userOptions = Object.assign(prevDdu.getUserOptions(), userOptions);
       }
 
-      await ddu.start(denops, context, options, userOptions);
+      await ddu.start(denops, aliases, context, options, userOptions);
     },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
       ensureString(arg1);
@@ -167,7 +185,7 @@ export async function main(denops: Denops) {
         userOptions,
       );
       const ddu = getDdu(name);
-      await ddu.start(denops, context, options, userOptions);
+      await ddu.start(denops, aliases, context, options, userOptions);
     },
     async uiAction(
       arg1: unknown,

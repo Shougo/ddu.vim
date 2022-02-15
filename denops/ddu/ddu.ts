@@ -66,14 +66,16 @@ export class Ddu {
 
   async start(
     denops: Denops,
+    aliases: Record<DduExtType, Record<string, string>>,
     context: Context,
     options: DduOptions,
     userOptions: Record<string, unknown>,
   ): Promise<void> {
-    await this.autoload(denops, "source", options.sources.map((s) => s.name));
-
+    this.aliases = aliases;
     this.context = context;
     this.userOptions = userOptions;
+
+    await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
     if (this.initialized && userOptions?.resume) {
       // Note: sources must not overwrite

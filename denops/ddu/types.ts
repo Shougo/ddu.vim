@@ -16,6 +16,7 @@ export type Context = {
   done: boolean;
   input: string;
   maxItems: number;
+  winId: number;
 };
 
 export type Custom = {
