@@ -613,7 +613,7 @@ export class Ddu {
     let items = this.gatherStates[index].items;
     const allItems = items.length;
 
-    const callFilters = async (filters: string[], items: DduItem[]) => {
+    const callFilters = async (filters: string[], input: string, items: DduItem[]) => {
       await this.autoload(denops, "filter", filters);
       for (const filterName of filters) {
         const filter = this.filters[filterName];
@@ -641,15 +641,21 @@ export class Ddu {
       return items;
     };
 
-    items = await callFilters(sourceOptions.matchers, items);
-    items = await callFilters(sourceOptions.sorters, items);
+    // Split input for matchers
+    for (let subInput of input.split(/(?<!\\)\s+/)) {
+      subInput = subInput.replaceAll(/\\(?=\s)/g, "");
+      if (subInput != "") {
+        items = await callFilters(sourceOptions.matchers, subInput, items);
+      }
+    }
+    items = await callFilters(sourceOptions.sorters, input, items);
 
     // Truncate before converters
     if (items.length > sourceOptions.maxItems) {
       items = items.slice(0, sourceOptions.maxItems);
     }
 
-    items = await callFilters(sourceOptions.converters, items);
+    items = await callFilters(sourceOptions.converters, input, items);
 
     return [this.gatherStates[index].done, allItems, items];
   }

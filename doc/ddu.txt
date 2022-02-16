@@ -88,6 +88,7 @@ filterParams
 							*ddu-option-input*
 input
 		Specify an initial narrowing text.
+		Note: If the input contains spaces, it means AND search.
 
 		Default: ""
 
