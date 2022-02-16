@@ -63,6 +63,7 @@ export function defaultSourceOptions(): SourceOptions {
     ignoreCase: false,
     matcherKey: "word",
     matchers: [],
+    maxItems: 10000,
     sorters: [],
   };
 }

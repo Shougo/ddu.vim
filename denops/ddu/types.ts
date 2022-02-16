@@ -60,6 +60,7 @@ export type SourceOptions = {
   ignoreCase: boolean;
   matcherKey: string;
   matchers: string[];
+  maxItems: number;
   sorters: string[];
 };
 

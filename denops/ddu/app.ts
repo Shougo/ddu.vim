@@ -6,7 +6,7 @@ import {
   ensureString,
   vars,
 } from "./deps.ts";
-import { DduExtType, DduEvent, DduItem, DduOptions } from "./types.ts";
+import { DduEvent, DduExtType, DduItem, DduOptions } from "./types.ts";
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 

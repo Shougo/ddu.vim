@@ -421,6 +421,13 @@ matchers		(string[])
 
 		Default: []
 
+				    		*ddu-source-option-maxItems*
+maxItems		(number)
+		It is the max number of source items.
+		It is applyed after sorters.
+
+		Default: 10000
+
 				    		*ddu-source-option-sorters*
 sorters			(string[])
 		It is a list of registered filter names to sort items.

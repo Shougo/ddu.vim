@@ -610,37 +610,48 @@ export class Ddu {
       source,
     );
 
-    const filters = sourceOptions.matchers.concat(sourceOptions.sorters).concat(
-      sourceOptions.converters,
-    );
-    await this.autoload(denops, "filter", filters);
-
     let items = this.gatherStates[index].items;
-    const maxItems = items.length;
-    for (const filterName of filters) {
-      const filter = this.filters[filterName];
-      if (!filter) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Invalid filter: ${filterName}`,
-        );
+    const allItems = items.length;
 
-        continue;
+    const callFilters = async (filters: string[], items: DduItem[]) => {
+      await this.autoload(denops, "filter", filters);
+      for (const filterName of filters) {
+        const filter = this.filters[filterName];
+        if (!filter) {
+          await denops.call(
+            "ddu#util#print_error",
+            `Invalid filter: ${filterName}`,
+          );
+          continue;
+        }
+
+        const [filterOptions, filterParams] = filterArgs(this.options, filter);
+
+        items = await filter.filter({
+          denops: denops,
+          options: this.options,
+          sourceOptions: sourceOptions,
+          filterOptions: filterOptions,
+          filterParams: filterParams,
+          input: input,
+          items: items,
+        });
       }
 
-      const [filterOptions, filterParams] = filterArgs(this.options, filter);
+      return items;
+    };
 
-      items = await filter.filter({
-        denops: denops,
-        options: this.options,
-        sourceOptions: sourceOptions,
-        filterOptions: filterOptions,
-        filterParams: filterParams,
-        input: input,
-        items: items,
-      });
+    items = await callFilters(sourceOptions.matchers, items);
+    items = await callFilters(sourceOptions.sorters, items);
+
+    // Truncate before converters
+    if (items.length > sourceOptions.maxItems) {
+      items = items.slice(0, sourceOptions.maxItems);
     }
-    return [this.gatherStates[index].done, maxItems, items];
+
+    items = await callFilters(sourceOptions.converters, items);
+
+    return [this.gatherStates[index].done, allItems, items];
   }
 }
 
