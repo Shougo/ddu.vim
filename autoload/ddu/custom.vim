@@ -20,13 +20,9 @@ function! ddu#custom#set_local(name, dict) abort
   call s:notify('setLocal', [a:dict, a:name])
 endfunction
 
-let s:aliases = {}
+let s:aliases = { 'ui': {}, 'source': {}, 'filter': {}, 'kind': {} }
 function! ddu#custom#alias(type, alias, base) abort
-  if !has_key(s:aliases, a:type)
-    let s:aliases[a:type] = {}
-  endif
   let s:aliases[a:type][a:alias] = a:base
-
   call s:notify('alias', [a:type, a:alias, a:base])
 endfunction
 
