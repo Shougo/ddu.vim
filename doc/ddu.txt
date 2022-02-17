@@ -259,6 +259,14 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
 		      \ 'foo': {'mark': 'foo'},
 		      \ })
 <
+						*ddu#custom#get_aliases()*
+ddu#custom#get_aliases()
+		Get aliases.
+
+					*ddu#custom#get_default_options()*
+ddu#custom#get_default_options()
+		Get the default options.
+
 						*ddu#custom#get_global()*
 ddu#custom#get_global()
 		Get global options.
