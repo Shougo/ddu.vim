@@ -22,6 +22,11 @@ endfunction
 
 let s:aliases = { 'ui': {}, 'source': {}, 'filter': {}, 'kind': {} }
 function! ddu#custom#alias(type, alias, base) abort
+  if !has_key(s:aliases, a:type)
+    call ddu#util#print_error('Invalid alias type: ' . a:type)
+    return
+  endif
+
   let s:aliases[a:type][a:alias] = a:base
   call s:notify('alias', [a:type, a:alias, a:base])
 endfunction
