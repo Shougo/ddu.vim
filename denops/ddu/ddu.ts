@@ -112,6 +112,16 @@ export class Ddu {
     let index = 0;
     for (const userSource of this.options.sources) {
       const currentIndex = index;
+
+      // Check previous gather state
+      if (this.gatherStates[currentIndex]) {
+        this.finished = true;
+        while (!this.gatherStates[currentIndex].done) {
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+        this.finished = false;
+      }
+
       this.gatherStates[currentIndex] = {
         items: [],
         done: false,
@@ -157,11 +167,17 @@ export class Ddu {
       ) => {
         const state = this.gatherStates[currentIndex];
 
+        if (this.finished) {
+          reader.cancel();
+          state.done = true;
+          state.items = [];
+          // Note: Must return after cancel()
+          return;
+        }
+
         if (!v.value || v.done) {
           state.done = true;
-          if (!this.finished) {
-            await this.redraw(denops);
-          }
+          await this.redraw(denops);
           return;
         }
 
@@ -186,12 +202,6 @@ export class Ddu {
           }
         } else {
           state.items = newItems;
-        }
-
-        if (this.finished) {
-          reader.cancel();
-          // Note: Must return after cancel()
-          return;
         }
 
         reader.read().then(readChunk);
@@ -613,7 +623,11 @@ export class Ddu {
     let items = this.gatherStates[index].items;
     const allItems = items.length;
 
-    const callFilters = async (filters: string[], input: string, items: DduItem[]) => {
+    const callFilters = async (
+      filters: string[],
+      input: string,
+      items: DduItem[],
+    ) => {
       await this.autoload(denops, "filter", filters);
       for (const filterName of filters) {
         const filter = this.filters[filterName];
