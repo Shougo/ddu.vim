@@ -21,7 +21,7 @@ function! ddu#get_item_actions(name, items) abort
 endfunction
 
 function! ddu#_request(name, args) abort
-  if ddu#_init()
+  if s:init(a:name)
     return {}
   endif
 
@@ -29,7 +29,7 @@ function! ddu#_request(name, args) abort
   return denops#request('ddu', a:name, a:args)
 endfunction
 function! ddu#_notify(name, args) abort
-  if ddu#_init()
+  if s:init(a:name)
     return {}
   endif
 
@@ -37,7 +37,7 @@ function! ddu#_notify(name, args) abort
   return denops#notify('ddu', a:name, a:args)
 endfunction
 
-function! ddu#_init() abort
+function! s:init(name) abort
   if exists('g:ddu#_initialized')
     return
   endif
@@ -59,6 +59,13 @@ function! ddu#_init() abort
     silent! call ddu#_register()
   else
     autocmd ddu User DenopsReady silent! call ddu#_register()
+  endif
+
+  " Note: If call denops#plugin#wait() in vim_starting, freezed!
+  if denops#server#status() !=# 'running' && has('vim_starting')
+    call ddu#util#print_error(
+          \ printf('You cannot call "%s" before denops initialized.', a:name))
+    return 1
   endif
 endfunction
 
