@@ -11,6 +11,9 @@ does not work with zero configuration. You can use other plugins.
 
 Please read [help](doc/ddu.txt) for details.
 
+Note: I have created
+[Japanese article](https://zenn.dev/shougo/articles/ddu-vim-beta) for ddu.vim.
+
 Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible and
 asynchronous UI framework for neovim/Vim8.
 
