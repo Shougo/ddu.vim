@@ -238,7 +238,7 @@ export class Ddu {
       index++;
     }
 
-    if (this.context.done) {
+    if (this.context.done && this.options.profile) {
       console.log(`Refresh all items: ${Date.now() - this.startTime} ms`);
     }
 
