@@ -63,7 +63,7 @@ export class Ddu {
   private initialized = false;
   private finished = false;
   private lock = new Lock();
-  private startTime: number = 0;
+  private startTime = 0;
 
   async start(
     denops: Denops,
@@ -192,6 +192,7 @@ export class Ddu {
           return {
             ...item,
             matcherKey: matcherKey,
+            __sourceIndex: currentIndex,
             __sourceName: source.name,
           };
         });
@@ -331,7 +332,10 @@ export class Ddu {
     const sources = [
       ...new Set(items.map((item) => this.sources[item.__sourceName])),
     ];
-    if (sources.length != 1) {
+    const indexes = [
+      ...new Set(items.map((item) => item.__sourceIndex)),
+    ];
+    if (sources.length != 1 && indexes.length != 1) {
       await denops.call(
         "ddu#util#print_error",
         `You must not mix multiple sources items: "${
@@ -366,7 +370,11 @@ export class Ddu {
     }
 
     const [kindOptions, _1] = kindArgs(this.options, kind);
-    const [sourceOptions, _2] = sourceArgs(this.options, null, source);
+    const [sourceOptions, _2] = sourceArgs(
+      this.options,
+      this.options.sources[indexes[0]],
+      source,
+    );
 
     return Object.assign(
       kind.actions,
@@ -391,10 +399,13 @@ export class Ddu {
     const sources = [
       ...new Set(items.map((item) => this.sources[item.__sourceName])),
     ];
+    const indexes = [
+      ...new Set(items.map((item) => item.__sourceIndex)),
+    ];
 
     const [sourceOptions, _] = sourceArgs(
       this.options,
-      null,
+      this.options.sources[indexes[0]],
       sources[0],
     );
 
