@@ -63,6 +63,7 @@ export class Ddu {
   private initialized = false;
   private finished = false;
   private lock = new Lock();
+  private startTime: number = 0;
 
   async start(
     denops: Denops,
@@ -110,6 +111,7 @@ export class Ddu {
     this.finished = false;
 
     let index = 0;
+    this.startTime = Date.now();
     for (const userSource of this.options.sources) {
       const currentIndex = index;
 
@@ -234,6 +236,10 @@ export class Ddu {
       this.context.maxItems += maxItems;
 
       index++;
+    }
+
+    if (this.context.done) {
+      console.log(`Refresh all items: ${Date.now() - this.startTime} ms`);
     }
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);

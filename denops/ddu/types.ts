@@ -37,6 +37,7 @@ export type DduOptions = {
   kindOptions: Record<string, Partial<KindOptions>>;
   kindParams: Record<string, Partial<Record<string, unknown>>>;
   name: string;
+  profile: boolean;
   push: boolean;
   refresh: boolean;
   resume: boolean;

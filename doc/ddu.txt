@@ -98,6 +98,11 @@ name
 
 		Default: "default"
 
+							*ddu-option-profile*
+profile
+		Print profile result.
+		Note: It is for debug.
+
 							*ddu-option-push*
 push
 		Save the current ddu state and create new ddu state.
