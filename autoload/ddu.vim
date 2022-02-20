@@ -33,7 +33,9 @@ function! ddu#_request(method, args) abort
     return {}
   endif
 
-  call denops#plugin#wait('ddu')
+  if denops#plugin#wait('ddu')
+    return {}
+  endif
   return denops#request('ddu', a:method, a:args)
 endfunction
 function! ddu#_notify(method, args) abort
@@ -42,7 +44,9 @@ function! ddu#_notify(method, args) abort
   endif
 
   if ddu#_denops_running()
-    call denops#plugin#wait('ddu')
+    if denops#plugin#wait('ddu')
+      return {}
+    endif
     call denops#notify('ddu', a:method, a:args)
   else
     " Lazy call notify
