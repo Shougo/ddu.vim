@@ -33,7 +33,7 @@ import {
   mergeUiParams,
 } from "./context.ts";
 import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
-import { defaultSourceOptions, defaultSourceParams } from "./base/source.ts";
+import { defaultSourceOptions, defaultSourceParams, GatherArguments } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
 import { Lock } from "https://deno.land/x/async@v1.1.5/mod.ts";
@@ -825,6 +825,61 @@ async function checkUiOnInit(
   }
 }
 
-Deno.test("test", () => {
-  assertEquals(1, 1);
+
+Deno.test("sourceArgs", () => {
+  const userOptions: DduOptions = {
+    ...defaultDduOptions(),
+    sources: [],
+    sourceOptions: {
+      "_": {
+        matcherKey: "foo",
+        matchers: ["matcher_head"],
+      },
+      "strength": {
+        matcherKey: "bar",
+      },
+    },
+    sourceParams: {
+      "_": {
+        "by_": "bar",
+      },
+      "strength": {
+        min: 100,
+      },
+    },
+  };
+  class S extends BaseSource<{ min: number; max: number }> {
+    params() {
+      return {
+        "min": 0,
+        "max": 999,
+      };
+    }
+    gather(
+      _args: GatherArguments<{ min: number; max: number }> | Denops,
+    ): ReadableStream<Item<{}>[]> {
+    return new ReadableStream({
+      async start(controller) {
+        controller.close();
+      },
+    });
+    }
+  }
+  const source = new S();
+  source.name = "strength";
+  const [o, p] = sourceArgs(userOptions, null, source);
+  console.log(o);
+  assertEquals(o, {
+    ...defaultSourceOptions(),
+    matcherKey: "bar",
+    matchers: ["matcher_head"],
+    converters: [],
+    sorters: [],
+  });
+  assertEquals(p, {
+    ...defaultSourceParams(),
+    by_: "bar",
+    min: 100,
+    max: 999,
+  });
 });
