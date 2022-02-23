@@ -455,8 +455,17 @@ export class Ddu {
     });
 
     let flags: ActionFlags;
-    if (sourceOptions.actions[actionName] || kindOptions.actions[actionName]) {
-      flags = await denops.call("ddu#custom#_call_action", action, {
+    if (sourceOptions.actions[actionName]) {
+      flags = await denops.call("denops#callback#call",
+                                sourceOptions.actions[actionName], {
+        options: this.options,
+        actionParams: params,
+        items: items,
+      }) as ActionFlags;
+    } else if (kindOptions.actions[actionName]) {
+      flags = await denops.call("denops#callback#call",
+                                kindOptions.actions[actionName],
+      {
         options: this.options,
         actionParams: params,
         items: items,
