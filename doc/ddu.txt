@@ -240,6 +240,15 @@ ddu#start({options})
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
 
+							*ddu#ui_action()*
+ddu#ui_action({name}, {action}, {params})
+		Do the {action} action in current UI.
+
+		{name} is specified ddu name(|ddu-option-name|).
+
+		{params} is action params.
+
+
 CUSTOM FUNCTIONS 					*ddu-custom-functions*
 
 							*ddu#custom#action()*
@@ -505,18 +514,84 @@ Please read the kind documentation.
 ==============================================================================
 CREATE UI						*ddu-create-ui*
 
+To create UI, you should read other UIs implementation.
+
+The UIs must put under "denops/@ddu-uis/*.ts".
+
+UI class must extend the BaseUi class.
+
+Note: The UIs must be written in TypeScript language.
+
+Note: If you call Vim functions, it is not asynchronous.
+
 
 ------------------------------------------------------------------------------
 UI ATTRIBUTES						*ddu-ui-attributes*
+
+						*ddu-ui-attribute-actions*
+actions			(Record<string, function>)	(Optional)
+		Defines UI actions.
+		The actions are called from |ddu#ui_action()|.
+
+						*ddu-ui-attribute-onInit*
+onInit			(function)			(Optional)
+		Called before call UI functions.
+
+						*ddu-ui-attribute-params*
+params			(function)			(Required)
+		Called to get UI params.
+
+						*ddu-ui-attribute-quit*
+quit			(function)			(Optional)
+		Called when quit current UI.
+
+					*ddu-ui-attribute-refreshItems*
+refreshItems		(function)			(Required)
+		Called when refresh items.
+
+						*ddu-ui-attribute-redraw*
+redraw			(function)			(Required)
+		Called when redraw UI.
 
 
 ==============================================================================
 CREATE SOURCE						*ddu-create-source*
 
+To create source, you should read other sources implementation.
+
+The sources must put under "denops/@ddu-sources/*.ts".
+
+The source class must extend the BaseSource class.
+
+Note: The sources must be written in TypeScript language.
+
+Note: If you call Vim functions, it is not asynchronous.
+
 
 ------------------------------------------------------------------------------
 SOURCE ATTRIBUTES				*ddu-source-attributes*
 
+						*ddu-source-attribute-actions*
+actions			(Record<string, function>)	(Optional)
+		Defines source specific actions.
+		Note: It overwrites kind actions.
+
+						*ddu-source-attribute-onEvent*
+onEvent			(function)			(Optional)
+		Called for the autocommands.
+		It is useful to make cache.
+
+						*ddu-source-attribute-onInit*
+onInit			(function)			(Optional)
+		Called before call source functions.
+
+						*ddu-source-attribute-gather*
+gather			(function)			(Required)
+		It is called to gather items.
+
+						*ddu-source-attribute-params*
+params			(function)			(Required)
+		Called to get source params.
 
 ------------------------------------------------------------------------------
 ITEM ATTRIBUTES						*ddu-item-attributes*
@@ -554,17 +629,57 @@ word		(String)			(Required)
 ==============================================================================
 CREATE FILTER						*ddu-create-filter*
 
+To create filter, you should read other filters implementation.
+
+The filters must put under "denops/@ddu-filters/*.ts".
+
+The filter class must extend the BaseFilter class.
+
+Note: The filters must be written in TypeScript language.
+
+Note: If you call Vim functions, it is not asynchronous.
+
 
 ------------------------------------------------------------------------------
 FILTER ATTRIBUTES				*ddu-filter-attributes*
+
+						*ddu-filter-attribute-filter*
+filter			(function)			(Required)
+		It is called to filter items.
+
+						*ddu-filter-attribute-onInit*
+onInit			(function)			(Optional)
+		Called before call filter functions.
+
+						*ddu-filter-attribute-params*
+params			(function)			(Required)
+		Called to get filter params.
 
 
 ==============================================================================
 CREATE KIND						*ddu-create-kind*
 
+To create kind, you should read other kinds implementation.
+
+The kinds must put under "denops/@ddu-kinds/*.ts".
+
+The kind class must extend the BaseKind class.
+
+Note: The kinds must be written in TypeScript language.
+
+Note: If you call Vim functions, it is not asynchronous.
+
 
 ------------------------------------------------------------------------------
 KIND ATTRIBUTES						*ddu-kind-attributes*
+
+						*ddu-kind-attribute-actions*
+actions			(Record<string, function>)	(Required)
+		Defines kind specific actions.
+
+						*ddu-kind-attribute-params*
+params			(function)			(Required)
+		Called to get kind params.
 
 
 ==============================================================================
