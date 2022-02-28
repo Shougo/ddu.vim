@@ -1,7 +1,5 @@
 # ddu.vim
 
-Note: It is beta version. You can test the features.
-
 > Dark deno-powered UI framework for neovim/Vim8
 
 If you don't want to configure plugins, you don't have to use the plugin. It
