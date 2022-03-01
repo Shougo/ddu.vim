@@ -686,13 +686,7 @@ export class Ddu {
       return items;
     };
 
-    // Split input for matchers
-    for (let subInput of input.split(/(?<!\\)\s+/)) {
-      subInput = subInput.replaceAll(/\\(?=\s)/g, "");
-      if (input == "" || subInput != "") {
-        items = await callFilters(sourceOptions.matchers, subInput, items);
-      }
-    }
+    items = await callFilters(sourceOptions.matchers, input, items);
 
     items = await callFilters(sourceOptions.sorters, input, items);
 

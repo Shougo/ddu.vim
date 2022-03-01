@@ -717,6 +717,9 @@ https://github.com/Shougo/ddu-commands.vim
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
 
+2022.03.01
+* Ddu does not split inputs by spaces.  It is filter's work.
+
 2022.02.09
 * Replace ddu#quit() to ddu#event().
 
