@@ -46,32 +46,24 @@ export async function main(denops: Denops) {
 
   denops.dispatcher = {
     setGlobal(arg1: unknown): Promise<void> {
-      ensureObject(arg1);
-
-      const options = arg1 as Record<string, unknown>;
+      const options = ensureObject(arg1);
       contextBuilder.setGlobal(options);
       return Promise.resolve();
     },
     setLocal(arg1: unknown, arg2: unknown): Promise<void> {
-      ensureObject(arg1);
-
-      const options = arg1 as Record<string, unknown>;
-      const name = arg2 as string;
+      const options = ensureObject(arg1);
+      const name = ensureString(arg2);
       contextBuilder.setLocal(name, options);
       return Promise.resolve();
     },
     patchGlobal(arg1: unknown): Promise<void> {
-      ensureObject(arg1);
-
-      const options = arg1 as Record<string, unknown>;
+      const options = ensureObject(arg1);
       contextBuilder.patchGlobal(options);
       return Promise.resolve();
     },
     patchLocal(arg1: unknown, arg2: unknown): Promise<void> {
-      ensureObject(arg1);
-
-      const options = arg1 as Record<string, unknown>;
-      const name = arg2 as string;
+      const options = ensureObject(arg1);
+      const name = ensureString(arg2);
       contextBuilder.patchLocal(name, options);
       return Promise.resolve();
     },
@@ -85,21 +77,15 @@ export async function main(denops: Denops) {
       return Promise.resolve(defaultDduOptions());
     },
     alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
-      ensureString(arg1);
-      ensureString(arg2);
-      ensureString(arg3);
-
-      const extType = arg1 as DduExtType;
-      const alias = arg2 as string;
-      const base = arg3 as string;
+      const extType = ensureString(arg1) as DduExtType;
+      const alias = ensureString(arg2);
+      const base = ensureString(arg3);
 
       aliases[extType][alias] = base;
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {
-      ensureObject(arg1);
-
-      let userOptions = arg1 as Record<string, unknown>;
+      let userOptions = ensureObject(arg1);
       const [context, options] = await contextBuilder.get(denops, userOptions);
 
       let ddu = getDdu(options.name);
@@ -114,11 +100,8 @@ export async function main(denops: Denops) {
       await ddu.start(denops, aliases, context, options, userOptions);
     },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
-      ensureString(arg1);
-      ensureObject(arg2);
-
-      const name = arg1 as string;
-      const opt = arg2 as {
+      const name = ensureString(arg1);
+      const opt = ensureObject(arg2) as {
         input?: string;
         refreshItems?: boolean;
         updateOptions?: Record<string, unknown>;
@@ -144,11 +127,8 @@ export async function main(denops: Denops) {
       }
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {
-      ensureString(arg1);
-      ensureString(arg2);
-
-      const name = arg1 as string;
-      const event = arg2 as DduEvent;
+      const name = ensureString(arg1);
+      const event = ensureString(arg2) as DduEvent;
 
       const ddu = getDdu(name);
 
@@ -159,9 +139,7 @@ export async function main(denops: Denops) {
       await ddu.onEvent(denops, event);
     },
     async pop(arg1: unknown): Promise<void> {
-      ensureString(arg1);
-
-      const name = arg1 as string;
+      const name = ensureString(arg1);
 
       const currentDdu = popDdu(name);
       if (!currentDdu) {
@@ -192,13 +170,9 @@ export async function main(denops: Denops) {
       arg2: unknown,
       arg3: unknown,
     ): Promise<void> {
-      ensureString(arg1);
-      ensureString(arg2);
-      ensureObject(arg3);
-
-      const name = arg1 as string;
-      const actionName = arg2 as string;
-      const params = arg3;
+      const name = ensureString(arg1);
+      const actionName = ensureString(arg2);
+      const params = ensureObject(arg3);
 
       const ddu = getDdu(name);
       await ddu.uiAction(denops, actionName, params);
@@ -209,15 +183,10 @@ export async function main(denops: Denops) {
       arg3: unknown,
       arg4: unknown,
     ): Promise<void> {
-      ensureString(arg1);
-      ensureString(arg2);
-      ensureArray(arg3);
-      ensureObject(arg4);
-
-      const name = arg1 as string;
-      const actionName = arg2 as string;
-      const items = arg3 as DduItem[];
-      const params = arg4;
+      const name = ensureString(arg1);
+      const actionName = ensureString(arg2);
+      const items = ensureArray(arg3) as DduItem[];
+      const params = ensureObject(arg4);
 
       const ddu = getDdu(name);
       await ddu.itemAction(denops, actionName, items, params);
@@ -226,11 +195,8 @@ export async function main(denops: Denops) {
       arg1: unknown,
       arg2: unknown,
     ): Promise<string[]> {
-      ensureString(arg1);
-      ensureArray(arg2);
-
-      const name = arg1 as string;
-      const items = arg2 as DduItem[];
+      const name = ensureString(arg1);
+      const items = ensureArray(arg2) as DduItem[];
 
       const ddu = getDdu(name);
       const actions = await ddu.getItemActions(denops, items);
