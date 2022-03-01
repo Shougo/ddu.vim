@@ -33,7 +33,11 @@ import {
   mergeUiParams,
 } from "./context.ts";
 import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
-import { defaultSourceOptions, defaultSourceParams, GatherArguments } from "./base/source.ts";
+import {
+  defaultSourceOptions,
+  defaultSourceParams,
+  GatherArguments,
+} from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
 import { Lock } from "https://deno.land/x/async@v1.1.5/mod.ts";
@@ -819,7 +823,6 @@ async function checkUiOnInit(
   }
 }
 
-
 Deno.test("sourceArgs", () => {
   const userOptions: DduOptions = {
     ...defaultDduOptions(),
@@ -851,12 +854,13 @@ Deno.test("sourceArgs", () => {
     }
     gather(
       _args: GatherArguments<{ min: number; max: number }> | Denops,
-    ): ReadableStream<Item<{}>[]> {
-    return new ReadableStream({
-      async start(controller) {
-        controller.close();
-      },
-    });
+    ): ReadableStream<Item<Record<never, never>>[]> {
+      return new ReadableStream({
+        // deno-lint-ignore require-await
+        async start(controller) {
+          controller.close();
+        },
+      });
     }
   }
   const source = new S();
