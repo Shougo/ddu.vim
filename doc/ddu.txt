@@ -456,6 +456,7 @@ maxItems		(number)
 				    		*ddu-source-option-path*
 path			(string)
 		Specify an initial narrowing path.
+		Note: It must be full path.
 
 				    		*ddu-source-option-sorters*
 sorters			(string[])
