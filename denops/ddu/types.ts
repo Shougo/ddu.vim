@@ -62,6 +62,7 @@ export type SourceOptions = {
   matcherKey: string;
   matchers: string[];
   maxItems: number;
+  path: string;
   sorters: string[];
 };
 
@@ -105,6 +106,8 @@ export type DduItem =
 export type ActionArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
   options: DduOptions;
+  sourceOptions: SourceOptions;
+  sourceParams: Params;
   kindOptions: KindOptions;
   kindParams: Params;
   actionParams: unknown;

@@ -407,7 +407,7 @@ export class Ddu {
       ...new Set(items.map((item) => item.__sourceIndex)),
     ];
 
-    const [sourceOptions, _] = sourceArgs(
+    const [sourceOptions, sourceParams] = sourceArgs(
       this.options,
       this.options.sources[indexes[0]],
       sources[0],
@@ -483,6 +483,8 @@ export class Ddu {
       flags = await action({
         denops: denops,
         options: this.options,
+        sourceOptions: sourceOptions,
+        sourceParams: sourceParams,
         kindOptions: kindOptions,
         kindParams: kindParams,
         actionParams: params,

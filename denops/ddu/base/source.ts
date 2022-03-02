@@ -64,6 +64,7 @@ export function defaultSourceOptions(): SourceOptions {
     matcherKey: "word",
     matchers: [],
     maxItems: 10000,
+    path: "",
     sorters: [],
   };
 }
