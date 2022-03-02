@@ -26,10 +26,9 @@ function! ddu#_request(method, args) abort
   endif
 
   " Note: If call denops#plugin#wait() in vim_starting, freezed!
-  if denops#server#status() !=# 'running' && has('vim_starting')
+  if has('vim_starting')
     call ddu#util#print_error(
-          \ printf('You cannot call "%s" before denops.vim initialized.',
-          \        a:method))
+          \ printf('You cannot call "%s" in vim_starting.', a:method))
     return {}
   endif
 
