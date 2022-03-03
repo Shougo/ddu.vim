@@ -480,6 +480,7 @@ export class Ddu {
         },
       ) as ActionFlags;
     } else {
+      const prevPath = sourceOptions.path;
       flags = await action({
         denops: denops,
         options: this.options,
@@ -490,6 +491,16 @@ export class Ddu {
         actionParams: params,
         items: items,
       });
+
+      // Check path is changed by action
+      if (sourceOptions.path != prevPath) {
+        // Overwrite current path
+        const userSource = this.options.sources[indexes[0]];
+        if (!userSource.options) {
+          userSource.options = defaultSourceOptions();
+        }
+        userSource.options.path = sourceOptions.path;
+      }
     }
 
     if (flags & ActionFlags.RefreshItems) {
