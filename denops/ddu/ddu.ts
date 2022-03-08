@@ -879,7 +879,6 @@ Deno.test("sourceArgs", () => {
   const source = new S();
   source.name = "strength";
   const [o, p] = sourceArgs(userOptions, null, source);
-  console.log(o);
   assertEquals(o, {
     ...defaultSourceOptions(),
     matcherKey: "bar",
