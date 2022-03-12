@@ -38,6 +38,7 @@ let s:custom_actions = {
 function! ddu#custom#action(type, source_kind_name, action_name, func) abort
   let dict = a:type ==# 'source' ?
         \ s:custom_actions.source : s:custom_actions.kind
+
   for key in ddu#util#split(a:source_kind_name)
     if !has_key(dict, key)
       let dict[key] = { 'actions': {} }
