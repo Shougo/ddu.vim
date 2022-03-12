@@ -31,11 +31,17 @@ function! ddu#custom#alias(type, alias, base) abort
   call ddu#_notify('alias', [a:type, a:alias, a:base])
 endfunction
 
+let s:custom_actions = {
+      \ 'source': {},
+      \ 'kind': {},
+      \ }
 function! ddu#custom#action(type, source_kind_name, action_name, func) abort
-  let dict = {}
-
+  let dict = a:type ==# 'source' ?
+        \ s:custom_actions.source : s:custom_actions.kind
   for key in ddu#util#split(a:source_kind_name)
-    let dict[key] = { 'actions': {} }
+    if !has_key(dict, key)
+      let dict[key] = { 'actions': {} }
+    endif
     let dict[key].actions[a:action_name] = denops#callback#register(a:func)
   endfor
 
