@@ -24,6 +24,8 @@ Filters			|ddu-filters|
 Kinds			|ddu-kinds|
   Kind options		  |ddu-kind-options|
   Kind params		  |ddu-kind-params|
+Actions			|ddu-actions|
+  Action options	  |ddu-action-options|
 Create UI		|ddu-create-ui|
   UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
@@ -514,6 +516,20 @@ These are the parameters that each kind can have.  You can select the
 behavior and tune the performance.
 
 Please read the kind documentation.
+
+
+==============================================================================
+ACTIONS							*ddu-actions*
+
+
+------------------------------------------------------------------------------
+ACTION OPTIONS						*ddu-action-options*
+
+					    	*ddu-action-option-quit*
+quit		(boolean)
+		Quit the UI before executing action.
+
+		Default: true
 
 
 ==============================================================================

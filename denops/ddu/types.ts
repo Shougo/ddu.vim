@@ -31,6 +31,7 @@ export type UserSource = {
 };
 
 export type DduOptions = {
+  actionOptions: Record<string, Partial<ActionOptions>>;
   filterOptions: Record<string, Partial<FilterOptions>>;
   filterParams: Record<string, Partial<Record<string, unknown>>>;
   input: string;
@@ -74,6 +75,10 @@ export type FilterOptions = {
 export type KindOptions = {
   actions: Record<string, string>;
   defaultAction: string;
+};
+
+export type ActionOptions = {
+  quit: boolean;
 };
 
 export type ItemHighlight = {

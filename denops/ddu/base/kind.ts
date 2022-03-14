@@ -1,4 +1,4 @@
-import { Actions, KindOptions } from "../types.ts";
+import { ActionOptions, Actions, KindOptions } from "../types.ts";
 
 export abstract class BaseKind<
   Params extends Record<string, unknown>,
@@ -21,4 +21,10 @@ export function defaultKindOptions(): KindOptions {
 }
 export function defaultKindParams(): Record<string, unknown> {
   return {};
+}
+
+export function defaultActionOptions(): ActionOptions {
+  return {
+    quit: true,
+  };
 }

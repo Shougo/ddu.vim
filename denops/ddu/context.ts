@@ -1,5 +1,6 @@
 import { assertEquals, Denops, fn } from "./deps.ts";
 import {
+  ActionOptions,
   Context,
   DduOptions,
   FilterOptions,
@@ -27,6 +28,7 @@ export const mergeUiOptions: Merge<UiOptions> = overwrite;
 export const mergeSourceOptions: Merge<SourceOptions> = overwrite;
 export const mergeFilterOptions: Merge<FilterOptions> = overwrite;
 export const mergeKindOptions: Merge<KindOptions> = overwrite;
+export const mergeActionOptions: Merge<ActionOptions> = overwrite;
 
 export const mergeUiParams: Merge<Record<string, unknown>> = overwrite;
 export const mergeSourceParams: Merge<Record<string, unknown>> = overwrite;
@@ -53,6 +55,7 @@ export function defaultContext(): Context {
 
 export function defaultDduOptions(): DduOptions {
   return {
+    actionOptions: {},
     filterOptions: {},
     filterParams: {},
     kindOptions: {},
@@ -110,6 +113,8 @@ export function mergeDduOptions(
   const partialMergeFilterParams = partialOverwrite;
   const partialMergeKindOptions = partialOverwrite;
   const partialMergeKindParams = partialOverwrite;
+  const partialMergeActionOptions = partialOverwrite;
+
   return Object.assign(overwritten, {
     uiOptions: migrateEachKeys(
       partialMergeUiOptions,
@@ -151,6 +156,11 @@ export function mergeDduOptions(
       a.kindParams,
       b.kindParams,
     ) || {},
+    actionOptions: migrateEachKeys(
+      partialMergeActionOptions,
+      a.actionOptions,
+      b.actionOptions,
+    ) || {},
   });
 }
 
@@ -187,6 +197,13 @@ function patchDduOptions(
     b.kindOptions,
   );
   if (ko) overwritten.kindOptions = ko;
+
+  const ao = migrateEachKeys(
+    partialOverwrite,
+    a.actionOptions,
+    b.actionOptions,
+  );
+  if (ao) overwritten.actionOptions = ao;
 
   const up = migrateEachKeys(partialOverwrite, a.uiParams, b.uiParams);
   if (up) overwritten.uiParams = up;

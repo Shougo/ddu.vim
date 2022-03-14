@@ -41,9 +41,11 @@ export async function main(denops: Denops) {
       ddus[name] = [];
     }
 
-    return ddus[name].length == 0 ? null :
-      ddus[name].length == 1 ? ddus[name].slice(-1)[0]:
-      ddus[name].pop();
+    return ddus[name].length == 0
+      ? null
+      : ddus[name].length == 1
+      ? ddus[name].slice(-1)[0]
+      : ddus[name].pop();
   };
 
   denops.dispatcher = {

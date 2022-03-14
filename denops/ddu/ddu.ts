@@ -1,6 +1,7 @@
 import { assertEquals, Denops, fn, op, parse, toFileUrl } from "./deps.ts";
 import {
   ActionFlags,
+  ActionOptions,
   Actions,
   BaseFilter,
   BaseKind,
@@ -22,6 +23,7 @@ import {
   defaultContext,
   defaultDduOptions,
   foldMerge,
+  mergeActionOptions,
   mergeDduOptions,
   mergeFilterOptions,
   mergeFilterParams,
@@ -40,6 +42,7 @@ import {
 } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
+import { defaultActionOptions } from "./base/action.ts";
 import { Lock } from "https://deno.land/x/async@v1.1.5/mod.ts";
 
 type GatherState = {
@@ -449,14 +452,18 @@ export class Ddu {
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
 
-    // Quit UI before action
-    await ui.quit({
-      denops: denops,
-      context: this.context,
-      options: this.options,
-      uiOptions: uiOptions,
-      uiParams: uiParams,
-    });
+    const [actionOptions, _] = actionArgs(this.options, actionName);
+
+    if (actionOptions.quit) {
+      // Quit UI before action
+      await ui.quit({
+        denops: denops,
+        context: this.context,
+        options: this.options,
+        uiOptions: uiOptions,
+        uiParams: uiParams,
+      });
+    }
 
     let flags: ActionFlags;
     if (sourceOptions.actions[actionName]) {
@@ -808,6 +815,21 @@ function kindArgs<
     options.kindParams[kind.name],
   ]);
   return [o, p];
+}
+
+function actionArgs(
+  options: DduOptions,
+  actionName: string,
+): [ActionOptions, Record<string, unknown>] {
+  const o = foldMerge(
+    mergeActionOptions,
+    defaultActionOptions,
+    [
+      options.actionOptions["_"],
+      options.actionOptions[actionName],
+    ],
+  );
+  return [o, {}];
 }
 
 async function checkUiOnInit(
