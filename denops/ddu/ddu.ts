@@ -156,76 +156,99 @@ export class Ddu {
         source,
       );
 
-      if (!this.initialized) {
-        await source.onInit({
-          denops,
-          sourceOptions,
-          sourceParams,
-        });
+      await this.gatherItems(
+        denops,
+        currentIndex,
+        source,
+        sourceOptions,
+        sourceParams,
+      );
+
+      index++;
+    }
+  }
+
+  async gatherItems<
+    Params extends Record<string, unknown>,
+    UserData extends unknown,
+  >(
+    denops: Denops,
+    index: number,
+    source: BaseSource<Params, UserData>,
+    sourceOptions: SourceOptions,
+    sourceParams: Params,
+  ): Promise<void> {
+    if (!this.initialized) {
+      await source.onInit({
+        denops,
+        sourceOptions,
+        sourceParams,
+      });
+    }
+
+    const sourceItems = source.gather({
+      denops: denops,
+      context: this.context,
+      options: this.options,
+      sourceOptions: sourceOptions,
+      sourceParams: sourceParams,
+      input: this.input,
+    });
+
+    const reader = sourceItems.getReader();
+
+    const readChunk = async (
+      v: ReadableStreamReadResult<Item<unknown>[]>,
+    ) => {
+      const state = this.gatherStates[index];
+
+      if (this.finished) {
+        reader.cancel();
+        state.done = true;
+        state.items = [];
+        // Note: Must return after cancel()
+        return;
       }
 
-      const sourceItems = source.gather({
-        denops: denops,
-        context: this.context,
-        options: this.options,
-        sourceOptions: sourceOptions,
-        sourceParams: sourceParams,
-        input: this.input,
+      if (!v.value || v.done) {
+        state.done = true;
+        const allDone = Object.values(this.gatherStates).filter(
+          (s) => !s.done,
+        ).length == 0;
+        if (allDone || !this.options.sync) {
+          await this.redraw(denops);
+        }
+        return;
+      }
+
+      const newItems = v.value.map((item: Item) => {
+        const matcherKey = (sourceOptions.matcherKey in item)
+          ? (item as Record<string, unknown>)[
+            sourceOptions.matcherKey
+          ] as string
+          : item.word;
+        return {
+          ...item,
+          matcherKey: matcherKey,
+          __sourceIndex: index,
+          __sourceName: source.name,
+        };
       });
 
-      const reader = sourceItems.getReader();
-
-      const readChunk = async (
-        v: ReadableStreamReadResult<Item<unknown>[]>,
-      ) => {
-        const state = this.gatherStates[currentIndex];
-
-        if (this.finished) {
-          reader.cancel();
-          state.done = true;
-          state.items = [];
-          // Note: Must return after cancel()
-          return;
-        }
-
-        if (!v.value || v.done) {
-          state.done = true;
-          const allDone = Object.values(this.gatherStates).filter(
-            (s) => !s.done,
-          ).length == 0;
-          if (allDone || !this.options.sync) {
-            await this.redraw(denops);
-          }
-          return;
-        }
-
-        const newItems = v.value.map((item: Item) => {
-          const matcherKey = (sourceOptions.matcherKey in item)
-            ? (item as Record<string, unknown>)[
-              sourceOptions.matcherKey
-            ] as string
-            : item.word;
-          return {
-            ...item,
-            matcherKey: matcherKey,
-            __sourceIndex: currentIndex,
-            __sourceName: source.name,
-          };
-        });
-
-        // Update items
+      // Update items
+      if (state.items.length != 0) {
         state.items = state.items.concat(newItems);
-
         if (!this.finished && !this.options.sync) {
           await this.redraw(denops);
         }
-
-        reader.read().then(readChunk);
-      };
+      } else {
+        state.items = newItems;
+      }
 
       reader.read().then(readChunk);
-      index++;
-    }
+    };
+
+    reader.read().then(readChunk);
   }
 
   async redraw(
