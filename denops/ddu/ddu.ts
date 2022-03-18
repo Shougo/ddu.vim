@@ -124,18 +124,16 @@ export class Ddu {
     let index = 0;
     this.startTime = Date.now();
     for (const userSource of this.options.sources) {
-      const currentIndex = index;
-
       // Check previous gather state
-      if (this.gatherStates[currentIndex]) {
+      if (this.gatherStates[index]) {
         this.finished = true;
-        while (!this.gatherStates[currentIndex].done) {
+        while (!this.gatherStates[index].done) {
           await new Promise((resolve) => setTimeout(resolve, 200));
         }
         this.finished = false;
       }
 
-      this.gatherStates[currentIndex] = {
+      this.gatherStates[index] = {
         items: [],
         done: false,
       };
@@ -158,7 +156,7 @@ export class Ddu {
 
       await this.gatherItems(
         denops,
-        currentIndex,
+        index,
         source,
         sourceOptions,
         sourceParams,
