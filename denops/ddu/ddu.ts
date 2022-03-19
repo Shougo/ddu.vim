@@ -105,6 +105,10 @@ export class Ddu {
       this.setInput(this.options.input);
     }
 
+    // Note: UI must be reset.
+    const [ui, _1, _2] = await this.getUi(denops);
+    ui.isInitialized = false;
+
     this.initialized = false;
 
     this.refresh(denops);
