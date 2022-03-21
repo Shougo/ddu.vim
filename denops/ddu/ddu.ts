@@ -211,11 +211,11 @@ export class Ddu {
         // Update items
         if (state.items.length != 0) {
           state.items = state.items.concat(newItems);
-          if (!this.finished) {
-            await this.redraw(denops);
-          }
         } else {
           state.items = newItems;
+        }
+        if (!this.finished) {
+          await this.redraw(denops);
         }
 
         reader.read().then(readChunk);
