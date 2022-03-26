@@ -114,6 +114,8 @@ push
 refresh
 		Refresh the items when |ddu-option-resume|.
 
+		Default: v:false
+
 							*ddu-option-resume*
 resume
 		Reuse the previous state.  If none exist, a new ddu
@@ -152,6 +154,13 @@ sources
 		indexes.
 
 		Default: []
+
+sync							*ddu-option-sync*
+		Redraw the UI when all sources are finished.
+		It is useful for multiple sources or to reduce screen
+		flickers.
+
+		Default: v:false
 
 						*ddu-option-ui*
 ui

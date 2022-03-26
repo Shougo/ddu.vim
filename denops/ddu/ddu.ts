@@ -190,7 +190,12 @@ export class Ddu {
 
         if (!v.value || v.done) {
           state.done = true;
-          await this.redraw(denops);
+          const allDone = Object.values(this.gatherStates).filter(
+            (s) => !s.done,
+          ).length == 0;
+          if (allDone || !this.options.sync) {
+            await this.redraw(denops);
+          }
           return;
         }
 
@@ -209,12 +214,9 @@ export class Ddu {
         });
 
         // Update items
-        if (state.items.length != 0) {
-          state.items = state.items.concat(newItems);
-        } else {
-          state.items = newItems;
-        }
-        if (!this.finished) {
+        state.items = state.items.concat(newItems);
+
+        if (!this.finished && !this.options.sync) {
           await this.redraw(denops);
         }
 

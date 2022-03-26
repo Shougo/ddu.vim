@@ -69,6 +69,7 @@ export function defaultDduOptions(): DduOptions {
     sourceOptions: {},
     sourceParams: {},
     sources: [],
+    sync: false,
     ui: "",
     uiOptions: {},
     uiParams: {},
