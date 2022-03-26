@@ -157,8 +157,7 @@ sources
 
 sync							*ddu-option-sync*
 		Redraw the UI when all sources are finished.
-		It is useful for multiple sources or to reduce screen
-		flickers.
+		It is useful for multiple sources.
 
 		Default: v:false
 
