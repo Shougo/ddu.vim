@@ -39,7 +39,7 @@ function! ddu#custom#action(type, source_kind_name, action_name, func) abort
   let dict = a:type ==# 'source' ?
         \ s:custom_actions.source : s:custom_actions.kind
 
-  for key in ddu#util#split(a:source_kind_name)
+  for key in split(a:source_kind_name, '\s*,\s*')
     if !has_key(dict, key)
       let dict[key] = { 'actions': {} }
     endif
