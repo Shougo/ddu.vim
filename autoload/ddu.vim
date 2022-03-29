@@ -32,6 +32,12 @@ function! ddu#_request(method, args) abort
     return {}
   endif
 
+  if bufname('%') ==# '[Command Line]'
+    call ddu#util#print_error(
+          \ 'You cannot execute ddu.vim from command line window')
+    return {}
+  endif
+
   if denops#plugin#wait('ddu')
     return {}
   endif
