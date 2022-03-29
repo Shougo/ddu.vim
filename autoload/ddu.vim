@@ -33,9 +33,8 @@ function! ddu#_request(method, args) abort
   endif
 
   if bufname('%') ==# '[Command Line]'
-    call ddu#util#print_error(
-          \ 'You cannot execute ddu.vim from command line window')
-    return {}
+    " Must quit from command line window
+    quit
   endif
 
   if denops#plugin#wait('ddu')
