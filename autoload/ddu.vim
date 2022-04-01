@@ -99,3 +99,8 @@ function! ddu#_denops_running() abort
         \ && denops#server#status() ==# 'running'
         \ && denops#plugin#is_loaded('ddu')
 endfunction
+
+function! ddu#_lazy_redraw(name, ...) abort
+  let args = get(a:000, 0, {})
+  call timer_start(0, { -> ddu#redraw(a:name, args) })
+endfunction
