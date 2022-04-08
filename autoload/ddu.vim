@@ -19,6 +19,9 @@ endfunction
 function! ddu#get_item_actions(name, items) abort
   return ddu#_request('getItemActions', [a:name, a:items])
 endfunction
+function! ddu#expandItem(name, item) abort
+  return ddu#_notify('expandItem', [a:name, a:item])
+endfunction
 
 function! ddu#_request(method, args) abort
   if s:init()

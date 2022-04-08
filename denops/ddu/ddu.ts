@@ -563,6 +563,45 @@ export class Ddu {
     }
   }
 
+  async expandItem(
+    denops: Denops,
+    item: DduItem,
+  ): Promise<void> {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+
+    ui.refreshItems({
+      context: this.context,
+      options: this.options,
+      uiOptions: uiOptions,
+      uiParams: uiParams,
+      items: [],
+    });
+
+    // Note: redraw must be locked
+    await this.lock.with(async () => {
+      try {
+        await ui.redraw({
+          denops: denops,
+          context: this.context,
+          options: this.options,
+          uiOptions: uiOptions,
+          uiParams: uiParams,
+        });
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message.includes(" E523: ")) {
+          // Note: It may be called on invalid state
+          // Ignore "E523: Not allowed here" errors
+          await denops.call("ddu#_lazy_redraw", this.options.name);
+        } else {
+          console.error(
+            `[ddc.vim] ui: ${ui.name} "redraw()" is failed`,
+          );
+          console.error(e);
+        }
+      }
+    });
+  }
+
   async register(type: DduExtType, path: string, name: string) {
     if (path in this.checkPaths) {
       return;
