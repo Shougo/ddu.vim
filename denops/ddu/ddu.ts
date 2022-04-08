@@ -230,6 +230,8 @@ export class Ddu {
           matcherKey: matcherKey,
           __sourceIndex: index,
           __sourceName: source.name,
+          __level: 0,
+          __expanded: false,
         };
       });
 
@@ -287,29 +289,15 @@ export class Ddu {
       items: allItems,
     });
 
-    // Note: redraw must be locked
-    await this.lock.with(async () => {
-      try {
-        await ui.redraw({
-          denops: denops,
-          context: this.context,
-          options: this.options,
-          uiOptions: uiOptions,
-          uiParams: uiParams,
-        });
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message.includes(" E523: ")) {
-          // Note: It may be called on invalid state
-          // Ignore "E523: Not allowed here" errors
-          await denops.call("ddu#_lazy_redraw", this.options.name);
-        } else {
-          console.error(
-            `[ddc.vim] ui: ${ui.name} "redraw()" is failed`,
-          );
-          console.error(e);
-        }
-      }
-    });
+    await uiRedraw(
+      denops,
+      this.lock,
+      this.context,
+      this.options,
+      ui,
+      uiOptions,
+      uiParams,
+    );
   }
 
   async onEvent(
@@ -565,41 +553,108 @@ export class Ddu {
 
   async expandItem(
     denops: Denops,
-    item: DduItem,
+    parent: DduItem,
+  ): Promise<void> {
+    const index = parent.__sourceIndex;
+    const source = this.sources[parent.__sourceName];
+    const [sourceOptions, sourceParams] = sourceArgs(
+      this.options,
+      this.options.sources[index],
+      source,
+    );
+
+    if (!this.initialized) {
+      await source.onInit({
+        denops,
+        sourceOptions,
+        sourceParams,
+      });
+    }
+
+    type ActionData = {
+      path?: string;
+    };
+
+    // Set path
+    sourceOptions.path = (parent.action as ActionData).path ?? parent.word;
+
+    const sourceItems = source.gather({
+      denops: denops,
+      context: this.context,
+      options: this.options,
+      sourceOptions: sourceOptions,
+      sourceParams: sourceParams,
+      input: this.input,
+    });
+
+    const reader = sourceItems.getReader();
+
+    let children: DduItem[] = [];
+
+    const readChunk = async (
+      v: ReadableStreamReadResult<Item<unknown>[]>,
+    ) => {
+      if (this.finished) {
+        reader.cancel();
+        // Note: Must return after cancel()
+        return;
+      }
+
+      if (!v.value || v.done) {
+        await this.redrawExpandItem(denops, parent, children);
+        return;
+      }
+
+      const newItems = v.value.map((item: Item) => {
+        const matcherKey = (sourceOptions.matcherKey in item)
+          ? (item as Record<string, unknown>)[
+            sourceOptions.matcherKey
+          ] as string
+          : item.word;
+        return {
+          ...item,
+          matcherKey: matcherKey,
+          __sourceIndex: index,
+          __sourceName: source.name,
+          __level: parent.__level + 1,
+          __expanded: false,
+        };
+      });
+
+      // Update children
+      children = children.concat(newItems);
+
+      reader.read().then(readChunk);
+    };
+
+    reader.read().then(readChunk);
+  }
+
+  async redrawExpandItem(
+    denops: Denops,
+    parent: DduItem,
+    children: DduItem[],
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
 
-    ui.refreshItems({
+    ui.expandItem({
       context: this.context,
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
-      items: [],
+      parent: parent,
+      children: children,
     });
 
-    // Note: redraw must be locked
-    await this.lock.with(async () => {
-      try {
-        await ui.redraw({
-          denops: denops,
-          context: this.context,
-          options: this.options,
-          uiOptions: uiOptions,
-          uiParams: uiParams,
-        });
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message.includes(" E523: ")) {
-          // Note: It may be called on invalid state
-          // Ignore "E523: Not allowed here" errors
-          await denops.call("ddu#_lazy_redraw", this.options.name);
-        } else {
-          console.error(
-            `[ddc.vim] ui: ${ui.name} "redraw()" is failed`,
-          );
-          console.error(e);
-        }
-      }
-    });
+    await uiRedraw(
+      denops,
+      this.lock,
+      this.context,
+      this.options,
+      ui,
+      uiOptions,
+      uiParams,
+    );
   }
 
   async register(type: DduExtType, path: string, name: string) {
@@ -935,6 +990,42 @@ async function checkUiOnInit(
     );
     console.error(e);
   }
+}
+
+async function uiRedraw<
+  Params extends Record<string, unknown>,
+>(
+  denops: Denops,
+  lock: Lock,
+  context: Context,
+  options: DduOptions,
+  ui: BaseUi<Params>,
+  uiOptions: UiOptions,
+  uiParams: Params,
+): Promise<void> {
+  // Note: redraw must be locked
+  await lock.with(async () => {
+    try {
+      await ui.redraw({
+        denops: denops,
+        context: context,
+        options: options,
+        uiOptions: uiOptions,
+        uiParams: uiParams,
+      });
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes(" E523: ")) {
+        // Note: It may be called on invalid state
+        // Ignore "E523: Not allowed here" errors
+        await denops.call("ddu#_lazy_redraw", options.name);
+      } else {
+        console.error(
+          `[ddc.vim] ui: ${ui.name} "redraw()" is failed`,
+        );
+        console.error(e);
+      }
+    }
+  });
 }
 
 Deno.test("sourceArgs", () => {

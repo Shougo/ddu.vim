@@ -107,6 +107,8 @@ export type DduItem =
     matcherKey: string;
     __sourceIndex: number;
     __sourceName: string;
+    __level: number;
+    __expanded: boolean;
   };
 
 export type ActionArguments<Params extends Record<string, unknown>> = {

@@ -26,6 +26,15 @@ export type RefreshItemsArguments<Params extends Record<string, unknown>> = {
   items: DduItem[];
 };
 
+export type ExpandItemArguments<Params extends Record<string, unknown>> = {
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+  parent: DduItem;
+  children: DduItem[];
+};
+
 export type RedrawArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
   context: Context;
@@ -62,6 +71,8 @@ export abstract class BaseUi<
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 
   refreshItems(_args: RefreshItemsArguments<Params>): void {}
+
+  expandItem(_args: ExpandItemArguments<Params>): void {}
 
   async redraw(_args: RedrawArguments<Params>): Promise<void> {}
 
