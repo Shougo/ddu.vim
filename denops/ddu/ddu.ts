@@ -894,14 +894,14 @@ function sourceArgs<
     defaultSourceOptions,
     [
       options.sourceOptions["_"],
-      options.sourceOptions[source.name],
+      source ? options.sourceOptions[source.name] : {},
       userSource?.options,
     ],
   );
   const p = foldMerge(mergeSourceParams, defaultSourceParams, [
     source?.params(),
     options.sourceParams["_"],
-    options.sourceParams[source.name],
+    source ? options.sourceParams[source.name] : {},
     userSource?.params,
   ]);
   return [o, p];
