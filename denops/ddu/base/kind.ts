@@ -1,4 +1,11 @@
-import { ActionOptions, Actions, KindOptions } from "../types.ts";
+import {
+  ActionOptions,
+  Actions,
+  DduItem,
+  KindOptions,
+  Previewer,
+} from "../types.ts";
+import { Denops } from "../deps.ts";
 
 export abstract class BaseKind<
   Params extends Record<string, unknown>,
@@ -11,6 +18,14 @@ export abstract class BaseKind<
   actions: Actions<Params> = {};
 
   abstract params(): Params;
+
+  getPreviewer(
+    _denops: Denops,
+    _item: DduItem,
+    _param: unknown,
+  ): Previewer {
+    return undefined;
+  }
 }
 
 export function defaultKindOptions(): KindOptions {

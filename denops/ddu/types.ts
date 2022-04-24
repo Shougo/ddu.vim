@@ -133,3 +133,31 @@ export enum ActionFlags {
   Redraw = 1 << 1,
   Persist = 1 << 2,
 }
+
+export type TermPreviewer = {
+  kind: "terminal";
+  cmds: string[];
+};
+
+export type NoFilePreviewer = {
+  kind: "nofile";
+  contents: string[];
+  syntax?: string;
+} & PreviewerCommon;
+
+export type BufferPreviewer = {
+  kind: "buffer";
+  expr?: number | string;
+  path?: string;
+} & PreviewerCommon;
+
+type PreviewerCommon = {
+  highlights?: ItemHighlight[];
+  lineNr?: number;
+};
+
+export type Previewer =
+  | TermPreviewer
+  | BufferPreviewer
+  | NoFilePreviewer
+  | undefined;
