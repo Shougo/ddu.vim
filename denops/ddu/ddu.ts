@@ -870,7 +870,7 @@ export class Ddu {
     await this.autoload(denops, "kind", [kindName]);
 
     const kind = this.kinds[kindName];
-    if (!kind) {
+    if (!kind || !kind.getPreviewer) {
       return;
     }
 
