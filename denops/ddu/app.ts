@@ -226,7 +226,7 @@ export async function main(denops: Denops) {
       arg1: unknown,
       arg2: unknown,
       arg3: unknown,
-    ): Promise<Previewer> {
+    ): Promise<Previewer | undefined> {
       const name = ensureString(arg1);
       const items = ensureObject(arg2) as DduItem;
       const actionParams = ensureObject(arg3);

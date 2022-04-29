@@ -23,7 +23,7 @@ export abstract class BaseKind<
     _denops: Denops,
     _item: DduItem,
     _param: unknown,
-  ): Previewer {
+  ): Previewer | undefined {
     return undefined;
   }
 }

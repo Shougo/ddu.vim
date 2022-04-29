@@ -863,7 +863,7 @@ export class Ddu {
     denops: Denops,
     item: DduItem,
     actionParams: unknown,
-  ): Promise<Previewer> {
+  ): Promise<Previewer | undefined> {
     const source = this.sources[item.__sourceName];
     const kindName = source.kind;
 

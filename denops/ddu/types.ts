@@ -156,11 +156,11 @@ export type BufferPreviewer = {
 type PreviewerCommon = {
   highlights?: PreviewHighlight[];
   lineNr?: number;
+  pattern?: string;
   syntax?: string;
 };
 
 export type Previewer =
   | TermPreviewer
   | BufferPreviewer
-  | NoFilePreviewer
-  | undefined;
+  | NoFilePreviewer;
