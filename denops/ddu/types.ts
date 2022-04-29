@@ -134,6 +134,9 @@ export enum ActionFlags {
   Persist = 1 << 2,
 }
 
+export type PreviewHighlight = ItemHighlight & {
+  row: number;
+};
 export type TermPreviewer = {
   kind: "terminal";
   cmds: string[];
@@ -142,7 +145,6 @@ export type TermPreviewer = {
 export type NoFilePreviewer = {
   kind: "nofile";
   contents: string[];
-  syntax?: string;
 } & PreviewerCommon;
 
 export type BufferPreviewer = {
@@ -152,8 +154,9 @@ export type BufferPreviewer = {
 } & PreviewerCommon;
 
 type PreviewerCommon = {
-  highlights?: ItemHighlight[];
+  highlights?: PreviewHighlight[];
   lineNr?: number;
+  syntax?: string;
 };
 
 export type Previewer =
