@@ -139,7 +139,7 @@ export type PreviewContext = {
   width: number;
   isFloating: boolean;
   isVertical: boolean;
-}
+};
 
 export type PreviewHighlight = ItemHighlight & {
   row: number;
