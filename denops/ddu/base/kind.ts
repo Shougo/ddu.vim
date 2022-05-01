@@ -23,8 +23,8 @@ export abstract class BaseKind<
     _denops: Denops,
     _item: DduItem,
     _param: unknown,
-  ): Previewer | undefined {
-    return undefined;
+  ): Promise<Previewer | undefined> {
+    return Promise.resolve(undefined);
   }
 }
 

@@ -137,6 +137,7 @@ export enum ActionFlags {
 export type PreviewHighlight = ItemHighlight & {
   row: number;
 };
+
 export type TermPreviewer = {
   kind: "terminal";
   cmds: string[];
