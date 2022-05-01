@@ -15,6 +15,7 @@ import {
   FilterOptions,
   Item,
   KindOptions,
+  PreviewContext,
   Previewer,
   SourceOptions,
   UiOptions,
@@ -863,6 +864,7 @@ export class Ddu {
     denops: Denops,
     item: DduItem,
     actionParams: unknown,
+    previewContext: PreviewContext,
   ): Promise<Previewer | undefined> {
     const source = this.sources[item.__sourceName];
     const kindName = source.kind;
@@ -874,7 +876,7 @@ export class Ddu {
       return;
     }
 
-    return kind.getPreviewer(denops, item, actionParams);
+    return kind.getPreviewer({ denops, item, actionParams, previewContext });
   }
 }
 

@@ -134,6 +134,13 @@ export enum ActionFlags {
   Persist = 1 << 2,
 }
 
+export type PreviewContext = {
+  height: number;
+  width: number;
+  isFloating: boolean;
+  isVertical: boolean;
+}
+
 export type PreviewHighlight = ItemHighlight & {
   row: number;
 };

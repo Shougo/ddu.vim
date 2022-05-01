@@ -11,6 +11,7 @@ import {
   DduExtType,
   DduItem,
   DduOptions,
+  PreviewContext,
   Previewer,
 } from "./types.ts";
 import { Ddu } from "./ddu.ts";
@@ -226,12 +227,19 @@ export async function main(denops: Denops) {
       arg1: unknown,
       arg2: unknown,
       arg3: unknown,
+      arg4: unknown,
     ): Promise<Previewer | undefined> {
       const name = ensureString(arg1);
       const items = ensureObject(arg2) as DduItem;
-      const actionParams = ensureObject(arg3);
+      const actionParams = arg3;
+      const previewContext = ensureObject(arg4) as PreviewContext;
       const ddu = getDdu(name);
-      return await ddu.getPreviewer(denops, items, actionParams);
+      return await ddu.getPreviewer(
+        denops,
+        items,
+        actionParams,
+        previewContext,
+      );
     },
   };
 

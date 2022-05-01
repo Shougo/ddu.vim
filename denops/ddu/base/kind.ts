@@ -3,9 +3,17 @@ import {
   Actions,
   DduItem,
   KindOptions,
+  PreviewContext,
   Previewer,
 } from "../types.ts";
 import { Denops } from "../deps.ts";
+
+export type GetPreviewerArguments = {
+  denops: Denops;
+  previewContext: PreviewContext;
+  item: DduItem;
+  actionParams: unknown;
+};
 
 export abstract class BaseKind<
   Params extends Record<string, unknown>,
@@ -19,11 +27,7 @@ export abstract class BaseKind<
 
   abstract params(): Params;
 
-  getPreviewer(
-    _denops: Denops,
-    _item: DduItem,
-    _param: unknown,
-  ): Promise<Previewer | undefined> {
+  getPreviewer({}: GetPreviewerArguments): Promise<Previewer | undefined> {
     return Promise.resolve(undefined);
   }
 }
