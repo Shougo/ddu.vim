@@ -986,7 +986,7 @@ async function checkUiOnInit(
     ui.isInitialized = true;
   } catch (e: unknown) {
     console.error(
-      `[ddc.vim] ui: ${ui.name} "onInit()" is failed`,
+      `[ddu.vim] ui: ${ui.name} "onInit()" is failed`,
     );
     console.error(e);
   }
@@ -1020,7 +1020,7 @@ async function uiRedraw<
         await denops.call("ddu#_lazy_redraw", options.name);
       } else {
         console.error(
-          `[ddc.vim] ui: ${ui.name} "redraw()" is failed`,
+          `[ddu.vim] ui: ${ui.name} "redraw()" is failed`,
         );
         console.error(e);
       }

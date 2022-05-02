@@ -95,6 +95,19 @@ function! ddu#_register() abort
   call denops#plugin#register('ddu',
         \ denops#util#join_path(s:root_dir, 'denops', 'ddu', 'app.ts'),
         \ { 'mode': 'skip' })
+
+  autocmd ddu User DenopsStopped call s:stopped()
+endfunction
+
+function! s:stopped() abort
+  unlet! g:ddu#_initialized
+
+  " Restore custom config
+  if exists('g:ddu#_customs')
+    for custom in g:ddu#_customs
+      call ddu#_notify(custom.method, custom.args)
+    endfor
+  endif
 endfunction
 
 function! ddu#_denops_running() abort
