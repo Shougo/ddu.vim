@@ -134,6 +134,9 @@ export enum ActionFlags {
   Persist = 1 << 2,
 }
 
+/**
+ * Information of preview window
+ */
 export type PreviewContext = {
   height: number;
   width: number;
@@ -145,29 +148,66 @@ export type PreviewHighlight = ItemHighlight & {
   row: number;
 };
 
+/**
+ * Preview type which uses Vim/Neovim's terminal feature
+ */
 export type TermPreviewer = {
   kind: "terminal";
+  /**
+   * Commands passed to `termopen()` or `term_start()` to render the preview
+   */
   cmds: string[];
 };
 
+/**
+ * Preview type which shows the contents specified by the `contents` property
+ */
 export type NoFilePreviewer = {
   kind: "nofile";
+  /**
+   * Contents to be shown in the preview buffer
+   */
   contents: string[];
 } & PreviewerCommon;
 
+/**
+ * Preview type which shows the contents of files or existing buffers
+ */
 export type BufferPreviewer = {
   kind: "buffer";
+  /**
+   * Buffer expression, which is the same as the arguments of `bufname()`
+   */
   expr?: number | string;
+  /**
+   * Path of file to preview
+   */
   path?: string;
 } & PreviewerCommon;
 
 type PreviewerCommon = {
+  /**
+   * Highlights to apply in the preview buffer
+   */
   highlights?: PreviewHighlight[];
+  /**
+   * Line number of preview buffer to be made center and highlighted
+   */
   lineNr?: number;
+  /**
+   * Pattern to jump to and highlight
+   */
   pattern?: string;
+  /**
+   * Syntax to apply in the preview buffer
+   */
   syntax?: string;
 };
 
+/**
+ *  Previewer defines how the preview is rendered
+ *  This must be implemented in the ddu-ui
+ */
 export type Previewer =
   | TermPreviewer
   | BufferPreviewer
