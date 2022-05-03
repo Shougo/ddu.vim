@@ -101,6 +101,7 @@ export class Ddu {
         return;
       }
     } else {
+      this.gatherStates = {};
       this.options = options;
       this.setInput(this.options.input);
     }
