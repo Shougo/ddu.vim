@@ -718,14 +718,14 @@ KIND ATTRIBUTES						*ddu-kind-attributes*
 actions			(Record<string, function>)	(Required)
 		Defines kind specific actions.
 
-						*ddu-kind-attribute-params*
-params			(function)			(Required)
-		Called to get kind params.
-
 					*ddu-kind-attribute-getPreviewer*
 getPreviewer		(function)			(Optional)
 		Called to get previewer. Previewer defines how preview is
 		rendered in the preview window.
+
+						*ddu-kind-attribute-params*
+params			(function)			(Required)
+		Called to get kind params.
 
 
 ==============================================================================
