@@ -11,8 +11,8 @@ import { Denops } from "../deps.ts";
 export type GetPreviewerArguments = {
   denops: Denops;
   previewContext: PreviewContext;
-  item: DduItem;
   actionParams: unknown;
+  item: DduItem;
 };
 
 export abstract class BaseKind<
