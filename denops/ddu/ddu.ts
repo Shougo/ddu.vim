@@ -15,6 +15,8 @@ import {
   FilterOptions,
   Item,
   KindOptions,
+  PreviewContext,
+  Previewer,
   SourceOptions,
   UiOptions,
   UserSource,
@@ -857,6 +859,25 @@ export class Ddu {
     items = await callFilters(sourceOptions.converters, input, items);
 
     return [this.gatherStates[index].done, allItems, items];
+  }
+
+  async getPreviewer(
+    denops: Denops,
+    item: DduItem,
+    actionParams: unknown,
+    previewContext: PreviewContext,
+  ): Promise<Previewer | undefined> {
+    const source = this.sources[item.__sourceName];
+    const kindName = source.kind;
+
+    await this.autoload(denops, "kind", [kindName]);
+
+    const kind = this.kinds[kindName];
+    if (!kind || !kind.getPreviewer) {
+      return;
+    }
+
+    return kind.getPreviewer({ denops, item, actionParams, previewContext });
   }
 }
 

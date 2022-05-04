@@ -22,6 +22,9 @@ endfunction
 function! ddu#expand_item(name, item) abort
   return ddu#_notify('expandItem', [a:name, a:item])
 endfunction
+function! ddu#get_previewer(name, item, params, context) abort
+  return ddu#_request('getPreviewer', [a:name, a:item, a:params, a:context])
+endfunction
 
 function! ddu#_request(method, args) abort
   if s:init()
