@@ -48,11 +48,16 @@ export async function main(denops: Denops) {
       ddus[name] = [];
     }
 
-    return ddus[name].length == 0
-      ? null
-      : ddus[name].length == 1
-      ? ddus[name].slice(-1)[0]
-      : ddus[name].pop();
+    if (ddus[name].length == 0) {
+      return null;
+    }
+
+    // Save the last
+    const lastDdu = ddus[name].slice(-1)[0];
+
+    ddus[name].pop();
+
+    return lastDdu;
   };
 
   denops.dispatcher = {
@@ -157,7 +162,7 @@ export async function main(denops: Denops) {
         return;
       }
 
-      if (ddus[name].length <= 1) {
+      if (ddus[name].length < 1) {
         // Quit current ddu
         currentDdu.quit();
         await currentDdu.onEvent(denops, "cancel");
