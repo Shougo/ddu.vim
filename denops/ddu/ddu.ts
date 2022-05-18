@@ -746,7 +746,7 @@ export class Ddu {
     names: string[],
   ): Promise<string[]> {
     if (names.length == 0) {
-      return Promise.resolve([]);
+      return [];
     }
 
     const runtimepath = await op.runtimepath.getGlobal(denops);
@@ -770,7 +770,7 @@ export class Ddu {
         }
       }
 
-      return Promise.resolve(paths);
+      return paths;
     }
 
     const paths = await globpath(
@@ -782,7 +782,7 @@ export class Ddu {
       await this.register(type, path, parse(path).name);
     }));
 
-    return Promise.resolve(paths);
+    return paths;
   }
 
   setInput(input: string) {
@@ -821,17 +821,17 @@ export class Ddu {
         "ddu#util#print_error",
         message,
       );
-      return Promise.resolve([
+      return [
         undefined,
         defaultUiOptions(),
         defaultUiParams(),
-      ]);
+      ];
     }
 
     const [uiOptions, uiParams] = uiArgs(this.options, ui);
     await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
-    return Promise.resolve([ui, uiOptions, uiParams]);
+    return [ui, uiOptions, uiParams];
   }
 
   private async filterItems(
