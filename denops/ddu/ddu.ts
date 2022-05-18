@@ -108,6 +108,9 @@ export class Ddu {
 
     // Note: UI must be reset.
     const [ui, _1, _2] = await this.getUi(denops);
+    if (!ui) {
+      return;
+    }
     ui.isInitialized = false;
 
     this.initialized = false;
@@ -294,6 +297,9 @@ export class Ddu {
     items: DduItem[],
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui) {
+      return;
+    }
 
     ui.refreshItems({
       context: this.context,
@@ -353,6 +359,9 @@ export class Ddu {
     params: unknown,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui) {
+      return;
+    }
 
     const action = ui.actions[actionName];
     const flags = await action({
@@ -496,6 +505,9 @@ export class Ddu {
     }
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui) {
+      return;
+    }
 
     const [actionOptions, _] = actionArgs(this.options, actionName);
 
@@ -653,6 +665,9 @@ export class Ddu {
     children: DduItem[],
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui) {
+      return;
+    }
 
     ui.expandItem({
       context: this.context,
@@ -792,22 +807,28 @@ export class Ddu {
   private async getUi(
     denops: Denops,
   ): Promise<
-    [BaseUi<Record<string, unknown>>, UiOptions, Record<string, unknown>]
+    [
+      BaseUi<Record<string, unknown>> | undefined,
+      UiOptions,
+      Record<string, unknown>,
+    ]
   > {
     await this.autoload(denops, "ui", [this.options.ui]);
-    if (!this.uis[this.options.ui]) {
+    const ui = this.uis[this.options.ui];
+    if (!ui) {
+      const message = `Invalid ui: "${this.options.ui}"`;
       await denops.call(
         "ddu#util#print_error",
-        `Invalid ui: "${this.options.ui}"`,
+        message,
       );
-      return Promise.reject();
+      return Promise.resolve([
+        undefined,
+        defaultUiOptions(),
+        defaultUiParams(),
+      ]);
     }
 
-    const ui = this.uis[this.options.ui];
-    const [uiOptions, uiParams] = uiArgs(
-      this.options,
-      ui,
-    );
+    const [uiOptions, uiParams] = uiArgs(this.options, ui);
     await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
     return Promise.resolve([ui, uiOptions, uiParams]);
