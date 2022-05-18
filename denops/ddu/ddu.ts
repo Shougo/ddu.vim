@@ -85,8 +85,6 @@ export class Ddu {
     this.context = context;
     this.userOptions = userOptions;
 
-    await this.autoload(denops, "source", options.sources.map((s) => s.name));
-
     if (this.initialized && userOptions?.resume) {
       // Note: sources must not overwrite
       userOptions.sources = this.options.sources;
@@ -114,7 +112,13 @@ export class Ddu {
 
     this.initialized = false;
 
-    this.refresh(denops);
+    // UI should load before refresh.
+    // Note: If UI is blocked until refresh, user input will break UI.
+    await this.uiRedraw(denops, []);
+
+    await this.autoload(denops, "source", options.sources.map((s) => s.name));
+
+    await this.refresh(denops);
 
     this.initialized = true;
   }
@@ -282,6 +286,13 @@ export class Ddu {
       console.log(`Refresh all items: ${Date.now() - this.startTime} ms`);
     }
 
+    await this.uiRedraw(denops, allItems);
+  }
+
+  async uiRedraw(
+    denops: Denops,
+    items: DduItem[],
+  ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
 
     ui.refreshItems({
@@ -289,7 +300,7 @@ export class Ddu {
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
-      items: allItems,
+      items: items,
     });
 
     await uiRedraw(
@@ -309,6 +320,9 @@ export class Ddu {
   ): Promise<void> {
     for (const userSource of this.options.sources) {
       const source = this.sources[userSource.name];
+      if (!source) {
+        continue;
+      }
       const [sourceOptions, sourceParams] = sourceArgs(
         this.options,
         userSource,
@@ -812,7 +826,12 @@ export class Ddu {
       source,
     );
 
-    let items = this.gatherStates[index].items;
+    const state = this.gatherStates[index];
+    if (!state) {
+      return [false, 0, []];
+    }
+
+    let items = state.items;
     const allItems = items.length;
 
     const callFilters = async (
@@ -858,7 +877,7 @@ export class Ddu {
 
     items = await callFilters(sourceOptions.converters, input, items);
 
-    return [this.gatherStates[index].done, allItems, items];
+    return [state.done, allItems, items];
   }
 
   async getPreviewer(
