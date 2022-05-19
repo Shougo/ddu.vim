@@ -917,7 +917,12 @@ export class Ddu {
       return;
     }
 
-    return kind.getPreviewer({ denops, item, actionParams, previewContext });
+    return kind.getPreviewer({
+      denops,
+      item,
+      actionParams,
+      previewContext,
+    });
   }
 }
 

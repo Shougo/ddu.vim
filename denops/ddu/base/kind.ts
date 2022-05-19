@@ -27,8 +27,10 @@ export abstract class BaseKind<
 
   abstract params(): Params;
 
-  getPreviewer({}: GetPreviewerArguments): Promise<Previewer | undefined> {
-    return Promise.resolve(undefined);
+  async getPreviewer(
+    {}: GetPreviewerArguments,
+  ): Promise<Previewer | undefined> {
+    return undefined;
   }
 }
 
