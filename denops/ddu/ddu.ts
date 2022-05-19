@@ -115,11 +115,28 @@ export class Ddu {
 
     this.initialized = false;
 
+    await this.autoload(denops, "source", options.sources.map((s) => s.name));
+
+    // source onInit() must be called before UI
+    for (const userSource of this.options.sources) {
+      const source = this.sources[userSource.name];
+      const [sourceOptions, sourceParams] = sourceArgs(
+        this.options,
+        userSource,
+        source,
+      );
+
+      await this.initSource(
+        denops,
+        source,
+        sourceOptions,
+        sourceParams,
+      );
+    }
+
     // UI should load before refresh.
     // Note: If UI is blocked until refresh, user input will break UI.
     await this.uiRedraw(denops, []);
-
-    await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
     await this.refresh(denops);
 
@@ -176,7 +193,28 @@ export class Ddu {
     }
   }
 
-  async gatherItems<
+  async initSource<
+    Params extends Record<string, unknown>,
+    UserData extends unknown,
+  >(
+    denops: Denops,
+    source: BaseSource<Params, UserData>,
+    sourceOptions: SourceOptions,
+    sourceParams: Params,
+  ): Promise<void> {
+    if (source.isInitialized) {
+      return;
+    }
+
+    await source.onInit({
+      denops,
+      sourceOptions,
+      sourceParams,
+    });
+    source.isInitialized = true;
+  }
+
+  gatherItems<
     Params extends Record<string, unknown>,
     UserData extends unknown,
   >(
@@ -185,15 +223,7 @@ export class Ddu {
     source: BaseSource<Params, UserData>,
     sourceOptions: SourceOptions,
     sourceParams: Params,
-  ): Promise<void> {
-    if (!this.initialized) {
-      await source.onInit({
-        denops,
-        sourceOptions,
-        sourceParams,
-      });
-    }
-
+  ): void {
     const sourceItems = source.gather({
       denops: denops,
       context: this.context,
@@ -580,10 +610,10 @@ export class Ddu {
     }
   }
 
-  async expandItem(
+  expandItem(
     denops: Denops,
     parent: DduItem,
-  ): Promise<void> {
+  ): void {
     const index = parent.__sourceIndex;
     const source = this.sources[parent.__sourceName];
     const [sourceOptions, sourceParams] = sourceArgs(
@@ -591,14 +621,6 @@ export class Ddu {
       this.options.sources[index],
       source,
     );
-
-    if (!this.initialized) {
-      await source.onInit({
-        denops,
-        sourceOptions,
-        sourceParams,
-      });
-    }
 
     type ActionData = {
       path?: string;

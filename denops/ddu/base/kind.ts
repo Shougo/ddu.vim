@@ -27,6 +27,7 @@ export abstract class BaseKind<
 
   abstract params(): Params;
 
+  // deno-lint-ignore require-await
   async getPreviewer(
     {}: GetPreviewerArguments,
   ): Promise<Previewer | undefined> {
