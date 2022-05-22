@@ -138,6 +138,8 @@ export enum ActionFlags {
  * Information of preview window
  */
 export type PreviewContext = {
+  row: number,
+  col: number,
   width: number;
   height: number;
   isFloating: boolean;
