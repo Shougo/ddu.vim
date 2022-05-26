@@ -125,7 +125,6 @@ export class Ddu {
         userSource,
         source,
       );
-
       await this.initSource(
         denops,
         source,
@@ -181,7 +180,7 @@ export class Ddu {
         source,
       );
 
-      await this.gatherItems(
+      this.gatherItems(
         denops,
         index,
         source,
@@ -202,10 +201,7 @@ export class Ddu {
     sourceOptions: SourceOptions,
     sourceParams: Params,
   ): Promise<void> {
-    if (source.isInitialized) {
-      return;
-    }
-
+    source.isInitialized = false;
     await source.onInit({
       denops,
       sourceOptions,
