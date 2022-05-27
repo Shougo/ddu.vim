@@ -163,12 +163,13 @@ export async function main(denops: Denops) {
     async pop(arg1: unknown): Promise<void> {
       const name = ensureString(arg1);
 
-      const currentDdu = popDdu(name);
+      const dduLength = ddus[name].length;
+      const currentDdu = dduLength > 1 ? popDdu(name) : getDdu(name);
       if (!currentDdu) {
         return;
       }
 
-      if (ddus[name].length < 1) {
+      if (dduLength <= 1) {
         // Quit current ddu
         currentDdu.quit();
         await currentDdu.onEvent(denops, "cancel");
