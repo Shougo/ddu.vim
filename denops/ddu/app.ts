@@ -7,6 +7,7 @@ import {
   vars,
 } from "./deps.ts";
 import {
+  Clipboard,
   DduEvent,
   DduExtType,
   DduItem,
@@ -25,6 +26,11 @@ export async function main(denops: Denops) {
     source: {},
     filter: {},
     kind: {},
+  };
+  const clipboard: Clipboard = {
+    action: "none",
+    items: [],
+    mode: "",
   };
 
   const getDdu = (name: string) => {
@@ -205,7 +211,7 @@ export async function main(denops: Denops) {
       const params = ensureObject(arg4);
 
       const ddu = getDdu(name);
-      await ddu.itemAction(denops, actionName, items, params);
+      await ddu.itemAction(denops, actionName, items, params, clipboard);
     },
     async getItemActions(
       arg1: unknown,

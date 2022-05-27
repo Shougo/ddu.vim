@@ -7,6 +7,7 @@ import {
   BaseKind,
   BaseSource,
   BaseUi,
+  Clipboard,
   Context,
   DduEvent,
   DduExtType,
@@ -476,6 +477,7 @@ export class Ddu {
     actionName: string,
     items: DduItem[],
     params: unknown,
+    clipboard: Clipboard,
   ): Promise<void> {
     const actions = await this.getItemActions(denops, items);
     if (!actions) {
@@ -580,6 +582,7 @@ export class Ddu {
         kindParams: kindParams,
         actionParams: params,
         items: items,
+        clipboard: clipboard,
       });
 
       // Check path is changed by action

@@ -120,6 +120,7 @@ export type ActionArguments<Params extends Record<string, unknown>> = {
   kindParams: Params;
   actionParams: unknown;
   items: DduItem[];
+  clipboard: Clipboard;
 };
 
 export type Actions<Params extends Record<string, unknown>> = Record<
@@ -138,8 +139,8 @@ export enum ActionFlags {
  * Information of preview window
  */
 export type PreviewContext = {
-  row: number,
-  col: number,
+  row: number;
+  col: number;
   width: number;
   height: number;
   isFloating: boolean;
@@ -221,3 +222,12 @@ export type Previewer =
   | TerminalPreviewer
   | BufferPreviewer
   | NoFilePreviewer;
+
+export type ClipboardAction = "none" | "move" | "copy" | "link";
+
+export type Clipboard = {
+  action: ClipboardAction;
+  items: DduItem[];
+  mode: string;
+  paster?: never;
+};
