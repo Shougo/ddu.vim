@@ -34,14 +34,14 @@ function! ddu#_request(method, args) abort
   " Note: If call denops#plugin#wait() in vim_starting, freezed!
   if has('vim_starting')
     call ddu#util#print_error(
-          \ printf('You cannot call "%s" in vim_starting.', a:method))
+          \ 'You cannot call ddu.vim in vim_starting.')
     return {}
   endif
 
+  " You cannot use ddu.vim in the command line window.
   if getcmdwintype() !=# ''
-    " You cannot use ddu.vim in command line window.
     call ddu#util#print_error(
-          \ printf('You cannot call "%s" in command line window.', a:method))
+          \ 'You cannot call ddu.vim in the command line window.')
     return {}
   endif
 
