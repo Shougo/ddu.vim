@@ -39,8 +39,10 @@ function! ddu#_request(method, args) abort
   endif
 
   if getcmdwintype() !=# ''
-    " Must quit from command line window
-    quit
+    " You cannot use ddu.vim in command line window.
+    call ddu#util#print_error(
+          \ printf('You cannot call "%s" in command line window.', a:method))
+    return {}
   endif
 
   if denops#plugin#wait('ddu')
