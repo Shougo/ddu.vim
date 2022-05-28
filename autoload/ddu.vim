@@ -38,7 +38,7 @@ function! ddu#_request(method, args) abort
     return {}
   endif
 
-  if bufname('%') ==# '[Command Line]'
+  if getcmdwintype() !=# ''
     " Must quit from command line window
     quit
   endif
