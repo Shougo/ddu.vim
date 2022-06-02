@@ -62,6 +62,9 @@ endfunction
 function! ddu#custom#get_default_options() abort
   return ddu#_request('getDefaultOptions', [])
 endfunction
+function! ddu#custom#get_current(name) abort
+  return ddu#_request('getCurrent', [a:name])
+endfunction
 function! ddu#custom#get_aliases() abort
   return s:aliases
 endfunction

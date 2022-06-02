@@ -301,6 +301,11 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
 ddu#custom#get_aliases()
 		Get aliases.
 
+						*ddu#custom#get_current()*
+ddu#custom#get_current({name})
+		Get current ddu options for {name}.
+		{name} is specified by |ddu-option-name|.
+
 					*ddu#custom#get_default_options()*
 ddu#custom#get_default_options()
 		Get the default options.

@@ -98,6 +98,11 @@ export async function main(denops: Denops) {
     getDefaultOptions(): Promise<Partial<DduOptions>> {
       return Promise.resolve(defaultDduOptions());
     },
+    getCurrent(arg1: unknown): Promise<Partial<DduOptions>> {
+      const name = ensureString(arg1);
+      const ddu = getDdu(name);
+      return Promise.resolve(ddu.getOptions());
+    },
     alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
       const extType = ensureString(arg1) as DduExtType;
       const alias = ensureString(arg2);
@@ -225,6 +230,7 @@ export async function main(denops: Denops) {
       const actions = await ddu.getItemActions(denops, items);
       return actions ? Object.keys(actions) : [];
     },
+    // deno-lint-ignore require-await
     async expandItem(
       arg1: unknown,
       arg2: unknown,
@@ -233,7 +239,7 @@ export async function main(denops: Denops) {
       const item = ensureObject(arg2) as DduItem;
 
       const ddu = getDdu(name);
-      await ddu.expandItem(denops, item);
+      ddu.expandItem(denops, item);
     },
     async getPreviewer(
       arg1: unknown,
