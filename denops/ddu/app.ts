@@ -26,6 +26,7 @@ export async function main(denops: Denops) {
     source: {},
     filter: {},
     kind: {},
+    column: {},
   };
   const clipboard: Clipboard = {
     action: "none",

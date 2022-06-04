@@ -63,6 +63,8 @@ Plug 'Shougo/ddu.vim'
 
 " Install your kinds
 
+" Install your columns
+
 call plug#end()
 ```
 
@@ -82,12 +84,14 @@ call dein#add('Shougo/ddu.vim')
 
 " Install your kinds
 
+" Install your columns
+
 call dein#end()
 ```
 
-**Note:** Ddu.vim does not include any UIs, sources, filters and kinds. You must
-install them you want manually. You can search ddu plugins(sources and filters)
-from [here](https://github.com/topics/ddu-vim).
+**Note:** Ddu.vim does not include any extra plugins. You must install them you
+want manually. You can search ddu plugins from
+[here](https://github.com/topics/ddu-vim).
 
 ### Requirements
 

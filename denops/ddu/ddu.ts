@@ -3,6 +3,7 @@ import {
   ActionFlags,
   ActionOptions,
   Actions,
+  BaseColumn,
   BaseFilter,
   BaseKind,
   BaseSource,
@@ -58,12 +59,15 @@ export class Ddu {
   private sources: Record<string, BaseSource<Record<string, unknown>>> = {};
   private filters: Record<string, BaseFilter<Record<string, unknown>>> = {};
   private kinds: Record<string, BaseKind<Record<string, unknown>>> = {};
+  private columns: Record<string, BaseColumn<Record<string, unknown>>> = {};
   private aliases: Record<DduExtType, Record<string, string>> = {
     ui: {},
     source: {},
     filter: {},
     kind: {},
+    column: {},
   };
+
   private checkPaths: Record<string, boolean> = {};
   private gatherStates: Record<string, GatherState> = {};
   private input = "";
@@ -748,6 +752,13 @@ export class Ddu {
           this.kinds[kind.name] = kind;
         };
         break;
+      case "column":
+        add = (name: string) => {
+          const column = new mod.Column();
+          column.name = name;
+          this.columns[column.name] = column;
+        };
+        break;
     }
 
     add(name);
@@ -918,6 +929,8 @@ export class Ddu {
     }
 
     items = await callFilters(sourceOptions.converters, input, items);
+
+    // todo: call columns
 
     return [state.done, allItems, items];
   }
