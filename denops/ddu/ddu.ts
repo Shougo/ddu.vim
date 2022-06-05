@@ -955,7 +955,7 @@ export class Ddu {
       item.highlights = [];
     }
 
-    let startCol = 0;
+    let startCol = 1;
     for (const columnName of columns) {
       const column = this.columns[columnName];
       if (!column) {
@@ -989,7 +989,7 @@ export class Ddu {
         item.display = text.text;
 
         if (text.highlights && item.highlights) {
-          item.highlights.concat(text.highlights);
+          item.highlights = item.highlights.concat(text.highlights);
         }
       }
 
