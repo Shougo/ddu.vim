@@ -20,6 +20,7 @@ export type GetTextArguments<Params extends Record<string, unknown>> = {
   options: DduOptions;
   columnOptions: ColumnOptions;
   columnParams: Params;
+  startCol: number;
   item: DduItem;
 };
 

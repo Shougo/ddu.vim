@@ -944,8 +944,18 @@ export class Ddu {
     columns: string[],
     items: DduItem[],
   ) {
+    if (columns.length == 0) {
+      return;
+    }
+
     await this.autoload(denops, "column", columns);
 
+    // Item highlights must be cleared
+    for (const item of items) {
+      item.highlights = [];
+    }
+
+    let startCol = 0;
     for (const columnName of columns) {
       const column = this.columns[columnName];
       if (!column) {
@@ -958,24 +968,32 @@ export class Ddu {
 
       const [columnOptions, columnParams] = columnArgs(this.options, column);
 
+      const columnLength = await column.getLength({
+        denops,
+        options: this.options,
+        columnOptions,
+        columnParams,
+        items,
+      });
+
       for (const item of items) {
         const text = await column.getText({
-          denops: denops,
+          denops,
           options: this.options,
-          columnOptions: columnOptions,
-          columnParams: columnParams,
-          item: item,
+          columnOptions,
+          columnParams,
+          startCol,
+          item,
         });
 
         item.display = text.text;
 
-        if (text.highlights) {
-          if (!item.highlights) {
-            item.highlights = [];
-          }
+        if (text.highlights && item.highlights) {
           item.highlights.concat(text.highlights);
         }
       }
+
+      startCol += columnLength;
     }
   }
 
