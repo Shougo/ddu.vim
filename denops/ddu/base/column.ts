@@ -38,7 +38,7 @@ export abstract class BaseColumn<Params extends Record<string, unknown>> {
 
   abstract getLength({}: GetLengthArguments<Params>): Promise<number>;
 
-  abstract getText({}: GetLengthArguments<Params>): Promise<GetTextResult>;
+  abstract getText({}: GetTextArguments<Params>): Promise<GetTextResult>;
 
   abstract params(): Params;
 }

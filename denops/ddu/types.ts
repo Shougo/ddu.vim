@@ -33,6 +33,8 @@ export type UserSource = {
 
 export type DduOptions = {
   actionOptions: Record<string, Partial<ActionOptions>>;
+  columnOptions: Record<string, Partial<ColumnOptions>>;
+  columnParams: Record<string, Partial<Record<string, unknown>>>;
   filterOptions: Record<string, Partial<FilterOptions>>;
   filterParams: Record<string, Partial<Record<string, unknown>>>;
   input: string;

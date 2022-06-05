@@ -9,6 +9,7 @@ import {
   BaseSource,
   BaseUi,
   Clipboard,
+  ColumnOptions,
   Context,
   DduEvent,
   DduExtType,
@@ -28,6 +29,8 @@ import {
   defaultDduOptions,
   foldMerge,
   mergeActionOptions,
+  mergeColumnOptions,
+  mergeColumnParams,
   mergeDduOptions,
   mergeFilterOptions,
   mergeFilterParams,
@@ -45,6 +48,7 @@ import {
   GatherArguments,
 } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
+import { defaultColumnOptions, defaultColumnParams } from "./base/column.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 import { Lock } from "https://deno.land/x/async@v1.1.5/mod.ts";
@@ -930,9 +934,49 @@ export class Ddu {
 
     items = await callFilters(sourceOptions.converters, input, items);
 
-    // todo: call columns
+    this.callColumns(denops, sourceOptions.columns, items);
 
     return [state.done, allItems, items];
+  }
+
+  private async callColumns(
+    denops: Denops,
+    columns: string[],
+    items: DduItem[],
+  ) {
+    await this.autoload(denops, "column", columns);
+
+    for (const columnName of columns) {
+      const column = this.columns[columnName];
+      if (!column) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid column: ${columnName}`,
+        );
+        continue;
+      }
+
+      const [columnOptions, columnParams] = columnArgs(this.options, column);
+
+      for (const item of items) {
+        const text = await column.getText({
+          denops: denops,
+          options: this.options,
+          columnOptions: columnOptions,
+          columnParams: columnParams,
+          item: item,
+        });
+
+        item.display = text.text;
+
+        if (text.highlights) {
+          if (!item.highlights) {
+            item.highlights = [];
+          }
+          item.highlights.concat(text.highlights);
+        }
+      }
+    }
   }
 
   async getPreviewer(
@@ -1026,6 +1070,28 @@ function filterArgs<
     filter?.params(),
     options.filterParams["_"],
     options.filterParams[filter.name],
+  ]);
+  return [o, p];
+}
+
+function columnArgs<
+  Params extends Record<string, unknown>,
+>(
+  options: DduOptions,
+  column: BaseColumn<Params>,
+): [ColumnOptions, Record<string, unknown>] {
+  const o = foldMerge(
+    mergeColumnOptions,
+    defaultColumnOptions,
+    [
+      options.columnOptions["_"],
+      options.columnOptions[column.name],
+    ],
+  );
+  const p = foldMerge(mergeColumnParams, defaultColumnParams, [
+    column?.params(),
+    options.columnParams["_"],
+    options.columnParams[column.name],
   ]);
   return [o, p];
 }
