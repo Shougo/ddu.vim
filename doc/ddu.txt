@@ -78,6 +78,20 @@ INTERFACE						*ddu-interface*
 ------------------------------------------------------------------------------
 OPTIONS	 						*ddu-options*
 
+						*ddu-option-columnOptions*
+columnOptions
+		It is a dictionary that maps column names to its options.
+		See also |ddu-column-options|.
+
+		Default: {}
+
+						*ddu-option-columnParams*
+columnParams
+		It is a dictionary that maps column names to its parameters.
+		See also |ddu-column-params|.
+
+		Default: {}
+
 						*ddu-option-filterOptions*
 filterOptions
 		It is a dictionary that maps filter names to its options.
