@@ -1,10 +1,11 @@
 import { BaseColumn, DduItem, ItemHighlight } from "../ddu/types.ts";
 import { GetTextResult } from "../ddu/base/column.ts";
-import { Denops } from "https://deno.land/x/ddu_vim@v0.14/deps.ts";
+import { Denops, fn } from "https://deno.land/x/ddu_vim@v0.14/deps.ts";
 
 type Params = {
   collapsedIcon: string;
   expandedIcon: string;
+  iconWidth: number;
   highlights: HighlightGroup;
 };
 
@@ -19,11 +20,18 @@ type ActionData = {
 };
 
 export class Column extends BaseColumn<Params> {
-  getLength(_: {
+  async getLength(args: {
     denops: Denops;
+    columnParams: Params;
     items: DduItem[];
   }): Promise<number> {
-    return Promise.resolve(100);
+    const widths = await Promise.all(args.items.map(
+      async (item) => item.__level + 1 +
+        (await fn.strwidth(
+          args.denops,
+          args.columnParams.iconWidth + (item.display ?? item.word)) as number)
+    )) as number[];
+    return Math.max(...widths);
   }
 
   getText(args: {
@@ -38,18 +46,18 @@ export class Column extends BaseColumn<Params> {
 
     if (isDirectory) {
       const userHighlights = args.columnParams.highlights;
-      const iconWidth = 1;
       highlights.push({
         name: "column-filename-directory-icon",
         "hl_group": userHighlights.directoryIcon ?? "Special",
         col: args.startCol + args.item.__level,
-        width: iconWidth,
+        width: args.columnParams.iconWidth,
       })
 
       highlights.push({
         name: "column-filename-directory-name",
         "hl_group": userHighlights.directoryName ?? "Directory",
-        col: args.startCol + args.item.__level + iconWidth + 1,
+        col: args.startCol + args.item.__level +
+          args.columnParams.iconWidth + 1,
         width: display.length,
       })
     }
@@ -72,6 +80,7 @@ export class Column extends BaseColumn<Params> {
     return {
       collapsedIcon: "+",
       expandedIcon: "-",
+      iconWidth: 1,
       highlights: {},
     };
   }
