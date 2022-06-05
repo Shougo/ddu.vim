@@ -210,6 +210,10 @@ export class Ddu {
     sourceOptions: SourceOptions,
     sourceParams: Params,
   ): Promise<void> {
+    if (!source) {
+      return;
+    }
+
     source.isInitialized = false;
     await source.onInit({
       denops,
