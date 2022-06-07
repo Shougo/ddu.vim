@@ -1188,13 +1188,11 @@ async function checkUiOnInit(
 
     ui.isInitialized = true;
   } catch (e: unknown) {
-    echoerr(denops, `[ddu.vim] ui: ${ui.name} "onInit()" is failed`);
-    if (e instanceof Error) {
-      echoerr(denops, e.message);
-      if (e.stack) {
-        echoerr(denops, e.stack);
-      }
-    }
+    errorException(
+      denops,
+      e,
+      `[ddu.vim] ui: ${ui.name} "onInit()" is failed`,
+    );
   }
 }
 
@@ -1225,13 +1223,11 @@ async function uiRedraw<
         // Ignore "E523: Not allowed here" errors
         await denops.call("ddu#_lazy_redraw", options.name);
       } else {
-        echoerr(denops, `[ddu.vim] ui: ${ui.name} "redraw()" is failed`);
-        if (e instanceof Error) {
-          echoerr(denops, e.message);
-          if (e.stack) {
-            echoerr(denops, e.stack);
-          }
-        }
+        errorException(
+          denops,
+          e,
+          `[ddu.vim] ui: ${ui.name} "redraw()" is failed`,
+        );
       }
     }
   });
@@ -1256,13 +1252,11 @@ async function checkFilterOnInit(
 
     filter.isInitialized = true;
   } catch (e: unknown) {
-    echoerr(denops, `[ddu.vim] filter: ${filter.name} "onInit()" is failed`);
-    if (e instanceof Error) {
-      echoerr(denops, e.message);
-      if (e.stack) {
-        echoerr(denops, e.stack);
-      }
-    }
+    errorException(
+      denops,
+      e,
+      `[ddu.vim] filter: ${filter.name} "onInit()" is failed`,
+    );
   }
 }
 
@@ -1285,12 +1279,20 @@ async function checkColumnOnInit(
 
     column.isInitialized = true;
   } catch (e: unknown) {
-    echoerr(denops, `[ddu.vim] column: ${column.name} "onInit()" is failed`);
-    if (e instanceof Error) {
-      echoerr(denops, e.message);
-      if (e.stack) {
-        echoerr(denops, e.stack);
-      }
+    errorException(
+      denops,
+      e,
+      `[ddu.vim] column: ${column.name} "onInit()" is failed`,
+    );
+  }
+}
+
+function errorException(denops: Denops, e: unknown, message: string) {
+  echoerr(denops, message);
+  if (e instanceof Error) {
+    echoerr(denops, e.message);
+    if (e.stack) {
+      echoerr(denops, e.stack);
     }
   }
 }
