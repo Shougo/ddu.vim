@@ -949,7 +949,7 @@ export class Ddu {
 
     items = await callFilters(sourceOptions.converters, input, items);
 
-    this.callColumns(denops, sourceOptions.columns, items);
+    await this.callColumns(denops, sourceOptions.columns, items);
 
     return [state.done, allItems, items];
   }
@@ -960,7 +960,7 @@ export class Ddu {
     items: DduItem[],
   ) {
     if (columns.length == 0) {
-      return;
+      return items;
     }
 
     await this.autoload(denops, "column", columns);
@@ -1000,6 +1000,7 @@ export class Ddu {
           columnOptions,
           columnParams,
           startCol,
+          endCol: startCol + columnLength,
           item,
         });
 

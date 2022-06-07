@@ -36,10 +36,11 @@ export class Column extends BaseColumn<Params> {
     return Math.max(...widths);
   }
 
-  getText(args: {
+  async getText(args: {
     denops: Denops;
     columnParams: Params;
     startCol: number;
+    endCol: number;
     item: DduItem;
   }): Promise<GetTextResult> {
     const isDirectory = (args.item.action as ActionData).isDirectory;
@@ -71,9 +72,11 @@ export class Column extends BaseColumn<Params> {
         ? args.columnParams.expandedIcon
         : args.columnParams.collapsedIcon) +
       " " + display;
+    const width = await fn.strwidth(args.denops, text) as number;
+    const padding = " ".repeat(args.endCol - args.startCol - width);
 
     return Promise.resolve({
-      text: text,
+      text: text + padding,
       highlights: highlights,
     });
   }

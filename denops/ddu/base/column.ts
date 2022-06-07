@@ -21,6 +21,7 @@ export type GetTextArguments<Params extends Record<string, unknown>> = {
   columnOptions: ColumnOptions;
   columnParams: Params;
   startCol: number;
+  endCol: number;
   item: DduItem;
 };
 
