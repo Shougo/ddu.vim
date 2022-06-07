@@ -1,4 +1,14 @@
-import { assertEquals, Denops, fn, op, parse, toFileUrl } from "./deps.ts";
+import {
+  assertEquals,
+  Denops,
+  echo,
+  echoerr,
+  fn,
+  op,
+  Lock,
+  parse,
+  toFileUrl,
+} from "./deps.ts";
 import {
   ActionFlags,
   ActionOptions,
@@ -51,7 +61,6 @@ import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
 import { defaultColumnOptions, defaultColumnParams } from "./base/column.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
-import { Lock } from "https://deno.land/x/async@v1.1.5/mod.ts";
 
 type GatherState = {
   items: DduItem[];
@@ -325,7 +334,7 @@ export class Ddu {
     }
 
     if (this.context.done && this.options.profile) {
-      console.log(`Refresh all items: ${Date.now() - this.startTime} ms`);
+      echo(denops, `Refresh all items: ${Date.now() - this.startTime} ms`);
     }
 
     await this.uiRedraw(denops, allItems);
@@ -1174,10 +1183,13 @@ async function checkUiOnInit(
 
     ui.isInitialized = true;
   } catch (e: unknown) {
-    console.error(
-      `[ddu.vim] ui: ${ui.name} "onInit()" is failed`,
-    );
-    console.error(e);
+    echoerr(denops, `[ddu.vim] ui: ${ui.name} "onInit()" is failed`);
+    if (e instanceof Error) {
+      echoerr(denops, e.message);
+      if (e.stack) {
+        echoerr(denops, e.stack);
+      }
+    }
   }
 }
 
@@ -1208,10 +1220,13 @@ async function uiRedraw<
         // Ignore "E523: Not allowed here" errors
         await denops.call("ddu#_lazy_redraw", options.name);
       } else {
-        console.error(
-          `[ddu.vim] ui: ${ui.name} "redraw()" is failed`,
-        );
-        console.error(e);
+        echoerr(denops, `[ddu.vim] ui: ${ui.name} "redraw()" is failed`);
+        if (e instanceof Error) {
+          echoerr(denops, e.message);
+          if (e.stack) {
+            echoerr(denops, e.stack);
+          }
+        }
       }
     }
   });

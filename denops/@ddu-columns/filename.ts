@@ -26,10 +26,12 @@ export class Column extends BaseColumn<Params> {
     items: DduItem[];
   }): Promise<number> {
     const widths = await Promise.all(args.items.map(
-      async (item) => item.__level + 1 +
+      async (item) =>
+        item.__level + 1 +
         (await fn.strwidth(
           args.denops,
-          args.columnParams.iconWidth + (item.display ?? item.word)) as number)
+          args.columnParams.iconWidth + (item.display ?? item.word),
+        ) as number),
     )) as number[];
     return Math.max(...widths);
   }
@@ -51,7 +53,7 @@ export class Column extends BaseColumn<Params> {
         "hl_group": userHighlights.directoryIcon ?? "Special",
         col: args.startCol + args.item.__level,
         width: args.columnParams.iconWidth,
-      })
+      });
 
       highlights.push({
         name: "column-filename-directory-name",
@@ -59,7 +61,7 @@ export class Column extends BaseColumn<Params> {
         col: args.startCol + args.item.__level +
           args.columnParams.iconWidth + 1,
         width: display.length,
-      })
+      });
     }
 
     const text = " ".repeat(args.item.__level) +
