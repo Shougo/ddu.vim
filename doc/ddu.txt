@@ -730,7 +730,19 @@ Note: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
-FILTER ATTRIBUTES				*ddu-column-attributes*
+FILTER ATTRIBUTES				*ddu-filter-attributes*
+
+						*ddu-filter-attribute-filter*
+filter			(function)			(Required)
+		It is called to filter items.
+
+						*ddu-filter-attribute-onInit*
+onInit			(function)			(Optional)
+		Called before call filter functions.
+
+						*ddu-filter-attribute-params*
+params			(function)			(Required)
+		Called to get filter params.
 
 
 ==============================================================================
@@ -748,20 +760,23 @@ Note: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
-FILTER ATTRIBUTES				*ddu-filter-attributes*
+COLUMN ATTRIBUTES				*ddu-column-attributes*
 
-						*ddu-filter-attribute-filter*
-filter			(function)			(Required)
-		It is called to filter items.
+					*ddu-column-attribute-getLength*
+getLength		(function)			(Required)
+		It is called to get column length.
 
-						*ddu-filter-attribute-onInit*
+						*ddu-column-attribute-getText*
+getText		(function)			(Required)
+		It is called to get column text with highlights.
+
+						*ddu-column-attribute-onInit*
 onInit			(function)			(Optional)
-		Called before call filter functions.
+		Called before call column functions.
 
-						*ddu-filter-attribute-params*
+						*ddu-column-attribute-params*
 params			(function)			(Required)
-		Called to get filter params.
-
+		Called to get column params.
 
 ==============================================================================
 CREATE KIND						*ddu-create-kind*
