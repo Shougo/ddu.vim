@@ -4,8 +4,8 @@ import {
   echo,
   echoerr,
   fn,
-  op,
   Lock,
+  op,
   parse,
   toFileUrl,
 } from "./deps.ts";
@@ -922,6 +922,8 @@ export class Ddu {
 
         const [filterOptions, filterParams] = filterArgs(this.options, filter);
 
+        await checkFilterOnInit(filter, denops, filterOptions, filterParams);
+
         items = await filter.filter({
           denops: denops,
           options: this.options,
@@ -980,6 +982,8 @@ export class Ddu {
       }
 
       const [columnOptions, columnParams] = columnArgs(this.options, column);
+
+      await checkColumnOnInit(column, denops, columnOptions, columnParams);
 
       const columnLength = await column.getLength({
         denops,
@@ -1230,6 +1234,64 @@ async function uiRedraw<
       }
     }
   });
+}
+
+async function checkFilterOnInit(
+  filter: BaseFilter<Record<string, unknown>>,
+  denops: Denops,
+  filterOptions: FilterOptions,
+  filterParams: Record<string, unknown>,
+) {
+  if (filter.isInitialized) {
+    return;
+  }
+
+  try {
+    await filter.onInit({
+      denops,
+      filterOptions,
+      filterParams,
+    });
+
+    filter.isInitialized = true;
+  } catch (e: unknown) {
+    echoerr(denops, `[ddu.vim] filter: ${filter.name} "onInit()" is failed`);
+    if (e instanceof Error) {
+      echoerr(denops, e.message);
+      if (e.stack) {
+        echoerr(denops, e.stack);
+      }
+    }
+  }
+}
+
+async function checkColumnOnInit(
+  column: BaseColumn<Record<string, unknown>>,
+  denops: Denops,
+  columnOptions: FilterOptions,
+  columnParams: Record<string, unknown>,
+) {
+  if (column.isInitialized) {
+    return;
+  }
+
+  try {
+    await column.onInit({
+      denops,
+      columnOptions,
+      columnParams,
+    });
+
+    column.isInitialized = true;
+  } catch (e: unknown) {
+    echoerr(denops, `[ddu.vim] column: ${column.name} "onInit()" is failed`);
+    if (e instanceof Error) {
+      echoerr(denops, e.message);
+      if (e.stack) {
+        echoerr(denops, e.stack);
+      }
+    }
+  }
 }
 
 Deno.test("sourceArgs", () => {
