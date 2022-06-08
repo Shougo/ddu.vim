@@ -596,6 +596,7 @@ export class Ddu {
       const prevPath = sourceOptions.path;
       flags = await action({
         denops: denops,
+        context: this.context,
         options: this.options,
         sourceOptions: sourceOptions,
         sourceParams: sourceParams,
@@ -614,6 +615,7 @@ export class Ddu {
           userSource.options = defaultSourceOptions();
         }
         userSource.options.path = sourceOptions.path;
+        this.context.path = sourceOptions.path;
       }
     }
 
@@ -648,6 +650,7 @@ export class Ddu {
 
     // Set path
     sourceOptions.path = (parent.action as ActionData).path ?? parent.word;
+    this.context.path = sourceOptions.path;
 
     const sourceItems = source.gather({
       denops: denops,

@@ -17,6 +17,7 @@ export type Context = {
   done: boolean;
   input: string;
   maxItems: number;
+  path: string;
   winId: number;
 };
 
@@ -122,6 +123,7 @@ export type DduItem =
 
 export type ActionArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
+  context: Context;
   options: DduOptions;
   sourceOptions: SourceOptions;
   sourceParams: Params;

@@ -52,6 +52,7 @@ export function defaultContext(): Context {
     done: false,
     input: "",
     maxItems: 0,
+    path: "",
     winId: 0,
   };
 }
