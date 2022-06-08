@@ -21,6 +21,9 @@ Sources			|ddu-sources|
 Filters			|ddu-filters|
   Filter options	  |ddu-filter-options|
   Filter params		  |ddu-filter-params|
+Columns			|ddu-columns|
+  Column options	  |ddu-column-options|
+  Column params		  |ddu-column-params|
 Kinds			|ddu-kinds|
   Kind options		  |ddu-kind-options|
   Kind params		  |ddu-kind-params|
@@ -33,6 +36,8 @@ Create source		|ddu-create-source|
   Item attributes    |ddu-item-attributes|
 Create filter		|ddu-create-filter|
   filter attributes	  |ddu-filter-attributes|
+Create column		|ddu-create-column|
+  column attributes	  |ddu-column-attributes|
 Create kind		|ddu-create-kind|
   kind attributes	  |ddu-kind-attributes|
 FAQ			|ddu-faq|
@@ -72,6 +77,20 @@ INTERFACE						*ddu-interface*
 
 ------------------------------------------------------------------------------
 OPTIONS	 						*ddu-options*
+
+						*ddu-option-columnOptions*
+columnOptions
+		It is a dictionary that maps column names to its options.
+		See also |ddu-column-options|.
+
+		Default: {}
+
+						*ddu-option-columnParams*
+columnParams
+		It is a dictionary that maps column names to its parameters.
+		See also |ddu-column-params|.
+
+		Default: {}
 
 						*ddu-option-filterOptions*
 filterOptions
@@ -438,6 +457,13 @@ Note: The sources cannot set default options for source.  If the source need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
+				    		*ddu-source-option-columns*
+columns		(string[])
+		It is a list of registered column names.
+		Items will be processed in the order you specify here.
+
+		Default: []
+
 				    		*ddu-source-option-converters*
 converters		(string[])
 		It is a list of registered filter names to change items
@@ -521,6 +547,23 @@ Please read the filter documentation.
 
 
 ==============================================================================
+COLUMNS							*ddu-columns*
+
+
+------------------------------------------------------------------------------
+COLUMN OPTIONS						*ddu-column-options*
+
+Undefined now
+
+------------------------------------------------------------------------------
+COLUMN PARAMS						*ddu-column-params*
+
+These are the parameters that each column can have.
+
+Please read the column documentation.
+
+
+==============================================================================
 KINDS							*ddu-kinds*
 
 
@@ -566,7 +609,7 @@ The UIs must put under "denops/@ddu-uis/*.ts".
 
 UI class must extend the BaseUi class.
 
-Note: The UIs must be written in TypeScript language.
+Note: It must be written in TypeScript language.
 
 Note: If you call Vim functions, it is not asynchronous.
 
@@ -609,7 +652,7 @@ The sources must put under "denops/@ddu-sources/*.ts".
 
 The source class must extend the BaseSource class.
 
-Note: The sources must be written in TypeScript language.
+Note: It must be written in TypeScript language.
 
 Note: If you call Vim functions, it is not asynchronous.
 
@@ -681,7 +724,7 @@ The filters must put under "denops/@ddu-filters/*.ts".
 
 The filter class must extend the BaseFilter class.
 
-Note: The filters must be written in TypeScript language.
+Note: It must be written in TypeScript language.
 
 Note: If you call Vim functions, it is not asynchronous.
 
@@ -703,6 +746,39 @@ params			(function)			(Required)
 
 
 ==============================================================================
+CREATE COLUMN						*ddu-create-column*
+
+To create column, you should read other columns implementation.
+
+The column must put under "denops/@ddu-columns/*.ts".
+
+The column class must extend the "BaseColumn" class.
+
+Note: It must be written in TypeScript language.
+
+Note: If you call Vim functions, it is not asynchronous.
+
+
+------------------------------------------------------------------------------
+COLUMN ATTRIBUTES				*ddu-column-attributes*
+
+					*ddu-column-attribute-getLength*
+getLength		(function)			(Required)
+		It is called to get column length.
+
+						*ddu-column-attribute-getText*
+getText		(function)			(Required)
+		It is called to get column text with highlights.
+
+						*ddu-column-attribute-onInit*
+onInit			(function)			(Optional)
+		Called before call column functions.
+
+						*ddu-column-attribute-params*
+params			(function)			(Required)
+		Called to get column params.
+
+==============================================================================
 CREATE KIND						*ddu-create-kind*
 
 To create kind, you should read other kinds implementation.
@@ -711,7 +787,7 @@ The kinds must put under "denops/@ddu-kinds/*.ts".
 
 The kind class must extend the BaseKind class.
 
-Note: The kinds must be written in TypeScript language.
+Note: It must be written in TypeScript language.
 
 Note: If you call Vim functions, it is not asynchronous.
 
@@ -744,16 +820,16 @@ plugins.  You can donate money to help me!
    https://github.com/sponsors/Shougo
 
 
-Q: Why does ddu.vim not include any UIs/sources/filters/kinds?
+Q: Why does ddu.vim not include any default extra files?
 
-A: Because I cannot determine the best default UIs/sources/filters/kinds.
+A: Because I cannot determine the best default files.
 Users use different environments/policy, etc...
 So ddu.vim should not define the defaults.
 You must define your defaults by configuration.
 ddu.vim does not conflict with your defaults.
 
 
-Q: Why do UIs/sources/filters/kinds have no default options?
+Q: Why ddu extra plugins cannot have default options(Not params)?
 
 A: Because users can customize sources perfectly.  If a source has the
 default, users have to check them.  It increases configuration cost.
@@ -763,6 +839,7 @@ Q: I want to use ":Ddu" command like ":Denite" in denite.nvim
 
 A: You can use ddu-commands.vim.
 https://github.com/Shougo/ddu-commands.vim
+It is not all users needed plugin and users can define the original commands.
 
 
 ==============================================================================

@@ -2,10 +2,11 @@ export { BaseUi } from "./base/ui.ts";
 export { BaseSource } from "./base/source.ts";
 export { BaseFilter } from "./base/filter.ts";
 export { BaseKind } from "./base/kind.ts";
+export { BaseColumn } from "./base/column.ts";
 export type { UiActions } from "./base/ui.ts";
 import { Denops } from "./deps.ts";
 
-export type DduExtType = "ui" | "source" | "filter" | "kind";
+export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
 
 export type DduEvent = "close" | "cancel";
 
@@ -32,6 +33,8 @@ export type UserSource = {
 
 export type DduOptions = {
   actionOptions: Record<string, Partial<ActionOptions>>;
+  columnOptions: Record<string, Partial<ColumnOptions>>;
+  columnParams: Record<string, Partial<Record<string, unknown>>>;
   filterOptions: Record<string, Partial<FilterOptions>>;
   filterParams: Record<string, Partial<Record<string, unknown>>>;
   input: string;
@@ -58,6 +61,7 @@ export type UiOptions = {
 
 export type SourceOptions = {
   actions: Record<string, string>;
+  columns: string[];
   converters: string[];
   defaultAction: string;
   ignoreCase: boolean;
@@ -69,6 +73,11 @@ export type SourceOptions = {
 };
 
 export type FilterOptions = {
+  // TODO: add options and remove placeholder
+  placeholder?: unknown;
+};
+
+export type ColumnOptions = {
   // TODO: add options and remove placeholder
   placeholder?: unknown;
 };

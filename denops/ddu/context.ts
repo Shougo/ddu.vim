@@ -1,6 +1,7 @@
 import { assertEquals, Denops, fn } from "./deps.ts";
 import {
   ActionOptions,
+  ColumnOptions,
   Context,
   DduOptions,
   FilterOptions,
@@ -27,12 +28,14 @@ function overwrite<T>(a: T, b: Partial<T>): T {
 export const mergeUiOptions: Merge<UiOptions> = overwrite;
 export const mergeSourceOptions: Merge<SourceOptions> = overwrite;
 export const mergeFilterOptions: Merge<FilterOptions> = overwrite;
+export const mergeColumnOptions: Merge<ColumnOptions> = overwrite;
 export const mergeKindOptions: Merge<KindOptions> = overwrite;
 export const mergeActionOptions: Merge<ActionOptions> = overwrite;
 
 export const mergeUiParams: Merge<Record<string, unknown>> = overwrite;
 export const mergeSourceParams: Merge<Record<string, unknown>> = overwrite;
 export const mergeFilterParams: Merge<Record<string, unknown>> = overwrite;
+export const mergeColumnParams: Merge<Record<string, unknown>> = overwrite;
 export const mergeKindParams: Merge<Record<string, unknown>> = overwrite;
 
 export function foldMerge<T>(
@@ -56,6 +59,8 @@ export function defaultContext(): Context {
 export function defaultDduOptions(): DduOptions {
   return {
     actionOptions: {},
+    columnOptions: {},
+    columnParams: {},
     filterOptions: {},
     filterParams: {},
     kindOptions: {},
@@ -112,6 +117,8 @@ export function mergeDduOptions(
   const partialMergeSourceParams = partialOverwrite;
   const partialMergeFilterOptions = partialOverwrite;
   const partialMergeFilterParams = partialOverwrite;
+  const partialMergeColumnOptions = partialOverwrite;
+  const partialMergeColumnParams = partialOverwrite;
   const partialMergeKindOptions = partialOverwrite;
   const partialMergeKindParams = partialOverwrite;
   const partialMergeActionOptions = partialOverwrite;
@@ -146,6 +153,16 @@ export function mergeDduOptions(
       partialMergeFilterParams,
       a.filterParams,
       b.filterParams,
+    ) || {},
+    columnOptions: migrateEachKeys(
+      partialMergeColumnOptions,
+      a.columnOptions,
+      b.columnOptions,
+    ) || {},
+    columnParams: migrateEachKeys(
+      partialMergeColumnParams,
+      a.columnParams,
+      b.columnParams,
     ) || {},
     kindOptions: migrateEachKeys(
       partialMergeKindOptions,
@@ -192,6 +209,13 @@ function patchDduOptions(
   );
   if (fo) overwritten.filterOptions = fo;
 
+  const co = migrateEachKeys(
+    partialOverwrite,
+    a.columnOptions,
+    b.columnOptions,
+  );
+  if (co) overwritten.columnOptions = co;
+
   const ko = migrateEachKeys(
     partialOverwrite,
     a.kindOptions,
@@ -212,6 +236,8 @@ function patchDduOptions(
   if (sp) overwritten.sourceParams = sp;
   const fp = migrateEachKeys(partialOverwrite, a.filterParams, b.filterParams);
   if (fp) overwritten.filterParams = fp;
+  const cp = migrateEachKeys(partialOverwrite, a.columnParams, b.columnParams);
+  if (cp) overwritten.columnParams = cp;
   const kp = migrateEachKeys(partialOverwrite, a.kindParams, b.kindParams);
   if (kp) overwritten.kindParams = kp;
   return overwritten;

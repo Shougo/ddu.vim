@@ -1,13 +1,25 @@
-import { assertEquals, Denops, fn, op, parse, toFileUrl } from "./deps.ts";
+import {
+  assertEquals,
+  Denops,
+  echo,
+  echoerr,
+  fn,
+  Lock,
+  op,
+  parse,
+  toFileUrl,
+} from "./deps.ts";
 import {
   ActionFlags,
   ActionOptions,
   Actions,
+  BaseColumn,
   BaseFilter,
   BaseKind,
   BaseSource,
   BaseUi,
   Clipboard,
+  ColumnOptions,
   Context,
   DduEvent,
   DduExtType,
@@ -27,6 +39,8 @@ import {
   defaultDduOptions,
   foldMerge,
   mergeActionOptions,
+  mergeColumnOptions,
+  mergeColumnParams,
   mergeDduOptions,
   mergeFilterOptions,
   mergeFilterParams,
@@ -44,9 +58,9 @@ import {
   GatherArguments,
 } from "./base/source.ts";
 import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
+import { defaultColumnOptions, defaultColumnParams } from "./base/column.ts";
 import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
-import { Lock } from "https://deno.land/x/async@v1.1.5/mod.ts";
 
 type GatherState = {
   items: DduItem[];
@@ -58,12 +72,15 @@ export class Ddu {
   private sources: Record<string, BaseSource<Record<string, unknown>>> = {};
   private filters: Record<string, BaseFilter<Record<string, unknown>>> = {};
   private kinds: Record<string, BaseKind<Record<string, unknown>>> = {};
+  private columns: Record<string, BaseColumn<Record<string, unknown>>> = {};
   private aliases: Record<DduExtType, Record<string, string>> = {
     ui: {},
     source: {},
     filter: {},
     kind: {},
+    column: {},
   };
+
   private checkPaths: Record<string, boolean> = {};
   private gatherStates: Record<string, GatherState> = {};
   private input = "";
@@ -202,6 +219,10 @@ export class Ddu {
     sourceOptions: SourceOptions,
     sourceParams: Params,
   ): Promise<void> {
+    if (!source) {
+      return;
+    }
+
     source.isInitialized = false;
     await source.onInit({
       denops,
@@ -313,7 +334,7 @@ export class Ddu {
     }
 
     if (this.context.done && this.options.profile) {
-      console.log(`Refresh all items: ${Date.now() - this.startTime} ms`);
+      echo(denops, `Refresh all items: ${Date.now() - this.startTime} ms`);
     }
 
     await this.uiRedraw(denops, allItems);
@@ -748,6 +769,13 @@ export class Ddu {
           this.kinds[kind.name] = kind;
         };
         break;
+      case "column":
+        add = (name: string) => {
+          const column = new mod.Column();
+          column.name = name;
+          this.columns[column.name] = column;
+        };
+        break;
     }
 
     add(name);
@@ -894,6 +922,8 @@ export class Ddu {
 
         const [filterOptions, filterParams] = filterArgs(this.options, filter);
 
+        await checkFilterOnInit(filter, denops, filterOptions, filterParams);
+
         items = await filter.filter({
           denops: denops,
           options: this.options,
@@ -919,7 +949,70 @@ export class Ddu {
 
     items = await callFilters(sourceOptions.converters, input, items);
 
+    await this.callColumns(denops, sourceOptions.columns, items);
+
     return [state.done, allItems, items];
+  }
+
+  private async callColumns(
+    denops: Denops,
+    columns: string[],
+    items: DduItem[],
+  ) {
+    if (columns.length == 0) {
+      return items;
+    }
+
+    await this.autoload(denops, "column", columns);
+
+    // Item highlights must be cleared
+    for (const item of items) {
+      item.highlights = [];
+    }
+
+    let startCol = 1;
+    for (const columnName of columns) {
+      const column = this.columns[columnName];
+      if (!column) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid column: ${columnName}`,
+        );
+        continue;
+      }
+
+      const [columnOptions, columnParams] = columnArgs(this.options, column);
+
+      await checkColumnOnInit(column, denops, columnOptions, columnParams);
+
+      const columnLength = await column.getLength({
+        denops,
+        options: this.options,
+        columnOptions,
+        columnParams,
+        items,
+      });
+
+      for (const item of items) {
+        const text = await column.getText({
+          denops,
+          options: this.options,
+          columnOptions,
+          columnParams,
+          startCol,
+          endCol: startCol + columnLength,
+          item,
+        });
+
+        item.display = text.text;
+
+        if (text.highlights && item.highlights) {
+          item.highlights = item.highlights.concat(text.highlights);
+        }
+      }
+
+      startCol += columnLength;
+    }
   }
 
   async getPreviewer(
@@ -1017,6 +1110,28 @@ function filterArgs<
   return [o, p];
 }
 
+function columnArgs<
+  Params extends Record<string, unknown>,
+>(
+  options: DduOptions,
+  column: BaseColumn<Params>,
+): [ColumnOptions, Record<string, unknown>] {
+  const o = foldMerge(
+    mergeColumnOptions,
+    defaultColumnOptions,
+    [
+      options.columnOptions["_"],
+      options.columnOptions[column.name],
+    ],
+  );
+  const p = foldMerge(mergeColumnParams, defaultColumnParams, [
+    column?.params(),
+    options.columnParams["_"],
+    options.columnParams[column.name],
+  ]);
+  return [o, p];
+}
+
 function kindArgs<
   Params extends Record<string, unknown>,
 >(
@@ -1073,10 +1188,11 @@ async function checkUiOnInit(
 
     ui.isInitialized = true;
   } catch (e: unknown) {
-    console.error(
+    errorException(
+      denops,
+      e,
       `[ddu.vim] ui: ${ui.name} "onInit()" is failed`,
     );
-    console.error(e);
   }
 }
 
@@ -1107,13 +1223,78 @@ async function uiRedraw<
         // Ignore "E523: Not allowed here" errors
         await denops.call("ddu#_lazy_redraw", options.name);
       } else {
-        console.error(
+        errorException(
+          denops,
+          e,
           `[ddu.vim] ui: ${ui.name} "redraw()" is failed`,
         );
-        console.error(e);
       }
     }
   });
+}
+
+async function checkFilterOnInit(
+  filter: BaseFilter<Record<string, unknown>>,
+  denops: Denops,
+  filterOptions: FilterOptions,
+  filterParams: Record<string, unknown>,
+) {
+  if (filter.isInitialized) {
+    return;
+  }
+
+  try {
+    await filter.onInit({
+      denops,
+      filterOptions,
+      filterParams,
+    });
+
+    filter.isInitialized = true;
+  } catch (e: unknown) {
+    errorException(
+      denops,
+      e,
+      `[ddu.vim] filter: ${filter.name} "onInit()" is failed`,
+    );
+  }
+}
+
+async function checkColumnOnInit(
+  column: BaseColumn<Record<string, unknown>>,
+  denops: Denops,
+  columnOptions: FilterOptions,
+  columnParams: Record<string, unknown>,
+) {
+  if (column.isInitialized) {
+    return;
+  }
+
+  try {
+    await column.onInit({
+      denops,
+      columnOptions,
+      columnParams,
+    });
+
+    column.isInitialized = true;
+  } catch (e: unknown) {
+    errorException(
+      denops,
+      e,
+      `[ddu.vim] column: ${column.name} "onInit()" is failed`,
+    );
+  }
+}
+
+function errorException(denops: Denops, e: unknown, message: string) {
+  echoerr(denops, message);
+  if (e instanceof Error) {
+    echoerr(denops, e.message);
+    if (e.stack) {
+      echoerr(denops, e.stack);
+    }
+  }
 }
 
 Deno.test("sourceArgs", () => {

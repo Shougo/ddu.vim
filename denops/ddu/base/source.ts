@@ -58,6 +58,7 @@ export abstract class BaseSource<
 export function defaultSourceOptions(): SourceOptions {
   return {
     actions: {},
+    columns: [],
     converters: [],
     defaultAction: "",
     ignoreCase: false,

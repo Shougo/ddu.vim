@@ -1,5 +1,9 @@
 export type { Denops } from "https://deno.land/x/denops_std@v3.3.1/mod.ts";
-export { execute } from "https://deno.land/x/denops_std@v3.3.1/helper/mod.ts";
+export {
+  echo,
+  echoerr,
+  execute,
+} from "https://deno.land/x/denops_std@v3.3.1/helper/mod.ts";
 export {
   batch,
   gather,
@@ -13,10 +17,11 @@ export {
   ensureObject,
   ensureString,
 } from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-export { assertEquals } from "https://deno.land/std@0.140.0/testing/asserts.ts";
-export { parse, toFileUrl } from "https://deno.land/std@0.140.0/path/mod.ts";
+export { assertEquals } from "https://deno.land/std@0.142.0/testing/asserts.ts";
+export { parse, toFileUrl } from "https://deno.land/std@0.142.0/path/mod.ts";
 export {
   deadline,
   DeadlineError,
-} from "https://deno.land/std@0.140.0/async/mod.ts";
+} from "https://deno.land/std@0.142.0/async/mod.ts";
 export { TimeoutError } from "https://deno.land/x/msgpack_rpc@v3.1.6/response_waiter.ts";
+export { Lock } from "https://deno.land/x/async@v1.1.5/mod.ts";

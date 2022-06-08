@@ -12,8 +12,8 @@ Please read [help](doc/ddu.txt) for details.
 Note: I have created
 [Japanese article](https://zenn.dev/shougo/articles/ddu-vim-beta) for ddu.vim.
 
-Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible
-and asynchronous UI framework for neovim/Vim8.
+Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible and
+asynchronous UI framework for neovim/Vim8.
 
 The development is supported by
 [github sponsors](https://github.com/sponsors/Shougo/). Thank you!
@@ -63,6 +63,8 @@ Plug 'Shougo/ddu.vim'
 
 " Install your kinds
 
+" Install your columns
+
 call plug#end()
 ```
 
@@ -82,12 +84,14 @@ call dein#add('Shougo/ddu.vim')
 
 " Install your kinds
 
+" Install your columns
+
 call dein#end()
 ```
 
-**Note:** Ddu.vim does not include any UIs, sources, filters and kinds. You must
-install them you want manually. You can search ddu plugins(sources and filters)
-from [here](https://github.com/topics/ddu-vim).
+**Note:** Ddu.vim does not include any extra plugins. You must install them you
+want manually. You can search ddu plugins from
+[here](https://github.com/topics/ddu-vim).
 
 ### Requirements
 
@@ -164,7 +168,6 @@ See `:help ddu-options` for a complete list of options.
 Please see: https://github.com/Shougo/ddu.vim/issues/10
 
 ![ddu.vim](https://user-images.githubusercontent.com/41495/154783539-469f773a-ab05-437e-9827-9cc6d1444f80.png)
-
 
 ## Plans
 
