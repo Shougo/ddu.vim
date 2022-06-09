@@ -695,6 +695,7 @@ export class Ddu {
         };
       });
 
+      await this.callColumns(denops, sourceOptions.columns, [parent]);
       await this.callColumns(denops, sourceOptions.columns, newItems);
 
       // Update children
