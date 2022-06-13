@@ -302,6 +302,11 @@ export class Ddu {
       } else {
         state.items = newItems;
       }
+      this.context.path = sourceOptions.path;
+      if (this.context.path == "") {
+        // Use current directory instead
+        this.context.path = await fn.getcwd(denops);
+      }
 
       reader.read().then(readChunk);
     };
