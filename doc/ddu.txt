@@ -841,6 +841,13 @@ A: You can use ddu-commands.vim.
 https://github.com/Shougo/ddu-commands.vim
 It is not all users needed plugin and users can define the original commands.
 
+Q: ddu.vim starting is slow.
+
+A: It may be slow in Windows environment.  You should use denops shared server
+feature.
+
+https://github.com/vim-denops/denops.vim#shared-server
+
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
