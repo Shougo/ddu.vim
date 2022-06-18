@@ -30,6 +30,7 @@ import {
   KindOptions,
   PreviewContext,
   Previewer,
+  SourceInfo,
   SourceOptions,
   UiOptions,
   UserSource,
@@ -305,7 +306,7 @@ export class Ddu {
       this.context.path = sourceOptions.path;
       if (this.context.path == "") {
         // Use current directory instead
-        this.context.path = await fn.getcwd(denops);
+        this.context.path = await fn.getcwd(denops) as string;
       }
 
       reader.read().then(readChunk);
@@ -354,11 +355,31 @@ export class Ddu {
       return;
     }
 
+    const sources: SourceInfo[] = [];
+    let index = 0;
+    for (const userSource of this.options.sources) {
+      const source = this.sources[userSource.name];
+      const [sourceOptions, _] = sourceArgs(
+        this.options,
+        userSource,
+        source,
+      );
+
+      sources.push({
+        name: userSource.name,
+        index,
+        path: sourceOptions.path,
+      });
+
+      index++;
+    }
+
     ui.refreshItems({
       context: this.context,
       options: this.options,
       uiOptions: uiOptions,
       uiParams: uiParams,
+      sources: sources,
       items: items,
     });
 

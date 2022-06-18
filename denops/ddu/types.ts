@@ -32,6 +32,12 @@ export type UserSource = {
   params?: Record<string, unknown>;
 };
 
+export type SourceInfo = {
+  name: string;
+  index: number;
+  path: string;
+};
+
 export type DduOptions = {
   actionOptions: Record<string, Partial<ActionOptions>>;
   columnOptions: Record<string, Partial<ColumnOptions>>;

@@ -3,6 +3,7 @@ import {
   Context,
   DduItem,
   DduOptions,
+  SourceInfo,
   UiOptions,
 } from "../types.ts";
 import { Denops } from "../deps.ts";
@@ -23,6 +24,7 @@ export type RefreshItemsArguments<Params extends Record<string, unknown>> = {
   options: DduOptions;
   uiOptions: UiOptions;
   uiParams: Params;
+  sources: SourceInfo[];
   items: DduItem[];
 };
 
