@@ -365,10 +365,13 @@ export class Ddu {
         source,
       );
 
+      const path = sourceOptions.path == ""
+        ? await fn.getcwd(denops) as string
+        : sourceOptions.path;
       sources.push({
         name: userSource.name,
         index,
-        path: sourceOptions.path,
+        path,
       });
 
       index++;
