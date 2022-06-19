@@ -760,6 +760,15 @@ export class Ddu {
       uiOptions,
       uiParams,
     );
+
+    await ui.searchItem({
+      denops,
+      context: this.context,
+      options: this.options,
+      uiOptions,
+      uiParams,
+      item: parent,
+    });
   }
 
   async collapseItem(
@@ -799,6 +808,15 @@ export class Ddu {
       uiOptions,
       uiParams,
     );
+
+    await ui.searchItem({
+      denops,
+      context: this.context,
+      options: this.options,
+      uiOptions,
+      uiParams,
+      item,
+    });
   }
 
   async register(type: DduExtType, path: string, name: string) {

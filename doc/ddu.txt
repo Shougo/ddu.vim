@@ -664,6 +664,10 @@ refreshItems		(function)			(Required)
 redraw			(function)			(Required)
 		Called when redraw UI.
 
+					*ddu-ui-attribute-searchItem*
+searchItem		(function)			(Optional)
+		Called when search item.
+
 
 ==============================================================================
 CREATE SOURCE						*ddu-create-source*

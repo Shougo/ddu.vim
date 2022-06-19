@@ -45,6 +45,15 @@ export type ExpandItemArguments<Params extends Record<string, unknown>> = {
   children: DduItem[];
 };
 
+export type SearchItemArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+  item: DduItem;
+};
+
 export type RedrawArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
   context: Context;
@@ -85,6 +94,8 @@ export abstract class BaseUi<
   collapseItem(_args: CollapseItemArguments<Params>): void {}
 
   expandItem(_args: ExpandItemArguments<Params>): void {}
+
+  async searchItem(_args: SearchItemArguments<Params>): Promise<void> {}
 
   async redraw(_args: RedrawArguments<Params>): Promise<void> {}
 
