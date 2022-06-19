@@ -272,6 +272,20 @@ ddu#redraw({name}[, {opt}])
 		updateOptions			(dictionary)
 		Overwrites options. Refer to |ddu-options| about options.
 
+							*ddu#redraw_tree()*
+ddu#redraw_tree({name}, {mode}, {item})
+		Redraw the tree item.
+
+		{name} is specified ddu name(|ddu-option-name|).
+
+		{mode} is the mode string:
+
+			"expand": Expand the tree item
+			"expand_recursive": Expand the tree item recursively
+			"collapse": Collapse the tree item
+
+		{item} is target tree item.
+
 							*ddu#start()*
 ddu#start({options})
 		Creates a new Ddu.

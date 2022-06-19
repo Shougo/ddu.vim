@@ -18,6 +18,8 @@ import {
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
+type RedrawTreeMode = "expand" | "expand_recursive" | "collapse";
+
 export async function main(denops: Denops) {
   const ddus: Record<string, Ddu[]> = {};
   const contextBuilder = new ContextBuilder();
@@ -154,6 +156,22 @@ export async function main(denops: Denops) {
         await ddu.redraw(denops);
       }
     },
+    // deno-lint-ignore require-await
+    async redrawTree(
+      arg1: unknown,
+      arg2: unknown,
+      arg3: unknown,
+    ): Promise<void> {
+      const name = ensureString(arg1);
+      const mode = ensureString(arg2) as RedrawTreeMode;
+      const item = ensureObject(arg3) as DduItem;
+
+      const ddu = getDdu(name);
+
+      if (mode == "expand") {
+        ddu.expandItem(denops, item);
+      }
+    },
     async event(arg1: unknown, arg2: unknown): Promise<void> {
       const name = ensureString(arg1);
       const event = ensureString(arg2) as DduEvent;
@@ -230,17 +248,6 @@ export async function main(denops: Denops) {
       const ddu = getDdu(name);
       const actions = await ddu.getItemActions(denops, items);
       return actions ? Object.keys(actions) : [];
-    },
-    // deno-lint-ignore require-await
-    async expandItem(
-      arg1: unknown,
-      arg2: unknown,
-    ): Promise<void> {
-      const name = ensureString(arg1);
-      const item = ensureObject(arg2) as DduItem;
-
-      const ddu = getDdu(name);
-      ddu.expandItem(denops, item);
     },
     async getPreviewer(
       arg1: unknown,

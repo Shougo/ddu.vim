@@ -4,6 +4,9 @@ endfunction
 function! ddu#redraw(name, ...) abort
   call ddu#_notify('redraw', [a:name, get(a:000, 0, {})])
 endfunction
+function! ddu#redraw_tree(name, mode, item) abort
+  return ddu#_notify('redrawTree', [a:name, a:mode, a:item])
+endfunction
 function! ddu#event(name, event) abort
   call ddu#_request('event', [a:name, a:event])
 endfunction
@@ -18,9 +21,6 @@ function! ddu#item_action(name, action, items, params) abort
 endfunction
 function! ddu#get_item_actions(name, items) abort
   return ddu#_request('getItemActions', [a:name, a:items])
-endfunction
-function! ddu#expand_item(name, item) abort
-  return ddu#_notify('expandItem', [a:name, a:item])
 endfunction
 function! ddu#get_previewer(name, item, params, context) abort
   return ddu#_request('getPreviewer', [a:name, a:item, a:params, a:context])
