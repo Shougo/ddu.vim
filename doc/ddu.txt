@@ -636,6 +636,14 @@ actions			(Record<string, function>)	(Optional)
 		Defines UI actions.
 		The actions are called from |ddu#ui_action()|.
 
+					*ddu-ui-attribute-collapseItem*
+collapseItem		(function)			(Optional)
+		Called when collapse item.
+
+					*ddu-ui-attribute-expandItem*
+expandItem		(function)			(Optional)
+		Called when expand item.
+
 						*ddu-ui-attribute-onInit*
 onInit			(function)			(Optional)
 		Called before call UI functions.
