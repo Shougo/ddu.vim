@@ -28,6 +28,14 @@ export type RefreshItemsArguments<Params extends Record<string, unknown>> = {
   items: DduItem[];
 };
 
+export type CollapseItemArguments<Params extends Record<string, unknown>> = {
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+  item: DduItem;
+};
+
 export type ExpandItemArguments<Params extends Record<string, unknown>> = {
   context: Context;
   options: DduOptions;
@@ -73,6 +81,8 @@ export abstract class BaseUi<
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 
   refreshItems(_args: RefreshItemsArguments<Params>): void {}
+
+  collapseItem(_args: CollapseItemArguments<Params>): void {}
 
   expandItem(_args: ExpandItemArguments<Params>): void {}
 

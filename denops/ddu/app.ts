@@ -170,6 +170,8 @@ export async function main(denops: Denops) {
 
       if (mode == "expand") {
         ddu.expandItem(denops, item);
+      } else if (mode == "collapse") {
+        ddu.collapseItem(denops, item);
       }
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {

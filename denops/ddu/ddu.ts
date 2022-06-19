@@ -762,6 +762,45 @@ export class Ddu {
     );
   }
 
+  async collapseItem(
+    denops: Denops,
+    item: DduItem,
+  ): Promise<void> {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui) {
+      return;
+    }
+
+    const index = item.__sourceIndex;
+    const source = this.sources[item.__sourceName];
+    const [sourceOptions, _] = sourceArgs(
+      this.options,
+      this.options.sources[index],
+      source,
+    );
+
+    item.__expanded = false;
+    await this.callColumns(denops, sourceOptions.columns, [item]);
+
+    ui.collapseItem({
+      context: this.context,
+      options: this.options,
+      uiOptions: uiOptions,
+      uiParams: uiParams,
+      item: item,
+    });
+
+    await uiRedraw(
+      denops,
+      this.lock,
+      this.context,
+      this.options,
+      ui,
+      uiOptions,
+      uiParams,
+    );
+  }
+
   async register(type: DduExtType, path: string, name: string) {
     if (path in this.checkPaths) {
       return;
