@@ -2,7 +2,6 @@ import {
   assertEquals,
   Denops,
   echo,
-  echoerr,
   fn,
   Lock,
   op,
@@ -1220,7 +1219,7 @@ async function checkUiOnInit(
 
     ui.isInitialized = true;
   } catch (e: unknown) {
-    errorException(
+    await errorException(
       denops,
       e,
       `[ddu.vim] ui: ${ui.name} "onInit()" is failed`,
@@ -1255,7 +1254,7 @@ async function uiRedraw<
         // Ignore "E523: Not allowed here" errors
         await denops.call("ddu#_lazy_redraw", options.name);
       } else {
-        errorException(
+        await errorException(
           denops,
           e,
           `[ddu.vim] ui: ${ui.name} "redraw()" is failed`,
@@ -1284,7 +1283,7 @@ async function checkFilterOnInit(
 
     filter.isInitialized = true;
   } catch (e: unknown) {
-    errorException(
+    await errorException(
       denops,
       e,
       `[ddu.vim] filter: ${filter.name} "onInit()" is failed`,
@@ -1311,7 +1310,7 @@ async function checkColumnOnInit(
 
     column.isInitialized = true;
   } catch (e: unknown) {
-    errorException(
+    await errorException(
       denops,
       e,
       `[ddu.vim] column: ${column.name} "onInit()" is failed`,
@@ -1319,12 +1318,21 @@ async function checkColumnOnInit(
   }
 }
 
-function errorException(denops: Denops, e: unknown, message: string) {
-  echoerr(denops, message);
+async function errorException(denops: Denops, e: unknown, message: string) {
+  await denops.call(
+    "ddu#util#print_error",
+    message,
+  );
   if (e instanceof Error) {
-    echoerr(denops, e.message);
+    await denops.call(
+      "ddu#util#print_error",
+      e.message,
+    );
     if (e.stack) {
-      echoerr(denops, e.stack);
+      await denops.call(
+        "ddu#util#print_error",
+        e.stack,
+      );
     }
   }
 }
