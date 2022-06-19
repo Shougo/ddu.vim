@@ -18,7 +18,7 @@ import {
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
-type RedrawTreeMode = "expand" | "expand_recursive" | "collapse";
+type RedrawTreeMode = "collapse" | "expand" | "expand_recursive";
 
 export async function main(denops: Denops) {
   const ddus: Record<string, Ddu[]> = {};
@@ -156,7 +156,6 @@ export async function main(denops: Denops) {
         await ddu.redraw(denops);
       }
     },
-    // deno-lint-ignore require-await
     async redrawTree(
       arg1: unknown,
       arg2: unknown,
@@ -168,10 +167,10 @@ export async function main(denops: Denops) {
 
       const ddu = getDdu(name);
 
-      if (mode == "expand") {
-        ddu.expandItem(denops, item);
-      } else if (mode == "collapse") {
-        ddu.collapseItem(denops, item);
+      if (mode == "collapse") {
+        await ddu.collapseItem(denops, item);
+      } else if (mode == "expand") {
+        await ddu.expandItem(denops, item);
       }
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {

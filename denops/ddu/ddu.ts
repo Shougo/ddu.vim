@@ -745,10 +745,10 @@ export class Ddu {
     ui.expandItem({
       context: this.context,
       options: this.options,
-      uiOptions: uiOptions,
-      uiParams: uiParams,
-      parent: parent,
-      children: children,
+      uiOptions,
+      uiParams,
+      parent,
+      children,
     });
 
     await uiRedraw(
@@ -785,9 +785,9 @@ export class Ddu {
     ui.collapseItem({
       context: this.context,
       options: this.options,
-      uiOptions: uiOptions,
-      uiParams: uiParams,
-      item: item,
+      uiOptions,
+      uiParams,
+      item,
     });
 
     await uiRedraw(
