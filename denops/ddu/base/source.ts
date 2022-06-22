@@ -30,6 +30,14 @@ export type GatherArguments<Params extends Record<string, unknown>> = {
   input: string;
 };
 
+export type CheckUpdatedArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  sourceOptions: SourceOptions;
+  sourceParams: Params;
+};
+
 export abstract class BaseSource<
   Params extends Record<string, unknown>,
   UserData extends unknown = unknown,
@@ -42,6 +50,8 @@ export abstract class BaseSource<
 
   kind = "base";
 
+  prevMtime = -1;
+
   actions: Actions<Params> = {};
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
@@ -51,6 +61,11 @@ export abstract class BaseSource<
   abstract gather(
     {}: GatherArguments<Params>,
   ): ReadableStream<Item<UserData>[]>;
+
+  // deno-lint-ignore require-await
+  async checkUpdated(_args: CheckUpdatedArguments<Params>): Promise<boolean> {
+    return false;
+  }
 
   abstract params(): Params;
 }

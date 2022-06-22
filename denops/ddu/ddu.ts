@@ -941,6 +941,36 @@ export class Ddu {
     ]);
   }
 
+  async checkUpdated(denops: Denops): Promise<boolean> {
+    for (const userSource of this.options.sources) {
+      const source = this.sources[userSource.name];
+
+      const [sourceOptions, sourceParams] = sourceArgs(
+        this.options,
+        userSource,
+        source,
+      );
+
+      if (!source.checkUpdated) {
+        continue;
+      }
+
+      const updated = await source.checkUpdated({
+        denops: denops,
+        context: this.context,
+        options: this.options,
+        sourceOptions: sourceOptions,
+        sourceParams: sourceParams,
+      });
+
+      if (updated) {
+        return updated;
+      }
+    }
+
+    return false;
+  }
+
   private async getUi(
     denops: Denops,
   ): Promise<

@@ -132,12 +132,18 @@ export async function main(denops: Denops) {
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
       const name = ensureString(arg1);
       const opt = ensureObject(arg2) as {
+        check?: boolean;
         input?: string;
         refreshItems?: boolean;
         updateOptions?: Record<string, unknown>;
       };
 
       const ddu = getDdu(name);
+
+      if (opt?.check && !(await ddu.checkUpdated())) {
+        // Mtime check failed
+        return;
+      }
 
       if (opt?.input != null) {
         ddu.setInput(opt.input);

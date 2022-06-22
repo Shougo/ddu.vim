@@ -263,6 +263,9 @@ ddu#redraw({name}[, {opt}])
 
 		{opt} is the options.  The options below are available:
 
+		check				(boolean)
+		If it is true, check the items are updated.
+
 		input				(string)
 		Specify narrowing text.
 
@@ -690,6 +693,10 @@ SOURCE ATTRIBUTES				*ddu-source-attributes*
 actions			(Record<string, function>)	(Optional)
 		Defines source specific actions.
 		Note: It overwrites kind actions.
+
+					*ddu-source-attribute-checkUpdated*
+checkUpdated		(function)			(Optional)
+		It is called to check items are updated.
 
 						*ddu-source-attribute-onEvent*
 onEvent			(function)			(Optional)
