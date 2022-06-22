@@ -243,11 +243,11 @@ export class Ddu {
     sourceParams: Params,
   ): void {
     const sourceItems = source.gather({
-      denops: denops,
+      denops,
       context: this.context,
       options: this.options,
-      sourceOptions: sourceOptions,
-      sourceParams: sourceParams,
+      sourceOptions,
+      sourceParams,
       input: this.input,
     });
 
@@ -438,11 +438,11 @@ export class Ddu {
 
     const action = ui.actions[actionName];
     const flags = await action({
-      denops: denops,
+      denops,
       context: this.context,
       options: this.options,
-      uiOptions: uiOptions,
-      uiParams: uiParams,
+      uiOptions,
+      uiParams,
       actionParams: params,
     });
 
@@ -450,11 +450,11 @@ export class Ddu {
       await this.refresh(denops);
     } else if (flags & ActionFlags.Redraw) {
       await ui.redraw({
-        denops: denops,
+        denops,
         context: this.context,
         options: this.options,
-        uiOptions: uiOptions,
-        uiParams: uiParams,
+        uiOptions,
+        uiParams,
       });
     }
   }
@@ -588,11 +588,11 @@ export class Ddu {
     if (actionOptions.quit) {
       // Quit UI before action
       await ui.quit({
-        denops: denops,
+        denops,
         context: this.context,
         options: this.options,
-        uiOptions: uiOptions,
-        uiParams: uiParams,
+        uiOptions,
+        uiParams,
       });
     }
 
@@ -620,16 +620,16 @@ export class Ddu {
     } else {
       const prevPath = sourceOptions.path;
       flags = await action({
-        denops: denops,
+        denops,
         context: this.context,
         options: this.options,
-        sourceOptions: sourceOptions,
-        sourceParams: sourceParams,
-        kindOptions: kindOptions,
-        kindParams: kindParams,
+        sourceOptions,
+        sourceParams,
+        kindOptions,
+        kindParams,
         actionParams: params,
-        items: items,
-        clipboard: clipboard,
+        items,
+        clipboard,
       });
 
       // Check path is changed by action
@@ -648,11 +648,11 @@ export class Ddu {
       await this.refresh(denops);
     } else if (flags & ActionFlags.Persist) {
       await ui.redraw({
-        denops: denops,
+        denops,
         context: this.context,
         options: this.options,
-        uiOptions: uiOptions,
-        uiParams: uiParams,
+        uiOptions,
+        uiParams,
       });
     }
   }
@@ -678,11 +678,11 @@ export class Ddu {
     this.context.path = sourceOptions.path;
 
     const sourceItems = source.gather({
-      denops: denops,
+      denops,
       context: this.context,
       options: this.options,
-      sourceOptions: sourceOptions,
-      sourceParams: sourceParams,
+      sourceOptions,
+      sourceParams,
       input: this.input,
     });
 
@@ -956,11 +956,11 @@ export class Ddu {
       }
 
       const updated = await source.checkUpdated({
-        denops: denops,
+        denops,
         context: this.context,
         options: this.options,
-        sourceOptions: sourceOptions,
-        sourceParams: sourceParams,
+        sourceOptions,
+        sourceParams,
       });
 
       if (updated) {
@@ -1043,13 +1043,13 @@ export class Ddu {
         await checkFilterOnInit(filter, denops, filterOptions, filterParams);
 
         items = await filter.filter({
-          denops: denops,
+          denops,
           options: this.options,
-          sourceOptions: sourceOptions,
-          filterOptions: filterOptions,
-          filterParams: filterParams,
-          input: input,
-          items: items,
+          sourceOptions,
+          filterOptions,
+          filterParams,
+          input,
+          items,
         });
       }
 
@@ -1329,11 +1329,11 @@ async function uiRedraw<
   await lock.with(async () => {
     try {
       await ui.redraw({
-        denops: denops,
-        context: context,
-        options: options,
-        uiOptions: uiOptions,
-        uiParams: uiParams,
+        denops,
+        context,
+        options,
+        uiOptions,
+        uiParams,
       });
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes(" E523: ")) {
