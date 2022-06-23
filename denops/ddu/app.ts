@@ -140,7 +140,7 @@ export async function main(denops: Denops) {
 
       const ddu = getDdu(name);
 
-      if (opt?.check && !(await ddu.checkUpdated())) {
+      if (opt?.check && !(await ddu.checkUpdated(denops))) {
         // Mtime check failed
         return;
       }
