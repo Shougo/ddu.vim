@@ -1,5 +1,6 @@
 import {
   assertEquals,
+  basename,
   Denops,
   echo,
   fn,
@@ -762,7 +763,9 @@ export class Ddu {
       };
 
       for (const child of children) {
-        if ((child.action as ActionData).isDirectory) {
+        const action = child.action as ActionData;
+        // Skip hidden directory
+        if (action.isDirectory && !basename(action.path).startsWith(".")) {
           await this.expandItem(denops, child, recursive);
         }
       }
