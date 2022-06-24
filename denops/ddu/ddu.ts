@@ -660,7 +660,10 @@ export class Ddu {
   expandItem(
     denops: Denops,
     parent: DduItem,
+    recursive: boolean,
   ): void {
+    parent.__expanded = true;
+
     const index = parent.__sourceIndex;
     const source = this.sources[parent.__sourceName];
     const [sourceOptions, sourceParams] = sourceArgs(
@@ -700,7 +703,7 @@ export class Ddu {
       }
 
       if (!v.value || v.done) {
-        await this.redrawExpandItem(denops, parent, children);
+        await this.redrawExpandItem(denops, parent, children, recursive);
         return;
       }
 
@@ -736,6 +739,7 @@ export class Ddu {
     denops: Denops,
     parent: DduItem,
     children: DduItem[],
+    recursive: boolean,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
@@ -750,6 +754,19 @@ export class Ddu {
       parent,
       children,
     });
+
+    if (recursive) {
+      type ActionData = {
+        isDirectory?: boolean;
+        path?: string;
+      };
+
+      for (const child of children) {
+        if ((child.action as ActionData).isDirectory) {
+          await this.expandItem(denops, child, recursive);
+        }
+      }
+    }
 
     await uiRedraw(
       denops,

@@ -175,8 +175,8 @@ export async function main(denops: Denops) {
 
       if (mode == "collapse") {
         await ddu.collapseItem(denops, item);
-      } else if (mode == "expand") {
-        await ddu.expandItem(denops, item);
+      } else if (mode == "expand" || mode == "expand_recursive") {
+        await ddu.expandItem(denops, item, mode == "expand_recursive");
       }
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {
