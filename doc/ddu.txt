@@ -285,7 +285,7 @@ ddu#redraw_tree({name}, {mode}, {item})
 
 			"collapse": Collapse the tree item
 			"expand": Expand the tree item
-			"expand_recursive": Expand the tree item recursively
+			"recursive": Expand the tree item recursively
 
 		{item} is target tree item.
 

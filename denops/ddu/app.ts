@@ -18,7 +18,7 @@ import {
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
-type RedrawTreeMode = "collapse" | "expand" | "expand_recursive";
+type RedrawTreeMode = "collapse" | "expand" | "recursive";
 
 export async function main(denops: Denops) {
   const ddus: Record<string, Ddu[]> = {};
@@ -175,8 +175,8 @@ export async function main(denops: Denops) {
 
       if (mode == "collapse") {
         await ddu.collapseItem(denops, item);
-      } else if (mode == "expand" || mode == "expand_recursive") {
-        await ddu.expandItem(denops, item, mode == "expand_recursive");
+      } else if (mode == "expand" || mode == "recursive") {
+        await ddu.expandItem(denops, item, mode == "recursive");
       }
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {
