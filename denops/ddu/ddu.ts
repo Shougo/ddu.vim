@@ -68,6 +68,10 @@ type GatherState = {
   done: boolean;
 };
 
+type ActionData = {
+  path?: string;
+};
+
 export class Ddu {
   private uis: Record<string, BaseUi<Record<string, unknown>>> = {};
   private sources: Record<string, BaseSource<Record<string, unknown>>> = {};
@@ -661,7 +665,8 @@ export class Ddu {
   expandItem(
     denops: Denops,
     parent: DduItem,
-    recursive: boolean,
+    maxLevel: number,
+    search?: string,
   ): void {
     parent.__expanded = true;
 
@@ -672,10 +677,6 @@ export class Ddu {
       this.options.sources[index],
       source,
     );
-
-    type ActionData = {
-      path?: string;
-    };
 
     // Set path
     sourceOptions.path = (parent.action as ActionData).path ?? parent.word;
@@ -704,7 +705,13 @@ export class Ddu {
       }
 
       if (!v.value || v.done) {
-        await this.redrawExpandItem(denops, parent, children, recursive);
+        await this.redrawExpandItem(
+          denops,
+          parent,
+          children,
+          maxLevel,
+          search,
+        );
         return;
       }
 
@@ -740,7 +747,8 @@ export class Ddu {
     denops: Denops,
     parent: DduItem,
     children: DduItem[],
-    recursive: boolean,
+    maxLevel: number,
+    search?: string,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
@@ -756,7 +764,7 @@ export class Ddu {
       children,
     });
 
-    if (recursive) {
+    if (maxLevel < 0 || parent.__level < maxLevel) {
       type ActionData = {
         isDirectory?: boolean;
         path?: string;
@@ -765,8 +773,11 @@ export class Ddu {
       for (const child of children) {
         const action = child.action as ActionData;
         // Skip hidden directory
-        if (action.isDirectory && !basename(action.path).startsWith(".")) {
-          await this.expandItem(denops, child, recursive);
+        if (
+          action.isDirectory && action.path &&
+          !basename(action.path).startsWith(".")
+        ) {
+          await this.expandItem(denops, child, maxLevel, search);
         }
       }
     }
@@ -781,14 +792,22 @@ export class Ddu {
       uiParams,
     );
 
-    await ui.searchItem({
-      denops,
-      context: this.context,
-      options: this.options,
-      uiOptions,
-      uiParams,
-      item: parent,
-    });
+    const searchItem = search
+      ? children.find(
+        (item) => search == (item?.action as ActionData).path ?? item.word,
+      )
+      : parent;
+
+    if (searchItem) {
+      await ui.searchItem({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        item: searchItem,
+      });
+    }
   }
 
   async collapseItem(

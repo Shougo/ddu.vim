@@ -18,7 +18,7 @@ import {
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
-type RedrawTreeMode = "collapse" | "expand" | "recursive";
+type RedrawTreeMode = "collapse" | "expand";
 
 export async function main(denops: Denops) {
   const ddus: Record<string, Ddu[]> = {};
@@ -166,17 +166,25 @@ export async function main(denops: Denops) {
       arg1: unknown,
       arg2: unknown,
       arg3: unknown,
+      arg4: unknown,
     ): Promise<void> {
       const name = ensureString(arg1);
       const mode = ensureString(arg2) as RedrawTreeMode;
       const item = ensureObject(arg3) as DduItem;
+      const opt = ensureObject(arg4) as {
+        maxLevel?: number;
+        search?: string;
+      };
 
       const ddu = getDdu(name);
 
       if (mode == "collapse") {
         await ddu.collapseItem(denops, item);
-      } else if (mode == "expand" || mode == "recursive") {
-        await ddu.expandItem(denops, item, mode == "recursive");
+      } else if (mode == "expand") {
+        const maxLevel = opt.maxLevel && opt.maxLevel < 0
+          ? -1
+          : item.__level + (opt.maxLevel ?? 0);
+        await ddu.expandItem(denops, item, maxLevel, opt.search);
       }
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {

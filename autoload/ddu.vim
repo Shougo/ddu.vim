@@ -4,8 +4,9 @@ endfunction
 function! ddu#redraw(name, ...) abort
   call ddu#_notify('redraw', [a:name, get(a:000, 0, {})])
 endfunction
-function! ddu#redraw_tree(name, mode, item) abort
-  return ddu#_notify('redrawTree', [a:name, a:mode, a:item])
+function! ddu#redraw_tree(name, mode, item, ...) abort
+  return ddu#_notify('redrawTree',
+        \ [a:name, a:mode, a:item, get(a:000, 0, {})])
 endfunction
 function! ddu#event(name, event) abort
   call ddu#_request('event', [a:name, a:event])
