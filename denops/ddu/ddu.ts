@@ -470,17 +470,19 @@ export class Ddu {
   ): Promise<Actions<Record<string, unknown>> | null> {
     const sources = [
       ...new Set(items.map((item) => this.sources[item.__sourceName])),
-    ];
+    ].filter((source) => source);
     const indexes = [
       ...new Set(items.map((item) => item.__sourceIndex)),
     ];
-    if (sources.length != 1 && indexes.length != 1) {
-      await denops.call(
-        "ddu#util#print_error",
-        `You must not mix multiple sources items: "${
-          sources.map((source) => source.name)
-        }"`,
-      );
+    if (sources.length == 0 || sources.length != 1 && indexes.length != 1) {
+      if (sources.length > 0) {
+        await denops.call(
+          "ddu#util#print_error",
+          `You must not mix multiple sources items: "${
+            sources.map((source) => source.name)
+          }"`,
+        );
+      }
       return null;
     }
     const source = sources[0];
