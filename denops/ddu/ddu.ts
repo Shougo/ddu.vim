@@ -990,7 +990,7 @@ export class Ddu {
         source,
       );
 
-      if (!source.checkUpdated) {
+      if (!source || !source.checkUpdated) {
         continue;
       }
 
