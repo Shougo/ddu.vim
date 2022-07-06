@@ -881,6 +881,10 @@ feature.
 
 https://github.com/vim-denops/denops.vim#shared-server
 
+Q: |:cnext| / |:cprevious| like commands are available?
+
+A: Nothing.  You can send items to |quickfix| by "quickfix" action instead.
+
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
