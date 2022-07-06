@@ -744,6 +744,16 @@ highlights	(List)			(Optional)
 		width				(number)
 		The highlight end width.
 
+						*ddu-item-attribute-status*
+status		(Object)			(Optional)
+		The item status.
+
+		size				(number)
+		The item size.
+
+		time				(number)
+		The item time.
+
 					*ddu-item-attribute-word*
 word		(String)			(Required)
 		The word of a item. It is used for matching inputs.

@@ -105,6 +105,11 @@ export type ItemHighlight = {
   width: number;
 };
 
+export type ItemStatus = {
+  size?: number;
+  time?: number;
+};
+
 export type Item<
   ActionData extends unknown = unknown,
 > = {
@@ -112,6 +117,7 @@ export type Item<
   display?: string;
   action?: ActionData;
   highlights?: ItemHighlight[];
+  status?: ItemStatus;
 };
 
 // For internal type
