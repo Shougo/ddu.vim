@@ -84,7 +84,6 @@ export abstract class BaseUi<
 > {
   name = "";
   isInitialized = false;
-  isDone = false;
 
   apiVersion = 1;
 

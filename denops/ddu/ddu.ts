@@ -134,7 +134,7 @@ export class Ddu {
     if (!ui) {
       return;
     }
-    if (ui.isDone && uiOptions.toggle) {
+    if (this.initialized && uiOptions.toggle) {
       await ui.quit({
         denops,
         context: this.context,
@@ -146,7 +146,6 @@ export class Ddu {
     }
 
     ui.isInitialized = false;
-    ui.isDone = false;
 
     this.initialized = false;
 
@@ -408,8 +407,6 @@ export class Ddu {
       uiOptions,
       uiParams,
     );
-
-    ui.isDone = this.context.done;
   }
 
   async onEvent(
