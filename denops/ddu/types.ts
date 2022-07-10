@@ -64,6 +64,7 @@ export type DduOptions = {
 
 export type UiOptions = {
   defaultAction: string;
+  toggle: boolean;
 };
 
 export type SourceOptions = {

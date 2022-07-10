@@ -450,6 +450,11 @@ defaultAction
 
 		Default: "default"
 
+				    		*ddu-ui-option-toggle*
+toggle
+		Quit the UI if the UI exists.
+		Default: v:false
+
 
 ------------------------------------------------------------------------------
 UI PARAMS					*ddu-ui-params*

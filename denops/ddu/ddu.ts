@@ -130,11 +130,23 @@ export class Ddu {
     }
 
     // Note: UI must be reset.
-    const [ui, _1, _2] = await this.getUi(denops);
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
       return;
     }
+    if (ui.isDone && uiOptions.toggle) {
+      await ui.quit({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+      });
+      return;
+    }
+
     ui.isInitialized = false;
+    ui.isDone = false;
 
     this.initialized = false;
 
@@ -396,6 +408,8 @@ export class Ddu {
       uiOptions,
       uiParams,
     );
+
+    ui.isDone = this.context.done;
   }
 
   async onEvent(

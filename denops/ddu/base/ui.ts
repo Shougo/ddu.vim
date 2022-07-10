@@ -84,6 +84,7 @@ export abstract class BaseUi<
 > {
   name = "";
   isInitialized = false;
+  isDone = false;
 
   apiVersion = 1;
 
@@ -109,6 +110,7 @@ export abstract class BaseUi<
 export function defaultUiOptions(): UiOptions {
   return {
     defaultAction: "default",
+    toggle: false,
   };
 }
 
