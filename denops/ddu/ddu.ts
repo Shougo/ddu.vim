@@ -134,7 +134,7 @@ export class Ddu {
     if (!ui) {
       return;
     }
-    if (this.initialized && uiOptions.toggle) {
+    if (this.initialized && !this.finished && uiOptions.toggle) {
       await ui.quit({
         denops,
         context: this.context,
@@ -142,12 +142,14 @@ export class Ddu {
         uiOptions,
         uiParams,
       });
+      this.finished = true;
       return;
     }
 
     ui.isInitialized = false;
 
     this.initialized = false;
+    this.finished = false;
 
     await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
@@ -612,6 +614,7 @@ export class Ddu {
         uiOptions,
         uiParams,
       });
+      this.finished = true;
     }
 
     let flags: ActionFlags;
