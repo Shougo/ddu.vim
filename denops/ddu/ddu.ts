@@ -119,8 +119,20 @@ export class Ddu {
       }
 
       if (!userOptions?.refresh) {
-        // Redraw
-        await this.redraw(denops);
+        // UI Redraw only
+        const [ui, uiOptions, uiParams] = await this.getUi(denops);
+        if (!ui) {
+          return;
+        }
+        await uiRedraw(
+          denops,
+          this.lock,
+          this.context,
+          this.options,
+          ui,
+          uiOptions,
+          uiParams,
+        );
         return;
       }
     } else {
@@ -697,6 +709,8 @@ export class Ddu {
     // Set path
     sourceOptions.path = (parent.action as ActionData).path ?? parent.word;
     this.context.path = sourceOptions.path;
+
+    this.finished = false;
 
     const sourceItems = source.gather({
       denops,
