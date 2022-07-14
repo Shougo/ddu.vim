@@ -108,7 +108,9 @@ export class Ddu {
     this.context = context;
     this.userOptions = userOptions;
 
-    if (this.initialized && userOptions?.resume) {
+    const resume = this.options?.resume || userOptions?.resume;
+
+    if (this.initialized && resume) {
       // Note: sources must not overwrite
       userOptions.sources = this.options.sources;
 
@@ -118,12 +120,20 @@ export class Ddu {
         this.setInput(userOptions.input as string);
       }
 
-      if (!userOptions?.refresh) {
+      const [ui, uiOptions, uiParams] = await this.getUi(denops);
+      if (!ui) {
+        return;
+      }
+
+      if (!this.finished && uiOptions.toggle) {
+        await this.uiQuit(denops, ui, uiOptions, uiParams);
+        return;
+      }
+
+      this.finished = false;
+
+      if (!this.options?.refresh) {
         // UI Redraw only
-        const [ui, uiOptions, uiParams] = await this.getUi(denops);
-        if (!ui) {
-          return;
-        }
         await uiRedraw(
           denops,
           this.lock,
@@ -147,14 +157,7 @@ export class Ddu {
       return;
     }
     if (this.initialized && !this.finished && uiOptions.toggle) {
-      await ui.quit({
-        denops,
-        context: this.context,
-        options: this.options,
-        uiOptions,
-        uiParams,
-      });
-      this.finished = true;
+      await this.uiQuit(denops, ui, uiOptions, uiParams);
       return;
     }
 
@@ -421,6 +424,24 @@ export class Ddu {
       uiOptions,
       uiParams,
     );
+  }
+
+  async uiQuit<
+    Params extends Record<string, unknown>,
+  >(
+    denops: Denops,
+    ui: BaseUi<Params>,
+    uiOptions: UiOptions,
+    uiParams: Params,
+  ): Promise<void> {
+    await ui.quit({
+      denops,
+      context: this.context,
+      options: this.options,
+      uiOptions,
+      uiParams,
+    });
+    this.finished = true;
   }
 
   async onEvent(
