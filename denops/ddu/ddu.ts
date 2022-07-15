@@ -108,7 +108,8 @@ export class Ddu {
     this.context = context;
     this.userOptions = userOptions;
 
-    const resume = this.options?.resume || userOptions?.resume;
+    const resume = (userOptions?.resume == undefined && this.options?.resume) ||
+      userOptions?.resume;
 
     if (this.initialized && resume) {
       // Note: sources must not overwrite

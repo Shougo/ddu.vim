@@ -25,6 +25,7 @@ function partialOverwrite<T>(a: Partial<T>, b: Partial<T>): Partial<T> {
 function overwrite<T>(a: T, b: Partial<T>): T {
   return { ...a, ...b };
 }
+
 export const mergeUiOptions: Merge<UiOptions> = overwrite;
 export const mergeSourceOptions: Merge<SourceOptions> = overwrite;
 export const mergeFilterOptions: Merge<FilterOptions> = overwrite;
@@ -241,6 +242,7 @@ function patchDduOptions(
   if (cp) overwritten.columnParams = cp;
   const kp = migrateEachKeys(partialOverwrite, a.kindParams, b.kindParams);
   if (kp) overwritten.kindParams = kp;
+
   return overwritten;
 }
 
