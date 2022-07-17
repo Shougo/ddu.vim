@@ -104,6 +104,8 @@ export class Ddu {
     options: DduOptions,
     userOptions: Record<string, unknown>,
   ): Promise<void> {
+    const prevInput = this.context.input;
+
     this.aliases = aliases;
     this.context = context;
     this.userOptions = userOptions;
@@ -117,8 +119,11 @@ export class Ddu {
 
       this.updateOptions(userOptions);
 
+      // Set input
       if (userOptions?.input != null) {
         this.setInput(userOptions.input as string);
+      } else if (prevInput != "") {
+        this.setInput(prevInput);
       }
 
       const [ui, uiOptions, uiParams] = await this.getUi(denops);
@@ -1015,6 +1020,7 @@ export class Ddu {
 
   setInput(input: string) {
     this.input = input;
+    this.context.input = input;
   }
 
   getOptions() {
