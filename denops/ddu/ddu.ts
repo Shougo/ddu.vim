@@ -328,7 +328,7 @@ export class Ddu {
       });
 
       // Update items
-      if (state.items.length != 0) {
+      if (state.items && state.items.length != 0) {
         state.items = state.items.concat(newItems);
         if (!this.finished && !this.options.sync) {
           await this.redraw(denops);
