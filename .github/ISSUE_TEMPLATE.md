@@ -17,9 +17,7 @@ reproduction instructions.**
 
 - neovim/Vim `:version` output:
 
-- `:checkhealth` or `:CheckHealth` result(neovim only):
-
-## Provide a minimal init.vim/vimrc with less than 50 lines (Required!)
+## Provide a minimal init.vim/vimrc without plugin managers (Required!)
 
 ```vim
 " Your minimal init.vim/vimrc
@@ -33,3 +31,5 @@ set runtimepath+=~/path/to/ddu.vim/
 3. baz
 
 ## Screenshot (if possible)
+
+## Upload the log messages by `:redir` and `:message` (if errored)

@@ -296,6 +296,10 @@ export class Ddu {
       v: ReadableStreamReadResult<Item<unknown>[]>,
     ) => {
       const state = this.gatherStates[index];
+      if (!state) {
+        reader.cancel();
+        return;
+      }
 
       if (this.finished) {
         reader.cancel();
