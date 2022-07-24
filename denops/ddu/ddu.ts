@@ -1410,7 +1410,7 @@ async function checkUiOnInit(
     await errorException(
       denops,
       e,
-      `[ddu.vim] ui: ${ui.name} "onInit()" is failed`,
+      `ui: ${ui.name} "onInit()" is failed`,
     );
   }
 }
@@ -1445,7 +1445,7 @@ async function uiRedraw<
         await errorException(
           denops,
           e,
-          `[ddu.vim] ui: ${ui.name} "redraw()" is failed`,
+          `ui: ${ui.name} "redraw()" is failed`,
         );
       }
     }
@@ -1474,7 +1474,7 @@ async function checkFilterOnInit(
     await errorException(
       denops,
       e,
-      `[ddu.vim] filter: ${filter.name} "onInit()" is failed`,
+      `filter: ${filter.name} "onInit()" is failed`,
     );
   }
 }
@@ -1501,7 +1501,7 @@ async function checkColumnOnInit(
     await errorException(
       denops,
       e,
-      `[ddu.vim] column: ${column.name} "onInit()" is failed`,
+      `column: ${column.name} "onInit()" is failed`,
     );
   }
 }
