@@ -416,7 +416,8 @@ export class Ddu {
       index++;
     }
 
-    ui.refreshItems({
+    await ui.refreshItems({
+      denops,
       context: this.context,
       options: this.options,
       uiOptions: uiOptions,
@@ -816,7 +817,8 @@ export class Ddu {
       return;
     }
 
-    ui.expandItem({
+    await ui.expandItem({
+      denops,
       context: this.context,
       options: this.options,
       uiOptions,
@@ -891,7 +893,8 @@ export class Ddu {
     item.__expanded = false;
     await this.callColumns(denops, sourceOptions.columns, [item]);
 
-    ui.collapseItem({
+    await ui.collapseItem({
+      denops,
       context: this.context,
       options: this.options,
       uiOptions,

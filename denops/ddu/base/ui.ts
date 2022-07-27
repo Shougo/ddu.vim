@@ -20,6 +20,7 @@ export type OnInitArguments<Params extends Record<string, unknown>> = {
 };
 
 export type RefreshItemsArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
   context: Context;
   options: DduOptions;
   uiOptions: UiOptions;
@@ -29,6 +30,7 @@ export type RefreshItemsArguments<Params extends Record<string, unknown>> = {
 };
 
 export type CollapseItemArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
   context: Context;
   options: DduOptions;
   uiOptions: UiOptions;
@@ -37,6 +39,7 @@ export type CollapseItemArguments<Params extends Record<string, unknown>> = {
 };
 
 export type ExpandItemArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
   context: Context;
   options: DduOptions;
   uiOptions: UiOptions;
@@ -89,11 +92,11 @@ export abstract class BaseUi<
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 
-  refreshItems(_args: RefreshItemsArguments<Params>): void {}
+  async refreshItems(_args: RefreshItemsArguments<Params>): Promise<void> {}
 
-  collapseItem(_args: CollapseItemArguments<Params>): void {}
+  async collapseItem(_args: CollapseItemArguments<Params>): Promise<void> {}
 
-  expandItem(_args: ExpandItemArguments<Params>): void {}
+  async expandItem(_args: ExpandItemArguments<Params>): Promise<void> {}
 
   async searchItem(_args: SearchItemArguments<Params>): Promise<void> {}
 
