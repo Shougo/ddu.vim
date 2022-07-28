@@ -1413,7 +1413,7 @@ async function checkUiOnInit(
     await errorException(
       denops,
       e,
-      `ui: ${ui.name} "onInit()" is failed`,
+      `ui: ${ui.name} "onInit()" failed`,
     );
   }
 }
@@ -1448,7 +1448,7 @@ async function uiRedraw<
         await errorException(
           denops,
           e,
-          `ui: ${ui.name} "redraw()" is failed`,
+          `ui: ${ui.name} "redraw()" failed`,
         );
       }
     }
@@ -1477,7 +1477,7 @@ async function checkFilterOnInit(
     await errorException(
       denops,
       e,
-      `filter: ${filter.name} "onInit()" is failed`,
+      `filter: ${filter.name} "onInit()" failed`,
     );
   }
 }
@@ -1504,7 +1504,7 @@ async function checkColumnOnInit(
     await errorException(
       denops,
       e,
-      `column: ${column.name} "onInit()" is failed`,
+      `column: ${column.name} "onInit()" failed`,
     );
   }
 }
