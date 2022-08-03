@@ -835,9 +835,11 @@ export class Ddu {
 
       for (const child of children) {
         const action = child.action as ActionData;
-        // Skip hidden directory
+
+        // Note: Skip hidden directory
         if (
           action.isDirectory && action.path &&
+          action.path.startsWith(search) &&
           !basename(action.path).startsWith(".")
         ) {
           await this.expandItem(denops, child, maxLevel, search);
