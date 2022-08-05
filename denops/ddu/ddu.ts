@@ -728,6 +728,10 @@ export class Ddu {
     maxLevel: number,
     search?: string,
   ): void {
+    if (parent.__level < 0) {
+      return;
+    }
+
     parent.__expanded = true;
 
     const index = parent.__sourceIndex;
@@ -827,7 +831,7 @@ export class Ddu {
       children,
     });
 
-    if (maxLevel < 0 || parent.__level < maxLevel) {
+    if (search && (maxLevel < 0 || parent.__level < maxLevel)) {
       type ActionData = {
         isDirectory?: boolean;
         path?: string;
@@ -842,7 +846,7 @@ export class Ddu {
           action.path.startsWith(search) &&
           !basename(action.path).startsWith(".")
         ) {
-          await this.expandItem(denops, child, maxLevel, search);
+          this.expandItem(denops, child, maxLevel, search);
         }
       }
     }
