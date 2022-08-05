@@ -210,7 +210,7 @@ volatile
 ------------------------------------------------------------------------------
 FUNCTIONS 						*ddu-functions*
 
-							*ddu#quit()*
+							*ddu#event()*
 ddu#event({name}, {event})
 		Call the ddu event handler.
 
