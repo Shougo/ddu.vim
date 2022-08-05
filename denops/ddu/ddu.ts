@@ -702,7 +702,7 @@ export class Ddu {
         // Overwrite current path
         const userSource = this.options.sources[indexes[0]];
         if (!userSource.options) {
-          userSource.options = defaultSourceOptions();
+          userSource.options = sourceOptions;
         }
         userSource.options.path = sourceOptions.path;
         this.context.path = sourceOptions.path;
