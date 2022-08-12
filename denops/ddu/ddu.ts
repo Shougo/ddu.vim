@@ -113,7 +113,10 @@ export class Ddu {
     const resume = (userOptions?.resume == undefined && this.options?.resume) ||
       userOptions?.resume;
 
-    if (this.initialized && resume) {
+    if (
+      this.initialized && resume &&
+      (!userOptions?.sources || userOptions.sources == this.options.sources)
+    ) {
       // Note: sources must not overwrite
       userOptions.sources = this.options.sources;
 
