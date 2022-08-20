@@ -834,7 +834,7 @@ export class Ddu {
       children,
     });
 
-    if (search && (maxLevel < 0 || parent.__level < maxLevel)) {
+    if (maxLevel < 0 || parent.__level < maxLevel) {
       type ActionData = {
         isDirectory?: boolean;
         path?: string;
@@ -846,7 +846,7 @@ export class Ddu {
         // Note: Skip hidden directory
         if (
           action.isDirectory && action.path &&
-          action.path.startsWith(search) &&
+          (!search || action.path.startsWith(search)) &&
           !basename(action.path).startsWith(".")
         ) {
           this.expandItem(denops, child, maxLevel, search);
