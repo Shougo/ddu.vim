@@ -834,6 +834,8 @@ export class Ddu {
       children,
     });
 
+    let skipRedraw = false;
+
     if (maxLevel < 0 || parent.__level < maxLevel) {
       type ActionData = {
         isDirectory?: boolean;
@@ -849,9 +851,16 @@ export class Ddu {
           (!search || action.path.startsWith(search)) &&
           !basename(action.path).startsWith(".")
         ) {
+          // Expand is not completed yet.
+          skipRedraw = true;
+
           this.expandItem(denops, child, maxLevel, search);
         }
       }
+    }
+
+    if (skipRedraw) {
+      return;
     }
 
     await uiRedraw(
