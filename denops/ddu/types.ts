@@ -119,6 +119,7 @@ export type Item<
   action?: ActionData;
   highlights?: ItemHighlight[];
   status?: ItemStatus;
+  kind?: string;
 };
 
 // For internal type

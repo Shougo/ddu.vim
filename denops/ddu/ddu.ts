@@ -337,7 +337,8 @@ export class Ddu {
           : item.word;
         return {
           ...item,
-          matcherKey: matcherKey,
+          kind: item.kind ?? source.kind,
+          matcherKey,
           __sourceIndex: index,
           __sourceName: source.name,
           __level: 0,
@@ -420,6 +421,7 @@ export class Ddu {
         name: userSource.name,
         index,
         path: sourceOptions.path,
+        kind: source.kind,
       });
 
       index++;
@@ -554,8 +556,8 @@ export class Ddu {
     const source = sources[0];
 
     const kinds = [
-      ...new Set(sources.map((source) => source.kind)),
-    ];
+      ...new Set(items.map((item) => item.kind)),
+    ] as string[];
     if (kinds.length != 1) {
       await denops.call(
         "ddu#util#print_error",
@@ -795,7 +797,8 @@ export class Ddu {
           : item.word;
         return {
           ...item,
-          matcherKey: matcherKey,
+          kind: item.kind ?? source.kind,
+          matcherKey,
           __sourceIndex: index,
           __sourceName: source.name,
           __level: parent.__level + 1,

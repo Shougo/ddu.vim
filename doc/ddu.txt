@@ -501,6 +501,12 @@ defaultAction
 
 		Default: ""
 
+						*ddu-source-option-kind*
+kind			(string)
+		Source items default kind.
+
+		Default: "base"
+
 				    	*ddu-source-option-ignoreCase*
 ignoreCase		(boolean)
 		If it is True, ddu ignores case.
@@ -732,6 +738,10 @@ display		(String)			(Optional)
 		The string displayed in Ddu buffer.  If it is omitted, word
 		attribute is used instead.  It is not used for matching
 		inputs.
+
+					*ddu-item-attribute-kind*
+kind		(String)		(Optional)
+		The kind name.
 
 					*ddu-item-attribute-highlights*
 highlights	(List)			(Optional)
