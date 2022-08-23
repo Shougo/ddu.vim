@@ -10,9 +10,9 @@ import {
   toFileUrl,
 } from "./deps.ts";
 import {
+  ActionArguments,
   ActionFlags,
   ActionOptions,
-  Actions,
   BaseColumn,
   BaseFilter,
   BaseKind,
@@ -70,6 +70,12 @@ type GatherState = {
 
 type ActionData = {
   path?: string;
+};
+
+type ItemActions = {
+  source: BaseSource<Record<string, unknown>, unknown>;
+  kind: BaseKind<Record<string, unknown>>;
+  actions: Record<string, unknown>;
 };
 
 export class Ddu {
@@ -527,7 +533,7 @@ export class Ddu {
   async getItemActions(
     denops: Denops,
     items: DduItem[],
-  ): Promise<Actions<Record<string, unknown>> | null> {
+  ): Promise<ItemActions | null> {
     const sources = [
       ...new Set(items.map((item) => this.sources[item.__sourceName])),
     ].filter((source) => source);
@@ -577,12 +583,16 @@ export class Ddu {
       source,
     );
 
-    return Object.assign(
-      kind.actions,
-      kindOptions.actions,
-      source.actions,
-      sourceOptions.actions,
-    );
+    return {
+      source,
+      kind,
+      actions: Object.assign(
+        kind.actions,
+        kindOptions.actions,
+        source.actions,
+        sourceOptions.actions,
+      ),
+    };
   }
 
   async itemAction(
@@ -592,15 +602,12 @@ export class Ddu {
     params: unknown,
     clipboard: Clipboard,
   ): Promise<void> {
-    const actions = await this.getItemActions(denops, items);
-    if (!actions) {
-      // Error
+    const ret = await this.getItemActions(denops, items);
+    if (!ret) {
       return;
     }
+    const { source, kind, actions } = ret;
 
-    const sources = [
-      ...new Set(items.map((item) => this.sources[item.__sourceName])),
-    ];
     const indexes = [
       ...new Set(items.map((item) => item.__sourceIndex)),
     ];
@@ -608,14 +615,8 @@ export class Ddu {
     const [sourceOptions, sourceParams] = sourceArgs(
       this.options,
       this.options.sources[indexes[0]],
-      sources[0],
+      source,
     );
-
-    const kinds = [
-      ...new Set(sources.map((source) => source.kind)),
-    ];
-    const kindName = kinds[0];
-    const kind = this.kinds[kindName];
 
     const [kindOptions, kindParams] = kindArgs(this.options, kind);
 
@@ -636,7 +637,9 @@ export class Ddu {
       }
     }
 
-    const action = actions[actionName];
+    const action = actions[actionName] as (
+      args: ActionArguments<Record<string, unknown>>,
+    ) => Promise<ActionFlags>;
     if (!action) {
       await denops.call(
         "ddu#util#print_error",

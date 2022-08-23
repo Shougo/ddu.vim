@@ -261,8 +261,8 @@ export async function main(denops: Denops) {
       const items = ensureArray(arg2) as DduItem[];
 
       const ddu = getDdu(name);
-      const actions = await ddu.getItemActions(denops, items);
-      return actions ? Object.keys(actions) : [];
+      const ret = await ddu.getItemActions(denops, items);
+      return ret && ret.actions ? Object.keys(ret.actions) : [];
     },
     async getPreviewer(
       arg1: unknown,
