@@ -745,8 +745,6 @@ export class Ddu {
     this.expandSet.clear();
 
     for (const item of items) {
-      this.expandSet.add(item.item);
-
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
@@ -764,6 +762,7 @@ export class Ddu {
       return;
     }
 
+    this.expandSet.add(parent);
     parent.__expanded = true;
 
     const index = parent.__sourceIndex;
@@ -849,8 +848,6 @@ export class Ddu {
     maxLevel: number,
     search?: string,
   ): Promise<void> {
-    this.expandSet.delete(parent);
-
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
       return;
@@ -882,11 +879,12 @@ export class Ddu {
           !basename(action.path).startsWith(".")
         ) {
           // Expand is not completed yet.
-          this.expandSet.add(child);
           this.expandItem(denops, child, maxLevel, search);
         }
       }
     }
+
+    this.expandSet.delete(parent);
 
     // To redraw items, expandItems must be empty
     if (this.expandSet.size != 0) {
