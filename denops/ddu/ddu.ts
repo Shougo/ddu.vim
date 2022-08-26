@@ -78,7 +78,7 @@ type ItemActions = {
   actions: Record<string, unknown>;
 };
 
-type ExpandItem = {
+export type ExpandItem = {
   item: DduItem;
   maxLevel?: number;
   search?: string;
@@ -108,6 +108,7 @@ export class Ddu {
   private finished = false;
   private lock = new Lock();
   private startTime = 0;
+  private expandSet = new Set();
 
   async start(
     denops: Denops,
@@ -740,7 +741,12 @@ export class Ddu {
     denops: Denops,
     items: ExpandItem[],
   ): void {
+    // Clear queue
+    this.expandSet.clear();
+
     for (const item of items) {
+      this.expandSet.add(item.item);
+
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
@@ -843,6 +849,8 @@ export class Ddu {
     maxLevel: number,
     search?: string,
   ): Promise<void> {
+    this.expandSet.delete(parent);
+
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
       return;
@@ -857,8 +865,6 @@ export class Ddu {
       parent,
       children,
     });
-
-    let skipRedraw = false;
 
     if (maxLevel < 0 || parent.__level < maxLevel) {
       type ActionData = {
@@ -876,14 +882,14 @@ export class Ddu {
           !basename(action.path).startsWith(".")
         ) {
           // Expand is not completed yet.
-          skipRedraw = true;
-
+          this.expandSet.add(child);
           this.expandItem(denops, child, maxLevel, search);
         }
       }
     }
 
-    if (skipRedraw) {
+    // To redraw items, expandItems must be empty
+    if (this.expandSet.size != 0) {
       return;
     }
 
