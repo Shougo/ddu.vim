@@ -12,10 +12,11 @@ import {
   DduExtType,
   DduItem,
   DduOptions,
+  ExpandItem,
   PreviewContext,
   Previewer,
 } from "./types.ts";
-import { Ddu, ExpandItem } from "./ddu.ts";
+import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
 type RedrawTreeMode = "collapse" | "expand";

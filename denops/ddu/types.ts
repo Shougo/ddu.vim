@@ -136,6 +136,12 @@ export type DduItem =
     __expanded: boolean;
   };
 
+export type ExpandItem = {
+  item: DduItem;
+  maxLevel?: number;
+  search?: string;
+};
+
 export type ActionArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
   context: Context;

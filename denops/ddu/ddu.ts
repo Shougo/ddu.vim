@@ -25,6 +25,7 @@ import {
   DduExtType,
   DduItem,
   DduOptions,
+  ExpandItem,
   FilterOptions,
   Item,
   KindOptions,
@@ -76,12 +77,6 @@ type ItemActions = {
   source: BaseSource<Record<string, unknown>, unknown>;
   kind: BaseKind<Record<string, unknown>>;
   actions: Record<string, unknown>;
-};
-
-export type ExpandItem = {
-  item: DduItem;
-  maxLevel?: number;
-  search?: string;
 };
 
 export class Ddu {
