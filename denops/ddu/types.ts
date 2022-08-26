@@ -36,6 +36,7 @@ export type SourceInfo = {
   name: string;
   index: number;
   path: string;
+  kind: string;
 };
 
 export type DduOptions = {

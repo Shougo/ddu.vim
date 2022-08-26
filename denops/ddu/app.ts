@@ -15,7 +15,7 @@ import {
   PreviewContext,
   Previewer,
 } from "./types.ts";
-import { Ddu } from "./ddu.ts";
+import { Ddu, ExpandItem } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
 type RedrawTreeMode = "collapse" | "expand";
@@ -166,25 +166,17 @@ export async function main(denops: Denops) {
       arg1: unknown,
       arg2: unknown,
       arg3: unknown,
-      arg4: unknown,
     ): Promise<void> {
       const name = ensureString(arg1);
       const mode = ensureString(arg2) as RedrawTreeMode;
-      const item = ensureObject(arg3) as DduItem;
-      const opt = ensureObject(arg4) as {
-        maxLevel?: number;
-        search?: string;
-      };
+      const items = ensureArray(arg3) as ExpandItem[];
 
       const ddu = getDdu(name);
 
       if (mode == "collapse") {
-        await ddu.collapseItem(denops, item);
+        await ddu.collapseItems(denops, items.map((item) => item.item));
       } else if (mode == "expand") {
-        const maxLevel = opt.maxLevel && opt.maxLevel < 0
-          ? -1
-          : item.__level + (opt.maxLevel ?? 0);
-        await ddu.expandItem(denops, item, maxLevel, opt.search);
+        ddu.expandItems(denops, items);
       }
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {

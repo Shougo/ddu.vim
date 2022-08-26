@@ -276,7 +276,7 @@ ddu#redraw({name}[, {opt}])
 		Overwrites options. Refer to |ddu-options| about options.
 
 							*ddu#redraw_tree()*
-ddu#redraw_tree({name}, {mode}, {item})
+ddu#redraw_tree({name}, {mode}, {items})
 		Redraw the tree item.
 
 		{name} is specified ddu name(|ddu-option-name|).
@@ -287,7 +287,7 @@ ddu#redraw_tree({name}, {mode}, {item})
 			"expand": Expand the tree item
 			"recursive": Expand the tree item recursively
 
-		{item} is target tree item.
+		{items} is target tree items.
 
 							*ddu#start()*
 ddu#start({options})

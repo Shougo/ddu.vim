@@ -78,6 +78,12 @@ type ItemActions = {
   actions: Record<string, unknown>;
 };
 
+type ExpandItem = {
+  item: DduItem;
+  maxLevel?: number;
+  search?: string;
+};
+
 export class Ddu {
   private uis: Record<string, BaseUi<Record<string, unknown>>> = {};
   private sources: Record<string, BaseSource<Record<string, unknown>>> = {};
@@ -730,6 +736,18 @@ export class Ddu {
     }
   }
 
+  expandItems(
+    denops: Denops,
+    items: ExpandItem[],
+  ): void {
+    for (const item of items) {
+      const maxLevel = item.maxLevel && item.maxLevel < 0
+        ? -1
+        : item.item.__level + (item.maxLevel ?? 0);
+      this.expandItem(denops, item.item, maxLevel, item.search);
+    }
+  }
+
   expandItem(
     denops: Denops,
     parent: DduItem,
@@ -897,34 +915,36 @@ export class Ddu {
     }
   }
 
-  async collapseItem(
+  async collapseItems(
     denops: Denops,
-    item: DduItem,
+    items: DduItem[],
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
       return;
     }
 
-    const index = item.__sourceIndex;
-    const source = this.sources[item.__sourceName];
-    const [sourceOptions, _] = sourceArgs(
-      this.options,
-      this.options.sources[index],
-      source,
-    );
+    for (const item of items) {
+      const index = item.__sourceIndex;
+      const source = this.sources[item.__sourceName];
+      const [sourceOptions, _] = sourceArgs(
+        this.options,
+        this.options.sources[index],
+        source,
+      );
 
-    item.__expanded = false;
-    await this.callColumns(denops, sourceOptions.columns, [item]);
+      item.__expanded = false;
+      await this.callColumns(denops, sourceOptions.columns, [item]);
 
-    await ui.collapseItem({
-      denops,
-      context: this.context,
-      options: this.options,
-      uiOptions,
-      uiParams,
-      item,
-    });
+      await ui.collapseItem({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        item,
+      });
+    }
 
     await uiRedraw(
       denops,
@@ -936,14 +956,18 @@ export class Ddu {
       uiParams,
     );
 
-    await ui.searchItem({
-      denops,
-      context: this.context,
-      options: this.options,
-      uiOptions,
-      uiParams,
-      item,
-    });
+    const searchItem = items.at(-1);
+
+    if (searchItem) {
+      await ui.searchItem({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        item: searchItem,
+      });
+    }
   }
 
   async register(type: DduExtType, path: string, name: string) {
