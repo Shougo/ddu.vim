@@ -3,6 +3,7 @@ import {
   basename,
   Denops,
   echo,
+  equal,
   fn,
   Lock,
   op,
@@ -123,7 +124,8 @@ export class Ddu {
 
     if (
       this.initialized && resume &&
-      (!userOptions?.sources || userOptions.sources == this.options.sources)
+      (!userOptions?.sources ||
+        equal(userOptions.sources, this.options.sources))
     ) {
       // Note: sources must not overwrite
       userOptions.sources = this.options.sources;
