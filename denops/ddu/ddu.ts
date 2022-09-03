@@ -152,6 +152,9 @@ export class Ddu {
       this.finished = false;
 
       if (!this.options?.refresh) {
+        // NOTE: Enable done to redraw UI properly
+        this.context.done = true;
+
         // UI Redraw only
         await uiRedraw(
           denops,
@@ -425,7 +428,7 @@ export class Ddu {
         name: userSource.name,
         index,
         path: sourceOptions.path,
-        kind: source.kind,
+        kind: source.kind ?? "base",
       });
 
       index++;
