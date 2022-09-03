@@ -353,11 +353,11 @@ export class Ddu {
       // Update items
       if (state?.items?.length > 0) {
         state.items = state.items.concat(newItems);
-        if (!this.finished && !this.options.sync) {
-          await this.redraw(denops);
-        }
       } else {
         state.items = newItems;
+      }
+      if (!this.finished && !this.options.sync) {
+        await this.redraw(denops);
       }
       this.context.path = sourceOptions.path;
       if (this.context.path == "") {
