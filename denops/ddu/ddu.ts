@@ -193,6 +193,14 @@ export class Ddu {
     // source onInit() must be called before UI
     for (const userSource of this.options.sources) {
       const source = this.sources[userSource.name];
+      if (!source) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid source: ${userSource.name}`,
+        );
+        return;
+      }
+
       const [sourceOptions, sourceParams] = sourceArgs(
         this.options,
         userSource,
@@ -423,7 +431,7 @@ export class Ddu {
           "ddu#util#print_error",
           `Invalid source: ${userSource.name}`,
         );
-        continue;
+        return;
       }
 
       const [sourceOptions, _] = sourceArgs(
