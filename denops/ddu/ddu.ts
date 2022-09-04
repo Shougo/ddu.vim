@@ -418,6 +418,14 @@ export class Ddu {
     let index = 0;
     for (const userSource of this.options.sources) {
       const source = this.sources[userSource.name];
+      if (!source) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid source: ${userSource.name}`,
+        );
+        continue;
+      }
+
       const [sourceOptions, _] = sourceArgs(
         this.options,
         userSource,
