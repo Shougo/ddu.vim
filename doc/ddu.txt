@@ -910,6 +910,33 @@ Q: |:cnext| / |:cprevious| like commands are available?
 
 A: Nothing.  You can send items to |quickfix| by "quickfix" action instead.
 
+Q: I want to execute grep action from items.
+
+A: The example is here. >
+
+	" Use ddu-source-rg
+	" https://github.com/shun/ddu-source-rg
+	call ddu#custom#action('kind', 'file', 'grep',
+	    \ { args -> GrepAction(args) })
+	function! GrepAction(args)
+	  " NOTE: param "path" must be one directory
+	  let path = a:args.items[0].action.path
+	  let directory = isdirectory(path) ? path : fnamemodify(path, ':h')
+	
+	  call ddu#start({
+	      \ "name": a:args.options.name,
+	      \ "push": v:true,
+	      \ "sources": [
+	      \   {
+	      \     "name": "rg",
+	      \     "params": {
+	      \       "path": path,
+	      \       "input": input('Pattern: '),
+	      \     },
+	      \   },
+	      \ ],
+	      \ })
+	endfunction
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
