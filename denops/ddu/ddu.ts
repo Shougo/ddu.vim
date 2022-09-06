@@ -533,6 +533,13 @@ export class Ddu {
     }
 
     const action = ui.actions[actionName];
+    if (!action) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid UI action: ${actionName}`,
+      );
+      return;
+    }
     const flags = await action({
       denops,
       context: this.context,
