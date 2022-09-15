@@ -50,7 +50,7 @@ export abstract class BaseSource<
 
   kind = "base";
 
-  prevMtime = -1;
+  prevMtime = new Date();
 
   actions: Actions<Params> = {};
 
