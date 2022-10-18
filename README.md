@@ -49,7 +49,7 @@ sure whether you have this.
 
 For vim-plug
 
-```viml
+```vim
 call plug#begin()
 
 Plug 'vim-denops/denops.vim'
@@ -70,7 +70,7 @@ call plug#end()
 
 For dein.vim
 
-```viml
+```vim
 call dein#begin()
 
 call dein#add('vim-denops/denops.vim')
