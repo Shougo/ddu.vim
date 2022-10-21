@@ -115,7 +115,3 @@ export function defaultUiOptions(): UiOptions {
     toggle: false,
   };
 }
-
-export function defaultUiParams(): Record<string, unknown> {
-  return {};
-}

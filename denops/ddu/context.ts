@@ -84,6 +84,10 @@ export function defaultDduOptions(): DduOptions {
   };
 }
 
+export function defaultDummy(): Record<string, unknown> {
+  return {};
+}
+
 function migrateEachKeys<T>(
   merge: PartialMerge<T>,
   a: null | undefined | Record<string, Partial<T>>,

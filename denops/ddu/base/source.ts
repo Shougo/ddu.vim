@@ -84,7 +84,3 @@ export function defaultSourceOptions(): SourceOptions {
     sorters: [],
   };
 }
-
-export function defaultSourceParams(): Record<string, unknown> {
-  return {};
-}

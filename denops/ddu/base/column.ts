@@ -50,7 +50,3 @@ export function defaultColumnOptions(): ColumnOptions {
     placeholder: undefined,
   };
 }
-
-export function defaultColumnParams(): Record<string, unknown> {
-  return {};
-}

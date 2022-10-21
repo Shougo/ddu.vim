@@ -41,9 +41,6 @@ export function defaultKindOptions(): KindOptions {
     defaultAction: "",
   };
 }
-export function defaultKindParams(): Record<string, unknown> {
-  return {};
-}
 
 export function defaultActionOptions(): ActionOptions {
   return {

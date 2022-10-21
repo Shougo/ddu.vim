@@ -40,6 +40,7 @@ import {
 import {
   defaultContext,
   defaultDduOptions,
+  defaultDummy,
   foldMerge,
   mergeActionOptions,
   mergeColumnOptions,
@@ -54,15 +55,11 @@ import {
   mergeUiOptions,
   mergeUiParams,
 } from "./context.ts";
-import { defaultUiOptions, defaultUiParams } from "./base/ui.ts";
-import {
-  defaultSourceOptions,
-  defaultSourceParams,
-  GatherArguments,
-} from "./base/source.ts";
-import { defaultFilterOptions, defaultFilterParams } from "./base/filter.ts";
-import { defaultColumnOptions, defaultColumnParams } from "./base/column.ts";
-import { defaultKindOptions, defaultKindParams } from "./base/kind.ts";
+import { defaultUiOptions } from "./base/ui.ts";
+import { defaultSourceOptions, GatherArguments } from "./base/source.ts";
+import { defaultFilterOptions } from "./base/filter.ts";
+import { defaultColumnOptions } from "./base/column.ts";
+import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 
 type GatherState = {
@@ -1170,7 +1167,7 @@ export class Ddu {
       return [
         undefined,
         defaultUiOptions(),
-        defaultUiParams(),
+        defaultDummy(),
       ];
     }
 
@@ -1351,7 +1348,7 @@ function uiArgs<
       options.uiOptions[ui.name],
     ],
   );
-  const p = foldMerge(mergeUiParams, defaultUiParams, [
+  const p = foldMerge(mergeUiParams, defaultDummy, [
     ui.params(),
     options.uiParams["_"],
     options.uiParams[ui.name],
@@ -1376,7 +1373,7 @@ function sourceArgs<
       userSource?.options,
     ],
   );
-  const p = foldMerge(mergeSourceParams, defaultSourceParams, [
+  const p = foldMerge(mergeSourceParams, defaultDummy, [
     source?.params(),
     options.sourceParams["_"],
     source ? options.sourceParams[source.name] : {},
@@ -1399,7 +1396,7 @@ function filterArgs<
       options.filterOptions[filter.name],
     ],
   );
-  const p = foldMerge(mergeFilterParams, defaultFilterParams, [
+  const p = foldMerge(mergeFilterParams, defaultDummy, [
     filter?.params(),
     options.filterParams["_"],
     options.filterParams[filter.name],
@@ -1421,7 +1418,7 @@ function columnArgs<
       options.columnOptions[column.name],
     ],
   );
-  const p = foldMerge(mergeColumnParams, defaultColumnParams, [
+  const p = foldMerge(mergeColumnParams, defaultDummy, [
     column?.params(),
     options.columnParams["_"],
     options.columnParams[column.name],
@@ -1443,7 +1440,7 @@ function kindArgs<
       options.kindOptions[kind.name],
     ],
   );
-  const p = foldMerge(mergeKindParams, defaultKindParams, [
+  const p = foldMerge(mergeKindParams, defaultDummy, [
     kind?.params(),
     options.kindParams["_"],
     options.kindParams[kind.name],
@@ -1654,7 +1651,7 @@ Deno.test("sourceArgs", () => {
     sorters: [],
   });
   assertEquals(p, {
-    ...defaultSourceParams(),
+    ...defaultDummy(),
     by_: "bar",
     min: 100,
     max: 999,

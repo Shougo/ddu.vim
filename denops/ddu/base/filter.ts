@@ -35,7 +35,3 @@ export function defaultFilterOptions(): FilterOptions {
     placeholder: undefined,
   };
 }
-
-export function defaultFilterParams(): Record<string, unknown> {
-  return {};
-}
