@@ -1062,9 +1062,6 @@ export class Ddu {
     }
 
     const runtimepath = await op.runtimepath.getGlobal(denops);
-    if (runtimepath.length == 0) {
-      return [];
-    }
 
     async function globpath(
       searches: string[],
