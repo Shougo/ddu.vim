@@ -1062,6 +1062,9 @@ export class Ddu {
     }
 
     const runtimepath = await op.runtimepath.getGlobal(denops);
+    if (runtimepath == "") {
+      return [];
+    }
 
     async function globpath(
       searches: string[],
@@ -1156,7 +1159,9 @@ export class Ddu {
       Record<string, unknown>,
     ]
   > {
-    await this.autoload(denops, "ui", [this.options.ui]);
+    if (!this.uis[this.options.ui]) {
+      await this.autoload(denops, "ui", [this.options.ui]);
+    }
     const ui = this.uis[this.options.ui];
     if (!ui) {
       const message = `Invalid ui: "${this.options.ui}"`;
