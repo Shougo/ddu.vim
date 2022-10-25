@@ -14,6 +14,7 @@ import {
   ActionArguments,
   ActionFlags,
   ActionOptions,
+  ActionResult,
   BaseColumn,
   BaseFilter,
   BaseKind,
@@ -668,7 +669,7 @@ export class Ddu {
 
     const action = actions[actionName] as (
       args: ActionArguments<Record<string, unknown>>,
-    ) => Promise<ActionFlags>;
+    ) => Promise<ActionFlags | ActionResult>;
     if (!action) {
       await denops.call(
         "ddu#util#print_error",
@@ -697,6 +698,7 @@ export class Ddu {
     }
 
     let flags: ActionFlags;
+    let searchPath = "";
     if (sourceOptions.actions[actionName]) {
       flags = await denops.call(
         "denops#callback#call",
@@ -719,7 +721,7 @@ export class Ddu {
       ) as ActionFlags;
     } else {
       const prevPath = sourceOptions.path;
-      flags = await action({
+      const ret = await action({
         denops,
         context: this.context,
         options: this.options,
@@ -731,6 +733,13 @@ export class Ddu {
         items,
         clipboard,
       });
+
+      if (typeof (ret) == "object") {
+        flags = ret.flags;
+        searchPath = ret.searchPath;
+      } else {
+        flags = ret;
+      }
 
       // Check path is changed by action
       if (sourceOptions.path != prevPath) {
@@ -753,6 +762,17 @@ export class Ddu {
         options: this.options,
         uiOptions,
         uiParams,
+      });
+    }
+
+    if (searchPath.length > 0) {
+      await ui.searchPath({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        path: searchPath,
       });
     }
   }

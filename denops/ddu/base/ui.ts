@@ -57,6 +57,15 @@ export type SearchItemArguments<Params extends Record<string, unknown>> = {
   item: DduItem;
 };
 
+export type SearchPathArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+  path: string;
+};
+
 export type RedrawArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
   context: Context;
@@ -99,6 +108,8 @@ export abstract class BaseUi<
   async expandItem(_args: ExpandItemArguments<Params>): Promise<void> {}
 
   async searchItem(_args: SearchItemArguments<Params>): Promise<void> {}
+
+  async searchPath(_args: SearchPathArguments<Params>): Promise<void> {}
 
   async redraw(_args: RedrawArguments<Params>): Promise<void> {}
 

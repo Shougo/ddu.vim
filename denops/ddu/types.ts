@@ -157,7 +157,7 @@ export type ActionArguments<Params extends Record<string, unknown>> = {
 
 export type Actions<Params extends Record<string, unknown>> = Record<
   string,
-  (args: ActionArguments<Params>) => Promise<ActionFlags>
+  (args: ActionArguments<Params>) => Promise<ActionFlags | ActionResult>
 >;
 
 export enum ActionFlags {
@@ -166,6 +166,11 @@ export enum ActionFlags {
   Redraw = 1 << 1,
   Persist = 1 << 2,
 }
+
+export type ActionResult = {
+  flags: ActionFlags;
+  searchPath: string;
+};
 
 /**
  * Information of preview window

@@ -264,13 +264,13 @@ export async function main(denops: Denops) {
       arg4: unknown,
     ): Promise<Previewer | undefined> {
       const name = ensureString(arg1);
-      const items = ensureObject(arg2) as DduItem;
+      const item = ensureObject(arg2) as DduItem;
       const actionParams = arg3;
       const previewContext = ensureObject(arg4) as PreviewContext;
       const ddu = getDdu(name);
       return await ddu.getPreviewer(
         denops,
-        items,
+        item,
         actionParams,
         previewContext,
       );
