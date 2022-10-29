@@ -355,8 +355,8 @@ export class Ddu {
           matcherKey,
           __sourceIndex: index,
           __sourceName: source.name,
-          __level: 0,
-          __expanded: false,
+          __level: item.level ?? 0,
+          __expanded: item.isExpanded ?? false,
         };
       });
 

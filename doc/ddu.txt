@@ -734,14 +734,26 @@ action		(List)			(Optional)
 		The dictionary of actions.
 
 					*ddu-item-attribute-display*
-display		(String)			(Optional)
+display		(String)		(Optional)
 		The string displayed in Ddu buffer.  If it is omitted, word
 		attribute is used instead.  It is not used for matching
 		inputs.
 
+					*ddu-item-attribute-isExpanded*
+isExpanded	(Boolean)		(Optional)
+		The tree is already expanded.
+
+					*ddu-item-attribute-isTree*
+isTree		(Boolean)		(Optional)
+		The item is tree.
+
 					*ddu-item-attribute-kind*
 kind		(String)		(Optional)
 		The kind name.
+
+					*ddu-item-attribute-level*
+level		(String)		(Optional)
+		The nested level.
 
 					*ddu-item-attribute-highlights*
 highlights	(List)			(Optional)
@@ -760,7 +772,7 @@ highlights	(List)			(Optional)
 		The highlight end width.
 
 						*ddu-item-attribute-status*
-status		(Object)			(Optional)
+status		(Object)		(Optional)
 		The item status.
 
 		size				(number)
@@ -770,7 +782,7 @@ status		(Object)			(Optional)
 		The item time.
 
 					*ddu-item-attribute-word*
-word		(String)			(Required)
+word		(String)		(Required)
 		The word of a item. It is used for matching inputs.
 
 ==============================================================================

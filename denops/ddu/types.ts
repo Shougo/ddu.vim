@@ -121,6 +121,10 @@ export type Item<
   highlights?: ItemHighlight[];
   status?: ItemStatus;
   kind?: string;
+  level?: number;
+  treePath?: string;
+  isExpanded?: boolean;
+  isTree?: boolean;
 };
 
 // For internal type
