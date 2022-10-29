@@ -103,6 +103,7 @@ export class Ddu {
   private lock = new Lock();
   private startTime = 0;
   private expandSet = new Set();
+  private searchPath = "";
 
   async start(
     denops: Denops,
@@ -467,6 +468,18 @@ export class Ddu {
       uiOptions,
       uiParams,
     );
+
+    if (this.searchPath.length > 0) {
+      await ui.searchPath({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        path: this.searchPath,
+      });
+      this.searchPath = "";
+    }
   }
 
   async uiQuit<
@@ -704,6 +717,7 @@ export class Ddu {
         "denops#callback#call",
         sourceOptions.actions[actionName],
         {
+          context: this.context,
           options: this.options,
           actionParams: params,
           items: items,
@@ -714,6 +728,7 @@ export class Ddu {
         "denops#callback#call",
         kindOptions.actions[actionName],
         {
+          context: this.context,
           options: this.options,
           actionParams: params,
           items: items,
@@ -766,14 +781,7 @@ export class Ddu {
     }
 
     if (searchPath.length > 0) {
-      await ui.searchPath({
-        denops,
-        context: this.context,
-        options: this.options,
-        uiOptions,
-        uiParams,
-        path: searchPath,
-      });
+      this.searchPath = searchPath;
     }
   }
 
