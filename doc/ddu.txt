@@ -781,6 +781,10 @@ status		(Object)		(Optional)
 		time				(number)
 		The item time.
 
+					*ddu-item-attribute-treePath*
+treePath	(String)		(Optional)
+		The item tree path.
+
 					*ddu-item-attribute-word*
 word		(String)		(Required)
 		The word of a item. It is used for matching inputs.

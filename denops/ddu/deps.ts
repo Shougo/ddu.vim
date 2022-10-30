@@ -16,7 +16,10 @@ export {
   ensureObject,
   ensureString,
 } from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-export { assertEquals, equal } from "https://deno.land/std@0.160.0/testing/asserts.ts";
+export {
+  assertEquals,
+  equal,
+} from "https://deno.land/std@0.160.0/testing/asserts.ts";
 export { parse, toFileUrl } from "https://deno.land/std@0.160.0/path/mod.ts";
 export {
   deadline,

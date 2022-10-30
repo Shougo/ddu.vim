@@ -68,10 +68,6 @@ type GatherState = {
   done: boolean;
 };
 
-type ActionData = {
-  path?: string;
-};
-
 type ItemActions = {
   source: BaseSource<Record<string, unknown>, unknown>;
   kind: BaseKind<Record<string, unknown>>;
@@ -822,7 +818,7 @@ export class Ddu {
     );
 
     // Set path
-    sourceOptions.path = (parent.action as ActionData).path ?? parent.word;
+    sourceOptions.path = parent.treePath ?? parent.word;
     this.context.path = sourceOptions.path;
 
     this.finished = false;
@@ -912,19 +908,12 @@ export class Ddu {
     });
 
     if (maxLevel < 0 || parent.__level < maxLevel) {
-      type ActionData = {
-        isDirectory?: boolean;
-        path?: string;
-      };
-
       for (const child of children) {
-        const action = child.action as ActionData;
-
         // Note: Skip hidden directory
         if (
-          action.isDirectory && action.path &&
-          (!search || action.path.startsWith(search)) &&
-          !basename(action.path).startsWith(".")
+          child.isTree && child.treePath &&
+          (!search || child.treePath.startsWith(search)) &&
+          !basename(child.treePath).startsWith(".")
         ) {
           // Expand is not completed yet.
           this.expandItem(denops, child, maxLevel, search);
@@ -950,9 +939,7 @@ export class Ddu {
     );
 
     const searchItem = search
-      ? children.find(
-        (item) => search == (item?.action as ActionData).path ?? item.word,
-      )
+      ? children.find((item) => search == item.treePath ?? item.word)
       : parent;
 
     if (searchItem) {
