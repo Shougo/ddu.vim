@@ -83,6 +83,7 @@ function! s:init() abort
 
   augroup ddu
     autocmd!
+    autocmd User DDUReady :
   augroup END
 
   " Note: ddu.vim must be registered manually.
