@@ -112,8 +112,6 @@ function! s:stopped() abort
     for custom in g:ddu#_customs
       call ddu#_notify(custom.method, custom.args)
     endfor
-
-    let g:ddu#_customs = []
   endif
 endfunction
 
