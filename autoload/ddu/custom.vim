@@ -31,9 +31,9 @@ function! ddu#custom#alias(type, alias, base) abort
   call s:notify('alias', [a:type, a:alias, a:base])
 endfunction
 
-let s:custom_actions = {
-      \ 'source': {},
-      \ 'kind': {},
+let s:custom_actions = #{
+      \   source: {},
+      \   kind: {},
       \ }
 function! ddu#custom#action(type, source_kind_name, action_name, func) abort
   let dict = a:type ==# 'source' ?
@@ -41,14 +41,14 @@ function! ddu#custom#action(type, source_kind_name, action_name, func) abort
 
   for key in split(a:source_kind_name, '\s*,\s*')
     if !has_key(dict, key)
-      let dict[key] = { 'actions': {} }
+      let dict[key] = #{ actions: {} }
     endif
     let dict[key].actions[a:action_name] = denops#callback#register(a:func)
   endfor
 
   call s:notify('patchGlobal', [
-        \ a:type ==# 'source' ?
-        \ { 'sourceOptions': dict } : { 'kindOptions': dict }
+        \   a:type ==# 'source' ? #{ sourceOptions: dict } :
+        \                         #{ kindOptions: dict }
         \ ])
 endfunction
 
@@ -95,7 +95,7 @@ function! s:notify(method, args) abort
     let g:ddu#_customs = []
   endif
 
-  call add(g:ddu#_customs, { 'method': a:method, 'args': a:args })
+  call add(g:ddu#_customs, #{ method: a:method, args: a:args })
 
   return ddu#_notify(a:method, a:args)
 endfunction

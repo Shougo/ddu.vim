@@ -75,9 +75,9 @@ function! s:init() abort
     return
   endif
 
-  if !has('patch-8.2.0662') && !has('nvim-0.6')
+  if !has('patch-8.2.0662') && !has('nvim-0.8')
     call ddu#util#print_error(
-          \ 'ddu requires Vim 8.2.0662+ or neovim 0.6.0+.')
+          \ 'ddu requires Vim 8.2.0662+ or neovim 0.8.0+.')
     return 1
   endif
 
@@ -99,7 +99,7 @@ let s:root_dir = fnamemodify(expand('<sfile>'), ':h:h')
 function! ddu#_register() abort
   call denops#plugin#register('ddu',
         \ denops#util#join_path(s:root_dir, 'denops', 'ddu', 'app.ts'),
-        \ { 'mode': 'skip' })
+        \ #{ mode: 'skip' })
 
   autocmd ddu User DenopsStopped call s:stopped()
 endfunction

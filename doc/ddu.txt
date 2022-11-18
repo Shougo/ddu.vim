@@ -57,7 +57,7 @@ It does not work with zero configuration.  You can use other plugins.
 ==============================================================================
 INSTALL							*ddu-install*
 
-Note: ddu.vim requires Neovim (0.6.0+) or Vim8.2.0662+ (latest is
+Note: ddu.vim requires Neovim (0.8.0+) or Vim8.2.0662+ (latest is
 recommended).
 
 Please install both Deno and "denops.vim".
@@ -163,10 +163,10 @@ sourceParams
 sources
 		It is a list of elements which are formatted as:
 >
-		{
-		    'name': {source-name},
-		    'options': {source-options},
-		    'params': {source-params},
+		#{
+		    name: {source-name},
+		    options: {source-options},
+		    params: {source-params},
 		}
 <
 		Items from sources with smaller indexes will have smaller
@@ -328,9 +328,9 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
 		Note: It must be called before sources/filters initialization.
 >
 		call ddu#custom#alias('source', 'foo', 'file')
-		call ddu#custom#patch_global('sourceOptions', {
-		      \ 'file': {'mark': 'A'},
-		      \ 'foo': {'mark': 'foo'},
+		call ddu#custom#patch_global('sourceOptions', #{
+		      \   file: #{ mark: 'A' },
+		      \   foo: #{ mark: 'foo' },
 		      \ })
 <
 						*ddu#custom#get_aliases()*
@@ -374,17 +374,17 @@ EXAMPLES						*ddu-examples*
 	" You must set the default ui.
 	" Note: ff ui
 	" https://github.com/Shougo/ddu-ui-ff
-	call ddu#custom#patch_global({
-	    \ 'ui': 'ff',
+	call ddu#custom#patch_global(#{
+	    \   ui: 'ff',
 	    \ })
 
 	" You must set the default action.
 	" Note: file kind
 	" https://github.com/Shougo/ddu-kind-file
-	call ddu#custom#patch_global({
-	    \   'kindOptions': {
-	    \     'file': {
-	    \       'defaultAction': 'open',
+	call ddu#custom#patch_global(#{
+	    \   kindOptions: #{
+	    \     file: #{
+	    \       defaultAction: 'open',
 	    \     },
 	    \   }
 	    \ })
@@ -392,10 +392,10 @@ EXAMPLES						*ddu-examples*
 	" Specify matcher.
 	" Note: matcher_substring filter
 	" https://github.com/Shougo/ddu-filter-matcher_substring
-	call ddu#custom#patch_global({
-	    \   'sourceOptions': {
-	    \     '_': {
-	    \       'matchers': ['matcher_substring'],
+	call ddu#custom#patch_global(#{
+	    \   sourceOptions: #{
+	    \     _: #{
+	    \       matchers: ['matcher_substring'],
 	    \     },
 	    \   }
 	    \ })
@@ -403,29 +403,29 @@ EXAMPLES						*ddu-examples*
 	" Set default sources
 	" Note: file source
 	" https://github.com/Shougo/ddu-source-file
-	"call ddu#custom#patch_global({
-	"    \ 'sources': [{'name': 'file', 'params': {}}],
+	"call ddu#custom#patch_global(#{
+	"    \   'sources': [#{ name: 'file', params: {} }],
 	"    \ })
 	
 	" Call default sources
 	"call ddu#start({})
 	
 	" Set buffer-name specific configuration
-	"call ddu#custom#patch_local('files', {
-	"    \ 'sources': [
-	"    \   {'name': 'file', 'params': {}},
-	"    \   {'name': 'file_old', 'params': {}},
+	"call ddu#custom#patch_local('files', #{
+	"    \   sources: [
+	"    \     #{ name: 'file', params: {} },
+	"    \     #{ name: 'file_old', params: {} },
 	"    \ ],
 	"    \ })
 	
 	" Specify buffer name
-	"call ddu#start({'name': 'files'})
+	"call ddu#start(#{ name: 'files' })
 
 	" Specify source with params
 	" Note: file_rec source
 	" https://github.com/Shougo/ddu-source-file_rec
 	"call ddu#start({'sources': [
-	"    \ {'name': 'file_rec', 'params': {'path': expand('~')}}
+	"    \   #{ name: 'file_rec', params: #{ path: expand('~') } }
 	"    \ ]})
 <
 
@@ -939,23 +939,26 @@ A: The example is here. >
 	  let path = a:args.items[0].action.path
 	  let directory = isdirectory(path) ? path : fnamemodify(path, ':h')
 	
-	  call ddu#start({
-	      \ "name": a:args.options.name,
-	      \ "push": v:true,
-	      \ "sources": [
-	      \   {
-	      \     "name": "rg",
-	      \     "params": {
-	      \       "path": path,
-	      \       "input": input('Pattern: '),
+	  call ddu#start(#{
+	      \   name: a:args.options.name,
+	      \   push: v:true,
+	      \   sources: [
+	      \     #{
+	      \       name: 'rg',
+	      \       params: #{
+	      \         path: path,
+	      \         input: input('Pattern: '),
+	      \       },
 	      \     },
-	      \   },
-	      \ ],
+	      \   ],
 	      \ })
 	endfunction
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2022.11.18
+* neovim 0.8 is required.
 
 2022.03.27
 * Some ddu#util functions are not public.
