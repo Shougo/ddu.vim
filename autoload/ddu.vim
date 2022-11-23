@@ -96,9 +96,10 @@ function! s:init() abort
 endfunction
 
 let s:root_dir = fnamemodify(expand('<sfile>'), ':h:h')
+let s:sep = has('win32') ? '\' : '/'
 function! ddu#_register() abort
   call denops#plugin#register('ddu',
-        \ denops#util#join_path(s:root_dir, 'denops', 'ddu', 'app.ts'),
+        \ join([s:root_dir, 'denops', 'ddu', 'app.ts'], s:sep),
         \ #{ mode: 'skip' })
 
   autocmd ddu User DenopsStopped call s:stopped()
