@@ -123,6 +123,7 @@ export abstract class BaseUi<
 export function defaultUiOptions(): UiOptions {
   return {
     defaultAction: "default",
+    persist: false,
     toggle: false,
   };
 }

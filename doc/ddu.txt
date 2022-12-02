@@ -452,6 +452,11 @@ defaultAction
 
 		Default: "default"
 
+				    		*ddu-ui-option-persist*
+persist
+		Redraw the UI after fire actions.
+		Default: v:false
+
 				    		*ddu-ui-option-toggle*
 toggle
 		Quit the UI if the UI exists.
@@ -461,10 +466,8 @@ toggle
 ------------------------------------------------------------------------------
 UI PARAMS					*ddu-ui-params*
 
-These are the parameters that each source can have.  You can select the
-behavior and tune the performance.
-
-Please read the UI documentation.
+These are the parameters that each UI can have.  Please read the UI
+documentation.
 
 
 ==============================================================================
@@ -552,10 +555,8 @@ sorters			(string[])
 ------------------------------------------------------------------------------
 SOURCE PARAMS					*ddu-source-params*
 
-These are the parameters that each source can have.  You can select the
-behavior and tune the performance.
-
-Please read the source documentation.
+These are the parameters that each source can have.  Please read the source
+documentation.
 
 
 ==============================================================================
@@ -570,10 +571,8 @@ Undefined now
 ------------------------------------------------------------------------------
 FILTER PARAMS						*ddu-filter-params*
 
-These are the parameters that each filter can have.  You can select the
-behavior and tune the performance.
-
-Please read the filter documentation.
+These are the parameters that each filter can have.  Please read the filter
+documentation.
 
 
 ==============================================================================
@@ -588,9 +587,8 @@ Undefined now
 ------------------------------------------------------------------------------
 COLUMN PARAMS						*ddu-column-params*
 
-These are the parameters that each column can have.
-
-Please read the column documentation.
+These are the parameters that each column can have.  Please read the column
+documentation.
 
 
 ==============================================================================
@@ -610,10 +608,8 @@ defaultAction	(string)
 ------------------------------------------------------------------------------
 KIND PARAMS						*ddu-kind-params*
 
-These are the parameters that each kind can have.  You can select the
-behavior and tune the performance.
-
-Please read the kind documentation.
+These are the parameters that each kind can have.  Please read the kind
+documentation.
 
 
 ==============================================================================

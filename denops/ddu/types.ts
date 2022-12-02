@@ -65,6 +65,7 @@ export type DduOptions = {
 
 export type UiOptions = {
   defaultAction: string;
+  persist: boolean;
   toggle: boolean;
 };
 

@@ -766,7 +766,7 @@ export class Ddu {
 
     if (flags & ActionFlags.RefreshItems) {
       await this.refresh(denops);
-    } else if (flags & ActionFlags.Persist) {
+    } else if (uiOptions.persist || flags & ActionFlags.Persist) {
       await ui.redraw({
         denops,
         context: this.context,
