@@ -728,14 +728,14 @@ params			(function)			(Required)
 ITEM ATTRIBUTES						*ddu-item-attributes*
 
 					*ddu-item-attribute-action*
-action		(List)			(Optional)
-		The dictionary of actions.
+action		(Dictionary)		(Optional)
+		The params dictionary for actions.
 
 					*ddu-item-attribute-display*
 display		(String)		(Optional)
-		The string displayed in Ddu buffer.  If it is omitted, word
-		attribute is used instead.  It is not used for matching
-		inputs.
+		The string displayed in Ddu buffer.  If it is omitted,
+		|ddu-item-attribute-word| attribute is used instead.  It is
+		not used for matching inputs.
 
 					*ddu-item-attribute-isExpanded*
 isExpanded	(Boolean)		(Optional)
