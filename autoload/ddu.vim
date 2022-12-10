@@ -102,7 +102,7 @@ function! ddu#_register() abort
         \ join([s:root_dir, 'denops', 'ddu', 'app.ts'], s:sep),
         \ #{ mode: 'skip' })
 
-  autocmd ddu User DenopsProcessStopped call s:stopped()
+  autocmd ddu User DenopsProcessStopped:* call s:stopped()
 endfunction
 
 function! s:stopped() abort
