@@ -312,7 +312,7 @@ export class Ddu {
     const reader = sourceItems.getReader();
 
     const readChunk = async (
-      v: ReadableStreamReadResult<Item<unknown>[]>,
+      v: ReadableStreamDefaultReadResult<Item<unknown>[]>,
     ) => {
       const state = this.gatherStates[index];
       if (!state) {
@@ -837,7 +837,7 @@ export class Ddu {
     let children: DduItem[] = [];
 
     const readChunk = async (
-      v: ReadableStreamReadResult<Item<unknown>[]>,
+      v: ReadableStreamDefaultReadResult<Item<unknown>[]>,
     ) => {
       if (this.finished) {
         reader.cancel();
