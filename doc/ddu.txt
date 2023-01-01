@@ -143,7 +143,7 @@ resume
 
 		Default: v:false
 
-						*ddu-option-sourceOptions*
+					    	*ddu-option-sourceOptions*
 sourceOptions
 		It is a dictionary that maps source names to its options.  The
 		options with the name "_" is used as the options for all
@@ -180,14 +180,14 @@ sync							*ddu-option-sync*
 
 		Default: v:false
 
-						*ddu-option-ui*
+							*ddu-option-ui*
 ui
 		Specify UI name.
 		Note: You must set the option in the first.
 
 		Default: ""
 
-						*ddu-option-uiOptions*
+							*ddu-option-uiOptions*
 uiOptions
 		It is a dictionary that maps UI names to its options.  The
 		options with the name "_" is used as the options for all
@@ -196,7 +196,7 @@ uiOptions
 
 		Default: {}
 
-						*ddu-option-uiParams*
+							*ddu-option-uiParams*
 uiParams
 		It is a dictionary that maps UI names to its parameters.
 		See also |ddu-ui-params|.
