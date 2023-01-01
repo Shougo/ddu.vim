@@ -464,7 +464,7 @@ toggle
 
 
 ------------------------------------------------------------------------------
-UI PARAMS					*ddu-ui-params*
+UI PARAMS						*ddu-ui-params*
 
 These are the parameters that each UI can have.  Please read the UI
 documentation.
