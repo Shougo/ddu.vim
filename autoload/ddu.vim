@@ -1,5 +1,5 @@
 function! ddu#start(...) abort
-  call ddu#_request('start', [get(a:000, 0, {})])
+  call ddu#_notify('start', [get(a:000, 0, {})])
 endfunction
 function! ddu#redraw(name, ...) abort
   call ddu#_notify('redraw', [a:name, get(a:000, 0, {})])
