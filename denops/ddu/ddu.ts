@@ -256,6 +256,27 @@ export class Ddu {
         source,
       );
 
+      // Call "onRefreshItems" hooks
+      const filters = sourceOptions.matchers.concat(
+          sourceOptions.sorters,
+        ).concat(sourceOptions.converters);
+      await this.autoload(denops, "filter", filters);
+      for (const filterName of filters) {
+        const [filter, filterOptions, filterParams] = await this.getFilter(
+          denops,
+          filterName,
+        );
+        if (!filter || !filter.onRefreshItems) {
+          continue;
+        }
+
+        await filter.onRefreshItems({
+          denops,
+          filterOptions,
+          filterParams,
+        });
+      }
+
       this.gatherItems(
         denops,
         index,
@@ -1153,10 +1174,9 @@ export class Ddu {
     }
     const ui = this.uis[this.options.ui];
     if (!ui) {
-      const message = `Invalid ui: "${this.options.ui}"`;
       await denops.call(
         "ddu#util#print_error",
-        message,
+        `Invalid ui: "${this.options.ui}"`,
       );
       return [
         undefined,
@@ -1169,6 +1189,35 @@ export class Ddu {
     await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
     return [ui, uiOptions, uiParams];
+  }
+
+  private async getFilter(
+    denops: Denops,
+    filterName: string,
+  ): Promise<
+    [
+      BaseFilter<Record<string, unknown>> | undefined,
+      FilterOptions,
+      Record<string, unknown>,
+    ]
+  > {
+    const filter = this.filters[filterName];
+    if (!filter) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Invalid filter: ${filterName}`,
+      );
+      return [
+        undefined,
+        defaultFilterOptions(),
+        defaultDummy(),
+      ];
+    }
+
+    const [filterOptions, filterParams] = filterArgs(this.options, filter);
+    await checkFilterOnInit(filter, denops, filterOptions, filterParams);
+
+    return [filter, filterOptions, filterParams];
   }
 
   private async filterItems(
@@ -1199,18 +1248,13 @@ export class Ddu {
     ) => {
       await this.autoload(denops, "filter", filters);
       for (const filterName of filters) {
-        const filter = this.filters[filterName];
+        const [filter, filterOptions, filterParams] = await this.getFilter(
+          denops,
+          filterName,
+        );
         if (!filter) {
-          await denops.call(
-            "ddu#util#print_error",
-            `Invalid filter: ${filterName}`,
-          );
           continue;
         }
-
-        const [filterOptions, filterParams] = filterArgs(this.options, filter);
-
-        await checkFilterOnInit(filter, denops, filterOptions, filterParams);
 
         items = await filter.filter({
           denops,

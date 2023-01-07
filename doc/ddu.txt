@@ -812,6 +812,10 @@ filter			(function)			(Required)
 onInit			(function)			(Optional)
 		Called before call filter functions.
 
+					*ddu-filter-attribute-onRefreshItems*
+onRefreshItems		(function)			(Optional)
+		Called before refresh items.
+
 						*ddu-filter-attribute-params*
 params			(function)			(Required)
 		Called to get filter params.

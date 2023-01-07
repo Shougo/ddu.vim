@@ -7,6 +7,12 @@ export type OnInitArguments<Params extends Record<string, unknown>> = {
   filterParams: Params;
 };
 
+export type OnRefreshItemsArguments<Params extends Record<string, unknown>> = {
+  denops: Denops;
+  filterOptions: FilterOptions;
+  filterParams: Params;
+};
+
 export type FilterArguments<Params extends Record<string, unknown>> = {
   denops: Denops;
   options: DduOptions;
@@ -21,9 +27,11 @@ export abstract class BaseFilter<Params extends Record<string, unknown>> {
   name = "";
   isInitialized = false;
 
-  apiVersion = 1;
+  apiVersion = 2;
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
+
+  async onRefreshItems(_args: OnRefreshItemsArguments<Params>): Promise<void> {}
 
   abstract filter({}: FilterArguments<Params>): Promise<DduItem[]>;
 
