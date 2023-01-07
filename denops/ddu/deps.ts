@@ -19,12 +19,12 @@ export {
 export {
   assertEquals,
   equal,
-} from "https://deno.land/std@0.170.0/testing/asserts.ts";
-export { parse, toFileUrl } from "https://deno.land/std@0.170.0/path/mod.ts";
+} from "https://deno.land/std@0.171.0/testing/asserts.ts";
+export { parse, toFileUrl } from "https://deno.land/std@0.171.0/path/mod.ts";
 export {
   deadline,
   DeadlineError,
-} from "https://deno.land/std@0.170.0/async/mod.ts";
+} from "https://deno.land/std@0.171.0/async/mod.ts";
 export { TimeoutError } from "https://deno.land/x/msgpack_rpc@v4.0.0/response_waiter.ts";
 export { Lock } from "https://deno.land/x/async@v1.2.0/mod.ts";
-export { basename } from "https://deno.land/std@0.170.0/path/mod.ts";
+export { basename } from "https://deno.land/std@0.171.0/path/mod.ts";
