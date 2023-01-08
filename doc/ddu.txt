@@ -529,7 +529,6 @@ matchers		(string[])
 		It is a list of registered filter names to filter items
 		by user input.
 		Items will be processed in the order you specify here.
-		Note: They are not applyed to expanded items.
 
 		Default: []
 

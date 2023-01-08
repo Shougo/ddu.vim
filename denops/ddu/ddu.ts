@@ -867,17 +867,13 @@ export class Ddu {
       }
 
       if (!v.value || v.done) {
-        children = await this.callFilters(
-          denops,
-          sourceOptions,
+        const filters = sourceOptions.matchers.concat(
           sourceOptions.sorters,
-          this.input,
-          children,
-        );
+        ).concat(sourceOptions.converters);
         children = await this.callFilters(
           denops,
           sourceOptions,
-          sourceOptions.converters,
+          filters,
           this.input,
           children,
         );
@@ -908,8 +904,11 @@ export class Ddu {
         };
       });
 
-      await this.callColumns(denops, sourceOptions.columns, [parent]);
-      await this.callColumns(denops, sourceOptions.columns, newItems);
+      await this.callColumns(
+        denops,
+        sourceOptions.columns,
+        [parent].concat(newItems),
+      );
 
       // Update children
       children = children.concat(newItems);
@@ -1258,15 +1257,7 @@ export class Ddu {
     items = await this.callFilters(
       denops,
       sourceOptions,
-      sourceOptions.matchers,
-      input,
-      items,
-    );
-
-    items = await this.callFilters(
-      denops,
-      sourceOptions,
-      sourceOptions.sorters,
+      sourceOptions.matchers.concat(sourceOptions.sorters),
       input,
       items,
     );
