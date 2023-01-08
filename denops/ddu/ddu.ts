@@ -258,8 +258,8 @@ export class Ddu {
 
       // Call "onRefreshItems" hooks
       const filters = sourceOptions.matchers.concat(
-          sourceOptions.sorters,
-        ).concat(sourceOptions.converters);
+        sourceOptions.sorters,
+      ).concat(sourceOptions.converters);
       await this.autoload(denops, "filter", filters);
       for (const filterName of filters) {
         const [filter, filterOptions, filterParams] = await this.getFilter(
@@ -867,6 +867,20 @@ export class Ddu {
       }
 
       if (!v.value || v.done) {
+        children = await this.callFilters(
+          denops,
+          sourceOptions,
+          sourceOptions.sorters,
+          this.input,
+          children,
+        );
+        children = await this.callFilters(
+          denops,
+          sourceOptions,
+          sourceOptions.converters,
+          this.input,
+          children,
+        );
         await this.redrawExpandItem(
           denops,
           parent,
@@ -1241,49 +1255,69 @@ export class Ddu {
     let items = state.items;
     const allItems = items.length;
 
-    const callFilters = async (
-      filters: string[],
-      input: string,
-      items: DduItem[],
-    ) => {
-      await this.autoload(denops, "filter", filters);
-      for (const filterName of filters) {
-        const [filter, filterOptions, filterParams] = await this.getFilter(
-          denops,
-          filterName,
-        );
-        if (!filter) {
-          continue;
-        }
+    items = await this.callFilters(
+      denops,
+      sourceOptions,
+      sourceOptions.matchers,
+      input,
+      items,
+    );
 
-        items = await filter.filter({
-          denops,
-          options: this.options,
-          sourceOptions,
-          filterOptions,
-          filterParams,
-          input,
-          items,
-        });
-      }
-
-      return items;
-    };
-
-    items = await callFilters(sourceOptions.matchers, input, items);
-
-    items = await callFilters(sourceOptions.sorters, input, items);
+    items = await this.callFilters(
+      denops,
+      sourceOptions,
+      sourceOptions.sorters,
+      input,
+      items,
+    );
 
     // Truncate before converters
     if (items.length > sourceOptions.maxItems) {
       items = items.slice(0, sourceOptions.maxItems);
     }
 
-    items = await callFilters(sourceOptions.converters, input, items);
+    items = await this.callFilters(
+      denops,
+      sourceOptions,
+      sourceOptions.converters,
+      input,
+      items,
+    );
 
     await this.callColumns(denops, sourceOptions.columns, items);
 
     return [state.done, allItems, items];
+  }
+
+  private async callFilters(
+    denops: Denops,
+    sourceOptions: SourceOptions,
+    filters: string[],
+    input: string,
+    items: DduItem[],
+  ) {
+    await this.autoload(denops, "filter", filters);
+    for (const filterName of filters) {
+      const [filter, filterOptions, filterParams] = await this.getFilter(
+        denops,
+        filterName,
+      );
+      if (!filter) {
+        continue;
+      }
+
+      items = await filter.filter({
+        denops,
+        options: this.options,
+        sourceOptions,
+        filterOptions,
+        filterParams,
+        input,
+        items,
+      });
+    }
+
+    return items;
   }
 
   private async callColumns(
