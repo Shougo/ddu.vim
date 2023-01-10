@@ -950,7 +950,7 @@ export class Ddu {
         // Note: Skip hidden directory
         if (
           child.isTree && child.treePath &&
-          (!search || child.treePath.startsWith(search)) &&
+          (!search || search.startsWith(child.treePath)) &&
           !basename(child.treePath).startsWith(".")
         ) {
           // Expand is not completed yet.
