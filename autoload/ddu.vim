@@ -1,8 +1,8 @@
-function! ddu#start(...) abort
-  call ddu#_notify('start', [get(a:000, 0, {})])
+function! ddu#start(options = {}) abort
+  call ddu#_notify('start', [a:options])
 endfunction
-function! ddu#redraw(name, ...) abort
-  call ddu#_notify('redraw', [a:name, get(a:000, 0, {})])
+function! ddu#redraw(name, options = {}) abort
+  call ddu#_notify('redraw', [a:name, a:options])
 endfunction
 function! ddu#redraw_tree(name, mode, items) abort
   return ddu#_notify('redrawTree', [a:name, a:mode, a:items])
@@ -122,7 +122,6 @@ function! ddu#_denops_running() abort
         \ && denops#plugin#is_loaded('ddu')
 endfunction
 
-function! ddu#_lazy_redraw(name, ...) abort
-  let args = get(a:000, 0, {})
-  call timer_start(0, { -> ddu#redraw(a:name, args) })
+function! ddu#_lazy_redraw(name, args = {}) abort
+  call timer_start(0, { -> ddu#redraw(a:name, a:args) })
 endfunction
