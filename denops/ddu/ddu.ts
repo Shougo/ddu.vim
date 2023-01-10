@@ -168,6 +168,10 @@ export class Ddu {
       this.setInput(this.options.input);
     }
 
+    if (this.options.searchPath.length > 0) {
+      this.searchPath = this.options.searchPath;
+    }
+
     // Note: UI must be reset.
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
@@ -486,7 +490,7 @@ export class Ddu {
       uiParams,
     );
 
-    if (this.searchPath.length > 0) {
+    if (this.searchPath.length > 0 && this.context.done) {
       await ui.searchPath({
         denops,
         context: this.context,

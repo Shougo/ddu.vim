@@ -73,6 +73,7 @@ export function defaultDduOptions(): DduOptions {
     push: false,
     refresh: false,
     resume: false,
+    searchPath: "",
     sourceOptions: {},
     sourceParams: {},
     sources: [],

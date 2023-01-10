@@ -53,6 +53,7 @@ export type DduOptions = {
   push: boolean;
   refresh: boolean;
   resume: boolean;
+  searchPath: string;
   sourceOptions: Record<SourceName, Partial<SourceOptions>>;
   sourceParams: Record<SourceName, Partial<Record<string, unknown>>>;
   sources: UserSource[];

@@ -143,6 +143,13 @@ resume
 
 		Default: v:false
 
+				    	    	*ddu-option-searchPath*
+searchPath	(string)
+		Search the path.
+		Note: The path must be absolute path.
+
+		Default: ""
+
 					    	*ddu-option-sourceOptions*
 sourceOptions
 		It is a dictionary that maps source names to its options.  The
