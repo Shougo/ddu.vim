@@ -1145,6 +1145,9 @@ export class Ddu {
       this.options,
       userOptions,
     ]);
+    if (this.options.searchPath.length > 0) {
+      this.searchPath = this.options.searchPath;
+    }
   }
 
   async checkUpdated(denops: Denops): Promise<boolean> {
