@@ -1,16 +1,16 @@
-export type { Denops } from "https://deno.land/x/denops_std@v3.12.1/mod.ts";
+export type { Denops } from "https://deno.land/x/denops_std@v3.12.2/mod.ts";
 export {
   echo,
   execute,
-} from "https://deno.land/x/denops_std@v3.12.1/helper/mod.ts";
+} from "https://deno.land/x/denops_std@v3.12.2/helper/mod.ts";
 export {
   batch,
   gather,
-} from "https://deno.land/x/denops_std@v3.12.1/batch/mod.ts";
-export * as op from "https://deno.land/x/denops_std@v3.12.1/option/mod.ts";
-export * as fn from "https://deno.land/x/denops_std@v3.12.1/function/mod.ts";
-export * as vars from "https://deno.land/x/denops_std@v3.12.1/variable/mod.ts";
-export * as autocmd from "https://deno.land/x/denops_std@v3.12.1/autocmd/mod.ts";
+} from "https://deno.land/x/denops_std@v3.12.2/batch/mod.ts";
+export * as op from "https://deno.land/x/denops_std@v3.12.2/option/mod.ts";
+export * as fn from "https://deno.land/x/denops_std@v3.12.2/function/mod.ts";
+export * as vars from "https://deno.land/x/denops_std@v3.12.2/variable/mod.ts";
+export * as autocmd from "https://deno.land/x/denops_std@v3.12.2/autocmd/mod.ts";
 export {
   ensureArray,
   ensureObject,
