@@ -966,6 +966,9 @@ A: The example is here. >
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
 
+2023.01.11
+* Remove "searchPath" from UI interface.
+
 2022.11.18
 * neovim 0.8 is required.
 

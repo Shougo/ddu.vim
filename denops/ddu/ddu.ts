@@ -2,6 +2,7 @@ import {
   assertEquals,
   basename,
   Denops,
+  dirname,
   echo,
   equal,
   fn,
@@ -491,14 +492,42 @@ export class Ddu {
     );
 
     if (this.searchPath.length > 0 && this.context.done) {
-      await ui.searchPath({
-        denops,
-        context: this.context,
-        options: this.options,
-        uiOptions,
-        uiParams,
-        path: this.searchPath,
-      });
+      const pos = items.findIndex(
+        (item) => this.searchPath == item.treePath ?? item.word,
+      );
+
+      if (pos < 0) {
+        // NOTE: "sesarchPath" is not found.  Try expand parents
+        const parent = items.find(
+          (item) =>
+            !item.__expanded && item.treePath &&
+            this.searchPath.startsWith(item.treePath),
+        );
+
+        if (parent) {
+          let maxLevel = 0;
+          for (
+            let path = dirname(this.searchPath);
+            path !== parent.treePath && path.startsWith(parent.treePath!);
+            path = dirname(path)
+          ) {
+            maxLevel += 1;
+          }
+
+          this.expandItem(denops, parent, maxLevel, this.searchPath);
+          return;
+        }
+      } else {
+        await ui.searchItem({
+          denops,
+          context: this.context,
+          options: this.options,
+          uiOptions,
+          uiParams,
+          item: items[pos],
+        });
+      }
+
       this.searchPath = "";
     }
   }
