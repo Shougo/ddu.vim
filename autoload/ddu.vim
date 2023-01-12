@@ -11,7 +11,7 @@ function! ddu#event(name, event) abort
   call ddu#_request('event', [a:name, a:event])
 endfunction
 function! ddu#pop(name) abort
-  call ddu#_notify('pop', [a:name])
+  call ddu#_request('pop', [a:name])
 endfunction
 function! ddu#ui_action(name, action, params) abort
   call ddu#_request('uiAction', [a:name, a:action, a:params])
