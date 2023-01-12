@@ -1088,11 +1088,14 @@ export class Ddu {
         source,
       );
 
-      [...this.expandedPaths].forEach((v) => {
-        if (item.treePath && isParentPath(item.treePath, v)) {
-          this.expandedPaths.delete(v);
-        }
-      });
+      if (item.treePath) {
+        this.expandedPaths.delete(item.treePath);
+        [...this.expandedPaths].forEach((v) => {
+          if (isParentPath(item.treePath!, v)) {
+            this.expandedPaths.delete(v);
+          }
+        });
+      }
       item.__expanded = false;
       await this.callColumns(denops, sourceOptions.columns, [item]);
 
