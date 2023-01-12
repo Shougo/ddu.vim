@@ -99,7 +99,7 @@ export class Ddu {
   private finished = false;
   private lock = new Lock();
   private startTime = 0;
-  private expandSet = new Set();
+  private expandedPaths = new Set();
   private searchPath = "";
 
   async start(
@@ -492,29 +492,32 @@ export class Ddu {
     );
 
     if (this.searchPath.length > 0 && this.context.done) {
+      const searchPath = this.searchPath;
+
+      // Prevent infinite loop
+      this.searchPath = "";
+
       const pos = items.findIndex(
-        (item) => this.searchPath == item.treePath ?? item.word,
+        (item) => searchPath == item.treePath ?? item.word,
       );
 
       if (pos < 0) {
         // NOTE: "sesarchPath" is not found.  Try expand parents
-        const parent = items.find(
-          (item) =>
-            !item.__expanded && item.treePath &&
-            this.searchPath.startsWith(item.treePath),
+        const parent = items.find((item) =>
+          item.isTree && !item.__expanded && item.treePath &&
+          !this.expandedPaths.has(item.treePath) &&
+          isParentPath(item.treePath, searchPath)
         );
 
         if (parent) {
-          let maxLevel = 0;
-          for (
-            let path = dirname(this.searchPath);
-            path !== parent.treePath && path.startsWith(parent.treePath!);
-            path = dirname(path)
-          ) {
+          let maxLevel = parent.__level;
+          let path = searchPath;
+          while (path !== parent.treePath && path != dirname(path)) {
+            path = dirname(path);
             maxLevel += 1;
           }
 
-          this.expandItem(denops, parent, maxLevel, this.searchPath);
+          this.expandItem(denops, parent, maxLevel, searchPath);
           return;
         }
       } else {
@@ -527,8 +530,6 @@ export class Ddu {
           item: items[pos],
         });
       }
-
-      this.searchPath = "";
     }
   }
 
@@ -840,7 +841,7 @@ export class Ddu {
     items: ExpandItem[],
   ): void {
     // Clear queue
-    this.expandSet.clear();
+    this.expandedPaths.clear();
 
     for (const item of items) {
       const maxLevel = item.maxLevel && item.maxLevel < 0
@@ -860,7 +861,7 @@ export class Ddu {
       return;
     }
 
-    this.expandSet.add(parent);
+    this.expandedPaths.add(parent.treePath);
     parent.__expanded = true;
 
     const index = parent.__sourceIndex;
@@ -979,7 +980,7 @@ export class Ddu {
         // Note: Skip hidden directory
         if (
           child.isTree && child.treePath &&
-          (!search || search.startsWith(child.treePath)) &&
+          (!search || isParentPath(child.treePath, search)) &&
           !basename(child.treePath).startsWith(".")
         ) {
           // Expand is not completed yet.
@@ -988,10 +989,10 @@ export class Ddu {
       }
     }
 
-    this.expandSet.delete(parent);
+    this.expandedPaths.delete(parent.treePath);
 
     // To redraw items, expandItems must be empty
-    if (this.expandSet.size != 0) {
+    if (this.expandedPaths.size != 0) {
       return;
     }
 
@@ -1733,6 +1734,14 @@ async function globpath(
   return paths;
 }
 
+function isParentPath(checkPath: string, searchPath: string) {
+  let path = searchPath;
+  while (path !== checkPath && path != dirname(path)) {
+    path = dirname(path);
+  }
+  return path === checkPath;
+}
+
 Deno.test("sourceArgs", () => {
   const userOptions: DduOptions = {
     ...defaultDduOptions(),
@@ -1789,4 +1798,16 @@ Deno.test("sourceArgs", () => {
     min: 100,
     max: 999,
   });
+});
+
+Deno.test("isParentPath", () => {
+  assertEquals(true, isParentPath("/home", "/home/string"));
+  assertEquals(
+    true,
+    isParentPath(
+      "/home/shougo/work/ddu.vim",
+      "/home/shougo/work/ddu.vim/denops/ddu/deps.ts",
+    ),
+  );
+  assertEquals(false, isParentPath("hoge", "/home"));
 });
