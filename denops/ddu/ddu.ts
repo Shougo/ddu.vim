@@ -471,7 +471,12 @@ export class Ddu {
 
       const toExpandItems = allItems.filter((item) => item.__expanded);
       if (toExpandItems.length) {
-        toExpandItems.forEach((item) => this.expandItem(denops, item, -1));
+        toExpandItems.forEach((item) => this.expandItem(
+          denops,
+          item,
+          -1,
+          ".", // Prevent recursive expanding by missing search arg.
+        ));
         return;
       }
     }
@@ -1779,7 +1784,7 @@ async function globpath(
 }
 
 function isParentPath(checkPath: string, searchPath: string) {
-  let path = searchPath;
+  let path = dirname(searchPath);
   while (path !== checkPath && path != dirname(path)) {
     path = dirname(path);
   }
