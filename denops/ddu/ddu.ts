@@ -99,7 +99,8 @@ export class Ddu {
   private finished = false;
   private lock = new Lock();
   private startTime = 0;
-  private expandedPaths = new Set();
+  private expandedPaths = new Set<string>();
+  private idsToKeepRedrawsWaiting = new Set<string>();
   private searchPath = "";
 
   async start(
@@ -294,6 +295,33 @@ export class Ddu {
     }
   }
 
+  private newDduItem<
+    Params extends Record<string, unknown>,
+    UserData extends unknown,
+  >(
+    sourceIndex: number,
+    source: BaseSource<Params, UserData>,
+    sourceOptions: SourceOptions,
+    item: Item,
+    level?: number,
+  ): DduItem {
+    const matcherKey = (sourceOptions.matcherKey in item)
+      ? (item as Record<string, unknown>)[
+        sourceOptions.matcherKey
+      ] as string
+      : item.word;
+    return {
+      ...item,
+      kind: item.kind ?? source.kind,
+      matcherKey,
+      __sourceIndex: sourceIndex,
+      __sourceName: source.name,
+      __level: level ?? item.level ?? 0,
+      __expanded: (item.treePath && this.expandedPaths.has(item.treePath)) ||
+        (item.isExpanded ?? false),
+    };
+  }
+
   async initSource<
     Params extends Record<string, unknown>,
     UserData extends unknown,
@@ -365,22 +393,14 @@ export class Ddu {
         return;
       }
 
-      const newItems = v.value.map((item: Item) => {
-        const matcherKey = (sourceOptions.matcherKey in item)
-          ? (item as Record<string, unknown>)[
-            sourceOptions.matcherKey
-          ] as string
-          : item.word;
-        return {
-          ...item,
-          kind: item.kind ?? source.kind,
-          matcherKey,
-          __sourceIndex: index,
-          __sourceName: source.name,
-          __level: item.level ?? 0,
-          __expanded: item.isExpanded ?? false,
-        };
-      });
+      const newItems = v.value.map((item: Item) =>
+        this.newDduItem(
+          index,
+          source,
+          sourceOptions,
+          item,
+        )
+      );
 
       // Update items
       if (state?.items?.length > 0) {
@@ -427,22 +447,39 @@ export class Ddu {
       index++;
     }
 
-    if (this.context.done && this.options.profile) {
-      echo(denops, `Refresh all items: ${Date.now() - this.startTime} ms`);
+    if (this.context.done) {
+      if (this.options.profile) {
+        echo(denops, `Refresh all items: ${Date.now() - this.startTime} ms`);
+      }
+
+      const [ui, uiOptions, uiParams] = await this.getUi(denops);
+      if (!ui) {
+        return;
+      }
+
+      const sources = await this.getSourceInfoList(denops);
+
+      await ui.refreshItems({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions: uiOptions,
+        uiParams: uiParams,
+        sources: sources,
+        items: allItems,
+      });
+
+      const toExpandItems = allItems.filter((item) => item.__expanded);
+      if (toExpandItems.length) {
+        toExpandItems.forEach((item) => this.expandItem(denops, item, -1));
+        return;
+      }
     }
 
     await this.uiRedraw(denops, allItems);
   }
 
-  async uiRedraw(
-    denops: Denops,
-    items: DduItem[],
-  ): Promise<void> {
-    const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui) {
-      return;
-    }
-
+  private async getSourceInfoList(denops: Denops): Promise<SourceInfo[]> {
     const sources: SourceInfo[] = [];
     let index = 0;
     for (const userSource of this.options.sources) {
@@ -452,7 +489,7 @@ export class Ddu {
           "ddu#util#print_error",
           `Invalid source: ${userSource.name}`,
         );
-        return;
+        continue;
       }
 
       const [sourceOptions, _] = sourceArgs(
@@ -470,6 +507,19 @@ export class Ddu {
 
       index++;
     }
+    return sources;
+  }
+
+  async uiRedraw(
+    denops: Denops,
+    items: DduItem[],
+  ): Promise<void> {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui) {
+      return;
+    }
+
+    const sources = await this.getSourceInfoList(denops);
 
     await ui.refreshItems({
       denops,
@@ -502,10 +552,9 @@ export class Ddu {
       );
 
       if (pos < 0) {
-        // NOTE: "sesarchPath" is not found.  Try expand parents
+        // NOTE: "searchPath" is not found.  Try expand parents
         const parent = items.find((item) =>
           item.isTree && !item.__expanded && item.treePath &&
-          !this.expandedPaths.has(item.treePath) &&
           isParentPath(item.treePath, searchPath)
         );
 
@@ -840,9 +889,6 @@ export class Ddu {
     denops: Denops,
     items: ExpandItem[],
   ): void {
-    // Clear queue
-    this.expandedPaths.clear();
-
     for (const item of items) {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
@@ -861,7 +907,10 @@ export class Ddu {
       return;
     }
 
-    this.expandedPaths.add(parent.treePath);
+    if (parent.treePath) {
+      this.expandedPaths.add(parent.treePath);
+    }
+    this.idsToKeepRedrawsWaiting.add(parent.treePath ?? parent.word);
     parent.__expanded = true;
 
     const index = parent.__sourceIndex;
@@ -911,32 +960,51 @@ export class Ddu {
           this.input,
           children,
         );
+        const [ui, uiOptions, uiParams] = await this.getUi(denops);
+        if (ui) {
+          await ui.expandItem({
+            denops,
+            context: this.context,
+            options: this.options,
+            uiOptions,
+            uiParams,
+            parent,
+            children,
+          });
+        }
+        this.idsToKeepRedrawsWaiting.delete(parent.treePath ?? parent.word);
+        if (maxLevel < 0 || parent.__level < maxLevel) {
+          for (const child of children) {
+            // Note: Skip hidden directory
+            if (
+              child.isTree && child.treePath &&
+              !basename(child.treePath).startsWith(".") &&
+              (!search || isParentPath(child.treePath, search) ||
+                child.__expanded)
+            ) {
+              // Expand is not completed yet.
+              this.expandItem(denops, child, maxLevel, search);
+            }
+          }
+        }
         await this.redrawExpandItem(
           denops,
           parent,
           children,
-          maxLevel,
           search,
         );
         return;
       }
 
-      const newItems = v.value.map((item: Item) => {
-        const matcherKey = (sourceOptions.matcherKey in item)
-          ? (item as Record<string, unknown>)[
-            sourceOptions.matcherKey
-          ] as string
-          : item.word;
-        return {
-          ...item,
-          kind: item.kind ?? source.kind,
-          matcherKey,
-          __sourceIndex: index,
-          __sourceName: source.name,
-          __level: parent.__level + 1,
-          __expanded: false,
-        };
-      });
+      const newItems = v.value.map((item: Item) =>
+        this.newDduItem(
+          index,
+          source,
+          sourceOptions,
+          item,
+          parent.__level + 1,
+        )
+      );
 
       await this.callColumns(
         denops,
@@ -957,42 +1025,15 @@ export class Ddu {
     denops: Denops,
     parent: DduItem,
     children: DduItem[],
-    maxLevel: number,
     search?: string,
   ): Promise<void> {
-    const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui) {
+    // To redraw items, idsToKeepRedrawsWaiting must be empty
+    if (this.idsToKeepRedrawsWaiting.size != 0) {
       return;
     }
 
-    await ui.expandItem({
-      denops,
-      context: this.context,
-      options: this.options,
-      uiOptions,
-      uiParams,
-      parent,
-      children,
-    });
-
-    if (maxLevel < 0 || parent.__level < maxLevel) {
-      for (const child of children) {
-        // Note: Skip hidden directory
-        if (
-          child.isTree && child.treePath &&
-          (!search || isParentPath(child.treePath, search)) &&
-          !basename(child.treePath).startsWith(".")
-        ) {
-          // Expand is not completed yet.
-          this.expandItem(denops, child, maxLevel, search);
-        }
-      }
-    }
-
-    this.expandedPaths.delete(parent.treePath);
-
-    // To redraw items, expandItems must be empty
-    if (this.expandedPaths.size != 0) {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui) {
       return;
     }
 
@@ -1040,6 +1081,9 @@ export class Ddu {
         source,
       );
 
+      if (item.treePath) {
+        this.expandedPaths.delete(item.treePath);
+      }
       item.__expanded = false;
       await this.callColumns(denops, sourceOptions.columns, [item]);
 
