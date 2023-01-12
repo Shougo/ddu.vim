@@ -471,12 +471,14 @@ export class Ddu {
 
       const toExpandItems = allItems.filter((item) => item.__expanded);
       if (toExpandItems.length) {
-        toExpandItems.forEach((item) => this.expandItem(
-          denops,
-          item,
-          -1,
-          ".", // Prevent recursive expanding by missing search arg.
-        ));
+        toExpandItems.forEach((item) =>
+          this.expandItem(
+            denops,
+            item,
+            -1,
+            ".", // Prevent recursive expanding by missing search arg.
+          )
+        );
         return;
       }
     }
@@ -1086,9 +1088,11 @@ export class Ddu {
         source,
       );
 
-      if (item.treePath) {
-        this.expandedPaths.delete(item.treePath);
-      }
+      [...this.expandedPaths].forEach((v) => {
+        if (item.treePath && isParentPath(item.treePath, v)) {
+          this.expandedPaths.delete(v);
+        }
+      });
       item.__expanded = false;
       await this.callColumns(denops, sourceOptions.columns, [item]);
 
