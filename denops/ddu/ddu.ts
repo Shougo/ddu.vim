@@ -148,7 +148,7 @@ export class Ddu {
 
       this.finished = false;
 
-      if (!this.options?.refresh) {
+      if (!this.options?.refresh && !this.searchPath) {
         // NOTE: Enable done to redraw UI properly
         this.context.done = true;
 
