@@ -99,7 +99,7 @@ export class Ddu {
   private finished = false;
   private lock = new Lock();
   private startTime = 0;
-  private expandedPaths = new Set();
+  private expandedPaths = new Set<string>();
   private searchPath = "";
 
   async start(
@@ -361,7 +361,7 @@ export class Ddu {
       __sourceIndex: sourceIndex,
       __sourceName: source.name,
       __level: level ?? item.level ?? 0,
-      __expanded: item.isExpanded ?? false,
+      __expanded: item.treePath ? this.expandedPaths.has(item.treePath) : false,
     };
   }
 
@@ -502,10 +502,9 @@ export class Ddu {
       );
 
       if (pos < 0) {
-        // NOTE: "sesarchPath" is not found.  Try expand parents
+        // NOTE: "searchPath" is not found.  Try expand parents
         const parent = items.find((item) =>
           item.isTree && !item.__expanded && item.treePath &&
-          !this.expandedPaths.has(item.treePath) &&
           isParentPath(item.treePath, searchPath)
         );
 
@@ -842,9 +841,6 @@ export class Ddu {
     denops: Denops,
     items: ExpandItem[],
   ): Promise<void> {
-    // Clear queue
-    this.expandedPaths.clear();
-
     if (items.length === 1) {
       // If items is only one item, search the item by `search` param after expanding.
       const item = items[0];
@@ -887,7 +883,9 @@ export class Ddu {
       return;
     }
 
-    this.expandedPaths.add(parent.treePath);
+    if (parent.treePath) {
+      this.expandedPaths.add(parent.treePath);
+    }
     parent.__expanded = true;
 
     const index = parent.__sourceIndex;
@@ -1036,6 +1034,14 @@ export class Ddu {
         source,
       );
 
+      if (item.treePath) {
+        this.expandedPaths.delete(item.treePath);
+        [...this.expandedPaths].forEach((v) => {
+          if (isParentPath(item.treePath!, v)) {
+            this.expandedPaths.delete(v);
+          }
+        });
+      }
       item.__expanded = false;
       await this.callColumns(denops, sourceOptions.columns, [item]);
 
