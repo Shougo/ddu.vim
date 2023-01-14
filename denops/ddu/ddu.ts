@@ -155,6 +155,11 @@ export class Ddu {
         this.context.done = true;
         this.quitted = false;
 
+        if (this.searchPath) {
+          // Redraw only without regather items.
+          return this.redraw(denops);
+        }
+
         // UI Redraw only
         await uiRedraw(
           denops,
@@ -220,7 +225,7 @@ export class Ddu {
 
     // UI should load before refresh.
     // Note: If UI is blocked until refresh, user input will break UI.
-    await this.uiRedraw(denops, []);
+    await this.uiRedraw(denops);
 
     await this.refresh(denops);
 
@@ -410,14 +415,40 @@ export class Ddu {
   async redraw(
     denops: Denops,
   ): Promise<void> {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui || this.quitted) {
+      return;
+    }
+
     // Update current input
     this.context.done = true;
     this.context.input = this.input;
     this.context.maxItems = 0;
 
+    const sources: SourceInfo[] = [];
     let allItems: DduItem[] = [];
     let index = 0;
     for (const userSource of this.options.sources) {
+      const source = this.sources[userSource.name];
+      if (!source) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid source: ${userSource.name}`,
+        );
+        return;
+      }
+      const [sourceOptions, _] = sourceArgs(
+        this.options,
+        userSource,
+        source,
+      );
+      sources.push({
+        name: userSource.name,
+        index,
+        path: sourceOptions.path,
+        kind: source.kind ?? "base",
+      });
+
       const [done, maxItems, items] = await this.filterItems(
         denops,
         userSource,
@@ -431,50 +462,6 @@ export class Ddu {
       index++;
     }
 
-    if (this.context.done && this.options.profile) {
-      echo(denops, `Refresh all items: ${Date.now() - this.startTime} ms`);
-    }
-
-    await this.uiRedraw(denops, allItems);
-  }
-
-  async uiRedraw(
-    denops: Denops,
-    items: DduItem[],
-  ): Promise<void> {
-    const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui) {
-      return;
-    }
-
-    const sources: SourceInfo[] = [];
-    let index = 0;
-    for (const userSource of this.options.sources) {
-      const source = this.sources[userSource.name];
-      if (!source) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Invalid source: ${userSource.name}`,
-        );
-        return;
-      }
-
-      const [sourceOptions, _] = sourceArgs(
-        this.options,
-        userSource,
-        source,
-      );
-
-      sources.push({
-        name: userSource.name,
-        index,
-        path: sourceOptions.path,
-        kind: source.kind ?? "base",
-      });
-
-      index++;
-    }
-
     await ui.refreshItems({
       denops,
       context: this.context,
@@ -482,8 +469,60 @@ export class Ddu {
       uiOptions: uiOptions,
       uiParams: uiParams,
       sources: sources,
-      items: items,
+      items: allItems,
     });
+
+    const searchPath = this.searchPath;
+
+    // Prevent infinite loop
+    this.searchPath = "";
+
+    let searchTargetItem: DduItem | undefined;
+
+    await Promise.all(allItems.map(async (item: DduItem): Promise<void> => {
+      if (searchPath === item.treePath ?? item.word) {
+        searchTargetItem = item;
+      }
+      if (
+        !searchTargetItem && searchPath && item.treePath &&
+        isParentPath(item.treePath, searchPath)
+      ) {
+        searchTargetItem = await this.expandItem(
+          denops,
+          item,
+          -1,
+          searchPath,
+          true,
+        );
+        return;
+      }
+
+      if (item.__expanded) {
+        await this.expandItem(
+          denops,
+          item,
+          -1,
+          searchPath,
+          true,
+        );
+      }
+    }));
+
+    if (this.context.done && this.options.profile) {
+      echo(denops, `Refresh all items: ${Date.now() - this.startTime} ms`);
+    }
+
+    await this.uiRedraw(denops, searchTargetItem);
+  }
+
+  async uiRedraw(
+    denops: Denops,
+    searchItem?: DduItem,
+  ): Promise<void> {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui || this.quitted) {
+      return;
+    }
 
     await uiRedraw(
       denops,
@@ -495,46 +534,15 @@ export class Ddu {
       uiParams,
     );
 
-    if (this.searchPath.length > 0 && this.context.done) {
-      const searchPath = this.searchPath;
-
-      // Prevent infinite loop
-      this.searchPath = "";
-
-      const pos = items.findIndex(
-        (item) => searchPath == item.treePath ?? item.word,
-      );
-
-      if (pos < 0) {
-        // NOTE: "searchPath" is not found.  Try expand parents
-        const parent = items.find((item) =>
-          item.isTree && !item.__expanded && item.treePath &&
-          isParentPath(item.treePath, searchPath)
-        );
-
-        if (parent) {
-          const maxLevel = parent.__level -
-            parent.treePath!.split(pathsep).length +
-            searchPath.split(pathsep).length - 1;
-          if (maxLevel <= 0) {
-            const errMsg =
-              `unexpected maxLevel ${maxLevel}; this means got a bug`;
-            await errorException(denops, new Error(errMsg), errMsg);
-          }
-
-          this.expandItem(denops, parent, maxLevel, searchPath);
-          return;
-        }
-      } else {
-        await ui.searchItem({
-          denops,
-          context: this.context,
-          options: this.options,
-          uiOptions,
-          uiParams,
-          item: items[pos],
-        });
-      }
+    if (searchItem) {
+      await ui.searchItem({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        item: searchItem,
+      });
     }
   }
 
@@ -961,10 +969,12 @@ export class Ddu {
       await Promise.all(
         children.filter((
           child,
-        ) => (child.isTree && child.treePath &&
-          (!search || isParentPath(child.treePath, search)) &&
-          // Note: Skip hidden directory
-          !basename(child.treePath).startsWith("."))
+        ) =>
+          (child.isTree && child.treePath &&
+            // Note: Skip hidden directory
+            !basename(child.treePath).startsWith(".")) &&
+          (child.__expanded || search == undefined ||
+            isParentPath(child.treePath, search))
         ).map(async (child: DduItem) => {
           // Expand is not completed yet.
           const hit = await this.expandItem(
@@ -983,7 +993,7 @@ export class Ddu {
 
     if (
       !searchedItem && parent.treePath &&
-      (!search || isParentPath(parent.treePath, search))
+      (search == undefined || isParentPath(parent.treePath, search))
     ) {
       searchedItem = search
         ? children.find((item) => search == item.treePath ?? item.word)
@@ -1181,8 +1191,9 @@ export class Ddu {
       this.options,
       userOptions,
     ]);
-    if (this.options.searchPath.length > 0) {
-      this.searchPath = this.options.searchPath;
+    if (userOptions.searchPath) {
+      // apply only defined by new options
+      this.searchPath = userOptions.searchPath as string;
     }
   }
 
