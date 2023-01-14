@@ -226,72 +226,95 @@ export class Ddu {
   async refresh(
     denops: Denops,
   ): Promise<void> {
+    this.startTime = Date.now();
+
+    // Clean up previous gather state
+    this.finished = true;
+    for (const state of Object.values(this.gatherStates)) {
+      while (!state.done) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+    }
     this.finished = false;
 
-    let index = 0;
-    this.startTime = Date.now();
-    for (const userSource of this.options.sources) {
-      // Check previous gather state
-      if (this.gatherStates[index]) {
-        this.finished = true;
-        while (!this.gatherStates[index].done) {
-          await new Promise((resolve) => setTimeout(resolve, 200));
-        }
-        this.finished = false;
-      }
+    await Promise.all(
+      this.options.sources.map(
+        async (userSource: UserSource, index: number): Promise<void> => {
+          this.gatherStates[index] = {
+            items: [],
+            done: false,
+          };
 
-      this.gatherStates[index] = {
-        items: [],
-        done: false,
-      };
+          const source = this.sources[userSource.name];
 
-      if (!this.sources[userSource.name]) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Invalid source: ${userSource.name}`,
-        );
+          if (!source) {
+            await denops.call(
+              "ddu#util#print_error",
+              `Invalid source: ${userSource.name}`,
+            );
+            this.gatherStates[index].done = true;
+            return;
+          }
 
-        continue;
-      }
+          const [sourceOptions, sourceParams] = sourceArgs(
+            this.options,
+            userSource,
+            source,
+          );
 
-      const source = this.sources[userSource.name];
-      const [sourceOptions, sourceParams] = sourceArgs(
-        this.options,
-        userSource,
-        source,
-      );
+          // Call "onRefreshItems" hooks
+          const filters = sourceOptions.matchers.concat(
+            sourceOptions.sorters,
+          ).concat(sourceOptions.converters);
+          await this.autoload(denops, "filter", filters);
+          for (const filterName of filters) {
+            const [filter, filterOptions, filterParams] = await this.getFilter(
+              denops,
+              filterName,
+            );
+            if (!filter || !filter.onRefreshItems) {
+              continue;
+            }
 
-      // Call "onRefreshItems" hooks
-      const filters = sourceOptions.matchers.concat(
-        sourceOptions.sorters,
-      ).concat(sourceOptions.converters);
-      await this.autoload(denops, "filter", filters);
-      for (const filterName of filters) {
-        const [filter, filterOptions, filterParams] = await this.getFilter(
-          denops,
-          filterName,
-        );
-        if (!filter || !filter.onRefreshItems) {
-          continue;
-        }
+            await filter.onRefreshItems({
+              denops,
+              filterOptions,
+              filterParams,
+            });
+          }
 
-        await filter.onRefreshItems({
-          denops,
-          filterOptions,
-          filterParams,
-        });
-      }
-
-      this.gatherItems(
-        denops,
-        index,
-        source,
-        sourceOptions,
-        sourceParams,
-      );
-
-      index++;
-    }
+          for await (
+            const newItems of this.gatherItems(
+              denops,
+              index,
+              source,
+              sourceOptions,
+              sourceParams,
+              0,
+            )
+          ) {
+            if (this.finished) {
+              break;;
+            }
+            if (!newItems.length) {
+              continue;
+            }
+            this.gatherStates[index].items = this.gatherStates[index].items
+              .concat(newItems);
+            if (!this.options.sync) {
+              await this.redraw(denops);
+            }
+            this.context.path = sourceOptions.path;
+            if (this.context.path == "") {
+              // Use current directory instead
+              this.context.path = await fn.getcwd(denops) as string;
+            }
+          }
+          this.gatherStates[index].done = true;
+        },
+      ),
+    );
+    this.redraw(denops);
   }
 
   async initSource<
@@ -342,7 +365,7 @@ export class Ddu {
     };
   }
 
-  gatherItems<
+  async *gatherItems<
     Params extends Record<string, unknown>,
     UserData extends unknown,
   >(
@@ -351,7 +374,8 @@ export class Ddu {
     source: BaseSource<Params, UserData>,
     sourceOptions: SourceOptions,
     sourceParams: Params,
-  ): void {
+    itemLevel?: number,
+  ): AsyncGenerator<DduItem[]> {
     const sourceItems = source.gather({
       denops,
       context: this.context,
@@ -361,64 +385,23 @@ export class Ddu {
       input: this.input,
     });
 
-    const reader = sourceItems.getReader();
-
-    const readChunk = async (
-      v: ReadableStreamDefaultReadResult<Item<unknown>[]>,
-    ) => {
-      const state = this.gatherStates[index];
-      if (!state) {
-        reader.cancel();
-        return;
-      }
-
+    for await (const chunk of sourceItems) {
       if (this.finished) {
-        reader.cancel();
-        state.done = true;
-        state.items = [];
         // Note: Must return after cancel()
         return;
       }
-
-      if (!v.value || v.done) {
-        state.done = true;
-        const allDone = Object.values(this.gatherStates).filter(
-          (s) => !s.done,
-        ).length == 0;
-        if (allDone || !this.options.sync) {
-          await this.redraw(denops);
-        }
-        return;
-      }
-
-      const newItems = v.value.map((item: Item) =>
+      const newItems = chunk.map((item: Item) =>
         this.newDduItem(
           index,
           source,
           sourceOptions,
           item,
+          itemLevel,
         )
       );
 
-      // Update items
-      if (state?.items?.length > 0) {
-        state.items = state.items.concat(newItems);
-      } else {
-        state.items = newItems;
-      }
-      if (!this.finished && !this.options.sync) {
-        await this.redraw(denops);
-      }
-      this.context.path = sourceOptions.path;
-      if (this.context.path == "") {
-        // Use current directory instead
-        this.context.path = await fn.getcwd(denops) as string;
-      }
-
-      reader.read().then(readChunk);
-    };
-
-    reader.read().then(readChunk);
+      yield newItems;
+    }
   }
 
   async redraw(
@@ -871,12 +854,12 @@ export class Ddu {
     }
   }
 
-  expandItem(
+  async expandItem(
     denops: Denops,
     parent: DduItem,
     maxLevel: number,
     search?: string,
-  ): void {
+  ): Promise<void> {
     if (parent.__level < 0) {
       return;
     }
@@ -898,72 +881,47 @@ export class Ddu {
 
     this.finished = false;
 
-    const sourceItems = source.gather({
-      denops,
-      context: this.context,
-      options: this.options,
-      sourceOptions,
-      sourceParams,
-      input: this.input,
-    });
-
-    const reader = sourceItems.getReader();
-
     let children: DduItem[] = [];
 
-    const readChunk = async (
-      v: ReadableStreamDefaultReadResult<Item<unknown>[]>,
-    ) => {
+    for await (
+      const newItems of this.gatherItems(
+        denops,
+        index,
+        source,
+        sourceOptions,
+        sourceParams,
+        parent.__level + 1,
+      )
+    ) {
       if (this.finished) {
-        reader.cancel();
-        // Note: Must return after cancel()
         return;
       }
-
-      if (!v.value || v.done) {
-        const filters = sourceOptions.matchers.concat(
-          sourceOptions.sorters,
-        ).concat(sourceOptions.converters);
-        children = await this.callFilters(
-          denops,
-          sourceOptions,
-          filters,
-          this.input,
-          children,
-        );
-        await this.redrawExpandItem(
-          denops,
-          parent,
-          children,
-          maxLevel,
-          search,
-        );
-        return;
-      }
-
-      const newItems = v.value.map((item: Item) =>
-        this.newDduItem(
-          index,
-          source,
-          sourceOptions,
-          item,
-          parent.__level + 1,
-        )
-      );
-
       await this.callColumns(
         denops,
         sourceOptions.columns,
         [parent].concat(newItems),
       );
-
-      // Update children
       children = children.concat(newItems);
+    }
 
-      reader.read().then(readChunk);
-    };
+    const filters = sourceOptions.matchers.concat(
+      sourceOptions.sorters,
+    ).concat(sourceOptions.converters);
 
-    reader.read().then(readChunk);
+    children = await this.callFilters(
+      denops,
+      sourceOptions,
+      filters,
+      this.input,
+      children,
+    );
+    await this.redrawExpandItem(
+      denops,
+      parent,
+      children,
+      maxLevel,
+      search,
+    );
   }
 
   async redrawExpandItem(
