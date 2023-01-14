@@ -2,13 +2,13 @@ import {
   assertEquals,
   basename,
   Denops,
-  dirname,
   echo,
   equal,
   fn,
   Lock,
   op,
   parse,
+  pathsep,
   toFileUrl,
 } from "./deps.ts";
 import {
@@ -510,11 +510,13 @@ export class Ddu {
         );
 
         if (parent) {
-          let maxLevel = parent.__level;
-          let path = searchPath;
-          while (path !== parent.treePath && path != dirname(path)) {
-            path = dirname(path);
-            maxLevel += 1;
+          const maxLevel = parent.__level -
+            parent.treePath!.split(pathsep).length +
+            searchPath.split(pathsep).length - 1;
+          if (maxLevel <= 0) {
+            const errMsg =
+              `unexpected maxLevel ${maxLevel}; this means got a bug`;
+            await errorException(denops, new Error(errMsg), errMsg);
           }
 
           this.expandItem(denops, parent, maxLevel, searchPath);
@@ -1735,11 +1737,7 @@ async function globpath(
 }
 
 function isParentPath(checkPath: string, searchPath: string) {
-  let path = searchPath;
-  while (path !== checkPath && path != dirname(path)) {
-    path = dirname(path);
-  }
-  return path === checkPath;
+  return checkPath !== searchPath && searchPath.startsWith(checkPath + pathsep);
 }
 
 Deno.test("sourceArgs", () => {
