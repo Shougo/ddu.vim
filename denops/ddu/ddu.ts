@@ -296,7 +296,7 @@ export class Ddu {
             if (this.finished) {
               break;
             }
-            if (!newItems.length) {
+            if (!newItems.length > 0) {
               continue;
             }
             this.gatherStates[index].items = this.gatherStates[index].items
