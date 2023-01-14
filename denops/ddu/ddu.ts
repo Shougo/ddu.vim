@@ -294,7 +294,7 @@ export class Ddu {
             )
           ) {
             if (this.finished) {
-              break;;
+              break;
             }
             if (!newItems.length) {
               continue;
