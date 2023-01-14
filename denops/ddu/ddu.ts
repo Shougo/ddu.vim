@@ -838,18 +838,41 @@ export class Ddu {
     }
   }
 
-  expandItems(
+  async expandItems(
     denops: Denops,
     items: ExpandItem[],
-  ): void {
+  ): Promise<void> {
     // Clear queue
     this.expandedPaths.clear();
 
-    for (const item of items) {
+    if (items.length === 1) {
+      // If items is only one item, search the item by `search` param after expanding.
+      const item = items[0];
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
-      this.expandItem(denops, item.item, maxLevel, item.search);
+      await this.expandItem(denops, item.item, maxLevel, item.search, false);
+      return;
+    }
+
+    await Promise.all(items.map((item) => {
+      const maxLevel = item.maxLevel && item.maxLevel < 0
+        ? -1
+        : item.item.__level + (item.maxLevel ?? 0);
+      return this.expandItem(denops, item.item, maxLevel, item.search, true);
+    }));
+
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (ui && !this.finished) {
+      await uiRedraw(
+        denops,
+        this.lock,
+        this.context,
+        this.options,
+        ui,
+        uiOptions,
+        uiParams,
+      );
     }
   }
 
@@ -858,7 +881,8 @@ export class Ddu {
     parent: DduItem,
     maxLevel: number,
     search?: string,
-  ): Promise<void> {
+    preventRedraw?: boolean,
+  ): Promise<DduItem /* searchedItem */ | undefined> {
     if (parent.__level < 0) {
       return;
     }
@@ -877,8 +901,6 @@ export class Ddu {
     // Set path
     sourceOptions.path = parent.treePath ?? parent.word;
     this.context.path = sourceOptions.path;
-
-    this.finished = false;
 
     let children: DduItem[] = [];
 
@@ -902,6 +924,9 @@ export class Ddu {
       );
       children = children.concat(newItems);
     }
+    if (this.finished) {
+      return;
+    }
 
     const filters = sourceOptions.matchers.concat(
       sourceOptions.sorters,
@@ -914,82 +939,83 @@ export class Ddu {
       this.input,
       children,
     );
-    await this.redrawExpandItem(
-      denops,
-      parent,
-      children,
-      maxLevel,
-      search,
-    );
-  }
 
-  async redrawExpandItem(
-    denops: Denops,
-    parent: DduItem,
-    children: DduItem[],
-    maxLevel: number,
-    search?: string,
-  ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui) {
-      return;
-    }
-
-    await ui.expandItem({
-      denops,
-      context: this.context,
-      options: this.options,
-      uiOptions,
-      uiParams,
-      parent,
-      children,
-    });
-
-    if (maxLevel < 0 || parent.__level < maxLevel) {
-      for (const child of children) {
-        // Note: Skip hidden directory
-        if (
-          child.isTree && child.treePath &&
-          (!search || isParentPath(child.treePath, search)) &&
-          !basename(child.treePath).startsWith(".")
-        ) {
-          // Expand is not completed yet.
-          this.expandItem(denops, child, maxLevel, search);
-        }
-      }
-    }
-
-    this.expandedPaths.delete(parent.treePath);
-
-    // To redraw items, expandItems must be empty
-    if (this.expandedPaths.size != 0) {
-      return;
-    }
-
-    await uiRedraw(
-      denops,
-      this.lock,
-      this.context,
-      this.options,
-      ui,
-      uiOptions,
-      uiParams,
-    );
-
-    const searchItem = search
-      ? children.find((item) => search == item.treePath ?? item.word)
-      : parent;
-
-    if (searchItem) {
-      await ui.searchItem({
+    if (ui && !this.finished) {
+      await ui.expandItem({
         denops,
         context: this.context,
         options: this.options,
         uiOptions,
         uiParams,
-        item: searchItem,
+        parent,
+        children,
       });
     }
+
+    let searchedItem: DduItem | undefined;
+
+    if (maxLevel < 0 || parent.__level < maxLevel) {
+      await Promise.all(
+        children.filter((
+          child,
+        ) => (child.isTree && child.treePath &&
+          (!search || isParentPath(child.treePath, search)) &&
+          // Note: Skip hidden directory
+          !basename(child.treePath).startsWith("."))
+        ).map(async (child: DduItem) => {
+          // Expand is not completed yet.
+          const hit = await this.expandItem(
+            denops,
+            child,
+            maxLevel,
+            search,
+            true,
+          );
+          if (hit) {
+            searchedItem = hit;
+          }
+        }),
+      );
+    }
+
+    if (
+      !searchedItem && parent.treePath &&
+      (!search || isParentPath(parent.treePath, search))
+    ) {
+      searchedItem = search
+        ? children.find((item) => search == item.treePath ?? item.word)
+        : parent;
+    }
+
+    if (ui && !this.finished && !preventRedraw) {
+      await uiRedraw(
+        denops,
+        this.lock,
+        this.context,
+        this.options,
+        ui,
+        uiOptions,
+        uiParams,
+      );
+
+      const searchItem = search
+        ? children.find((item) => search == item.treePath ?? item.word)
+        : parent;
+
+      if (searchItem) {
+        await ui.searchItem({
+          denops,
+          context: this.context,
+          options: this.options,
+          uiOptions,
+          uiParams,
+          item: searchItem,
+        });
+      }
+    }
+
+    return searchedItem;
   }
 
   async collapseItems(
