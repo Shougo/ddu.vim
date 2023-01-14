@@ -96,11 +96,16 @@ export class Ddu {
   private options: DduOptions = defaultDduOptions();
   private userOptions: Record<string, unknown> = {};
   private initialized = false;
-  private finished = false;
+  private quitted = false;
+  private cancelToRefresh = false;
   private lock = new Lock();
   private startTime = 0;
   private expandedPaths = new Set();
   private searchPath = "";
+
+  private shouldStopCurrentContext(): boolean {
+    return this.quitted || this.cancelToRefresh;
+  }
 
   async start(
     denops: Denops,
@@ -140,7 +145,7 @@ export class Ddu {
         return;
       }
 
-      if (!this.finished && uiOptions.toggle) {
+      if (!this.quitted && uiOptions.toggle) {
         await this.uiQuit(denops, ui, uiOptions, uiParams);
         return;
       }
@@ -148,7 +153,7 @@ export class Ddu {
       if (!this.options?.refresh) {
         // NOTE: Enable done to redraw UI properly
         this.context.done = true;
-        this.finished = false;
+        this.quitted = false;
 
         // UI Redraw only
         await uiRedraw(
@@ -177,7 +182,7 @@ export class Ddu {
     if (!ui) {
       return;
     }
-    if (this.initialized && !this.finished && uiOptions.toggle) {
+    if (this.initialized && !this.quitted && uiOptions.toggle) {
       await this.uiQuit(denops, ui, uiOptions, uiParams);
       return;
     }
@@ -185,7 +190,7 @@ export class Ddu {
     ui.isInitialized = false;
 
     this.initialized = false;
-    this.finished = false;
+    this.quitted = false;
 
     await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
@@ -228,13 +233,13 @@ export class Ddu {
     this.startTime = Date.now();
 
     // Clean up previous gather state
-    this.finished = true;
+    this.cancelToRefresh = true;
     for (const state of Object.values(this.gatherStates)) {
       while (!state.done) {
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
     }
-    this.finished = false;
+    this.cancelToRefresh = false;
 
     await Promise.all(
       this.options.sources.map(
@@ -292,7 +297,7 @@ export class Ddu {
               0,
             )
           ) {
-            if (this.finished) {
+            if (this.shouldStopCurrentContext()) {
               break;
             }
             if (newItems.length === 0) {
@@ -385,7 +390,7 @@ export class Ddu {
     });
 
     for await (const chunk of sourceItems) {
-      if (this.finished) {
+      if (this.shouldStopCurrentContext()) {
         return;
       }
       const newItems = chunk.map((item: Item) =>
@@ -549,7 +554,7 @@ export class Ddu {
       uiOptions,
       uiParams,
     });
-    this.finished = true;
+    this.quitted = true;
   }
 
   async onEvent(
@@ -582,7 +587,7 @@ export class Ddu {
   }
 
   quit() {
-    this.finished = true;
+    this.quitted = true;
   }
 
   async uiAction(
@@ -759,7 +764,7 @@ export class Ddu {
         uiOptions,
         uiParams,
       });
-      this.finished = true;
+      this.quitted = true;
     }
 
     let flags: ActionFlags;
@@ -862,7 +867,7 @@ export class Ddu {
     }));
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (ui && !this.finished) {
+    if (ui && !this.shouldStopCurrentContext()) {
       await uiRedraw(
         denops,
         this.lock,
@@ -913,7 +918,7 @@ export class Ddu {
         parent.__level + 1,
       )
     ) {
-      if (this.finished) {
+      if (this.shouldStopCurrentContext()) {
         return;
       }
       await this.callColumns(
@@ -923,7 +928,7 @@ export class Ddu {
       );
       children = children.concat(newItems);
     }
-    if (this.finished) {
+    if (this.shouldStopCurrentContext()) {
       return;
     }
 
@@ -940,7 +945,7 @@ export class Ddu {
     );
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (ui && !this.finished) {
+    if (ui && !this.shouldStopCurrentContext()) {
       await ui.expandItem({
         denops,
         context: this.context,
@@ -987,7 +992,7 @@ export class Ddu {
         : parent;
     }
 
-    if (ui && !this.finished && !preventRedraw) {
+    if (ui && !this.shouldStopCurrentContext() && !preventRedraw) {
       await uiRedraw(
         denops,
         this.lock,
