@@ -387,7 +387,6 @@ export class Ddu {
 
     for await (const chunk of sourceItems) {
       if (this.finished) {
-        // Note: Must return after cancel()
         return;
       }
       const newItems = chunk.map((item: Item) =>
