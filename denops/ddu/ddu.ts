@@ -316,6 +316,32 @@ export class Ddu {
     source.isInitialized = true;
   }
 
+  private newDduItem<
+    Params extends Record<string, unknown>,
+    UserData extends unknown,
+  >(
+    sourceIndex: number,
+    source: BaseSource<Params, UserData>,
+    sourceOptions: SourceOptions,
+    item: Item,
+    level?: number,
+  ): DduItem {
+    const matcherKey = (sourceOptions.matcherKey in item)
+      ? (item as Record<string, unknown>)[
+        sourceOptions.matcherKey
+      ] as string
+      : item.word;
+    return {
+      ...item,
+      kind: item.kind ?? source.kind,
+      matcherKey,
+      __sourceIndex: sourceIndex,
+      __sourceName: source.name,
+      __level: level ?? item.level ?? 0,
+      __expanded: item.isExpanded ?? false,
+    };
+  }
+
   gatherItems<
     Params extends Record<string, unknown>,
     UserData extends unknown,
@@ -365,22 +391,14 @@ export class Ddu {
         return;
       }
 
-      const newItems = v.value.map((item: Item) => {
-        const matcherKey = (sourceOptions.matcherKey in item)
-          ? (item as Record<string, unknown>)[
-            sourceOptions.matcherKey
-          ] as string
-          : item.word;
-        return {
-          ...item,
-          kind: item.kind ?? source.kind,
-          matcherKey,
-          __sourceIndex: index,
-          __sourceName: source.name,
-          __level: item.level ?? 0,
-          __expanded: item.isExpanded ?? false,
-        };
-      });
+      const newItems = v.value.map((item: Item) =>
+        this.newDduItem(
+          index,
+          source,
+          sourceOptions,
+          item,
+        )
+      );
 
       // Update items
       if (state?.items?.length > 0) {
@@ -923,22 +941,15 @@ export class Ddu {
         return;
       }
 
-      const newItems = v.value.map((item: Item) => {
-        const matcherKey = (sourceOptions.matcherKey in item)
-          ? (item as Record<string, unknown>)[
-            sourceOptions.matcherKey
-          ] as string
-          : item.word;
-        return {
-          ...item,
-          kind: item.kind ?? source.kind,
-          matcherKey,
-          __sourceIndex: index,
-          __sourceName: source.name,
-          __level: parent.__level + 1,
-          __expanded: false,
-        };
-      });
+      const newItems = v.value.map((item: Item) =>
+        this.newDduItem(
+          index,
+          source,
+          sourceOptions,
+          item,
+          parent.__level + 1,
+        )
+      );
 
       await this.callColumns(
         denops,
