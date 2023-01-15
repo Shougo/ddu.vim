@@ -832,6 +832,9 @@ export class Ddu {
       }
     }
 
+    // restore quitted flag before refresh and redraw
+    this.quitted = false;
+
     if (flags & ActionFlags.RefreshItems) {
       await this.refresh(denops);
     } else if (uiOptions.persist || flags & ActionFlags.Persist) {
