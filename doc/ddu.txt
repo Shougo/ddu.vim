@@ -145,7 +145,8 @@ resume
 
 				    	    	*ddu-option-searchPath*
 searchPath	(string)
-		Search the path.
+		Search the path.  This only works when specified |ddu#start| or
+		|ddu#redraw|.
 		Note: The path must be absolute path.
 
 		Default: ""
