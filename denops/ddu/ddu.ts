@@ -145,11 +145,10 @@ export class Ddu {
         return;
       }
 
-      this.finished = false;
-
       if (!this.options?.refresh) {
         // NOTE: Enable done to redraw UI properly
         this.context.done = true;
+        this.finished = false;
 
         // UI Redraw only
         await uiRedraw(
