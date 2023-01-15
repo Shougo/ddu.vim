@@ -257,9 +257,17 @@ ddu#item_action({name}, {action}, {items}, {params})
 		Note: It is for creating UI interface.
 
 							*ddu#pop()*
-ddu#pop({name})
+ddu#pop({name}[, {opt}])
 		Restore the previous state.
-		If the state is empty, "cancel" the current ddu.
+
+		{name} is specified ddu name(|ddu-option-name|).
+
+		{opt} is the options.  The options below are available:
+
+		quit			(boolean)
+		If it is true, does not open previous ddu.
+
+		If the state is empty, "quit" the current ddu.
 		Note The previous state is saved by |ddu-option-push|.
 
 							*ddu#redraw()*

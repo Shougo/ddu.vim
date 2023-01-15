@@ -192,8 +192,11 @@ export async function main(denops: Denops) {
 
       await ddu.onEvent(denops, event);
     },
-    async pop(arg1: unknown): Promise<void> {
+    async pop(arg1: unknown, arg2: unknown): Promise<void> {
       const name = ensureString(arg1);
+      const opt = ensureObject(arg2) as {
+        quit?: boolean;
+      };
 
       const dduLength = ddus[name].length;
       const currentDdu = dduLength > 1 ? popDdu(name) : getDdu(name);
@@ -201,7 +204,7 @@ export async function main(denops: Denops) {
         return;
       }
 
-      if (dduLength <= 1) {
+      if (dduLength <= 1 || opt?.quit) {
         // Quit current ddu
         currentDdu.quit();
         await currentDdu.onEvent(denops, "cancel");
