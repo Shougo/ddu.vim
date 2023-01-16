@@ -490,9 +490,11 @@ export class Ddu {
         searchTargetItem = await this.expandItem(
           denops,
           item,
-          -1,
-          searchPath,
-          true,
+          {
+            maxLevel: -1,
+            search: searchPath,
+            preventRedraw: true,
+          },
         );
         return;
       }
@@ -501,9 +503,11 @@ export class Ddu {
         await this.expandItem(
           denops,
           item,
-          -1,
-          searchPath,
-          true,
+          {
+            maxLevel: -1,
+            search: searchPath,
+            preventRedraw: true,
+          },
         );
       }
     }));
@@ -856,21 +860,24 @@ export class Ddu {
     denops: Denops,
     items: ExpandItem[],
   ): Promise<void> {
-    if (items.length === 1) {
-      // If items is only one item, search the item by `search` param after expanding.
-      const item = items[0];
+    const searchedItems = await Promise.all(items.map((item) => {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
-      await this.expandItem(denops, item.item, maxLevel, item.search, false);
-      return;
-    }
-
-    await Promise.all(items.map((item) => {
-      const maxLevel = item.maxLevel && item.maxLevel < 0
-        ? -1
-        : item.item.__level + (item.maxLevel ?? 0);
-      return this.expandItem(denops, item.item, maxLevel, item.search, true);
+      return this.expandItem(
+        denops,
+        item.item,
+        item.search == undefined
+          ? {
+            maxLevel: maxLevel,
+            preventRedraw: true,
+          }
+          : {
+            maxLevel: maxLevel,
+            search: item.search,
+            preventRedraw: true,
+          },
+      );
     }));
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
@@ -884,15 +891,33 @@ export class Ddu {
         uiOptions,
         uiParams,
       );
+
+      if (searchedItems.length == 1) {
+        await ui.searchItem({
+          denops,
+          context: this.context,
+          options: this.options,
+          uiOptions,
+          uiParams,
+          item: searchedItems[0] ?? items[0].item,
+        });
+      }
     }
   }
 
   async expandItem(
     denops: Denops,
     parent: DduItem,
-    maxLevel: number,
-    search?: string,
-    preventRedraw?: boolean,
+    options: {
+      // expand recursively to the maxLevel
+      maxLevel: number;
+      preventRedraw?: boolean;
+    } | {
+      // expand recursively to find the `search` path
+      search: string;
+      maxLevel: number;
+      preventRedraw?: boolean;
+    },
   ): Promise<DduItem /* searchedItem */ | undefined> {
     if (parent.__level < 0) {
       return;
@@ -968,42 +993,55 @@ export class Ddu {
 
     let searchedItem: DduItem | undefined;
 
-    if (maxLevel < 0 || parent.__level < maxLevel) {
-      await Promise.all(
-        children.filter((
-          child,
-        ) =>
-          (child.isTree && child.treePath &&
+    if (options.maxLevel < 0 || parent.__level < options.maxLevel) {
+      const expandTargetChildren = "search" in options
+        ? children.filter((child) =>
+          // expand recursively to find the `search` path
+          child.__expanded ||
+          child.isTree && child.treePath &&
+            isParentPath(child.treePath, options.search)
+        )
+        : children.filter((child) =>
+          // expand recursively to the maxLevel
+          child.__expanded ||
+          child.isTree && child.treePath &&
             // Note: Skip hidden directory
-            !basename(child.treePath).startsWith(".")) &&
-          (child.__expanded || search == undefined ||
-            isParentPath(child.treePath, search))
-        ).map(async (child: DduItem) => {
-          // Expand is not completed yet.
-          const hit = await this.expandItem(
-            denops,
-            child,
-            maxLevel,
-            search,
-            true,
-          );
-          if (hit) {
-            searchedItem = hit;
-          }
-        }),
-      );
+            !basename(child.treePath).startsWith(".")
+        );
+
+      if (expandTargetChildren.length > 0) {
+        // Expand is not completed yet.
+        const childOptions = {
+          ...options,
+          preventRedraw: true,
+        };
+
+        await Promise.all(
+          expandTargetChildren.map(async (child: DduItem) => {
+            const hit = await this.expandItem(
+              denops,
+              child,
+              childOptions,
+            );
+            if (hit) {
+              searchedItem = hit;
+            }
+          }),
+        );
+      }
     }
 
     if (
+      "search" in options &&
       !searchedItem && parent.treePath &&
-      (search == undefined || isParentPath(parent.treePath, search))
+      isParentPath(parent.treePath, options.search)
     ) {
-      searchedItem = search
-        ? children.find((item) => search == item.treePath ?? item.word)
-        : parent;
+      searchedItem = children.find((item) =>
+        options.search == item.treePath ?? item.word
+      );
     }
 
-    if (ui && !this.shouldStopCurrentContext() && !preventRedraw) {
+    if (ui && !this.shouldStopCurrentContext() && !options.preventRedraw) {
       await uiRedraw(
         denops,
         this.lock,
@@ -1014,20 +1052,14 @@ export class Ddu {
         uiParams,
       );
 
-      const searchItem = search
-        ? children.find((item) => search == item.treePath ?? item.word)
-        : parent;
-
-      if (searchItem) {
-        await ui.searchItem({
-          denops,
-          context: this.context,
-          options: this.options,
-          uiOptions,
-          uiParams,
-          item: searchItem,
-        });
-      }
+      await ui.searchItem({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        item: searchedItem ?? parent,
+      });
     }
 
     return searchedItem;
