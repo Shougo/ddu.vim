@@ -151,8 +151,6 @@ export class Ddu {
       }
 
       if (!this.options?.refresh) {
-        // NOTE: Enable done to redraw UI properly
-        this.context.done = true;
         this.quitted = false;
 
         if (this.searchPath) {
@@ -161,6 +159,8 @@ export class Ddu {
         }
 
         // UI Redraw only
+        // NOTE: Enable done to redraw UI properly
+        this.context.done = true;
         await uiRedraw(
           denops,
           this.lock,
