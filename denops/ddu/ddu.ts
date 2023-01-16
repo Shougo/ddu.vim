@@ -157,7 +157,7 @@ export class Ddu {
 
         if (this.searchPath) {
           // Redraw only without regather items.
-          return this.redraw(denops);
+          return this.redraw(denops, true);
         }
 
         // UI Redraw only
@@ -414,6 +414,8 @@ export class Ddu {
 
   async redraw(
     denops: Denops,
+    // Set restoreItemState to true if redraw without regather because item's states reset to gathered.
+    restoreItemState?: boolean,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui || this.quitted) {
@@ -455,6 +457,13 @@ export class Ddu {
         index,
         this.input,
       );
+      if (restoreItemState) {
+        items.forEach((item) => {
+          if (item.treePath) {
+            item.__expanded = this.expandedPaths.has(item.treePath);
+          }
+        });
+      }
       allItems = allItems.concat(items);
       this.context.done = done && this.context.done;
       this.context.maxItems += maxItems;
