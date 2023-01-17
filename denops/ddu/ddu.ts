@@ -100,7 +100,7 @@ export class Ddu {
   private cancelToRefresh = false;
   private lock = new Lock();
   private startTime = 0;
-  private expandedPaths = new Set<string>();
+  private expandedPaths = new Map<string, Set<string>>();
   private searchPath = "";
 
   private shouldStopCurrentContext(): boolean {
@@ -128,7 +128,7 @@ export class Ddu {
       (!userOptions?.sources ||
         equal(userOptions.sources, this.options.sources))
     ) {
-      // Note: sources must not overwrite
+      // NOTE: sources must not overwrite
       userOptions.sources = this.options.sources;
 
       this.updateOptions(userOptions);
@@ -150,12 +150,22 @@ export class Ddu {
         return;
       }
 
+      if (userOptions.searchPath) {
+        // Apply only defined by new options
+        this.searchPath = userOptions.searchPath as string;
+      }
+
       if (!this.options?.refresh) {
-        // NOTE: Enable done to redraw UI properly
-        this.context.done = true;
         this.quitted = false;
 
+        if (this.searchPath) {
+          // Redraw only without regather items.
+          return this.redraw(denops, true);
+        }
+
         // UI Redraw only
+        // NOTE: Enable done to redraw UI properly
+        this.context.done = true;
         await uiRedraw(
           denops,
           this.lock,
@@ -177,7 +187,7 @@ export class Ddu {
       this.searchPath = this.options.searchPath;
     }
 
-    // Note: UI must be reset.
+    // NOTE: UI must be reset.
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
       return;
@@ -194,7 +204,7 @@ export class Ddu {
 
     await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
-    // source onInit() must be called before UI
+    // Source onInit() must be called before UI
     for (const userSource of this.options.sources) {
       const source = this.sources[userSource.name];
       if (!source) {
@@ -219,8 +229,8 @@ export class Ddu {
     }
 
     // UI should load before refresh.
-    // Note: If UI is blocked until refresh, user input will break UI.
-    await this.uiRedraw(denops, []);
+    // NOTE: If UI is blocked until refresh, user input will break UI.
+    await this.uiRedraw(denops);
 
     await this.refresh(denops);
 
@@ -365,7 +375,10 @@ export class Ddu {
       __sourceIndex: sourceIndex,
       __sourceName: source.name,
       __level: level ?? item.level ?? 0,
-      __expanded: item.treePath ? this.expandedPaths.has(item.treePath) : false,
+      __expanded: Boolean(
+        item.treePath &&
+          this.isExpanded(sourceOptions, item.treePath),
+      ),
     };
   }
 
@@ -409,45 +422,21 @@ export class Ddu {
 
   async redraw(
     denops: Denops,
+    // Set restoreItemState to true if redraw without regather because item's states reset to gathered.
+    restoreItemState?: boolean,
   ): Promise<void> {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui || this.quitted) {
+      return;
+    }
+
     // Update current input
     this.context.done = true;
     this.context.input = this.input;
     this.context.maxItems = 0;
 
-    let allItems: DduItem[] = [];
-    let index = 0;
-    for (const userSource of this.options.sources) {
-      const [done, maxItems, items] = await this.filterItems(
-        denops,
-        userSource,
-        index,
-        this.input,
-      );
-      allItems = allItems.concat(items);
-      this.context.done = done && this.context.done;
-      this.context.maxItems += maxItems;
-
-      index++;
-    }
-
-    if (this.context.done && this.options.profile) {
-      echo(denops, `Refresh all items: ${Date.now() - this.startTime} ms`);
-    }
-
-    await this.uiRedraw(denops, allItems);
-  }
-
-  async uiRedraw(
-    denops: Denops,
-    items: DduItem[],
-  ): Promise<void> {
-    const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui) {
-      return;
-    }
-
     const sources: SourceInfo[] = [];
+    let allItems: DduItem[] = [];
     let index = 0;
     for (const userSource of this.options.sources) {
       const source = this.sources[userSource.name];
@@ -458,19 +447,34 @@ export class Ddu {
         );
         return;
       }
-
       const [sourceOptions, _] = sourceArgs(
         this.options,
         userSource,
         source,
       );
-
       sources.push({
         name: userSource.name,
         index,
         path: sourceOptions.path,
         kind: source.kind ?? "base",
       });
+
+      const [done, maxItems, items] = await this.filterItems(
+        denops,
+        userSource,
+        index,
+        this.input,
+      );
+      if (restoreItemState) {
+        items.forEach((item) => {
+          if (item.treePath) {
+            item.__expanded = this.isExpanded(sourceOptions, item.treePath);
+          }
+        });
+      }
+      allItems = allItems.concat(items);
+      this.context.done = done && this.context.done;
+      this.context.maxItems += maxItems;
 
       index++;
     }
@@ -482,8 +486,66 @@ export class Ddu {
       uiOptions: uiOptions,
       uiParams: uiParams,
       sources: sources,
-      items: items,
+      items: allItems,
     });
+
+    const searchPath = this.searchPath;
+
+    // Prevent infinite loop
+    this.searchPath = "";
+
+    let searchTargetItem: DduItem | undefined;
+
+    await Promise.all(allItems.map(async (item: DduItem): Promise<void> => {
+      if (searchPath) {
+        if (searchPath === item.treePath ?? item.word) {
+          searchTargetItem = item;
+        }
+        if (
+          !searchTargetItem && item.treePath &&
+          isParentPath(item.treePath, searchPath)
+        ) {
+          searchTargetItem = await this.expandItem(
+            denops,
+            item,
+            {
+              maxLevel: -1,
+              search: searchPath,
+              preventRedraw: true,
+            },
+          );
+          return;
+        }
+      }
+
+      if (item.__expanded) {
+        await this.expandItem(
+          denops,
+          item,
+          {
+            maxLevel: -1,
+            search: searchPath,
+            preventRedraw: true,
+          },
+        );
+      }
+    }));
+
+    if (this.context.done && this.options.profile) {
+      echo(denops, `Refresh all items: ${Date.now() - this.startTime} ms`);
+    }
+
+    await this.uiRedraw(denops, searchTargetItem);
+  }
+
+  async uiRedraw(
+    denops: Denops,
+    searchItem?: DduItem,
+  ): Promise<void> {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui || this.quitted) {
+      return;
+    }
 
     await uiRedraw(
       denops,
@@ -495,46 +557,15 @@ export class Ddu {
       uiParams,
     );
 
-    if (this.searchPath.length > 0 && this.context.done) {
-      const searchPath = this.searchPath;
-
-      // Prevent infinite loop
-      this.searchPath = "";
-
-      const pos = items.findIndex(
-        (item) => searchPath == item.treePath ?? item.word,
-      );
-
-      if (pos < 0) {
-        // NOTE: "searchPath" is not found.  Try expand parents
-        const parent = items.find((item) =>
-          item.isTree && !item.__expanded && item.treePath &&
-          isParentPath(item.treePath, searchPath)
-        );
-
-        if (parent) {
-          const maxLevel = parent.__level -
-            parent.treePath!.split(pathsep).length +
-            searchPath.split(pathsep).length - 1;
-          if (maxLevel <= 0) {
-            const errMsg =
-              `unexpected maxLevel ${maxLevel}; this means got a bug`;
-            await errorException(denops, new Error(errMsg), errMsg);
-          }
-
-          this.expandItem(denops, parent, maxLevel, searchPath);
-          return;
-        }
-      } else {
-        await ui.searchItem({
-          denops,
-          context: this.context,
-          options: this.options,
-          uiOptions,
-          uiParams,
-          item: items[pos],
-        });
-      }
+    if (searchItem) {
+      await ui.searchItem({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        item: searchItem,
+      });
     }
   }
 
@@ -825,8 +856,12 @@ export class Ddu {
     }
 
     if (flags & ActionFlags.RefreshItems) {
+      // Restore quitted flag before refresh and redraw
+      this.quitted = false;
       await this.refresh(denops);
     } else if (uiOptions.persist || flags & ActionFlags.Persist) {
+      // Restore quitted flag before refresh and redraw
+      this.quitted = false;
       await ui.redraw({
         denops,
         context: this.context,
@@ -845,21 +880,24 @@ export class Ddu {
     denops: Denops,
     items: ExpandItem[],
   ): Promise<void> {
-    if (items.length === 1) {
-      // If items is only one item, search the item by `search` param after expanding.
-      const item = items[0];
+    const searchedItems = await Promise.all(items.map((item) => {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
-      await this.expandItem(denops, item.item, maxLevel, item.search, false);
-      return;
-    }
-
-    await Promise.all(items.map((item) => {
-      const maxLevel = item.maxLevel && item.maxLevel < 0
-        ? -1
-        : item.item.__level + (item.maxLevel ?? 0);
-      return this.expandItem(denops, item.item, maxLevel, item.search, true);
+      return this.expandItem(
+        denops,
+        item.item,
+        item.search == undefined
+          ? {
+            maxLevel: maxLevel,
+            preventRedraw: true,
+          }
+          : {
+            maxLevel: maxLevel,
+            search: item.search,
+            preventRedraw: true,
+          },
+      );
     }));
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
@@ -873,24 +911,37 @@ export class Ddu {
         uiOptions,
         uiParams,
       );
+
+      if (searchedItems.length == 1) {
+        await ui.searchItem({
+          denops,
+          context: this.context,
+          options: this.options,
+          uiOptions,
+          uiParams,
+          item: searchedItems[0] ?? items[0].item,
+        });
+      }
     }
   }
 
   async expandItem(
     denops: Denops,
     parent: DduItem,
-    maxLevel: number,
-    search?: string,
-    preventRedraw?: boolean,
+    options: {
+      // Expand recursively to the maxLevel
+      maxLevel: number;
+      preventRedraw?: boolean;
+    } | {
+      // Expand recursively to find the `search` path
+      search: string;
+      maxLevel: number;
+      preventRedraw?: boolean;
+    },
   ): Promise<DduItem /* searchedItem */ | undefined> {
     if (parent.__level < 0) {
       return;
     }
-
-    if (parent.treePath) {
-      this.expandedPaths.add(parent.treePath);
-    }
-    parent.__expanded = true;
 
     const index = parent.__sourceIndex;
     const source = this.sources[parent.__sourceName];
@@ -899,6 +950,11 @@ export class Ddu {
       this.options.sources[index],
       source,
     );
+
+    if (parent.treePath) {
+      this.setExpanded(sourceOptions, parent.treePath);
+    }
+    parent.__expanded = true;
 
     // Set path
     sourceOptions.path = parent.treePath ?? parent.word;
@@ -957,40 +1013,55 @@ export class Ddu {
 
     let searchedItem: DduItem | undefined;
 
-    if (maxLevel < 0 || parent.__level < maxLevel) {
-      await Promise.all(
-        children.filter((
-          child,
-        ) => (child.isTree && child.treePath &&
-          (!search || isParentPath(child.treePath, search)) &&
-          // Note: Skip hidden directory
-          !basename(child.treePath).startsWith("."))
-        ).map(async (child: DduItem) => {
-          // Expand is not completed yet.
-          const hit = await this.expandItem(
-            denops,
-            child,
-            maxLevel,
-            search,
-            true,
-          );
-          if (hit) {
-            searchedItem = hit;
-          }
-        }),
-      );
+    if (options.maxLevel < 0 || parent.__level < options.maxLevel) {
+      const expandTargetChildren = "search" in options
+        ? children.filter((child) =>
+          // Expand recursively to find the `search` path
+          child.__expanded ||
+          child.isTree && child.treePath &&
+            isParentPath(child.treePath, options.search)
+        )
+        : children.filter((child) =>
+          // Expand recursively to the maxLevel
+          child.__expanded ||
+          child.isTree && child.treePath &&
+            // NOTE: Skip hidden directory
+            !basename(child.treePath).startsWith(".")
+        );
+
+      if (expandTargetChildren.length > 0) {
+        // Expand is not completed yet.
+        const childOptions = {
+          ...options,
+          preventRedraw: true,
+        };
+
+        await Promise.all(
+          expandTargetChildren.map(async (child: DduItem) => {
+            const hit = await this.expandItem(
+              denops,
+              child,
+              childOptions,
+            );
+            if (hit) {
+              searchedItem = hit;
+            }
+          }),
+        );
+      }
     }
 
     if (
+      "search" in options &&
       !searchedItem && parent.treePath &&
-      (!search || isParentPath(parent.treePath, search))
+      isParentPath(parent.treePath, options.search)
     ) {
-      searchedItem = search
-        ? children.find((item) => search == item.treePath ?? item.word)
-        : parent;
+      searchedItem = children.find((item) =>
+        options.search == item.treePath ?? item.word
+      );
     }
 
-    if (ui && !this.shouldStopCurrentContext() && !preventRedraw) {
+    if (ui && !this.shouldStopCurrentContext() && !options.preventRedraw) {
       await uiRedraw(
         denops,
         this.lock,
@@ -1001,20 +1072,14 @@ export class Ddu {
         uiParams,
       );
 
-      const searchItem = search
-        ? children.find((item) => search == item.treePath ?? item.word)
-        : parent;
-
-      if (searchItem) {
-        await ui.searchItem({
-          denops,
-          context: this.context,
-          options: this.options,
-          uiOptions,
-          uiParams,
-          item: searchItem,
-        });
-      }
+      await ui.searchItem({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        item: searchedItem ?? parent,
+      });
     }
 
     return searchedItem;
@@ -1039,12 +1104,7 @@ export class Ddu {
       );
 
       if (item.treePath) {
-        this.expandedPaths.delete(item.treePath);
-        [...this.expandedPaths].forEach((v) => {
-          if (isParentPath(item.treePath!, v)) {
-            this.expandedPaths.delete(v);
-          }
-        });
+        this.setUnexpanded(sourceOptions, item.treePath);
       }
       item.__expanded = false;
       await this.callColumns(denops, sourceOptions.columns, [item]);
@@ -1181,9 +1241,6 @@ export class Ddu {
       this.options,
       userOptions,
     ]);
-    if (this.options.searchPath.length > 0) {
-      this.searchPath = this.options.searchPath;
-    }
   }
 
   async checkUpdated(denops: Denops): Promise<boolean> {
@@ -1438,6 +1495,43 @@ export class Ddu {
       previewContext,
     });
   }
+
+  private isExpanded(
+    sourceOptions: SourceOptions,
+    itemTreePath: string,
+  ): boolean {
+    return Boolean(
+      this.expandedPaths.get(sourceOptions.path)?.has(itemTreePath),
+    );
+  }
+  private setExpanded(
+    sourceOptions: SourceOptions,
+    itemTreePath: string,
+  ): void {
+    let m = this.expandedPaths.get(sourceOptions.path);
+    if (!m) {
+      m = new Set<string>();
+      this.expandedPaths.set(sourceOptions.path, m);
+    }
+    m.add(itemTreePath);
+  }
+  private setUnexpanded(
+    sourceOptions: SourceOptions,
+    itemTreePath: string,
+  ): void {
+    const m = this.expandedPaths.get(sourceOptions.path);
+    if (!m) {
+      return;
+    }
+    [...m].forEach((v) => {
+      if (v === itemTreePath || isParentPath(itemTreePath, v)) {
+        m.delete(v);
+      }
+    });
+    if (m.size === 0) {
+      this.expandedPaths.delete(sourceOptions.path);
+    }
+  }
 }
 
 function uiArgs<
@@ -1607,7 +1701,7 @@ async function uiRedraw<
   uiOptions: UiOptions,
   uiParams: Params,
 ): Promise<void> {
-  // Note: redraw must be locked
+  // NOTE: Redraw must be locked
   await lock.with(async () => {
     try {
       await ui.redraw({
@@ -1619,7 +1713,7 @@ async function uiRedraw<
       });
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes(" E523: ")) {
-        // Note: It may be called on invalid state
+        // NOTE: It may be called on invalid state
         // Ignore "E523: Not allowed here" errors
         await denops.call("ddu#_lazy_redraw", options.name);
       } else {
