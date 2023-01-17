@@ -128,7 +128,7 @@ export class Ddu {
       (!userOptions?.sources ||
         equal(userOptions.sources, this.options.sources))
     ) {
-      // Note: sources must not overwrite
+      // NOTE: sources must not overwrite
       userOptions.sources = this.options.sources;
 
       this.updateOptions(userOptions);
@@ -151,7 +151,7 @@ export class Ddu {
       }
 
       if (userOptions.searchPath) {
-        // apply only defined by new options
+        // Apply only defined by new options
         this.searchPath = userOptions.searchPath as string;
       }
 
@@ -187,7 +187,7 @@ export class Ddu {
       this.searchPath = this.options.searchPath;
     }
 
-    // Note: UI must be reset.
+    // NOTE: UI must be reset.
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
       return;
@@ -204,7 +204,7 @@ export class Ddu {
 
     await this.autoload(denops, "source", options.sources.map((s) => s.name));
 
-    // source onInit() must be called before UI
+    // Source onInit() must be called before UI
     for (const userSource of this.options.sources) {
       const source = this.sources[userSource.name];
       if (!source) {
@@ -229,7 +229,7 @@ export class Ddu {
     }
 
     // UI should load before refresh.
-    // Note: If UI is blocked until refresh, user input will break UI.
+    // NOTE: If UI is blocked until refresh, user input will break UI.
     await this.uiRedraw(denops);
 
     await this.refresh(denops);
@@ -856,11 +856,11 @@ export class Ddu {
     }
 
     if (flags & ActionFlags.RefreshItems) {
-      // restore quitted flag before refresh and redraw
+      // Restore quitted flag before refresh and redraw
       this.quitted = false;
       await this.refresh(denops);
     } else if (uiOptions.persist || flags & ActionFlags.Persist) {
-      // restore quitted flag before refresh and redraw
+      // Restore quitted flag before refresh and redraw
       this.quitted = false;
       await ui.redraw({
         denops,
@@ -929,11 +929,11 @@ export class Ddu {
     denops: Denops,
     parent: DduItem,
     options: {
-      // expand recursively to the maxLevel
+      // Expand recursively to the maxLevel
       maxLevel: number;
       preventRedraw?: boolean;
     } | {
-      // expand recursively to find the `search` path
+      // Expand recursively to find the `search` path
       search: string;
       maxLevel: number;
       preventRedraw?: boolean;
@@ -1016,16 +1016,16 @@ export class Ddu {
     if (options.maxLevel < 0 || parent.__level < options.maxLevel) {
       const expandTargetChildren = "search" in options
         ? children.filter((child) =>
-          // expand recursively to find the `search` path
+          // Expand recursively to find the `search` path
           child.__expanded ||
           child.isTree && child.treePath &&
             isParentPath(child.treePath, options.search)
         )
         : children.filter((child) =>
-          // expand recursively to the maxLevel
+          // Expand recursively to the maxLevel
           child.__expanded ||
           child.isTree && child.treePath &&
-            // Note: Skip hidden directory
+            // NOTE: Skip hidden directory
             !basename(child.treePath).startsWith(".")
         );
 
@@ -1701,7 +1701,7 @@ async function uiRedraw<
   uiOptions: UiOptions,
   uiParams: Params,
 ): Promise<void> {
-  // Note: redraw must be locked
+  // NOTE: Redraw must be locked
   await lock.with(async () => {
     try {
       await ui.redraw({
@@ -1713,7 +1713,7 @@ async function uiRedraw<
       });
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes(" E523: ")) {
-        // Note: It may be called on invalid state
+        // NOTE: It may be called on invalid state
         // Ignore "E523: Not allowed here" errors
         await denops.call("ddu#_lazy_redraw", options.name);
       } else {

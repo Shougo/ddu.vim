@@ -84,12 +84,12 @@ export type SourceOptions = {
 };
 
 export type FilterOptions = {
-  // TODO: add options and remove placeholder
+  // TODO: Add options and remove placeholder
   placeholder?: unknown;
 };
 
 export type ColumnOptions = {
-  // TODO: add options and remove placeholder
+  // TODO: Add options and remove placeholder
   placeholder?: unknown;
 };
 
