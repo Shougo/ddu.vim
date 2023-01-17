@@ -853,12 +853,13 @@ export class Ddu {
       }
     }
 
-    // restore quitted flag before refresh and redraw
-    this.quitted = false;
-
     if (flags & ActionFlags.RefreshItems) {
+      // restore quitted flag before refresh and redraw
+      this.quitted = false;
       await this.refresh(denops);
     } else if (uiOptions.persist || flags & ActionFlags.Persist) {
+      // restore quitted flag before refresh and redraw
+      this.quitted = false;
       await ui.redraw({
         denops,
         context: this.context,
