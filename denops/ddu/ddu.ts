@@ -497,23 +497,25 @@ export class Ddu {
     let searchTargetItem: DduItem | undefined;
 
     await Promise.all(allItems.map(async (item: DduItem): Promise<void> => {
-      if (searchPath === item.treePath ?? item.word) {
-        searchTargetItem = item;
-      }
-      if (
-        !searchTargetItem && searchPath && item.treePath &&
-        isParentPath(item.treePath, searchPath)
-      ) {
-        searchTargetItem = await this.expandItem(
-          denops,
-          item,
-          {
-            maxLevel: -1,
-            search: searchPath,
-            preventRedraw: true,
-          },
-        );
-        return;
+      if (searchPath) {
+        if (searchPath === item.treePath ?? item.word) {
+          searchTargetItem = item;
+        }
+        if (
+          !searchTargetItem && item.treePath &&
+          isParentPath(item.treePath, searchPath)
+        ) {
+          searchTargetItem = await this.expandItem(
+            denops,
+            item,
+            {
+              maxLevel: -1,
+              search: searchPath,
+              preventRedraw: true,
+            },
+          );
+          return;
+        }
       }
 
       if (item.__expanded) {
