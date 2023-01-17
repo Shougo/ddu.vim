@@ -100,7 +100,7 @@ export class Ddu {
   private cancelToRefresh = false;
   private lock = new Lock();
   private startTime = 0;
-  private expandedPaths = new Set<string>();
+  private expandedPaths = new Map<string, Set<string>>();
   private searchPath = "";
 
   private shouldStopCurrentContext(): boolean {
@@ -148,6 +148,11 @@ export class Ddu {
       if (!this.quitted && uiOptions.toggle) {
         await this.uiQuit(denops, ui, uiOptions, uiParams);
         return;
+      }
+
+      if (userOptions.searchPath) {
+        // apply only defined by new options
+        this.searchPath = userOptions.searchPath as string;
       }
 
       if (!this.options?.refresh) {
@@ -370,7 +375,10 @@ export class Ddu {
       __sourceIndex: sourceIndex,
       __sourceName: source.name,
       __level: level ?? item.level ?? 0,
-      __expanded: item.treePath ? this.expandedPaths.has(item.treePath) : false,
+      __expanded: Boolean(
+        item.treePath &&
+          this.isExpanded(sourceOptions, item.treePath),
+      ),
     };
   }
 
@@ -460,7 +468,7 @@ export class Ddu {
       if (restoreItemState) {
         items.forEach((item) => {
           if (item.treePath) {
-            item.__expanded = this.expandedPaths.has(item.treePath);
+            item.__expanded = this.isExpanded(sourceOptions, item.treePath);
           }
         });
       }
@@ -932,11 +940,6 @@ export class Ddu {
       return;
     }
 
-    if (parent.treePath) {
-      this.expandedPaths.add(parent.treePath);
-    }
-    parent.__expanded = true;
-
     const index = parent.__sourceIndex;
     const source = this.sources[parent.__sourceName];
     const [sourceOptions, sourceParams] = sourceArgs(
@@ -944,6 +947,11 @@ export class Ddu {
       this.options.sources[index],
       source,
     );
+
+    if (parent.treePath) {
+      this.setExpanded(sourceOptions, parent.treePath);
+    }
+    parent.__expanded = true;
 
     // Set path
     sourceOptions.path = parent.treePath ?? parent.word;
@@ -1093,12 +1101,7 @@ export class Ddu {
       );
 
       if (item.treePath) {
-        this.expandedPaths.delete(item.treePath);
-        [...this.expandedPaths].forEach((v) => {
-          if (isParentPath(item.treePath!, v)) {
-            this.expandedPaths.delete(v);
-          }
-        });
+        this.setUnexpanded(sourceOptions, item.treePath);
       }
       item.__expanded = false;
       await this.callColumns(denops, sourceOptions.columns, [item]);
@@ -1235,10 +1238,6 @@ export class Ddu {
       this.options,
       userOptions,
     ]);
-    if (userOptions.searchPath) {
-      // apply only defined by new options
-      this.searchPath = userOptions.searchPath as string;
-    }
   }
 
   async checkUpdated(denops: Denops): Promise<boolean> {
@@ -1492,6 +1491,43 @@ export class Ddu {
       actionParams,
       previewContext,
     });
+  }
+
+  private isExpanded(
+    sourceOptions: SourceOptions,
+    itemTreePath: string,
+  ): boolean {
+    return Boolean(
+      this.expandedPaths.get(sourceOptions.path)?.has(itemTreePath),
+    );
+  }
+  private setExpanded(
+    sourceOptions: SourceOptions,
+    itemTreePath: string,
+  ): void {
+    let m = this.expandedPaths.get(sourceOptions.path);
+    if (!m) {
+      m = new Set<string>();
+      this.expandedPaths.set(sourceOptions.path, m);
+    }
+    m.add(itemTreePath);
+  }
+  private setUnexpanded(
+    sourceOptions: SourceOptions,
+    itemTreePath: string,
+  ): void {
+    const m = this.expandedPaths.get(sourceOptions.path);
+    if (!m) {
+      return;
+    }
+    [...m].forEach((v) => {
+      if (v === itemTreePath || isParentPath(itemTreePath, v)) {
+        m.delete(v);
+      }
+    });
+    if (m.size === 0) {
+      this.expandedPaths.delete(sourceOptions.path);
+    }
   }
 }
 
