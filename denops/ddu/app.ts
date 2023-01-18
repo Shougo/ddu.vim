@@ -7,12 +7,14 @@ import {
   vars,
 } from "./deps.ts";
 import {
+  BaseFilter,
   Clipboard,
   DduEvent,
   DduExtType,
   DduItem,
   DduOptions,
   ExpandItem,
+  FilterOptions,
   PreviewContext,
   Previewer,
 } from "./types.ts";
@@ -277,6 +279,18 @@ export async function main(denops: Denops) {
         actionParams,
         previewContext,
       );
+    },
+    async getFilter(arg1: unknown, arg2: unknown): Promise<
+      [
+        BaseFilter<Record<string, unknown>> | undefined,
+        FilterOptions,
+        Record<string, unknown>,
+      ]
+    > {
+      const name = ensureString(arg1);
+      const filterName = ensureString(arg2);
+      const ddu = getDdu(name);
+      return await ddu.getFilter(denops, filterName);
     },
   };
 

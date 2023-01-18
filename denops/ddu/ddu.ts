@@ -280,7 +280,6 @@ export class Ddu {
           const filters = sourceOptions.matchers.concat(
             sourceOptions.sorters,
           ).concat(sourceOptions.converters);
-          await this.autoload(denops, "filter", filters);
           for (const filterName of filters) {
             const [filter, filterOptions, filterParams] = await this.getFilter(
               denops,
@@ -1313,7 +1312,7 @@ export class Ddu {
     return [ui, uiOptions, uiParams];
   }
 
-  private async getFilter(
+  async getFilter(
     denops: Denops,
     filterName: string,
   ): Promise<
@@ -1323,6 +1322,8 @@ export class Ddu {
       Record<string, unknown>,
     ]
   > {
+    await this.autoload(denops, "filter", [filterName]);
+
     const filter = this.filters[filterName];
     if (!filter) {
       await denops.call(
