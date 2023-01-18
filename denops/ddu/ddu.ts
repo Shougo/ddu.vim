@@ -100,7 +100,7 @@ export class Ddu {
   private cancelToRefresh = false;
   private lock = new Lock();
   private startTime = 0;
-  private expandedPaths = new Map<string, Set<string>>();
+  private expandedPaths = new Set<string>();
   private searchPath = "";
 
   private shouldStopCurrentContext(): boolean {
@@ -377,7 +377,7 @@ export class Ddu {
       __level: level ?? item.level ?? 0,
       __expanded: Boolean(
         item.treePath &&
-          this.isExpanded(sourceOptions, item.treePath),
+          this.isExpanded(item.treePath),
       ),
     };
   }
@@ -468,7 +468,7 @@ export class Ddu {
       if (restoreItemState) {
         items.forEach((item) => {
           if (item.treePath) {
-            item.__expanded = this.isExpanded(sourceOptions, item.treePath);
+            item.__expanded = this.isExpanded(item.treePath);
           }
         });
       }
@@ -952,7 +952,7 @@ export class Ddu {
     );
 
     if (parent.treePath) {
-      this.setExpanded(sourceOptions, parent.treePath);
+      this.setExpanded(parent.treePath);
     }
     parent.__expanded = true;
 
@@ -1049,6 +1049,12 @@ export class Ddu {
           }),
         );
       }
+    } else {
+      // Collapse children exceed the maxLevel
+      const expandedChildren = children.filter((child) => child.__expanded);
+      if (expandedChildren.length > 0) {
+        await this.collapseItems(denops, expandedChildren, true);
+      }
     }
 
     if (
@@ -1088,6 +1094,7 @@ export class Ddu {
   async collapseItems(
     denops: Denops,
     items: DduItem[],
+    preventRedraw?: boolean,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
@@ -1104,7 +1111,7 @@ export class Ddu {
       );
 
       if (item.treePath) {
-        this.setUnexpanded(sourceOptions, item.treePath);
+        this.setUnexpanded(item.treePath);
       }
       item.__expanded = false;
       await this.callColumns(denops, sourceOptions.columns, [item]);
@@ -1119,27 +1126,29 @@ export class Ddu {
       });
     }
 
-    await uiRedraw(
-      denops,
-      this.lock,
-      this.context,
-      this.options,
-      ui,
-      uiOptions,
-      uiParams,
-    );
-
-    const searchItem = items.at(-1);
-
-    if (searchItem) {
-      await ui.searchItem({
+    if (!preventRedraw) {
+      await uiRedraw(
         denops,
-        context: this.context,
-        options: this.options,
+        this.lock,
+        this.context,
+        this.options,
+        ui,
         uiOptions,
         uiParams,
-        item: searchItem,
-      });
+      );
+
+      const searchItem = items.at(-1);
+
+      if (searchItem) {
+        await ui.searchItem({
+          denops,
+          context: this.context,
+          options: this.options,
+          uiOptions,
+          uiParams,
+          item: searchItem,
+        });
+      }
     }
   }
 
@@ -1497,40 +1506,25 @@ export class Ddu {
   }
 
   private isExpanded(
-    sourceOptions: SourceOptions,
     itemTreePath: string,
   ): boolean {
     return Boolean(
-      this.expandedPaths.get(sourceOptions.path)?.has(itemTreePath),
+      this.expandedPaths.has(itemTreePath),
     );
   }
   private setExpanded(
-    sourceOptions: SourceOptions,
     itemTreePath: string,
   ): void {
-    let m = this.expandedPaths.get(sourceOptions.path);
-    if (!m) {
-      m = new Set<string>();
-      this.expandedPaths.set(sourceOptions.path, m);
-    }
-    m.add(itemTreePath);
+    this.expandedPaths.add(itemTreePath);
   }
   private setUnexpanded(
-    sourceOptions: SourceOptions,
     itemTreePath: string,
   ): void {
-    const m = this.expandedPaths.get(sourceOptions.path);
-    if (!m) {
-      return;
-    }
-    [...m].forEach((v) => {
+    [...this.expandedPaths].forEach((v) => {
       if (v === itemTreePath || isParentPath(itemTreePath, v)) {
-        m.delete(v);
+        this.expandedPaths.delete(v);
       }
     });
-    if (m.size === 0) {
-      this.expandedPaths.delete(sourceOptions.path);
-    }
   }
 }
 
