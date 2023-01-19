@@ -144,7 +144,7 @@ resume
 		Default: v:false
 
 				    	    	*ddu-option-searchPath*
-searchPath	(string)
+searchPath		(string)
 		Search the path.  This only works when specified |ddu#start| or
 		|ddu#redraw|.
 		Note: The path must be absolute path.
@@ -279,16 +279,16 @@ ddu#redraw({name}[, {opt}])
 
 		{opt} is the options.  The options below are available:
 
-		check				(boolean)
+		check			(boolean)
 		If it is true, check the items are updated.
 
-		input				(string)
+		input			(string)
 		Specify narrowing text.
 
-		refreshItems			(boolean)
+		refreshItems		(boolean)
 		If it is true, refresh current items.
 
-		updateOptions			(dictionary)
+		updateOptions		(dictionary)
 		Overwrites options. Refer to |ddu-options| about options.
 
 							*ddu#redraw_tree()*
@@ -501,7 +501,7 @@ to specify the recommended configuration, you should write it in the
 documentation instead.
 
 				    		*ddu-source-option-columns*
-columns		(string[])
+columns			(string[])
 		It is a list of registered column names.
 		Items will be processed in the order you specify here.
 
@@ -615,7 +615,7 @@ KINDS							*ddu-kinds*
 KIND OPTIONS						*ddu-kind-options*
 
 				    	*ddu-kind-option-defaultAction*
-defaultAction	(string)
+defaultAction		(string)
 		Specify the default action.
 
 		Default: ""
@@ -636,7 +636,7 @@ ACTIONS							*ddu-actions*
 ACTION OPTIONS						*ddu-action-options*
 
 					    	*ddu-action-option-quit*
-quit		(boolean)
+quit			(boolean)
 		Quit the UI before executing action.
 
 		Default: true
@@ -744,63 +744,63 @@ params			(function)			(Required)
 ITEM ATTRIBUTES						*ddu-item-attributes*
 
 					*ddu-item-attribute-action*
-action		(dictionary)		(Optional)
+action			(dictionary)			(Optional)
 		The params dictionary for actions.
 
 					*ddu-item-attribute-display*
-display		(string)		(Optional)
+display			(string)			(Optional)
 		The string displayed in Ddu buffer.  If it is omitted,
 		|ddu-item-attribute-word| attribute is used instead.  It is
 		not used for matching inputs.
 
 					*ddu-item-attribute-isExpanded*
-isExpanded	(boolean)		(Optional)
+isExpanded		(boolean)			(Optional)
 		The tree is already expanded.
 
 					*ddu-item-attribute-isTree*
-isTree		(boolean)		(Optional)
+isTree			(boolean)			(Optional)
 		The item is tree.
 
 					*ddu-item-attribute-kind*
-kind		(string)		(Optional)
+kind			(string)			(Optional)
 		The kind name.
 
 					*ddu-item-attribute-level*
-level		(number)		(Optional)
+level			(number)			(Optional)
 		The nested level.
 
 					*ddu-item-attribute-highlights*
-highlights	(object[])		(Optional)
+highlights		(object[])			(Optional)
 		The list of highlight.
 
-		name				(string)
+		name			(string)
 		The highlight name.
 
-		hl_group			(string)
+		hl_group		(string)
 		|:highlight| group.  Please see |highlight-groups|.
 
-		col				(number)
+		col			(number)
 		The highlight start column.
 
-		width				(number)
+		width			(number)
 		The highlight end width.
 
 						*ddu-item-attribute-status*
-status		(object)		(Optional)
+status			(object)			(Optional)
 		The item status.
 
-		size				(number)
+		size			(number)
 		The item size.
 
-		time				(number)
+		time			(number)
 		The item time.
 
 					*ddu-item-attribute-treePath*
-treePath	(string)		(Optional)
+treePath		(string)			(Optional)
 		The item tree path.
 
 					*ddu-item-attribute-word*
-word		(string)		(Required)
+word			(string)			(Required)
 		The word of a item. It is used for matching inputs.
 
 ==============================================================================
@@ -859,7 +859,7 @@ getLength		(function)			(Required)
 		It is called to get column length.
 
 						*ddu-column-attribute-getText*
-getText		(function)			(Required)
+getText			(function)			(Required)
 		It is called to get column text with highlights.
 
 						*ddu-column-attribute-onInit*
