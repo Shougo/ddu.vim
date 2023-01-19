@@ -744,25 +744,25 @@ params			(function)			(Required)
 ITEM ATTRIBUTES						*ddu-item-attributes*
 
 					*ddu-item-attribute-action*
-action		(Dictionary)		(Optional)
+action		(dictionary)		(Optional)
 		The params dictionary for actions.
 
 					*ddu-item-attribute-display*
-display		(String)		(Optional)
+display		(string)		(Optional)
 		The string displayed in Ddu buffer.  If it is omitted,
 		|ddu-item-attribute-word| attribute is used instead.  It is
 		not used for matching inputs.
 
 					*ddu-item-attribute-isExpanded*
-isExpanded	(Boolean)		(Optional)
+isExpanded	(boolean)		(Optional)
 		The tree is already expanded.
 
 					*ddu-item-attribute-isTree*
-isTree		(Boolean)		(Optional)
+isTree		(boolean)		(Optional)
 		The item is tree.
 
 					*ddu-item-attribute-kind*
-kind		(String)		(Optional)
+kind		(string)		(Optional)
 		The kind name.
 
 					*ddu-item-attribute-level*
@@ -770,7 +770,7 @@ level		(number)		(Optional)
 		The nested level.
 
 					*ddu-item-attribute-highlights*
-highlights	(List)			(Optional)
+highlights	(list)			(Optional)
 		The list of highlight.
 
 		name				(string)
@@ -786,7 +786,7 @@ highlights	(List)			(Optional)
 		The highlight end width.
 
 						*ddu-item-attribute-status*
-status		(Object)		(Optional)
+status		(object)		(Optional)
 		The item status.
 
 		size				(number)
@@ -796,11 +796,11 @@ status		(Object)		(Optional)
 		The item time.
 
 					*ddu-item-attribute-treePath*
-treePath	(String)		(Optional)
+treePath	(string)		(Optional)
 		The item tree path.
 
 					*ddu-item-attribute-word*
-word		(String)		(Required)
+word		(string)		(Required)
 		The word of a item. It is used for matching inputs.
 
 ==============================================================================
