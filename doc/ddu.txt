@@ -770,7 +770,7 @@ level		(number)		(Optional)
 		The nested level.
 
 					*ddu-item-attribute-highlights*
-highlights	(list)			(Optional)
+highlights	(object[])		(Optional)
 		The list of highlight.
 
 		name				(string)
