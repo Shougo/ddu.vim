@@ -79,64 +79,64 @@ INTERFACE						*ddu-interface*
 OPTIONS	 						*ddu-options*
 
 						*ddu-option-columnOptions*
-columnOptions
+columnOptions		(dictionary)
 		It is a dictionary that maps column names to its options.
 		See also |ddu-column-options|.
 
 		Default: {}
 
 						*ddu-option-columnParams*
-columnParams
+columnParams		(dictionary)
 		It is a dictionary that maps column names to its parameters.
 		See also |ddu-column-params|.
 
 		Default: {}
 
 						*ddu-option-filterOptions*
-filterOptions
+filterOptions		(dictionary)
 		It is a dictionary that maps filter names to its options.
 		See also |ddu-filter-options|.
 
 		Default: {}
 
 						*ddu-option-filterParams*
-filterParams
+filterParams		(dictionary)
 		It is a dictionary that maps filter names to its parameters.
 		See also |ddu-filter-params|.
 
 		Default: {}
 
 							*ddu-option-input*
-input
+input			(string)
 		Specify an initial narrowing text.
 		Note: If the input contains spaces, it means AND search.
 
 		Default: ""
 
 							*ddu-option-name*
-name
+name			(string)
 		Specify the name.
 
 		Default: "default"
 
 							*ddu-option-profile*
-profile
+profile			(boolean)
 		Print profile result.
 		Note: It is for debug.
 
 							*ddu-option-push*
-push
+push			(boolean)
 		Save the current ddu state and create new ddu state.
 		Note: The state can be restored by |ddu#pop()|.
 
 							*ddu-option-refresh*
-refresh
+refresh			(boolean)
 		Refresh the items when |ddu-option-resume|.
 
 		Default: v:false
 
 							*ddu-option-resume*
-resume
+resume			(boolean)
 		Reuse the previous state.  If none exist, a new ddu
 		state is created.
 		Note: Uses |ddu-option-name| to search for previous state.
@@ -152,7 +152,7 @@ searchPath		(string)
 		Default: ""
 
 					    	*ddu-option-sourceOptions*
-sourceOptions
+sourceOptions		(dictionary)
 		It is a dictionary that maps source names to its options.  The
 		options with the name "_" is used as the options for all
 		sources.
@@ -161,14 +161,14 @@ sourceOptions
 		Default: {}
 
 						*ddu-option-sourceParams*
-sourceParams
+sourceParams		(dictionary)
 		It is a dictionary that maps source names to its parameters.
 		See also |ddu-source-params|.
 
 		Default: {}
 
 							*ddu-option-sources*
-sources
+sources			(list)
 		It is a list of elements which are formatted as:
 >
 		#{
@@ -182,21 +182,22 @@ sources
 
 		Default: []
 
-sync							*ddu-option-sync*
+							*ddu-option-sync*
+sync			(boolean)
 		Redraw the UI when all sources are finished.
 		It is useful for multiple sources.
 
 		Default: v:false
 
 							*ddu-option-ui*
-ui
+ui			(string)
 		Specify UI name.
 		Note: You must set the option in the first.
 
 		Default: ""
 
 							*ddu-option-uiOptions*
-uiOptions
+uiOptions		(dictionary)
 		It is a dictionary that maps UI names to its options.  The
 		options with the name "_" is used as the options for all
 		UIs.
@@ -205,14 +206,14 @@ uiOptions
 		Default: {}
 
 							*ddu-option-uiParams*
-uiParams
+uiParams		(dictionary)
 		It is a dictionary that maps UI names to its parameters.
 		See also |ddu-ui-params|.
 
 		Default: {}
 
 							*ddu-option-volatile*
-volatile
+volatile		(boolean)
 		Refresh items when |ddu#redraw()|.
 
 ------------------------------------------------------------------------------
@@ -462,19 +463,19 @@ to specify the recommended configuration, you should write it in the
 documentation instead.
 
 						*ddu-ui-option-defaultAction*
-defaultAction
+defaultAction		(string)
 		Specify the default action.
 		Note: It overwrites kind/source default actions.
 
 		Default: "default"
 
 				    		*ddu-ui-option-persist*
-persist
+persist			(boolean)
 		Redraw the UI after fire actions.
 		Default: v:false
 
 				    		*ddu-ui-option-toggle*
-toggle
+toggle			(boolean)
 		Quit the UI if the UI exists.
 		Default: v:false
 
@@ -516,7 +517,7 @@ converters		(string[])
 		Default: []
 
 					*ddu-source-option-defaultAction*
-defaultAction
+defaultAction		(string)
 		Specify the default action.
 		Note: It overwrites kind default actions.
 
