@@ -766,7 +766,7 @@ kind		(String)		(Optional)
 		The kind name.
 
 					*ddu-item-attribute-level*
-level		(String)		(Optional)
+level		(number)		(Optional)
 		The nested level.
 
 					*ddu-item-attribute-highlights*
