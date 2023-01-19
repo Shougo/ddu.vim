@@ -79,64 +79,64 @@ INTERFACE						*ddu-interface*
 OPTIONS	 						*ddu-options*
 
 						*ddu-option-columnOptions*
-columnOptions
+columnOptions		(dictionary)
 		It is a dictionary that maps column names to its options.
 		See also |ddu-column-options|.
 
 		Default: {}
 
 						*ddu-option-columnParams*
-columnParams
+columnParams		(dictionary)
 		It is a dictionary that maps column names to its parameters.
 		See also |ddu-column-params|.
 
 		Default: {}
 
 						*ddu-option-filterOptions*
-filterOptions
+filterOptions		(dictionary)
 		It is a dictionary that maps filter names to its options.
 		See also |ddu-filter-options|.
 
 		Default: {}
 
 						*ddu-option-filterParams*
-filterParams
+filterParams		(dictionary)
 		It is a dictionary that maps filter names to its parameters.
 		See also |ddu-filter-params|.
 
 		Default: {}
 
 							*ddu-option-input*
-input
+input			(string)
 		Specify an initial narrowing text.
 		Note: If the input contains spaces, it means AND search.
 
 		Default: ""
 
 							*ddu-option-name*
-name
+name			(string)
 		Specify the name.
 
 		Default: "default"
 
 							*ddu-option-profile*
-profile
+profile			(boolean)
 		Print profile result.
 		Note: It is for debug.
 
 							*ddu-option-push*
-push
+push			(boolean)
 		Save the current ddu state and create new ddu state.
 		Note: The state can be restored by |ddu#pop()|.
 
 							*ddu-option-refresh*
-refresh
+refresh			(boolean)
 		Refresh the items when |ddu-option-resume|.
 
 		Default: v:false
 
 							*ddu-option-resume*
-resume
+resume			(boolean)
 		Reuse the previous state.  If none exist, a new ddu
 		state is created.
 		Note: Uses |ddu-option-name| to search for previous state.
@@ -144,7 +144,7 @@ resume
 		Default: v:false
 
 				    	    	*ddu-option-searchPath*
-searchPath	(string)
+searchPath		(string)
 		Search the path.  This only works when specified |ddu#start| or
 		|ddu#redraw|.
 		Note: The path must be absolute path.
@@ -152,7 +152,7 @@ searchPath	(string)
 		Default: ""
 
 					    	*ddu-option-sourceOptions*
-sourceOptions
+sourceOptions		(dictionary)
 		It is a dictionary that maps source names to its options.  The
 		options with the name "_" is used as the options for all
 		sources.
@@ -161,14 +161,14 @@ sourceOptions
 		Default: {}
 
 						*ddu-option-sourceParams*
-sourceParams
+sourceParams		(dictionary)
 		It is a dictionary that maps source names to its parameters.
 		See also |ddu-source-params|.
 
 		Default: {}
 
 							*ddu-option-sources*
-sources
+sources			(list)
 		It is a list of elements which are formatted as:
 >
 		#{
@@ -182,21 +182,22 @@ sources
 
 		Default: []
 
-sync							*ddu-option-sync*
+							*ddu-option-sync*
+sync			(boolean)
 		Redraw the UI when all sources are finished.
 		It is useful for multiple sources.
 
 		Default: v:false
 
 							*ddu-option-ui*
-ui
+ui			(string)
 		Specify UI name.
 		Note: You must set the option in the first.
 
 		Default: ""
 
 							*ddu-option-uiOptions*
-uiOptions
+uiOptions		(dictionary)
 		It is a dictionary that maps UI names to its options.  The
 		options with the name "_" is used as the options for all
 		UIs.
@@ -205,14 +206,14 @@ uiOptions
 		Default: {}
 
 							*ddu-option-uiParams*
-uiParams
+uiParams		(dictionary)
 		It is a dictionary that maps UI names to its parameters.
 		See also |ddu-ui-params|.
 
 		Default: {}
 
 							*ddu-option-volatile*
-volatile
+volatile		(boolean)
 		Refresh items when |ddu#redraw()|.
 
 ------------------------------------------------------------------------------
@@ -279,16 +280,16 @@ ddu#redraw({name}[, {opt}])
 
 		{opt} is the options.  The options below are available:
 
-		check				(boolean)
+		check			(boolean)
 		If it is true, check the items are updated.
 
-		input				(string)
+		input			(string)
 		Specify narrowing text.
 
-		refreshItems			(boolean)
+		refreshItems		(boolean)
 		If it is true, refresh current items.
 
-		updateOptions			(dictionary)
+		updateOptions		(dictionary)
 		Overwrites options. Refer to |ddu-options| about options.
 
 							*ddu#redraw_tree()*
@@ -462,19 +463,19 @@ to specify the recommended configuration, you should write it in the
 documentation instead.
 
 						*ddu-ui-option-defaultAction*
-defaultAction
+defaultAction		(string)
 		Specify the default action.
 		Note: It overwrites kind/source default actions.
 
 		Default: "default"
 
 				    		*ddu-ui-option-persist*
-persist
+persist			(boolean)
 		Redraw the UI after fire actions.
 		Default: v:false
 
 				    		*ddu-ui-option-toggle*
-toggle
+toggle			(boolean)
 		Quit the UI if the UI exists.
 		Default: v:false
 
@@ -501,7 +502,7 @@ to specify the recommended configuration, you should write it in the
 documentation instead.
 
 				    		*ddu-source-option-columns*
-columns		(string[])
+columns			(string[])
 		It is a list of registered column names.
 		Items will be processed in the order you specify here.
 
@@ -516,7 +517,7 @@ converters		(string[])
 		Default: []
 
 					*ddu-source-option-defaultAction*
-defaultAction
+defaultAction		(string)
 		Specify the default action.
 		Note: It overwrites kind default actions.
 
@@ -615,7 +616,7 @@ KINDS							*ddu-kinds*
 KIND OPTIONS						*ddu-kind-options*
 
 				    	*ddu-kind-option-defaultAction*
-defaultAction	(string)
+defaultAction		(string)
 		Specify the default action.
 
 		Default: ""
@@ -636,7 +637,7 @@ ACTIONS							*ddu-actions*
 ACTION OPTIONS						*ddu-action-options*
 
 					    	*ddu-action-option-quit*
-quit		(boolean)
+quit			(boolean)
 		Quit the UI before executing action.
 
 		Default: true
@@ -744,63 +745,63 @@ params			(function)			(Required)
 ITEM ATTRIBUTES						*ddu-item-attributes*
 
 					*ddu-item-attribute-action*
-action		(Dictionary)		(Optional)
+action			(dictionary)			(Optional)
 		The params dictionary for actions.
 
 					*ddu-item-attribute-display*
-display		(String)		(Optional)
+display			(string)			(Optional)
 		The string displayed in Ddu buffer.  If it is omitted,
 		|ddu-item-attribute-word| attribute is used instead.  It is
 		not used for matching inputs.
 
 					*ddu-item-attribute-isExpanded*
-isExpanded	(Boolean)		(Optional)
+isExpanded		(boolean)			(Optional)
 		The tree is already expanded.
 
 					*ddu-item-attribute-isTree*
-isTree		(Boolean)		(Optional)
+isTree			(boolean)			(Optional)
 		The item is tree.
 
 					*ddu-item-attribute-kind*
-kind		(String)		(Optional)
+kind			(string)			(Optional)
 		The kind name.
 
 					*ddu-item-attribute-level*
-level		(String)		(Optional)
+level			(number)			(Optional)
 		The nested level.
 
 					*ddu-item-attribute-highlights*
-highlights	(List)			(Optional)
+highlights		(object[])			(Optional)
 		The list of highlight.
 
-		name				(string)
+		name			(string)
 		The highlight name.
 
-		hl_group			(string)
+		hl_group		(string)
 		|:highlight| group.  Please see |highlight-groups|.
 
-		col				(number)
+		col			(number)
 		The highlight start column.
 
-		width				(number)
+		width			(number)
 		The highlight end width.
 
 						*ddu-item-attribute-status*
-status		(Object)		(Optional)
+status			(object)			(Optional)
 		The item status.
 
-		size				(number)
+		size			(number)
 		The item size.
 
-		time				(number)
+		time			(number)
 		The item time.
 
 					*ddu-item-attribute-treePath*
-treePath	(String)		(Optional)
+treePath		(string)			(Optional)
 		The item tree path.
 
 					*ddu-item-attribute-word*
-word		(String)		(Required)
+word			(string)			(Required)
 		The word of a item. It is used for matching inputs.
 
 ==============================================================================
@@ -859,7 +860,7 @@ getLength		(function)			(Required)
 		It is called to get column length.
 
 						*ddu-column-attribute-getText*
-getText		(function)			(Required)
+getText			(function)			(Required)
 		It is called to get column text with highlights.
 
 						*ddu-column-attribute-onInit*
