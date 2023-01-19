@@ -43,15 +43,13 @@ export abstract class BaseSource<
   UserData extends unknown = unknown,
 > {
   name = "";
-
+  path = "";
   isInitialized = false;
 
   apiVersion = 2;
 
   kind = "base";
-
   prevMtime = new Date();
-
   actions: Actions<Params> = {};
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}

@@ -32,6 +32,7 @@ export type GetTextResult = {
 
 export abstract class BaseColumn<Params extends Record<string, unknown>> {
   name = "";
+  path = "";
   isInitialized = false;
 
   apiVersion = 1;

@@ -19,6 +19,7 @@ export abstract class BaseKind<
   Params extends Record<string, unknown>,
 > {
   name = "";
+  path = "";
   isInitialized = false;
 
   apiVersion = 1;

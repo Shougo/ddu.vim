@@ -7,7 +7,6 @@ import {
   vars,
 } from "./deps.ts";
 import {
-  BaseFilter,
   Clipboard,
   DduEvent,
   DduExtType,
@@ -282,7 +281,7 @@ export async function main(denops: Denops) {
     },
     async getFilter(arg1: unknown, arg2: unknown): Promise<
       [
-        BaseFilter<Record<string, unknown>> | undefined,
+        string,
         FilterOptions,
         Record<string, unknown>,
       ]
@@ -290,7 +289,11 @@ export async function main(denops: Denops) {
       const name = ensureString(arg1);
       const filterName = ensureString(arg2);
       const ddu = getDdu(name);
-      return await ddu.getFilter(denops, filterName);
+      const [filter, filterOptions, filterParams] = await ddu.getFilter(
+        denops,
+        filterName,
+      );
+      return [filter ? filter.path : "", filterOptions, filterParams];
     },
   };
 

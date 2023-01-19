@@ -25,6 +25,7 @@ export type FilterArguments<Params extends Record<string, unknown>> = {
 
 export abstract class BaseFilter<Params extends Record<string, unknown>> {
   name = "";
+  path = "";
   isInitialized = false;
 
   apiVersion = 2;

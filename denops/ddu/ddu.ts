@@ -1163,37 +1163,42 @@ export class Ddu {
     switch (type) {
       case "ui":
         add = (name: string) => {
-          const ui = new mod.Ui();
-          ui.name = name;
-          this.uis[ui.name] = ui;
+          const obj = new mod.Ui();
+          obj.name = name;
+          obj.path = path;
+          this.uis[obj.name] = obj;
         };
         break;
       case "source":
         add = (name: string) => {
-          const source = new mod.Source();
-          source.name = name;
-          this.sources[source.name] = source;
+          const obj = new mod.Source();
+          obj.name = name;
+          obj.path = path;
+          this.sources[obj.name] = obj;
         };
         break;
       case "filter":
         add = (name: string) => {
-          const filter = new mod.Filter();
-          filter.name = name;
-          this.filters[filter.name] = filter;
+          const obj = new mod.Filter();
+          obj.name = name;
+          obj.path = path;
+          this.filters[obj.name] = obj;
         };
         break;
       case "kind":
         add = (name: string) => {
-          const kind = new mod.Kind();
-          kind.name = name;
-          this.kinds[kind.name] = kind;
+          const obj = new mod.Kind();
+          obj.name = name;
+          obj.path = path;
+          this.kinds[obj.name] = obj;
         };
         break;
       case "column":
         add = (name: string) => {
-          const column = new mod.Column();
-          column.name = name;
-          this.columns[column.name] = column;
+          const obj = new mod.Column();
+          obj.name = name;
+          obj.path = path;
+          this.columns[obj.name] = obj;
         };
         break;
     }
