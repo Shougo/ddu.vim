@@ -7,6 +7,7 @@ import {
   vars,
 } from "./deps.ts";
 import {
+  BaseFilterParams,
   Clipboard,
   DduEvent,
   DduExtType,
@@ -283,7 +284,7 @@ export async function main(denops: Denops) {
       [
         string,
         FilterOptions,
-        Record<string, unknown>,
+        BaseFilterParams,
       ]
     > {
       const name = ensureString(arg1);

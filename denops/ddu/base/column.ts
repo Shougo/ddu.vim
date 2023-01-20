@@ -1,13 +1,15 @@
 import { ColumnOptions, DduItem, DduOptions, ItemHighlight } from "../types.ts";
 import { Denops } from "../deps.ts";
 
-export type OnInitArguments<Params extends Record<string, unknown>> = {
+export type BaseColumnParams = Record<string, unknown>;
+
+export type OnInitArguments<Params extends BaseColumnParams> = {
   denops: Denops;
   columnOptions: ColumnOptions;
   columnParams: Params;
 };
 
-export type GetLengthArguments<Params extends Record<string, unknown>> = {
+export type GetLengthArguments<Params extends BaseColumnParams> = {
   denops: Denops;
   options: DduOptions;
   columnOptions: ColumnOptions;
@@ -15,7 +17,7 @@ export type GetLengthArguments<Params extends Record<string, unknown>> = {
   items: DduItem[];
 };
 
-export type GetTextArguments<Params extends Record<string, unknown>> = {
+export type GetTextArguments<Params extends BaseColumnParams> = {
   denops: Denops;
   options: DduOptions;
   columnOptions: ColumnOptions;
@@ -30,7 +32,7 @@ export type GetTextResult = {
   highlights?: ItemHighlight[];
 };
 
-export abstract class BaseColumn<Params extends Record<string, unknown>> {
+export abstract class BaseColumn<Params extends BaseColumnParams> {
   name = "";
   path = "";
   isInitialized = false;

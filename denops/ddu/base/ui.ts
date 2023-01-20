@@ -8,18 +8,20 @@ import {
 } from "../types.ts";
 import { Denops } from "../deps.ts";
 
-export type UiActions<Params extends Record<string, unknown>> = Record<
+export type BaseUiParams = Record<string, unknown>;
+
+export type UiActions<Params extends BaseUiParams> = Record<
   string,
   (args: ActionArguments<Params>) => Promise<ActionFlags>
 >;
 
-export type OnInitArguments<Params extends Record<string, unknown>> = {
+export type OnInitArguments<Params extends BaseUiParams> = {
   denops: Denops;
   uiOptions: UiOptions;
   uiParams: Params;
 };
 
-export type RefreshItemsArguments<Params extends Record<string, unknown>> = {
+export type RefreshItemsArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -29,7 +31,7 @@ export type RefreshItemsArguments<Params extends Record<string, unknown>> = {
   items: DduItem[];
 };
 
-export type CollapseItemArguments<Params extends Record<string, unknown>> = {
+export type CollapseItemArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -38,7 +40,7 @@ export type CollapseItemArguments<Params extends Record<string, unknown>> = {
   item: DduItem;
 };
 
-export type ExpandItemArguments<Params extends Record<string, unknown>> = {
+export type ExpandItemArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -48,7 +50,7 @@ export type ExpandItemArguments<Params extends Record<string, unknown>> = {
   children: DduItem[];
 };
 
-export type SearchItemArguments<Params extends Record<string, unknown>> = {
+export type SearchItemArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -57,7 +59,7 @@ export type SearchItemArguments<Params extends Record<string, unknown>> = {
   item: DduItem;
 };
 
-export type RedrawArguments<Params extends Record<string, unknown>> = {
+export type RedrawArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -65,7 +67,7 @@ export type RedrawArguments<Params extends Record<string, unknown>> = {
   uiParams: Params;
 };
 
-export type QuitArguments<Params extends Record<string, unknown>> = {
+export type QuitArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -73,7 +75,7 @@ export type QuitArguments<Params extends Record<string, unknown>> = {
   uiParams: Params;
 };
 
-export type ActionArguments<Params extends Record<string, unknown>> = {
+export type ActionArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -83,7 +85,7 @@ export type ActionArguments<Params extends Record<string, unknown>> = {
 };
 
 export abstract class BaseUi<
-  Params extends Record<string, unknown>,
+  Params extends BaseUiParams,
 > {
   name = "";
   path = "";

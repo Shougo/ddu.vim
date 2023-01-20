@@ -8,20 +8,22 @@ import {
 } from "../types.ts";
 import { Denops } from "../deps.ts";
 
-export type OnInitArguments<Params extends Record<string, unknown>> = {
+export type BaseSourceParams = Record<string, unknown>;
+
+export type OnInitArguments<Params extends BaseSourceParams> = {
   denops: Denops;
   sourceOptions: SourceOptions;
   sourceParams: Params;
 };
 
-export type OnEventArguments<Params extends Record<string, unknown>> = {
+export type OnEventArguments<Params extends BaseSourceParams> = {
   denops: Denops;
   sourceOptions: SourceOptions;
   sourceParams: Params;
   event: DduEvent;
 };
 
-export type GatherArguments<Params extends Record<string, unknown>> = {
+export type GatherArguments<Params extends BaseSourceParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -30,7 +32,7 @@ export type GatherArguments<Params extends Record<string, unknown>> = {
   input: string;
 };
 
-export type CheckUpdatedArguments<Params extends Record<string, unknown>> = {
+export type CheckUpdatedArguments<Params extends BaseSourceParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -39,7 +41,7 @@ export type CheckUpdatedArguments<Params extends Record<string, unknown>> = {
 };
 
 export abstract class BaseSource<
-  Params extends Record<string, unknown>,
+  Params extends BaseSourceParams,
   UserData extends unknown = unknown,
 > {
   name = "";

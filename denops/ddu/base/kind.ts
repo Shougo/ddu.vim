@@ -8,6 +8,8 @@ import {
 } from "../types.ts";
 import { Denops } from "../deps.ts";
 
+export type BaseKindParams = Record<string, unknown>;
+
 export type GetPreviewerArguments = {
   denops: Denops;
   previewContext: PreviewContext;
@@ -16,7 +18,7 @@ export type GetPreviewerArguments = {
 };
 
 export abstract class BaseKind<
-  Params extends Record<string, unknown>,
+  Params extends BaseKindParams,
 > {
   name = "";
   path = "";
