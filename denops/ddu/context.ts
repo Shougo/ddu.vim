@@ -1,6 +1,11 @@
 import { assertEquals, Denops, fn } from "./deps.ts";
 import {
   ActionOptions,
+  BaseColumnParams,
+  BaseFilterParams,
+  BaseKindParams,
+  BaseSourceParams,
+  BaseUiParams,
   ColumnOptions,
   Context,
   DduOptions,
@@ -33,11 +38,11 @@ export const mergeColumnOptions: Merge<ColumnOptions> = overwrite;
 export const mergeKindOptions: Merge<KindOptions> = overwrite;
 export const mergeActionOptions: Merge<ActionOptions> = overwrite;
 
-export const mergeUiParams: Merge<Record<string, unknown>> = overwrite;
-export const mergeSourceParams: Merge<Record<string, unknown>> = overwrite;
-export const mergeFilterParams: Merge<Record<string, unknown>> = overwrite;
-export const mergeColumnParams: Merge<Record<string, unknown>> = overwrite;
-export const mergeKindParams: Merge<Record<string, unknown>> = overwrite;
+export const mergeUiParams: Merge<BaseUiParams> = overwrite;
+export const mergeSourceParams: Merge<BaseSourceParams> = overwrite;
+export const mergeFilterParams: Merge<BaseFilterParams> = overwrite;
+export const mergeColumnParams: Merge<BaseColumnParams> = overwrite;
+export const mergeKindParams: Merge<BaseKindParams> = overwrite;
 
 export function foldMerge<T>(
   merge: Merge<T>,

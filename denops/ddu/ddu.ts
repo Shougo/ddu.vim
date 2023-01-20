@@ -17,10 +17,15 @@ import {
   ActionOptions,
   ActionResult,
   BaseColumn,
+  BaseColumnParams,
   BaseFilter,
+  BaseFilterParams,
   BaseKind,
+  BaseKindParams,
   BaseSource,
+  BaseSourceParams,
   BaseUi,
+  BaseUiParams,
   Clipboard,
   ColumnOptions,
   Context,
@@ -70,17 +75,17 @@ type GatherState = {
 };
 
 type ItemActions = {
-  source: BaseSource<Record<string, unknown>, unknown>;
-  kind: BaseKind<Record<string, unknown>>;
+  source: BaseSource<BaseSourceParams, unknown>;
+  kind: BaseKind<BaseKindParams>;
   actions: Record<string, unknown>;
 };
 
 export class Ddu {
-  private uis: Record<string, BaseUi<Record<string, unknown>>> = {};
-  private sources: Record<string, BaseSource<Record<string, unknown>>> = {};
-  private filters: Record<string, BaseFilter<Record<string, unknown>>> = {};
-  private kinds: Record<string, BaseKind<Record<string, unknown>>> = {};
-  private columns: Record<string, BaseColumn<Record<string, unknown>>> = {};
+  private uis: Record<string, BaseUi<BaseUiParams>> = {};
+  private sources: Record<string, BaseSource<BaseSourceParams>> = {};
+  private filters: Record<string, BaseFilter<BaseFilterParams>> = {};
+  private kinds: Record<string, BaseKind<BaseKindParams>> = {};
+  private columns: Record<string, BaseColumn<BaseColumnParams>> = {};
   private aliases: Record<DduExtType, Record<string, string>> = {
     ui: {},
     source: {},
@@ -331,7 +336,7 @@ export class Ddu {
   }
 
   async initSource<
-    Params extends Record<string, unknown>,
+    Params extends BaseSourceParams,
     UserData extends unknown,
   >(
     denops: Denops,
@@ -353,7 +358,7 @@ export class Ddu {
   }
 
   private newDduItem<
-    Params extends Record<string, unknown>,
+    Params extends BaseSourceParams,
     UserData extends unknown,
   >(
     sourceIndex: number,
@@ -382,7 +387,7 @@ export class Ddu {
   }
 
   async *gatherItems<
-    Params extends Record<string, unknown>,
+    Params extends BaseSourceParams,
     UserData extends unknown,
   >(
     denops: Denops,
@@ -569,7 +574,7 @@ export class Ddu {
   }
 
   async uiQuit<
-    Params extends Record<string, unknown>,
+    Params extends BaseUiParams,
   >(
     denops: Denops,
     ui: BaseUi<Params>,
@@ -1290,9 +1295,9 @@ export class Ddu {
     denops: Denops,
   ): Promise<
     [
-      BaseUi<Record<string, unknown>> | undefined,
+      BaseUi<BaseUiParams> | undefined,
       UiOptions,
-      Record<string, unknown>,
+      BaseUiParams,
     ]
   > {
     if (!this.uis[this.options.ui]) {
@@ -1322,9 +1327,9 @@ export class Ddu {
     filterName: string,
   ): Promise<
     [
-      BaseFilter<Record<string, unknown>> | undefined,
+      BaseFilter<BaseFilterParams> | undefined,
       FilterOptions,
-      Record<string, unknown>,
+      BaseFilterParams,
     ]
   > {
     await this.autoload(denops, "filter", [filterName]);
@@ -1535,11 +1540,11 @@ export class Ddu {
 }
 
 function uiArgs<
-  Params extends Record<string, unknown>,
+  Params extends BaseUiParams,
 >(
   options: DduOptions,
   ui: BaseUi<Params>,
-): [UiOptions, Record<string, unknown>] {
+): [UiOptions, BaseUiParams] {
   const o = foldMerge(
     mergeUiOptions,
     defaultUiOptions,
@@ -1557,13 +1562,13 @@ function uiArgs<
 }
 
 function sourceArgs<
-  Params extends Record<string, unknown>,
+  Params extends BaseSourceParams,
   UserData extends unknown,
 >(
   options: DduOptions,
   userSource: UserSource | null,
   source: BaseSource<Params, UserData>,
-): [SourceOptions, Record<string, unknown>] {
+): [SourceOptions, BaseSourceParams] {
   const o = foldMerge(
     mergeSourceOptions,
     defaultSourceOptions,
@@ -1583,11 +1588,11 @@ function sourceArgs<
 }
 
 function filterArgs<
-  Params extends Record<string, unknown>,
+  Params extends BaseFilterParams,
 >(
   options: DduOptions,
   filter: BaseFilter<Params>,
-): [FilterOptions, Record<string, unknown>] {
+): [FilterOptions, BaseFilterParams] {
   const o = foldMerge(
     mergeFilterOptions,
     defaultFilterOptions,
@@ -1605,11 +1610,11 @@ function filterArgs<
 }
 
 function columnArgs<
-  Params extends Record<string, unknown>,
+  Params extends BaseColumnParams,
 >(
   options: DduOptions,
   column: BaseColumn<Params>,
-): [ColumnOptions, Record<string, unknown>] {
+): [ColumnOptions, BaseColumnParams] {
   const o = foldMerge(
     mergeColumnOptions,
     defaultColumnOptions,
@@ -1627,11 +1632,11 @@ function columnArgs<
 }
 
 function kindArgs<
-  Params extends Record<string, unknown>,
+  Params extends BaseKindParams,
 >(
   options: DduOptions,
   kind: BaseKind<Params>,
-): [KindOptions, Record<string, unknown>] {
+): [KindOptions, BaseKindParams] {
   const o = foldMerge(
     mergeKindOptions,
     defaultKindOptions,
@@ -1648,10 +1653,12 @@ function kindArgs<
   return [o, p];
 }
 
+type _DummyActionParams = Record<string, unknown>;
+
 function actionArgs(
   options: DduOptions,
   actionName: string,
-): [ActionOptions, Record<string, unknown>] {
+): [ActionOptions, _DummyActionParams] {
   const o = foldMerge(
     mergeActionOptions,
     defaultActionOptions,
@@ -1664,10 +1671,10 @@ function actionArgs(
 }
 
 async function checkUiOnInit(
-  ui: BaseUi<Record<string, unknown>>,
+  ui: BaseUi<BaseUiParams>,
   denops: Denops,
   uiOptions: UiOptions,
-  uiParams: Record<string, unknown>,
+  uiParams: BaseUiParams,
 ) {
   if (ui.isInitialized) {
     return;
@@ -1691,7 +1698,7 @@ async function checkUiOnInit(
 }
 
 async function uiRedraw<
-  Params extends Record<string, unknown>,
+  Params extends BaseUiParams,
 >(
   denops: Denops,
   lock: Lock,
@@ -1728,10 +1735,10 @@ async function uiRedraw<
 }
 
 async function checkFilterOnInit(
-  filter: BaseFilter<Record<string, unknown>>,
+  filter: BaseFilter<BaseFilterParams>,
   denops: Denops,
   filterOptions: FilterOptions,
-  filterParams: Record<string, unknown>,
+  filterParams: BaseFilterParams,
 ) {
   if (filter.isInitialized) {
     return;
@@ -1755,10 +1762,10 @@ async function checkFilterOnInit(
 }
 
 async function checkColumnOnInit(
-  column: BaseColumn<Record<string, unknown>>,
+  column: BaseColumn<BaseColumnParams>,
   denops: Denops,
   columnOptions: FilterOptions,
-  columnParams: Record<string, unknown>,
+  columnParams: BaseColumnParams,
 ) {
   if (column.isInitialized) {
     return;

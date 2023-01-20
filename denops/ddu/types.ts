@@ -3,7 +3,16 @@ export { BaseSource } from "./base/source.ts";
 export { BaseFilter } from "./base/filter.ts";
 export { BaseKind } from "./base/kind.ts";
 export { BaseColumn } from "./base/column.ts";
-export type { UiActions } from "./base/ui.ts";
+export type { BaseUiParams, UiActions } from "./base/ui.ts";
+export type { BaseSourceParams } from "./base/source.ts";
+export type { BaseFilterParams } from "./base/filter.ts";
+export type { BaseKindParams } from "./base/kind.ts";
+export type { BaseColumnParams } from "./base/column.ts";
+import type { BaseUiParams } from "./base/ui.ts";
+import type { BaseSourceParams } from "./base/source.ts";
+import type { BaseFilterParams } from "./base/filter.ts";
+import type { BaseKindParams } from "./base/kind.ts";
+import type { BaseColumnParams } from "./base/column.ts";
 import { Denops } from "./deps.ts";
 
 export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
@@ -29,7 +38,7 @@ export type Custom = {
 export type UserSource = {
   name: string;
   options?: SourceOptions;
-  params?: Record<string, unknown>;
+  params?: BaseSourceParams;
 };
 
 export type SourceInfo = {
@@ -42,12 +51,12 @@ export type SourceInfo = {
 export type DduOptions = {
   actionOptions: Record<string, Partial<ActionOptions>>;
   columnOptions: Record<string, Partial<ColumnOptions>>;
-  columnParams: Record<string, Partial<Record<string, unknown>>>;
+  columnParams: Record<string, Partial<BaseColumnParams>>;
   filterOptions: Record<string, Partial<FilterOptions>>;
-  filterParams: Record<string, Partial<Record<string, unknown>>>;
+  filterParams: Record<string, Partial<BaseFilterParams>>;
   input: string;
   kindOptions: Record<string, Partial<KindOptions>>;
-  kindParams: Record<string, Partial<Record<string, unknown>>>;
+  kindParams: Record<string, Partial<BaseKindParams>>;
   name: string;
   profile: boolean;
   push: boolean;
@@ -55,12 +64,12 @@ export type DduOptions = {
   resume: boolean;
   searchPath: string;
   sourceOptions: Record<SourceName, Partial<SourceOptions>>;
-  sourceParams: Record<SourceName, Partial<Record<string, unknown>>>;
+  sourceParams: Record<SourceName, Partial<BaseSourceParams>>;
   sources: UserSource[];
   sync: boolean;
   ui: string;
   uiOptions: Record<string, Partial<UiOptions>>;
-  uiParams: Record<string, Partial<Record<string, unknown>>>;
+  uiParams: Record<string, Partial<BaseUiParams>>;
   volatile: boolean;
 };
 
