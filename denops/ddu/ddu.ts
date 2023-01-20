@@ -16,6 +16,7 @@ import {
   ActionFlags,
   ActionOptions,
   ActionResult,
+  BaseActionParams,
   BaseColumn,
   BaseColumnParams,
   BaseFilter,
@@ -42,6 +43,7 @@ import {
   SourceInfo,
   SourceOptions,
   UiOptions,
+  UserOptions,
   UserSource,
 } from "./types.ts";
 import {
@@ -99,7 +101,7 @@ export class Ddu {
   private input = "";
   private context: Context = defaultContext();
   private options: DduOptions = defaultDduOptions();
-  private userOptions: Record<string, unknown> = {};
+  private userOptions: UserOptions = {};
   private initialized = false;
   private quitted = false;
   private cancelToRefresh = false;
@@ -117,7 +119,7 @@ export class Ddu {
     aliases: Record<DduExtType, Record<string, string>>,
     context: Context,
     options: DduOptions,
-    userOptions: Record<string, unknown>,
+    userOptions: UserOptions,
   ): Promise<void> {
     const prevInput = this.context.input;
 
@@ -772,7 +774,7 @@ export class Ddu {
     }
 
     const action = actions[actionName] as (
-      args: ActionArguments<Record<string, unknown>>,
+      args: ActionArguments<BaseActionParams>,
     ) => Promise<ActionFlags | ActionResult>;
     if (!action) {
       await denops.call(
@@ -1254,7 +1256,7 @@ export class Ddu {
     return this.userOptions;
   }
 
-  updateOptions(userOptions: Record<string, unknown>) {
+  updateOptions(userOptions: UserOptions) {
     this.options = foldMerge(mergeDduOptions, defaultDduOptions, [
       this.options,
       userOptions,
@@ -1653,12 +1655,10 @@ function kindArgs<
   return [o, p];
 }
 
-type _DummyActionParams = Record<string, unknown>;
-
 function actionArgs(
   options: DduOptions,
   actionName: string,
-): [ActionOptions, _DummyActionParams] {
+): [ActionOptions, BaseActionParams] {
   const o = foldMerge(
     mergeActionOptions,
     defaultActionOptions,

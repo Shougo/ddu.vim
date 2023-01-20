@@ -17,6 +17,7 @@ import {
   FilterOptions,
   PreviewContext,
   Previewer,
+  UserOptions,
 } from "./types.ts";
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
@@ -138,7 +139,7 @@ export async function main(denops: Denops) {
         check?: boolean;
         input?: string;
         refreshItems?: boolean;
-        updateOptions?: Record<string, unknown>;
+        updateOptions?: UserOptions;
       };
 
       const ddu = getDdu(name);

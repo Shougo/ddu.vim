@@ -73,6 +73,8 @@ export type DduOptions = {
   volatile: boolean;
 };
 
+export type UserOptions = Record<string, unknown>;
+
 export type UiOptions = {
   defaultAction: string;
   persist: boolean;
@@ -157,7 +159,9 @@ export type ExpandItem = {
   search?: string;
 };
 
-export type ActionArguments<Params extends Record<string, unknown>> = {
+export type BaseActionParams = Record<string, unknown>;
+
+export type ActionArguments<Params extends BaseActionParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -170,7 +174,7 @@ export type ActionArguments<Params extends Record<string, unknown>> = {
   clipboard: Clipboard;
 };
 
-export type Actions<Params extends Record<string, unknown>> = Record<
+export type Actions<Params extends BaseActionParams> = Record<
   string,
   (args: ActionArguments<Params>) => Promise<ActionFlags | ActionResult>
 >;

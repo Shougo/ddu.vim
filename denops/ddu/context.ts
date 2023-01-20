@@ -13,6 +13,7 @@ import {
   KindOptions,
   SourceOptions,
   UiOptions,
+  UserOptions,
 } from "./types.ts";
 
 // where
@@ -261,7 +262,7 @@ class Custom {
   global: Partial<DduOptions> = {};
   local: Record<string, Partial<DduOptions>> = {};
 
-  get(userOptions: Record<string, unknown>): DduOptions {
+  get(userOptions: UserOptions): DduOptions {
     const options = foldMerge(mergeDduOptions, defaultDduOptions, [
       this.global,
       userOptions,
@@ -301,7 +302,7 @@ export class ContextBuilder {
 
   async get(
     denops: Denops,
-    options: Record<string, unknown>,
+    options: UserOptions,
   ): Promise<[Context, DduOptions]> {
     return [
       {
