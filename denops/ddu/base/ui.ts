@@ -114,6 +114,7 @@ export abstract class BaseUi<
 
 export function defaultUiOptions(): UiOptions {
   return {
+    actions: {},
     defaultAction: "default",
     persist: false,
     toggle: false,

@@ -636,22 +636,38 @@ export class Ddu {
       return;
     }
 
-    const action = ui.actions[actionName];
-    if (!action) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Invalid UI action: ${actionName}`,
-      );
-      return;
+    let flags: ActionFlags;
+    if (uiOptions.actions[actionName]) {
+      flags = await denops.call(
+        "denops#callback#call",
+        uiOptions.actions[actionName],
+        {
+          context: this.context,
+          options: this.options,
+          uiOptions,
+          uiParams,
+          actionParams: params,
+        },
+      ) as ActionFlags;
+    } else {
+      const action = ui.actions[actionName];
+      if (!action) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid UI action: ${actionName}`,
+        );
+        return;
+      }
+
+      flags = await action({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        actionParams: params,
+      });
     }
-    const flags = await action({
-      denops,
-      context: this.context,
-      options: this.options,
-      uiOptions,
-      uiParams,
-      actionParams: params,
-    });
 
     if (flags & ActionFlags.RefreshItems) {
       await this.refresh(denops);

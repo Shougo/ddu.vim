@@ -26,12 +26,12 @@ function! ddu#custom#alias(type, alias, base) abort
 endfunction
 
 let s:custom_actions = #{
+      \   ui: {},
       \   source: {},
       \   kind: {},
       \ }
 function! ddu#custom#action(type, source_kind_name, action_name, func) abort
-  let dict = a:type ==# 'source' ?
-        \ s:custom_actions.source : s:custom_actions.kind
+  let dict = s:custom_actions[a:type]
 
   for key in split(a:source_kind_name, '\s*,\s*')
     if !has_key(dict, key)
@@ -41,6 +41,7 @@ function! ddu#custom#action(type, source_kind_name, action_name, func) abort
   endfor
 
   call s:notify('patchGlobal', [
+        \   a:type ==# 'ui' ?     #{ uiOptions: dict } :
         \   a:type ==# 'source' ? #{ sourceOptions: dict } :
         \                         #{ kindOptions: dict }
         \ ])

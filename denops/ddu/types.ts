@@ -78,6 +78,7 @@ export type DduOptions = {
 export type UserOptions = Record<string, unknown>;
 
 export type UiOptions = {
+  actions: Record<string, string>;
   defaultAction: string;
   persist: boolean;
   toggle: boolean;
