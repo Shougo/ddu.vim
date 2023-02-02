@@ -385,7 +385,7 @@ export class Ddu {
         item.treePath &&
           this.isExpanded(item.treePath),
       ),
-      __saveHighlights: item.highlights ?? [],
+      __savedHighlights: item.highlights ?? [],
     };
   }
 
@@ -1476,7 +1476,7 @@ export class Ddu {
 
     // Item highlights must be cleared
     for (const item of items) {
-      item.highlights = item.__saveHighlights;
+      item.highlights = item.__savedHighlights;
     }
 
     let startCol = 1;
