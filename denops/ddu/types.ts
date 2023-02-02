@@ -72,6 +72,7 @@ export type DduOptions = {
   ui: string;
   uiOptions: Record<string, Partial<UiOptions>>;
   uiParams: Record<string, Partial<BaseUiParams>>;
+  unique: boolean;
   volatile: boolean;
 };
 

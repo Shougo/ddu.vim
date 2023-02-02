@@ -145,8 +145,8 @@ resume			(boolean)
 
 				    	    	*ddu-option-searchPath*
 searchPath		(string)
-		Search the path.  This only works when specified |ddu#start| or
-		|ddu#redraw|.
+		Search the path.  This only works when specified |ddu#start()|
+		or |ddu#redraw()|.
 		Note: The path must be absolute path.
 
 		Default: ""
@@ -212,9 +212,17 @@ uiParams		(dictionary)
 
 		Default: {}
 
+							*ddu-option-unique*
+unique			(boolean)
+		Unique the items by |ddu-item-attribute-word| attribute.
+
+		Default: v:false
+
 							*ddu-option-volatile*
 volatile		(boolean)
 		Refresh items when |ddu#redraw()|.
+
+		Default: v:false
 
 ------------------------------------------------------------------------------
 FUNCTIONS 						*ddu-functions*

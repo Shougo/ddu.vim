@@ -485,6 +485,19 @@ export class Ddu {
       index++;
     }
 
+    if (this.options.unique) {
+      // Unique all items
+
+      const words = new Set<string>();
+      allItems = allItems.reduce((items: DduItem[], item) => {
+        if (!words.has(item.word)) {
+          words.add(item.word);
+          items.push(item);
+        }
+        return items;
+      }, []);
+    }
+
     await ui.refreshItems({
       denops,
       context: this.context,
