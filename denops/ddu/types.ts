@@ -155,7 +155,6 @@ export type DduItem =
     __sourceName: string;
     __level: number;
     __expanded: boolean;
-    __savedHighlights: ItemHighlight[];
   };
 
 export type ExpandItem = {

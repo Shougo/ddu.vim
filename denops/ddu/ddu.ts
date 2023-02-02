@@ -385,7 +385,6 @@ export class Ddu {
         item.treePath &&
           this.isExpanded(item.treePath),
       ),
-      __savedHighlights: item.highlights ?? [],
     };
   }
 
@@ -1011,6 +1010,7 @@ export class Ddu {
       if (this.shouldStopCurrentContext()) {
         return;
       }
+
       await this.callColumns(
         denops,
         sourceOptions.columns,
@@ -1406,6 +1406,9 @@ export class Ddu {
     let items = state.items;
     const allItems = items.length;
 
+    // NOTE: Call columns before filters
+    await this.callColumns(denops, sourceOptions.columns, items);
+
     items = await this.callFilters(
       denops,
       sourceOptions,
@@ -1426,8 +1429,6 @@ export class Ddu {
       input,
       items,
     );
-
-    await this.callColumns(denops, sourceOptions.columns, items);
 
     return [state.done, allItems, items];
   }
@@ -1476,7 +1477,7 @@ export class Ddu {
 
     // Item highlights must be cleared
     for (const item of items) {
-      item.highlights = item.__savedHighlights;
+      item.highlights = [];
     }
 
     let startCol = 1;
