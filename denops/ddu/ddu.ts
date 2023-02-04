@@ -261,10 +261,12 @@ export class Ddu {
     await Promise.all(
       this.options.sources.map(
         async (userSource: UserSource, index: number): Promise<void> => {
-          this.gatherStates[index] = {
+          const state: GatherState = {
             items: [],
             done: false,
           };
+
+          this.gatherStates[index] = state;
 
           const source = this.sources[userSource.name];
 
@@ -273,7 +275,7 @@ export class Ddu {
               "ddu#util#print_error",
               `Invalid source: ${userSource.name}`,
             );
-            this.gatherStates[index].done = true;
+            state.done = true;
             return;
           }
 
@@ -319,8 +321,7 @@ export class Ddu {
             if (newItems.length === 0) {
               continue;
             }
-            this.gatherStates[index].items = this.gatherStates[index].items
-              .concat(newItems);
+            state.items = state.items.concat(newItems);
             if (!this.options.sync) {
               await this.redraw(denops);
             }
@@ -330,7 +331,8 @@ export class Ddu {
               this.context.path = await fn.getcwd(denops) as string;
             }
           }
-          this.gatherStates[index].done = true;
+
+          state.done = true;
         },
       ),
     );
