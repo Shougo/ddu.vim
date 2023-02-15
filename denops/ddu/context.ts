@@ -56,6 +56,7 @@ export function foldMerge<T>(
 
 export function defaultContext(): Context {
   return {
+    bufName: "",
     bufNr: 0,
     done: false,
     input: "",
@@ -321,6 +322,7 @@ export class ContextBuilder {
     return [
       {
         ...defaultContext(),
+        bufName: await fn.bufname(denops, "%"),
         bufNr: await fn.bufnr(denops, "%"),
         winId: await fn.win_getid(denops) as number,
       },

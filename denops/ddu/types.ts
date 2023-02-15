@@ -24,6 +24,7 @@ export type DduEvent = "close" | "cancel";
 export type SourceName = string;
 
 export type Context = {
+  bufName: string;
   bufNr: number;
   done: boolean;
   input: string;
@@ -204,7 +205,7 @@ export type PreviewContext = {
   width: number;
   height: number;
   isFloating: boolean;
-  isVertical: boolean;
+  split: "horizontal" | "vertical" | "no";
 };
 
 export type PreviewHighlight = ItemHighlight & {
