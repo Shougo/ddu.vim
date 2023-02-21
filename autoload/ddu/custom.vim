@@ -14,7 +14,13 @@ function! ddu#custom#set_local(name, dict) abort
   call s:notify('setLocal', [a:dict, a:name])
 endfunction
 
-let s:aliases = { 'ui': {}, 'source': {}, 'filter': {}, 'kind': {} }
+let s:aliases = #{
+      \   ui: {},
+      \   source: {},
+      \   filter: {},
+      \   kind: {},
+      \   column: {},
+      \ }
 function! ddu#custom#alias(type, alias, base) abort
   if !has_key(s:aliases, a:type)
     call ddu#util#print_error('Invalid alias type: ' . a:type)

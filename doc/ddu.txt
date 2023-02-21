@@ -351,7 +351,8 @@ ddu#custom#action({type}, {name}, {action-name}, {func})
 							*ddu#custom#alias()*
 ddu#custom#alias({type}, {alias-name}, {base-name})
 		Define {alias-name} alias based on {base-name}.
-		{type} must be "ui" or "source" or "filter" or "kind".
+		{type} must be "ui" or "source" or "filter" or "kind" or
+		"column".
 		Note: It must be called before sources/filters initialization.
 >
 		call ddu#custom#alias('source', 'foo', 'file')
