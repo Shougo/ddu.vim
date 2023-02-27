@@ -430,7 +430,8 @@ export class Ddu {
 
   async redraw(
     denops: Denops,
-    // Set restoreItemState to true if redraw without regather because item's states reset to gathered.
+    // NOTE: Set restoreItemState to true if redraw without regather because
+    // item's states reset to gathered.
     restoreItemState?: boolean,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
@@ -702,7 +703,13 @@ export class Ddu {
     items: DduItem[],
   ): Promise<ItemActions | null> {
     const sources = [
-      ...new Set(items.map((item) => this.sources[item.__sourceName])),
+      ...new Set(
+        items.length > 0
+          ? items.map((item) => this.sources[item.__sourceName])
+          : this.options.sources.map((userSource) =>
+            this.sources[userSource.name]
+          ),
+      ),
     ].filter((source) => source);
     const indexes = [
       ...new Set(items.map((item) => item.__sourceIndex)),
@@ -721,7 +728,11 @@ export class Ddu {
     const source = sources[0];
 
     const kinds = [
-      ...new Set(items.map((item) => item.kind)),
+      ...new Set(
+        items.length > 0
+          ? items.map((item) => item.kind)
+          : sources.map((source) => source.kind),
+      ),
     ] as string[];
     if (kinds.length != 1) {
       await denops.call(
