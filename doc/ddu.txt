@@ -262,6 +262,8 @@ ddu#item_action({name}, {action}, {items}, {params})
 
 		{name} is specified ddu name(|ddu-option-name|).
 
+		{items} can be empty.
+
 		{params} is action params.
 
 		Note: It is for creating UI interface.
