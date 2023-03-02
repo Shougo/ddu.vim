@@ -71,7 +71,7 @@ function! ddu#_notify(method, args) abort
 endfunction
 
 function! s:init() abort
-  if exists('g:ddu#_initialized')
+  if 'g:ddu#_initialized'->exists()
     return
   endif
 
@@ -90,16 +90,16 @@ function! s:init() abort
 
   " Note: denops load may be started
   autocmd ddu User DenopsReady silent! call ddu#_register()
-  if exists('g:loaded_denops') && denops#server#status() ==# 'running'
+  if 'g:loaded_denops'->exists() && denops#server#status() ==# 'running'
     silent! call ddu#_register()
   endif
 endfunction
 
-let s:root_dir = fnamemodify(expand('<sfile>'), ':h:h')
+let s:root_dir = '<sfile>'->expand()->fnamemodify(':h:h')
 let s:sep = has('win32') ? '\' : '/'
 function! ddu#_register() abort
   call denops#plugin#register('ddu',
-        \ join([s:root_dir, 'denops', 'ddu', 'app.ts'], s:sep),
+        \ [s:root_dir, 'denops', 'ddu', 'app.ts']->join(s:sep),
         \ #{ mode: 'skip' })
 
   autocmd ddu User DenopsClosed call s:stopped()
@@ -109,7 +109,7 @@ function! s:stopped() abort
   unlet! g:ddu#_initialized
 
   " Restore custom config
-  if exists('g:ddu#_customs')
+  if 'g:ddu#_customs'->exists()
     for custom in g:ddu#_customs
       call ddu#_notify(custom.method, custom.args)
     endfor
@@ -117,7 +117,7 @@ function! s:stopped() abort
 endfunction
 
 function! ddu#_denops_running() abort
-  return exists('g:loaded_denops')
+  return 'g:loaded_denops'->exists()
         \ && denops#server#status() ==# 'running'
         \ && denops#plugin#is_loaded('ddu')
 endfunction

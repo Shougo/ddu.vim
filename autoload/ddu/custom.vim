@@ -22,7 +22,7 @@ let s:aliases = #{
       \   column: {},
       \ }
 function! ddu#custom#alias(type, alias, base) abort
-  if !has_key(s:aliases, a:type)
+  if !(s:aliases->has_key(a:type))
     call ddu#util#print_error('Invalid alias type: ' . a:type)
     return
   endif
@@ -39,8 +39,8 @@ let s:custom_actions = #{
 function! ddu#custom#action(type, source_kind_name, action_name, func) abort
   let dict = s:custom_actions[a:type]
 
-  for key in split(a:source_kind_name, '\s*,\s*')
-    if !has_key(dict, key)
+  for key in a:source_kind_name->split('\s*,\s*')
+    if !(dict->has_key(key))
       let dict[key] = #{ actions: {} }
     endif
     let dict[key].actions[a:action_name] = denops#callback#register(a:func)
@@ -71,9 +71,9 @@ function! ddu#custom#get_aliases() abort
 endfunction
 
 function! s:normalize_key_or_dict(key_or_dict, value) abort
-  if type(a:key_or_dict) == v:t_dict
+  if a:key_or_dict->type() == v:t_dict
     return a:key_or_dict
-  elseif type(a:key_or_dict) == v:t_string
+  elseif a:key_or_dict->type() == v:t_string
     let base = {}
     let base[a:key_or_dict] = a:value
     return base
@@ -82,9 +82,9 @@ function! s:normalize_key_or_dict(key_or_dict, value) abort
 endfunction
 
 function! s:normalize_string_or_list(string_or_list) abort
-  if type(a:string_or_list) == v:t_list
+  if a:string_or_list->type() == v:t_list
     return a:string_or_list
-  elseif type(a:string_or_list) == v:t_string
+  elseif a:string_or_list->type() == v:t_string
     return [a:string_or_list]
   endif
   return []
@@ -92,7 +92,7 @@ endfunction
 
 function! s:notify(method, args) abort
   " Save notify args
-  if !exists('g:ddu#_customs')
+  if !('g:ddu#_customs'->exists())
     let g:ddu#_customs = []
   endif
 
