@@ -27,7 +27,7 @@ function! ddu#util#execute_path(command, path) abort
 endfunction
 
 function! ddu#util#input_yesno(message) abort
-  let yesno = (a:message . ' [yes/no]: ')->input()
+  let yesno = (a:message .. ' [yes/no]: ')->input()
   while yesno !~? '^\%(y\%[es]\|n\%[o]\)$'
     redraw
     if yesno ==# ''
@@ -37,7 +37,7 @@ function! ddu#util#input_yesno(message) abort
 
     " Retry.
     call ddu#util#print_error('Invalid input.')
-    let yesno = (a:message . ' [yes/no]: ')->input()
+    let yesno = (a:message .. ' [yes/no]: ')->input()
   endwhile
 
   redraw

@@ -23,7 +23,7 @@ let s:aliases = #{
       \ }
 function! ddu#custom#alias(type, alias, base) abort
   if !(s:aliases->has_key(a:type))
-    call ddu#util#print_error('Invalid alias type: ' . a:type)
+    call ddu#util#print_error('Invalid alias type: ' .. a:type)
     return
   endif
 
