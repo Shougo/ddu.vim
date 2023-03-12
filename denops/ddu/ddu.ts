@@ -903,6 +903,8 @@ export class Ddu {
       }
     }
 
+    const winId = await fn.win_getid(denops);
+
     if (flags & ActionFlags.RefreshItems) {
       // Restore quitted flag before refresh and redraw
       this.quitted = false;
@@ -918,6 +920,9 @@ export class Ddu {
         uiParams,
       });
     }
+
+    // Restore the cursor
+    await fn.win_gotoid(denops, winId);
 
     if (searchPath.length > 0) {
       this.searchPath = searchPath;
