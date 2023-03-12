@@ -921,8 +921,10 @@ export class Ddu {
       });
     }
 
-    // Restore the cursor
-    await fn.win_gotoid(denops, winId);
+    if (flags & ActionFlags.RestoreCursor) {
+      // Restore the cursor
+      await fn.win_gotoid(denops, winId);
+    }
 
     if (searchPath.length > 0) {
       this.searchPath = searchPath;

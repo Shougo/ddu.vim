@@ -189,6 +189,7 @@ export enum ActionFlags {
   RefreshItems = 1 << 0,
   Redraw = 1 << 1,
   Persist = 1 << 2,
+  RestoreCursor = 1 << 3,
 }
 
 export type ActionResult = {
