@@ -536,12 +536,6 @@ defaultAction		(string)
 
 		Default: ""
 
-						*ddu-source-option-kind*
-kind			(string)
-		Source items default kind.
-
-		Default: "base"
-
 				    	*ddu-source-option-ignoreCase*
 ignoreCase		(boolean)
 		If it is True, ddu ignores case.
@@ -736,6 +730,12 @@ actions			(Record<string, function>)	(Optional)
 					*ddu-source-attribute-checkUpdated*
 checkUpdated		(function)			(Optional)
 		It is called to check items are updated.
+
+						*ddu-source-attribute-kind*
+kind			(string)
+		Source items default kind.
+
+		Default: "base"
 
 						*ddu-source-attribute-onEvent*
 onEvent			(function)			(Optional)
