@@ -9,6 +9,7 @@ import {
 import {
   BaseFilterParams,
   Clipboard,
+  Context,
   DduEvent,
   DduExtType,
   DduItem,
@@ -109,6 +110,11 @@ export async function main(denops: Denops) {
       const name = ensureString(arg1);
       const ddu = getDdu(name);
       return Promise.resolve(ddu.getOptions());
+    },
+    getContext(arg1: unknown): Promise<Context> {
+      const name = ensureString(arg1);
+      const ddu = getDdu(name);
+      return Promise.resolve(ddu.getContext());
     },
     alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
       const extType = ensureString(arg1) as DduExtType;

@@ -325,10 +325,17 @@ export class Ddu {
             if (!this.options.sync) {
               await this.redraw(denops);
             }
-            this.context.path = sourceOptions.path;
-            if (this.context.path == "") {
+
+            let path = sourceOptions.path;
+            if (path == "") {
               // Use current directory instead
-              this.context.path = await fn.getcwd(denops) as string;
+              path = await fn.getcwd(denops) as string;
+            }
+            if (path != this.context.path) {
+              if (this.context.path.length > 0) {
+                this.context.pathHistories.push(this.context.path);
+              }
+              this.context.path = path
             }
           }
 
@@ -899,6 +906,9 @@ export class Ddu {
           userSource.options = sourceOptions;
         }
         userSource.options.path = sourceOptions.path;
+        if (this.context.path.length > 0) {
+          this.context.pathHistories.push(this.context.path);
+        }
         this.context.path = sourceOptions.path;
       }
     }
@@ -1296,6 +1306,10 @@ export class Ddu {
   setInput(input: string) {
     this.input = input;
     this.context.input = input;
+  }
+
+  getContext() {
+    return this.context;
   }
 
   getOptions() {

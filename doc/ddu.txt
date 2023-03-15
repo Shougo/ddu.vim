@@ -238,6 +238,12 @@ ddu#event({name}, {event})
 			"cancel": After cancel the UI
 			"close": After close the UI
 
+						*ddu#get_context()*
+ddu#get_context({name})
+		Get the context information.
+
+		{name} is specified ddu name(|ddu-option-name|).
+
 						*ddu#get_item_actions()*
 ddu#get_item_actions({name}, {items})
 		Get the {name} actions for {items}.

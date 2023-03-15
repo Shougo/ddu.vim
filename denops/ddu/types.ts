@@ -30,6 +30,7 @@ export type Context = {
   input: string;
   maxItems: number;
   path: string;
+  pathHistories: string[];
   winId: number;
 };
 

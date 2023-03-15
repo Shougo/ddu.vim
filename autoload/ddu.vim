@@ -25,6 +25,9 @@ endfunction
 function! ddu#get_previewer(name, item, params, context) abort
   return ddu#_request('getPreviewer', [a:name, a:item, a:params, a:context])
 endfunction
+function! ddu#get_context(name) abort
+  return ddu#_request('getContext', [a:name])
+endfunction
 
 function! ddu#_request(method, args) abort
   if s:init()
