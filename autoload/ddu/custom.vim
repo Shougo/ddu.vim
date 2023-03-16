@@ -20,6 +20,7 @@ let s:aliases = #{
       \   filter: {},
       \   kind: {},
       \   column: {},
+      \   action: {},
       \ }
 function! ddu#custom#alias(type, alias, base) abort
   if !(s:aliases->has_key(a:type))

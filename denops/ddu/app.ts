@@ -28,12 +28,13 @@ type RedrawTreeMode = "collapse" | "expand";
 export async function main(denops: Denops) {
   const ddus: Record<string, Ddu[]> = {};
   const contextBuilder = new ContextBuilder();
-  const aliases: Record<DduExtType, Record<string, string>> = {
+  const aliases: Record<DduExtType | "action", Record<string, string>> = {
     ui: {},
     source: {},
     filter: {},
     kind: {},
     column: {},
+    action: {},
   };
   const clipboard: Clipboard = {
     action: "none",
@@ -267,7 +268,13 @@ export async function main(denops: Denops) {
 
       const ddu = getDdu(name);
       const ret = await ddu.getItemActions(denops, items);
-      return ret && ret.actions ? Object.keys(ret.actions) : [];
+      const actions = ret && ret.actions ? Object.keys(ret.actions) : []
+      for (const aliasAction of Object.keys(aliases.action)) {
+        if (actions.indexOf(aliases.action[aliasAction]) >= 0) {
+          actions.push(aliasAction);
+        }
+      }
+      return actions;
     },
     async getPreviewer(
       arg1: unknown,

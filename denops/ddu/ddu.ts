@@ -88,12 +88,13 @@ export class Ddu {
   private filters: Record<string, BaseFilter<BaseFilterParams>> = {};
   private kinds: Record<string, BaseKind<BaseKindParams>> = {};
   private columns: Record<string, BaseColumn<BaseColumnParams>> = {};
-  private aliases: Record<DduExtType, Record<string, string>> = {
+  private aliases: Record<DduExtType | "action", Record<string, string>> = {
     ui: {},
     source: {},
     filter: {},
     kind: {},
     column: {},
+    action: {},
   };
 
   private checkPaths: Record<string, boolean> = {};
@@ -116,7 +117,7 @@ export class Ddu {
 
   async start(
     denops: Denops,
-    aliases: Record<DduExtType, Record<string, string>>,
+    aliases: Record<DduExtType | "action", Record<string, string>>,
     context: Context,
     options: DduOptions,
     userOptions: UserOptions,
@@ -791,6 +792,12 @@ export class Ddu {
     if (!ret) {
       return;
     }
+
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui) {
+      return;
+    }
+
     const { source, kind, actions } = ret;
 
     const indexes = [
@@ -805,7 +812,7 @@ export class Ddu {
 
     const [kindOptions, kindParams] = kindArgs(this.options, kind);
 
-    // Get default action
+    // Get default action in the first
     if (actionName == "default") {
       actionName = sourceOptions.defaultAction;
       if (actionName == "") {
@@ -822,6 +829,14 @@ export class Ddu {
       }
     }
 
+    // Note: "actionName" may be overwritten by aliases
+    const [actionOptions, _] = actionArgs(this.options, actionName);
+
+    // Check action aliases
+    if (this.aliases.action[actionName]) {
+      actionName = this.aliases.action[actionName];
+    }
+
     const action = actions[actionName] as (
       args: ActionArguments<BaseActionParams>,
     ) => Promise<ActionFlags | ActionResult>;
@@ -832,13 +847,6 @@ export class Ddu {
       );
       return;
     }
-
-    const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui) {
-      return;
-    }
-
-    const [actionOptions, _] = actionArgs(this.options, actionName);
 
     if (actionOptions.quit) {
       // Quit UI before action
