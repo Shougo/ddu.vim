@@ -660,6 +660,14 @@ export class Ddu {
       return;
     }
 
+    if (ui.onBeforeAction) {
+      await ui.onBeforeAction({
+        denops,
+        uiOptions,
+        uiParams,
+      });
+    }
+
     let flags: ActionFlags;
     if (uiOptions.actions[actionName]) {
       flags = await denops.call(
@@ -690,6 +698,14 @@ export class Ddu {
         uiOptions,
         uiParams,
         actionParams: params,
+      });
+    }
+
+    if (ui.onAfterAction) {
+      await ui.onAfterAction({
+        denops,
+        uiOptions,
+        uiParams,
       });
     }
 

@@ -21,6 +21,18 @@ export type OnInitArguments<Params extends BaseUiParams> = {
   uiParams: Params;
 };
 
+export type OnBeforeActionArguments<Params extends BaseUiParams> = {
+  denops: Denops;
+  uiOptions: UiOptions;
+  uiParams: Params;
+};
+
+export type OnAfterActionArguments<Params extends BaseUiParams> = {
+  denops: Denops;
+  uiOptions: UiOptions;
+  uiParams: Params;
+};
+
 export type RefreshItemsArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
@@ -94,6 +106,8 @@ export abstract class BaseUi<
   apiVersion = 1;
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
+  async onBeforeAction(_args: OnBeforeActionArguments<Params>): Promise<void> {}
+  async onAfterAction(_args: OnAfterActionArguments<Params>): Promise<void> {}
 
   async refreshItems(_args: RefreshItemsArguments<Params>): Promise<void> {}
 

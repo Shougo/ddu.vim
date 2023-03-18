@@ -414,6 +414,7 @@ ddu#ui#do_action({action-name}[, {params}])
 						*ddu#ui#get_item()*
 ddu#ui#get_item()
 		Return the current item as |Dictionary| from current UI.
+		Note: current UI must support "getItem" action.
 
 						*ddu#ui#multi_actions()*
 ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
@@ -709,6 +710,14 @@ collapseItem		(function)			(Optional)
 					*ddu-ui-attribute-expandItem*
 expandItem		(function)			(Optional)
 		Called when expand item.
+
+					*ddu-ui-attribute-onAfterAction*
+onAfterAction		(function)			(Optional)
+		Called after execute UI actions.
+
+					*ddu-ui-attribute-onBeforeAction*
+onBeforeAction		(function)			(Optional)
+		Called before execute UI actions.
 
 						*ddu-ui-attribute-onInit*
 onInit			(function)			(Optional)
