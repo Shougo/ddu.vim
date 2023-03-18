@@ -11,6 +11,7 @@ Interface		|ddu-interface|
   Options		  |ddu-options|
   Functions		  |ddu-functions|
   Custom Functions	  |ddu-custom-functions|
+  UI Functions		  |ddu-ui-functions|
 Examples		|ddu-examples|
 UIs			|ddu-uis|
   UI option	          |ddu-ui-options|
@@ -403,6 +404,29 @@ ddu#custom#patch_local({buffer-name}, {dict})
 		Set local options for specific |ddu-option-name|.
 		The arguments are the same as for |ddu#custom#patch_global()|.
 
+UI FUNCTIONS 					*ddu-ui-functions*
+
+						*ddu#ui#do_action()*
+ddu#ui#do_action({action-name}[, {params}])
+		Fire {action-name} action with {params} from current UI.
+		{args} behavior depends on {action-name}.
+
+						*ddu#ui#get_item()*
+ddu#ui#get_item()
+		Return the current item as |Dictionary| from current UI.
+
+						*ddu#ui#multi_actions()*
+ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
+		Fire multiple actions.
+
+		Example: >
+
+		nnoremap <buffer> c
+		\ <Cmd>call ddu#ui#multi_actions([
+		\ ['itemAction', {'name': 'copy'}],
+		\ ['clearSelectAllItems'],
+		\ ])<CR>
+<
 
 ==============================================================================
 EXAMPLES						*ddu-examples*

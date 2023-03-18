@@ -13,10 +13,10 @@ endfunction
 function! ddu#pop(name, options = {}) abort
   call ddu#_request('pop', [a:name, a:options])
 endfunction
-function! ddu#ui_action(name, action, params) abort
+function! ddu#ui_action(name, action, params = {}) abort
   call ddu#_request('uiAction', [a:name, a:action, a:params])
 endfunction
-function! ddu#item_action(name, action, items, params) abort
+function! ddu#item_action(name, action, items, params = {}) abort
   call ddu#_request('itemAction', [a:name, a:action, a:items, a:params])
 endfunction
 function! ddu#get_item_actions(name, items) abort
