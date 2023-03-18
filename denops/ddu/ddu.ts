@@ -753,6 +753,11 @@ export class Ddu {
     await this.autoload(denops, "kind", kinds);
 
     const kindName = kinds[0];
+    if (kindName == "base") {
+      // Dummy kind
+      return null;
+    }
+
     const kind = this.kinds[kindName];
     if (!kind) {
       await denops.call(
