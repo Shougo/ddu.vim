@@ -1,4 +1,4 @@
-let s:is_windows = has('win32') || has('win64')
+const s:is_windows = has('win32') || has('win64')
 
 function! ddu#util#print_error(string, name = 'ddu') abort
   echohl Error
@@ -8,7 +8,7 @@ function! ddu#util#print_error(string, name = 'ddu') abort
 endfunction
 
 function! ddu#util#execute_path(command, path) abort
-  let dir = s:path2directory(a:path)
+  const dir = s:path2directory(a:path)
   " Auto make directory.
   if dir !~# '^\a\+:' && !(dir->isdirectory())
         \ && ddu#util#input_yesno(

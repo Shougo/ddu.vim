@@ -1029,8 +1029,8 @@ A: The example is here. >
 	    \ { args -> GrepAction(args) })
 	function! GrepAction(args)
 	  " NOTE: param "path" must be one directory
-	  let path = a:args.items[0].action.path
-	  let directory = isdirectory(path) ? path : fnamemodify(path, ':h')
+	  const path = a:args.items[0].action.path
+	  const directory = isdirectory(path) ? path : fnamemodify(path, ':h')
 	
 	  call ddu#start(#{
 	      \   name: a:args.options.name,

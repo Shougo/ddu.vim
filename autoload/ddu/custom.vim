@@ -1,9 +1,9 @@
 function! ddu#custom#patch_global(key_or_dict, value = '') abort
-  let dict = s:normalize_key_or_dict(a:key_or_dict, a:value)
+  const dict = s:normalize_key_or_dict(a:key_or_dict, a:value)
   call s:notify('patchGlobal', [dict])
 endfunction
 function! ddu#custom#patch_local(name, key_or_dict, value = '') abort
-  let dict = s:normalize_key_or_dict(a:key_or_dict, a:value)
+  const dict = s:normalize_key_or_dict(a:key_or_dict, a:value)
   call s:notify('patchLocal', [dict, a:name])
 endfunction
 

@@ -98,8 +98,8 @@ function! s:init() abort
   endif
 endfunction
 
-let s:root_dir = '<sfile>'->expand()->fnamemodify(':h:h')
-let s:sep = has('win32') ? '\' : '/'
+const s:root_dir = '<sfile>'->expand()->fnamemodify(':h:h')
+const s:sep = has('win32') ? '\' : '/'
 function! ddu#_register() abort
   call denops#plugin#register('ddu',
         \ [s:root_dir, 'denops', 'ddu', 'app.ts']->join(s:sep),
