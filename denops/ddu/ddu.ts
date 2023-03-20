@@ -654,7 +654,7 @@ export class Ddu {
   async uiAction(
     denops: Denops,
     actionName: string,
-    params: unknown,
+    actionParams: BaseActionParams,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (!ui) {
@@ -679,7 +679,7 @@ export class Ddu {
           options: this.options,
           uiOptions,
           uiParams,
-          actionParams: params,
+          actionParams,
         },
       ) as ActionFlags;
     } else {
@@ -698,7 +698,7 @@ export class Ddu {
         options: this.options,
         uiOptions,
         uiParams,
-        actionParams: params,
+        actionParams,
       });
     }
 
@@ -807,7 +807,7 @@ export class Ddu {
     denops: Denops,
     actionName: string,
     items: DduItem[],
-    params: BaseActionParams,
+    userActionParams: BaseActionParams,
     clipboard: Clipboard,
   ): Promise<void> {
     const ret = await this.getItemActions(denops, items);
@@ -855,7 +855,7 @@ export class Ddu {
     const [actionOptions, actionParams] = actionArgs(
       this.options,
       actionName,
-      params,
+      userActionParams,
     );
 
     // Check action aliases
@@ -1596,7 +1596,7 @@ export class Ddu {
   async getPreviewer(
     denops: Denops,
     item: DduItem,
-    actionParams: unknown,
+    actionParams: BaseActionParams,
     previewContext: PreviewContext,
   ): Promise<Previewer | undefined> {
     const source = this.sources[item.__sourceName];
