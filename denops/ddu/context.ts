@@ -1,6 +1,7 @@
 import { assertEquals, Denops, fn } from "./deps.ts";
 import {
   ActionOptions,
+  BaseActionParams,
   BaseColumnParams,
   BaseFilterParams,
   BaseKindParams,
@@ -45,6 +46,7 @@ export const mergeSourceParams: Merge<BaseSourceParams> = overwrite;
 export const mergeFilterParams: Merge<BaseFilterParams> = overwrite;
 export const mergeColumnParams: Merge<BaseColumnParams> = overwrite;
 export const mergeKindParams: Merge<BaseKindParams> = overwrite;
+export const mergeActionParams: Merge<BaseActionParams> = overwrite;
 
 export function foldMerge<T>(
   merge: Merge<T>,
@@ -70,6 +72,7 @@ export function defaultContext(): Context {
 export function defaultDduOptions(): DduOptions {
   return {
     actionOptions: {},
+    actionParams: {},
     columnOptions: {},
     columnParams: {},
     filterOptions: {},
@@ -139,6 +142,7 @@ export function mergeDduOptions(
   const partialMergeKindOptions = partialOverwrite;
   const partialMergeKindParams = partialOverwrite;
   const partialMergeActionOptions = partialOverwrite;
+  const partialMergeActionParams = partialOverwrite;
 
   return Object.assign(overwritten, {
     uiOptions: migrateEachKeys(
@@ -195,6 +199,11 @@ export function mergeDduOptions(
       partialMergeActionOptions,
       a.actionOptions,
       b.actionOptions,
+    ) || {},
+    actionParams: migrateEachKeys(
+      partialMergeActionParams,
+      a.actionParams,
+      b.actionParams,
     ) || {},
   });
 }
@@ -257,6 +266,8 @@ function patchDduOptions(
   if (cp) overwritten.columnParams = cp;
   const kp = migrateEachKeys(partialOverwrite, a.kindParams, b.kindParams);
   if (kp) overwritten.kindParams = kp;
+  const ap = migrateEachKeys(partialOverwrite, a.actionParams, b.actionParams);
+  if (ap) overwritten.actionParams = ap;
 
   return overwritten;
 }

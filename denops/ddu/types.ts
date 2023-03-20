@@ -54,6 +54,7 @@ export type SourceInfo = {
 
 export type DduOptions = {
   actionOptions: Record<string, Partial<ActionOptions>>;
+  actionParams: Record<string, Partial<BaseActionParams>>;
   columnOptions: Record<string, Partial<ColumnOptions>>;
   columnParams: Record<string, Partial<BaseColumnParams>>;
   filterOptions: Record<string, Partial<FilterOptions>>;
@@ -118,6 +119,7 @@ export type KindOptions = {
 export type ActionOptions = {
   quit: boolean;
 };
+export type BaseActionParams = Record<string, unknown>;
 
 export type ItemHighlight = {
   name: string;
@@ -164,8 +166,6 @@ export type ExpandItem = {
   maxLevel?: number;
   search?: string;
 };
-
-export type BaseActionParams = Record<string, unknown>;
 
 export type ActionArguments<Params extends BaseActionParams> = {
   denops: Denops;

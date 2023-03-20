@@ -30,6 +30,7 @@ Kinds			|ddu-kinds|
   Kind params		  |ddu-kind-params|
 Actions			|ddu-actions|
   Action options	  |ddu-action-options|
+  Action params		  |ddu-action-params|
 Create UI		|ddu-create-ui|
   UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
@@ -78,6 +79,20 @@ INTERFACE						*ddu-interface*
 
 ------------------------------------------------------------------------------
 OPTIONS	 						*ddu-options*
+
+						*ddu-option-actionOptions*
+actionOptions		(dictionary)
+		It is a dictionary that maps action names to its options.
+		See also |ddu-action-options|.
+
+		Default: {}
+
+						*ddu-option-actionParams*
+actionParams		(dictionary)
+		It is a dictionary that maps action names to its parameters.
+		See also |ddu-action-params|.
+
+		Default: {}
 
 						*ddu-option-columnOptions*
 columnOptions		(dictionary)
@@ -679,6 +694,13 @@ quit			(boolean)
 		Quit the UI before executing action.
 
 		Default: true
+
+
+------------------------------------------------------------------------------
+ACTION PARAMS						*ddu-action-params*
+
+These are the parameters that each action can have.  Please read the kind
+documentation.
 
 
 ==============================================================================

@@ -268,7 +268,7 @@ export async function main(denops: Denops) {
 
       const ddu = getDdu(name);
       const ret = await ddu.getItemActions(denops, items);
-      const actions = ret && ret.actions ? Object.keys(ret.actions) : []
+      const actions = ret && ret.actions ? Object.keys(ret.actions) : [];
       for (const aliasAction of Object.keys(aliases.action)) {
         if (actions.indexOf(aliases.action[aliasAction]) >= 0) {
           actions.push(aliasAction);

@@ -52,6 +52,7 @@ import {
   defaultDummy,
   foldMerge,
   mergeActionOptions,
+  mergeActionParams,
   mergeColumnOptions,
   mergeColumnParams,
   mergeDduOptions,
@@ -336,7 +337,7 @@ export class Ddu {
               if (this.context.path.length > 0) {
                 this.context.pathHistories.push(this.context.path);
               }
-              this.context.path = path
+              this.context.path = path;
             }
           }
 
@@ -806,7 +807,7 @@ export class Ddu {
     denops: Denops,
     actionName: string,
     items: DduItem[],
-    params: unknown,
+    params: BaseActionParams,
     clipboard: Clipboard,
   ): Promise<void> {
     const ret = await this.getItemActions(denops, items);
@@ -851,7 +852,11 @@ export class Ddu {
     }
 
     // Note: "actionName" may be overwritten by aliases
-    const [actionOptions, _] = actionArgs(this.options, actionName);
+    const [actionOptions, actionParams] = actionArgs(
+      this.options,
+      actionName,
+      params,
+    );
 
     // Check action aliases
     if (this.aliases.action[actionName]) {
@@ -890,7 +895,7 @@ export class Ddu {
         {
           context: this.context,
           options: this.options,
-          actionParams: params,
+          actionParams,
           items: items,
         },
       ) as ActionFlags;
@@ -901,7 +906,7 @@ export class Ddu {
         {
           context: this.context,
           options: this.options,
-          actionParams: params,
+          actionParams,
           items: items,
         },
       ) as ActionFlags;
@@ -915,7 +920,7 @@ export class Ddu {
         sourceParams,
         kindOptions,
         kindParams,
-        actionParams: params,
+        actionParams,
         items,
         clipboard,
       });
@@ -1705,28 +1710,6 @@ function filterArgs<
   return [o, p];
 }
 
-function columnArgs<
-  Params extends BaseColumnParams,
->(
-  options: DduOptions,
-  column: BaseColumn<Params>,
-): [ColumnOptions, BaseColumnParams] {
-  const o = foldMerge(
-    mergeColumnOptions,
-    defaultColumnOptions,
-    [
-      options.columnOptions["_"],
-      options.columnOptions[column.name],
-    ],
-  );
-  const p = foldMerge(mergeColumnParams, defaultDummy, [
-    column?.params(),
-    options.columnParams["_"],
-    options.columnParams[column.name],
-  ]);
-  return [o, p];
-}
-
 function kindArgs<
   Params extends BaseKindParams,
 >(
@@ -1749,9 +1732,32 @@ function kindArgs<
   return [o, p];
 }
 
+function columnArgs<
+  Params extends BaseColumnParams,
+>(
+  options: DduOptions,
+  column: BaseColumn<Params>,
+): [ColumnOptions, BaseColumnParams] {
+  const o = foldMerge(
+    mergeColumnOptions,
+    defaultColumnOptions,
+    [
+      options.columnOptions["_"],
+      options.columnOptions[column.name],
+    ],
+  );
+  const p = foldMerge(mergeColumnParams, defaultDummy, [
+    column?.params(),
+    options.columnParams["_"],
+    options.columnParams[column.name],
+  ]);
+  return [o, p];
+}
+
 function actionArgs(
   options: DduOptions,
   actionName: string,
+  params: BaseActionParams,
 ): [ActionOptions, BaseActionParams] {
   const o = foldMerge(
     mergeActionOptions,
@@ -1761,7 +1767,12 @@ function actionArgs(
       options.actionOptions[actionName],
     ],
   );
-  return [o, {}];
+  const p = foldMerge(mergeActionParams, defaultDummy, [
+    options.actionParams["_"],
+    options.actionParams[actionName],
+    params,
+  ]);
+  return [o, p];
 }
 
 async function checkUiOnInit(
