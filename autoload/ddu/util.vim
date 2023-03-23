@@ -8,7 +8,9 @@ function! ddu#util#print_error(string, name = 'ddu') abort
 endfunction
 
 function! ddu#util#execute_path(command, path) abort
-  const dir = s:path2directory(a:path)
+  const path = s:expand(a:path)
+
+  const dir = s:path2directory(path)
   " Auto make directory.
   if dir !~# '^\a\+:' && !(dir->isdirectory())
         \ && ddu#util#input_yesno(
@@ -17,7 +19,7 @@ function! ddu#util#execute_path(command, path) abort
   endif
 
   try
-    silent execute a:command s:expand(a:path)->fnameescape()
+    silent execute a:command path->fnamemodify(':.')->fnameescape()
   catch /^Vim\%((\a\+)\)\=:E325\|^Vim:Interrupt/
     " Ignore swap file error
   catch
