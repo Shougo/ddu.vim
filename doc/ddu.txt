@@ -449,7 +449,7 @@ ddu#ui#visible({name}[, {tabnr}])
 
 		{name} is specified ddu name(|ddu-option-name|).
 		{tabnr} is tabpage number.  If it is omitted, current tabpage
-		is used.
+		is used.  If it is less than 1, it means search from all tabs.
 
 						*ddu#ui#winid()*
 ddu#ui#winid({name})
