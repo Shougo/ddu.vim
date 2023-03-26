@@ -25,3 +25,11 @@ function! ddu#ui#get_item() abort
 
   return b:->get('ddu_ui_item', {})
 endfunction
+
+function! ddu#ui#visible(name, tabnr = tabpagenr()) abort
+  return ddu#_request('uiVisible', [a:name, a:tabnr])
+endfunction
+
+function! ddu#ui#winid(name) abort
+  return ddu#_request('uiWinid', [a:name])
+endfunction

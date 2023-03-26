@@ -13,6 +13,7 @@ export * as vars from "https://deno.land/x/denops_std@v4.0.0/variable/mod.ts";
 export * as autocmd from "https://deno.land/x/denops_std@v4.0.0/autocmd/mod.ts";
 export {
   ensureArray,
+  ensureNumber,
   ensureObject,
   ensureString,
 } from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";

@@ -443,6 +443,19 @@ ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
 		\ ['clearSelectAllItems'],
 		\ ])<CR>
 <
+						*ddu#ui#visible()*
+ddu#ui#visible({name}[, {tabnr}])
+		Return v:true if UI is visible.
+
+		{name} is specified ddu name(|ddu-option-name|).
+		{tabnr} is tabpage number.  If it is omitted, current tabpage
+		is used.
+
+						*ddu#ui#winid()*
+ddu#ui#winid({name})
+		Return UI window ID.
+
+		{name} is specified ddu name(|ddu-option-name|).
 
 ==============================================================================
 EXAMPLES						*ddu-examples*
@@ -764,6 +777,14 @@ redraw			(function)			(Required)
 					*ddu-ui-attribute-searchItem*
 searchItem		(function)			(Optional)
 		Called when search item.
+
+					*ddu-ui-attribute-visible*
+visible			(function)			(Optional)
+		Called to get UI is visible.
+
+					*ddu-ui-attribute-winId*
+winId			(function)			(Optional)
+		Called to get UI's |window-Id|.
 
 
 ==============================================================================

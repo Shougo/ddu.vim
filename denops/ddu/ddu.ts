@@ -1252,6 +1252,42 @@ export class Ddu {
     }
   }
 
+  async uiVisible(
+    denops: Denops,
+    tabNr: number,
+  ): Promise<boolean> {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui || !ui.visible || this.quitted) {
+      return false;
+    }
+
+    return await ui.visible({
+      denops,
+      context: this.context,
+      options: this.options,
+      uiOptions,
+      uiParams,
+      tabNr,
+    });
+  }
+
+  async uiWinid(
+    denops: Denops,
+  ): Promise<number> {
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui || !ui.winId || this.quitted) {
+      return -1;
+    }
+
+    return await ui.winId({
+      denops,
+      context: this.context,
+      options: this.options,
+      uiOptions,
+      uiParams,
+    });
+  }
+
   async register(type: DduExtType, path: string, name: string) {
     if (path in this.checkPaths) {
       return;

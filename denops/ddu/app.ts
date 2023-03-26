@@ -2,11 +2,13 @@ import {
   batch,
   Denops,
   ensureArray,
+  ensureNumber,
   ensureObject,
   ensureString,
   vars,
 } from "./deps.ts";
 import {
+  BaseActionParams,
   BaseFilterParams,
   Clipboard,
   Context,
@@ -284,7 +286,7 @@ export async function main(denops: Denops) {
     ): Promise<Previewer | undefined> {
       const name = ensureString(arg1);
       const item = ensureObject(arg2) as DduItem;
-      const actionParams = arg3;
+      const actionParams = arg3 as BaseActionParams;
       const previewContext = ensureObject(arg4) as PreviewContext;
       const ddu = getDdu(name);
       return await ddu.getPreviewer(
@@ -309,6 +311,24 @@ export async function main(denops: Denops) {
         filterName,
       );
       return [filter ? filter.path : "", filterOptions, filterParams];
+    },
+    async uiVisible(
+      arg1: unknown,
+      arg2: unknown,
+    ): Promise<boolean> {
+      const name = ensureString(arg1);
+      const tabNr = ensureNumber(arg2);
+
+      const ddu = getDdu(name);
+      return await ddu.uiVisible(denops, tabNr);
+    },
+    async uiWinid(
+      arg1: unknown,
+    ): Promise<number> {
+      const name = ensureString(arg1);
+
+      const ddu = getDdu(name);
+      return await ddu.uiWinid(denops);
     },
   };
 

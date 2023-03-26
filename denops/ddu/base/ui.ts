@@ -87,6 +87,23 @@ export type QuitArguments<Params extends BaseUiParams> = {
   uiParams: Params;
 };
 
+export type VisibleArguments<Params extends BaseUiParams> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+  tabNr: number;
+};
+
+export type WinidArguments<Params extends BaseUiParams> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+};
+
 export type ActionArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
@@ -120,6 +137,15 @@ export abstract class BaseUi<
   async redraw(_args: RedrawArguments<Params>): Promise<void> {}
 
   async quit(_args: QuitArguments<Params>): Promise<void> {}
+
+  // deno-lint-ignore require-await
+  async visible(_args: VisibleArguments<Params>): Promise<boolean> {
+    return false;
+  }
+  // deno-lint-ignore require-await
+  async winId(_args: WinidArguments<Params>): Promise<number> {
+    return -1;
+  }
 
   actions: UiActions<Params> = {};
 
