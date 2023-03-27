@@ -423,17 +423,19 @@ UI FUNCTIONS 					*ddu-ui-functions*
 
 						*ddu#ui#do_action()*
 ddu#ui#do_action({action-name}[, {params}])
-		Fire {action-name} action with {params} from current UI.
+		Fire {action-name} action with {params} from current buffer
+		UI.
 		{args} behavior depends on {action-name}.
 
 						*ddu#ui#get_item()*
 ddu#ui#get_item()
-		Return the current item as |Dictionary| from current UI.
+		Return the current item as |Dictionary| from current buffer
+		UI.
 		Note: current UI must support "getItem" action.
 
 						*ddu#ui#multi_actions()*
 ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
-		Fire multiple actions.
+		Fire multiple actions for current buffer UI.
 
 		Example: >
 
@@ -446,7 +448,6 @@ ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
 						*ddu#ui#visible()*
 ddu#ui#visible({name}[, {tabnr}])
 		Return v:true if UI is visible.
-
 		{name} is specified ddu name(|ddu-option-name|).
 		{tabnr} is tabpage number.  If it is omitted, current tabpage
 		is used.  If it is less than 1, it means search from all tabs.
@@ -454,7 +455,6 @@ ddu#ui#visible({name}[, {tabnr}])
 						*ddu#ui#winid()*
 ddu#ui#winid({name})
 		Return UI window ID.
-
 		{name} is specified ddu name(|ddu-option-name|).
 
 ==============================================================================
