@@ -29,8 +29,9 @@ function! ddu#util#execute_path(command, path) abort
 endfunction
 
 function! ddu#util#input_yesno(message) abort
-  let yesno = (a:message .. ' [yes/no]: ')->input()
+  let yesno = ''
   while yesno !~? '^\%(y\%[es]\|n\%[o]\)$'
+    let yesno = (a:message .. ' [yes/no]: ')->input()
     redraw
     if yesno ==# ''
       echo 'Canceled.'
@@ -39,12 +40,36 @@ function! ddu#util#input_yesno(message) abort
 
     " Retry.
     call ddu#util#print_error('Invalid input.')
-    let yesno = (a:message .. ' [yes/no]: ')->input()
   endwhile
 
   redraw
 
   return yesno =~? 'y\%[es]'
+endfunction
+
+function! ddu#util#input_list(message, list) abort
+  let ret = ''
+  let s:input_completion_list = copy(a:list)
+  while a:list->index(ret) < 0
+    let ret = (a:message)->input('', 'customlist,CompleteDduInput')
+    redraw
+    if ret ==# ''
+      echo 'Canceled.'
+      break
+    endif
+
+    " Retry.
+    call ddu#util#print_error('Invalid input.')
+  endwhile
+
+  redraw
+
+  return ret
+endfunction
+
+function CompleteDduInput(ArgLead, CmdLine, CursorPos) abort
+  return s:input_completion_list->copy()->filter(
+        \ { _, val -> val->stridx(a:ArgLead) == 0 })
 endfunction
 
 function! s:path2directory(path) abort

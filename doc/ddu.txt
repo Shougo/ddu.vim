@@ -429,9 +429,15 @@ ddu#ui#do_action({action-name}[, {params}])
 
 						*ddu#ui#get_item()*
 ddu#ui#get_item()
-		Return the current item as |Dictionary| from current buffer
-		UI.
+		Return the current cursor item as |Dictionary| from current
+		buffer UI.
 		Note: current UI must support "getItem" action.
+
+						*ddu#ui#get_selected_items()*
+ddu#ui#get_selected_items()
+		Return the selected items as |List| of |Dictionary| from
+		current buffer UI.
+		Note: current UI must support "getSelectedItems" action.
 
 						*ddu#ui#multi_actions()*
 ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
