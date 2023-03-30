@@ -51,7 +51,7 @@ function! ddu#util#input_list(message, list) abort
   let ret = ''
   let s:input_completion_list = copy(a:list)
   while a:list->index(ret) < 0
-    let ret = (a:message)->input('', 'customlist,CompleteDduInput')
+    let ret = a:message->input('', 'customlist,ddu#util#_complete_ddu_input')
     redraw
     if ret ==# ''
       echo 'Canceled.'
@@ -67,7 +67,7 @@ function! ddu#util#input_list(message, list) abort
   return ret
 endfunction
 
-function CompleteDduInput(ArgLead, CmdLine, CursorPos) abort
+function ddu#util#_complete_ddu_input(ArgLead, CmdLine, CursorPos) abort
   return s:input_completion_list->copy()->filter(
         \ { _, val -> val->stridx(a:ArgLead) == 0 })
 endfunction
