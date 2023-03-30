@@ -65,9 +65,8 @@ function! ddu#_notify(method, args) abort
     call denops#notify('ddu', a:method, a:args)
   else
     " Lazy call notify
-    execute printf('autocmd User DDUReady call ' .
-          \ 'denops#notify("ddu", "%s", %s)',
-          \ a:method, string(a:args))
+    execute printf('autocmd User DDUReady call '
+          \ .. 'denops#notify("ddu", "%s", %s)', a:method, string(a:args))
   endif
 
   return {}
