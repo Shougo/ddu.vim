@@ -347,9 +347,17 @@ ddu#start({options})
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
 
-							*ddu#ui_action()*
-ddu#ui_action({name}, {action}, {params})
-		Do the {action} action in current UI.
+							*ddu#ui_async_action()*
+ddu#ui_async_action({name}, {action}, {params})
+		Do the {action} action in current UI asynchronously.
+
+		{name} is specified ddu name(|ddu-option-name|).
+
+		{params} is action params.
+
+							*ddu#ui_sync_action()*
+ddu#ui_sync_action({name}, {action}, {params})
+		Do the {action} action in current UI synchronously.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
@@ -424,7 +432,7 @@ UI FUNCTIONS 					*ddu-ui-functions*
 						*ddu#ui#do_action()*
 ddu#ui#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params} from current buffer
-		UI.
+		UI asynchronously.
 		{args} behavior depends on {action-name}.
 
 						*ddu#ui#get_item()*
@@ -441,7 +449,7 @@ ddu#ui#get_selected_items()
 
 						*ddu#ui#multi_actions()*
 ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
-		Fire multiple actions for current buffer UI.
+		Fire multiple actions for current buffer UI synchronously.
 
 		Example: >
 
@@ -451,6 +459,12 @@ ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
 		\ ['clearSelectAllItems'],
 		\ ])<CR>
 <
+						*ddu#ui#sync_action()*
+ddu#ui#sync_action({action-name}[, {params}])
+		Fire {action-name} action with {params} from current buffer
+		UI synchronously.
+		{args} behavior depends on {action-name}.
+
 						*ddu#ui#visible()*
 ddu#ui#visible({name}[, {tabnr}])
 		Return v:true if UI is visible.
@@ -1076,6 +1090,10 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2023.04.04
+* Rename "ddu#ui_action()" to "ddu#ui_sync_action()".
+* "ddu#ui#do_action()" executes action asynchronously.
 
 2023.01.11
 * Remove "searchPath" from UI interface.

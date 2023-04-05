@@ -3,7 +3,15 @@ function! ddu#ui#do_action(name, options = {}) abort
     return
   endif
 
-  call ddu#ui_action(b:ddu_ui_name, a:name, a:options)
+  call ddu#ui_async_action(b:ddu_ui_name, a:name, a:options)
+endfunction
+
+function! ddu#ui#sync_action(name, options = {}) abort
+  if !('b:ddu_ui_name'->exists())
+    return
+  endif
+
+  call ddu#ui_sync_action(b:ddu_ui_name, a:name, a:options)
 endfunction
 
 function! ddu#ui#multi_actions(actions) abort
@@ -12,7 +20,7 @@ function! ddu#ui#multi_actions(actions) abort
   endif
 
   for action in a:actions
-    call call('ddu#ui#do_action', action)
+    call call('ddu#ui#sync_action', action)
   endfor
 endfunction
 

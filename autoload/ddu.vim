@@ -13,7 +13,10 @@ endfunction
 function! ddu#pop(name, options = {}) abort
   call ddu#_request('pop', [a:name, a:options])
 endfunction
-function! ddu#ui_action(name, action, params = {}) abort
+function! ddu#ui_async_action(name, action, params = {}) abort
+  call ddu#_notify('uiAction', [a:name, a:action, a:params])
+endfunction
+function! ddu#ui_sync_action(name, action, params = {}) abort
   call ddu#_request('uiAction', [a:name, a:action, a:params])
 endfunction
 function! ddu#item_action(name, action, items, params = {}) abort
