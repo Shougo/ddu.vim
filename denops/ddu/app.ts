@@ -208,6 +208,7 @@ export async function main(denops: Denops) {
       const name = ensureString(arg1);
       const opt = ensureObject(arg2) as {
         quit?: boolean;
+        sync?: boolean;
       };
 
       const dduLength = ddus[name].length;

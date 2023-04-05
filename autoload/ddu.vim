@@ -11,7 +11,11 @@ function! ddu#event(name, event) abort
   call ddu#_request('event', [a:name, a:event])
 endfunction
 function! ddu#pop(name, options = {}) abort
-  call ddu#_request('pop', [a:name, a:options])
+  if a:options->get('sync', v:false)
+    call ddu#_request('pop', [a:name, a:options])
+  else
+    call ddu#_notify('pop', [a:name, a:options])
+  endif
 endfunction
 function! ddu#ui_async_action(name, action, params = {}) abort
   call ddu#_notify('uiAction', [a:name, a:action, a:params])

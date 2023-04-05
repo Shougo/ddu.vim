@@ -301,8 +301,12 @@ ddu#pop({name}[, {opt}])
 		quit			(boolean)
 		If it is true, does not open previous ddu.
 
+		sync			(boolean)
+		If it is true, ddu is blocked until the acton is done.
+
 		If the state is empty, "quit" the current ddu.
-		Note The previous state is saved by |ddu-option-push|.
+
+		NOTE: The previous state is saved by |ddu-option-push|.
 
 							*ddu#redraw()*
 ddu#redraw({name}[, {opt}])
