@@ -29,7 +29,7 @@ function! ddu#ui#get_item() abort
     return {}
   endif
 
-  call ddu#ui_action(b:ddu_ui_name, 'getItem', {})
+  call ddu#ui_sync_action(b:ddu_ui_name, 'getItem', {})
 
   return b:->get('ddu_ui_item', {})
 endfunction
@@ -39,7 +39,7 @@ function! ddu#ui#get_selected_items() abort
     return []
   endif
 
-  call ddu#ui_action(b:ddu_ui_name, 'getSelectedItems', {})
+  call ddu#ui_sync_action(b:ddu_ui_name, 'getSelectedItems', {})
 
   return b:->get('ddu_ui_selected_items', [])
 endfunction
