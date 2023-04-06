@@ -760,7 +760,7 @@ UI ATTRIBUTES						*ddu-ui-attributes*
 						*ddu-ui-attribute-actions*
 actions			(Record<string, function>)	(Optional)
 		Defines UI actions.
-		The actions are called from |ddu#ui_action()|.
+		The actions are called from |ddu#ui_sync_action|.
 
 					*ddu-ui-attribute-collapseItem*
 collapseItem		(function)			(Optional)
