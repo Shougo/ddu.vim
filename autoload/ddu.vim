@@ -95,6 +95,8 @@ function! s:init() abort
     autocmd User DDUReady :
   augroup END
 
+  let g:ddu#_started = reltime()
+
   " Note: ddu.vim must be registered manually.
 
   " Note: denops load may be started

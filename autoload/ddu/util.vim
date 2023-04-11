@@ -49,7 +49,7 @@ endfunction
 
 function! ddu#util#input_list(message, list) abort
   let ret = ''
-  let s:input_completion_list = copy(a:list)
+  let s:input_completion_list = a:list->copy()
   while a:list->index(ret) < 0
     let ret = a:message->input('', 'customlist,ddu#util#_complete_ddu_input')
     redraw
@@ -65,6 +65,16 @@ function! ddu#util#input_list(message, list) abort
   redraw
 
   return ret
+endfunction
+
+function! ddu#util#benchmark(msg = '') abort
+  let msg = a:msg
+  if msg !=# ''
+    let msg ..= ' '
+  endif
+  const diff = g:ddu#_started->reltime()->reltimefloat()
+  call ddu#util#print_error(printf('%s%s: Took %f seconds.',
+        \ msg, '<sfile>'->expand(), diff))
 endfunction
 
 function ddu#util#_complete_ddu_input(ArgLead, CmdLine, CursorPos) abort
