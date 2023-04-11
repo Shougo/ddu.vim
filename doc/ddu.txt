@@ -234,12 +234,6 @@ unique			(boolean)
 
 		Default: v:false
 
-							*ddu-option-volatile*
-volatile		(boolean)
-		Refresh items when |ddu#redraw()|.
-
-		Default: v:false
-
 ------------------------------------------------------------------------------
 FUNCTIONS 						*ddu-functions*
 
@@ -657,6 +651,14 @@ sorters			(string[])
 		Items will be processed in the order you specify here.
 
 		Default: []
+
+						*ddu-source-option-volatile*
+volatile		(boolean)
+		Refresh items when |ddu#redraw()|.
+		It is useful if the source depends on user input.
+		Note: It is slow for filtering.
+
+		Default: v:false
 
 
 ------------------------------------------------------------------------------
@@ -1094,6 +1096,9 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2023.04.11
+* Change "ddu-option-volatile" to "ddu-source-option-volatile".
 
 2023.04.04
 * Rename "ddu#ui_action()" to "ddu#ui_sync_action()".

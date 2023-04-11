@@ -76,7 +76,6 @@ export type DduOptions = {
   uiOptions: Record<string, Partial<UiOptions>>;
   uiParams: Record<string, Partial<BaseUiParams>>;
   unique: boolean;
-  volatile: boolean;
 };
 
 export type UserOptions = Record<string, unknown>;
@@ -99,6 +98,7 @@ export type SourceOptions = {
   maxItems: number;
   path: string;
   sorters: string[];
+  volatile: boolean;
 };
 
 export type FilterOptions = {

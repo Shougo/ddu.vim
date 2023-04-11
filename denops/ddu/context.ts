@@ -94,7 +94,6 @@ export function defaultDduOptions(): DduOptions {
     uiOptions: {},
     uiParams: {},
     unique: false,
-    volatile: false,
   };
 }
 

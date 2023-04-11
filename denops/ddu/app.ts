@@ -5,6 +5,7 @@ import {
   ensureNumber,
   ensureObject,
   ensureString,
+  Lock,
   vars,
 } from "./deps.ts";
 import {
@@ -25,9 +26,15 @@ import {
 import { Ddu } from "./ddu.ts";
 import { ContextBuilder, defaultDduOptions } from "./context.ts";
 
-type RedrawTreeMode = "collapse" | "expand";
-
 export async function main(denops: Denops) {
+  type RedrawTreeMode = "collapse" | "expand";
+  type RedrawOption = {
+    check?: boolean;
+    input?: string;
+    refreshItems?: boolean;
+    updateOptions?: UserOptions;
+  };
+
   const ddus: Record<string, Ddu[]> = {};
   const contextBuilder = new ContextBuilder();
   const aliases: Record<DduExtType | "action", Record<string, string>> = {
@@ -43,6 +50,9 @@ export async function main(denops: Denops) {
     items: [],
     mode: "",
   };
+  const lock = new Lock();
+  let queuedName: string | null = null;
+  let queuedRedrawOption: RedrawOption | null = null;
 
   const getDdu = (name: string) => {
     if (!ddus[name]) {
@@ -143,37 +153,54 @@ export async function main(denops: Denops) {
       await ddu.start(denops, aliases, context, options, userOptions);
     },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
-      const name = ensureString(arg1);
-      const opt = ensureObject(arg2) as {
-        check?: boolean;
-        input?: string;
-        refreshItems?: boolean;
-        updateOptions?: UserOptions;
-      };
+      queuedName = ensureString(arg1);
+      queuedRedrawOption = ensureObject(arg2) as RedrawOption;
 
-      const ddu = getDdu(name);
+      // Note: must be locked
+      await lock.with(async () => {
+        while (queuedName != null) {
+          const name = queuedName;
+          const opt = queuedRedrawOption;
+          queuedName = null;
+          queuedRedrawOption = null;
 
-      if (opt?.check && !(await ddu.checkUpdated(denops))) {
-        // Mtime check failed
-        return;
-      }
+          const ddu = getDdu(name);
 
-      if (opt?.input != null) {
-        ddu.setInput(opt.input);
-      }
+          if (opt?.check && !(await ddu.checkUpdated(denops))) {
+            // Mtime check failed
+            continue;
+          }
 
-      if (opt?.updateOptions) {
-        ddu.updateOptions(opt.updateOptions);
-      }
+          if (opt?.input != null) {
+            ddu.setInput(opt.input);
+          }
 
-      if (
-        ddu.getOptions().volatile ||
-        opt?.refreshItems || opt?.updateOptions
-      ) {
-        await ddu.refresh(denops);
-      } else {
-        await ddu.redraw(denops);
-      }
+          if (opt?.updateOptions) {
+            ddu.updateOptions(opt.updateOptions);
+          }
+
+          if (opt?.refreshItems || opt?.updateOptions) {
+            await ddu.refresh(denops);
+            continue;
+          }
+
+          // Check volatile sources
+          const volatiles = [];
+          let index = 0;
+          for (const sourceArgs of ddu.getSourceArgs()) {
+            if (sourceArgs[0].volatile) {
+              volatiles.push(index);
+            }
+            index++;
+          }
+
+          if (volatiles.length > 0) {
+            await ddu.refresh(denops, volatiles);
+          } else {
+            await ddu.redraw(denops);
+          }
+        }
+      });
     },
     async redrawTree(
       arg1: unknown,

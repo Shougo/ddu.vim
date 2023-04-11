@@ -248,6 +248,7 @@ export class Ddu {
 
   async refresh(
     denops: Denops,
+    refreshIndexes: number[] = [],
   ): Promise<void> {
     this.startTime = Date.now();
 
@@ -263,6 +264,11 @@ export class Ddu {
     await Promise.all(
       this.options.sources.map(
         async (userSource: UserSource, index: number): Promise<void> => {
+          if (refreshIndexes.length > 0 && !refreshIndexes.includes(index)) {
+            // Skip
+            return;
+          }
+
           const state: GatherState = {
             items: [],
             done: false,
@@ -345,6 +351,7 @@ export class Ddu {
         },
       ),
     );
+
     this.redraw(denops);
   }
 
@@ -1390,6 +1397,12 @@ export class Ddu {
     return this.userOptions;
   }
 
+  getSourceArgs() {
+    return this.options.sources.map((userSource) =>
+      sourceArgs(this.options, userSource, this.sources[userSource.name])
+    );
+  }
+
   updateOptions(userOptions: UserOptions) {
     this.options = foldMerge(mergeDduOptions, defaultDduOptions, [
       this.options,
@@ -1704,7 +1717,7 @@ function sourceArgs<
 >(
   options: DduOptions,
   userSource: UserSource | null,
-  source: BaseSource<Params, UserData>,
+  source: BaseSource<Params, UserData> | null,
 ): [SourceOptions, BaseSourceParams] {
   const o = foldMerge(
     mergeSourceOptions,
