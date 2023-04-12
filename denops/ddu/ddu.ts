@@ -357,7 +357,9 @@ export class Ddu {
       ),
     );
 
-    this.redraw(denops);
+    if (this.options.sync) {
+      await this.redraw(denops);
+    }
   }
 
   async initSource<
@@ -520,6 +522,7 @@ export class Ddu {
         }
         return items;
       }, []);
+      this.context.maxItems = allItems.length;
     }
 
     await ui.refreshItems({
