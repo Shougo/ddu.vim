@@ -261,6 +261,11 @@ export class Ddu {
     }
     this.cancelToRefresh = false;
 
+    // Initialize UI window
+    if (!this.options.sync) {
+      await this.redraw(denops);
+    }
+
     await Promise.all(
       this.options.sources.map(
         async (userSource: UserSource, index: number): Promise<void> => {
