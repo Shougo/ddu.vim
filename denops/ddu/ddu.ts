@@ -371,10 +371,6 @@ export class Ddu {
             if (newItems.length === 0) {
               continue;
             }
-            state.items = state.items.concat(newItems);
-            if (!this.options.sync) {
-              await this.redraw(denops);
-            }
 
             let path = sourceOptions.path;
             if (path == "") {
@@ -386,6 +382,11 @@ export class Ddu {
                 this.context.pathHistories.push(this.context.path);
               }
               this.context.path = path;
+            }
+
+            state.items = state.items.concat(newItems);
+            if (!this.options.sync) {
+              await this.redraw(denops);
             }
           }
 
