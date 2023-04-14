@@ -131,9 +131,20 @@ export class Ddu {
 
     const resume = (userOptions?.resume == undefined && this.options?.resume) ||
       userOptions?.resume;
+    const uiChanged = userOptions?.ui && this.options.ui != "" &&
+      userOptions?.ui != this.options.ui;
+
+    if (uiChanged) {
+      // Quit current UI
+      const [ui, uiOptions, uiParams] = await this.getUi(denops);
+      if (!ui) {
+        return;
+      }
+      await this.uiQuit(denops, ui, uiOptions, uiParams);
+    }
 
     if (
-      this.initialized && resume &&
+      this.initialized && resume && !uiChanged &&
       (!userOptions?.sources ||
         equal(userOptions.sources, this.options.sources))
     ) {
@@ -244,6 +255,32 @@ export class Ddu {
     await this.refresh(denops);
 
     this.initialized = true;
+  }
+
+  async restart(
+    denops: Denops,
+    aliases: Record<DduExtType | "action", Record<string, string>>,
+    userOptions: UserOptions,
+  ): Promise<void> {
+    // Quit current UI
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui) {
+      return;
+    }
+    await this.uiQuit(denops, ui, uiOptions, uiParams);
+
+    // Disable resume
+    userOptions.resume = false;
+
+    // Restart
+    this.updateOptions(userOptions);
+    await this.start(
+      denops,
+      aliases,
+      this.context,
+      this.options,
+      userOptions,
+    );
   }
 
   async refresh(

@@ -176,6 +176,15 @@ export async function main(denops: Denops) {
           }
 
           if (opt?.updateOptions) {
+            if (
+              opt.updateOptions?.ui &&
+              opt.updateOptions?.ui != ddu.getOptions().ui
+            ) {
+              // UI is changed
+              await ddu.restart(denops, aliases, opt.updateOptions);
+              continue;
+            }
+
             ddu.updateOptions(opt.updateOptions);
           }
 
@@ -273,7 +282,9 @@ export async function main(denops: Denops) {
       const params = ensureObject(arg3);
 
       const ddu = getDdu(name);
-      await ddu.uiAction(denops, actionName, params);
+      if (ddu.getOptions().ui != "") {
+        await ddu.uiAction(denops, actionName, params);
+      }
     },
     async itemAction(
       arg1: unknown,
