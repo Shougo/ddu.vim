@@ -1003,6 +1003,10 @@ export class Ddu {
       }
     }
 
+    if (searchPath.length > 0) {
+      this.searchPath = searchPath;
+    }
+
     const winId = await fn.win_getid(denops);
 
     if (flags & ActionFlags.RefreshItems) {
@@ -1024,10 +1028,6 @@ export class Ddu {
     if (flags & ActionFlags.RestoreCursor) {
       // Restore the cursor
       await fn.win_gotoid(denops, winId);
-    }
-
-    if (searchPath.length > 0) {
-      this.searchPath = searchPath;
     }
   }
 
