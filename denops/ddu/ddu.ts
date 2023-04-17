@@ -14,6 +14,7 @@ import {
 import {
   ActionArguments,
   ActionFlags,
+  ActionHistory,
   ActionOptions,
   ActionResult,
   BaseActionParams,
@@ -862,6 +863,7 @@ export class Ddu {
     items: DduItem[],
     userActionParams: BaseActionParams,
     clipboard: Clipboard,
+    actionHistory: ActionHistory,
   ): Promise<void> {
     const ret = await this.getItemActions(denops, items);
     if (!ret) {
@@ -976,6 +978,7 @@ export class Ddu {
         actionParams,
         items,
         clipboard,
+        actionHistory,
       });
 
       if (typeof (ret) == "object") {

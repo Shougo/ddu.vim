@@ -9,6 +9,7 @@ import {
   vars,
 } from "./deps.ts";
 import {
+  ActionHistory,
   BaseActionParams,
   BaseFilterParams,
   Clipboard,
@@ -49,6 +50,11 @@ export async function main(denops: Denops) {
     action: "none",
     items: [],
     mode: "",
+  };
+  const actionHistory: ActionHistory = {
+    action: "none",
+    items: [],
+    dest: "",
   };
   const lock = new Lock();
   let queuedName: string | null = null;
@@ -298,7 +304,14 @@ export async function main(denops: Denops) {
       const params = ensureObject(arg4);
 
       const ddu = getDdu(name);
-      await ddu.itemAction(denops, actionName, items, params, clipboard);
+      await ddu.itemAction(
+        denops,
+        actionName,
+        items,
+        params,
+        clipboard,
+        actionHistory,
+      );
     },
     async getItemActions(
       arg1: unknown,

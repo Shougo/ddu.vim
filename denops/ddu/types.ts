@@ -178,6 +178,7 @@ export type ActionArguments<Params extends BaseActionParams> = {
   actionParams: unknown;
   items: DduItem[];
   clipboard: Clipboard;
+  actionHistory: ActionHistory;
 };
 
 export type Actions<Params extends BaseActionParams> = Record<
@@ -293,4 +294,10 @@ export type Clipboard = {
   items: DduItem[];
   mode: string;
   paster?: never;
+};
+
+export type ActionHistory = {
+  action: string;
+  items: DduItem[];
+  dest: string;
 };
