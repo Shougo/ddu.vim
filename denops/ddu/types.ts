@@ -297,7 +297,9 @@ export type Clipboard = {
 };
 
 export type ActionHistory = {
-  action: string;
-  items: DduItem[];
-  dest: string;
+  actions: {
+    action: string;
+    item: DduItem;
+    dest: string;
+  }[];
 };

@@ -52,9 +52,7 @@ export async function main(denops: Denops) {
     mode: "",
   };
   const actionHistory: ActionHistory = {
-    action: "none",
-    items: [],
-    dest: "",
+    actions: [],
   };
   const lock = new Lock();
   let queuedName: string | null = null;
