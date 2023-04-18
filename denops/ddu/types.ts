@@ -299,7 +299,7 @@ export type Clipboard = {
 export type ActionHistory = {
   actions: {
     action: string;
-    item: DduItem;
-    dest: string;
+    item?: DduItem;
+    dest?: string;
   }[];
 };
