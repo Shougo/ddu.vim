@@ -841,7 +841,7 @@ export class Ddu {
     const [kindOptions, _1] = kindArgs(this.options, kind);
     const [sourceOptions, _2] = sourceArgs(
       this.options,
-      this.options.sources[indexes[0]],
+      this.options.sources[indexes.length > 0 ? indexes[0] : 0],
       source,
     );
 
@@ -881,9 +881,12 @@ export class Ddu {
       ...new Set(items.map((item) => item.__sourceIndex)),
     ];
 
+    const userSource = this.options.sources[
+      indexes.length > 0 ? indexes[0] : 0
+    ];
     const [sourceOptions, sourceParams] = sourceArgs(
       this.options,
-      this.options.sources[indexes[0]],
+      userSource,
       source,
     );
 
@@ -991,7 +994,6 @@ export class Ddu {
       // Check path is changed by action
       if (sourceOptions.path != prevPath) {
         // Overwrite current path
-        const userSource = this.options.sources[indexes[0]];
         if (!userSource.options) {
           userSource.options = sourceOptions;
         }
