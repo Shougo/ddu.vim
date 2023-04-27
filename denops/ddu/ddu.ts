@@ -125,6 +125,7 @@ export class Ddu {
     userOptions: UserOptions,
   ): Promise<void> {
     const prevInput = this.context.input;
+    const prevPath = this.context.path;
 
     this.aliases = aliases;
     this.context = context;
@@ -160,6 +161,9 @@ export class Ddu {
       } else if (prevInput != "") {
         this.setInput(prevInput);
       }
+
+      // Set path
+      this.context.path = prevPath;
 
       const [ui, uiOptions, uiParams] = await this.getUi(denops);
       if (!ui) {
