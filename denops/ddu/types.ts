@@ -123,7 +123,7 @@ export type BaseActionParams = Record<string, unknown>;
 
 export type ItemHighlight = {
   name: string;
-  "hl_group": string;
+  hl_group: string;
   col: number;
   width: number;
 };
