@@ -78,7 +78,7 @@ INTERFACE						*ddu-interface*
 
 
 ------------------------------------------------------------------------------
-OPTIONS	 						*ddu-options*
+OPTIONS							*ddu-options*
 
 						*ddu-option-actionOptions*
 actionOptions		(dictionary)
@@ -159,7 +159,7 @@ resume			(boolean)
 
 		Default: v:false
 
-				    	    	*ddu-option-searchPath*
+						*ddu-option-searchPath*
 searchPath		(string)
 		Search the path.  This only works when specified |ddu#start()|
 		or |ddu#redraw()|.
@@ -167,7 +167,7 @@ searchPath		(string)
 
 		Default: ""
 
-					    	*ddu-option-sourceOptions*
+						*ddu-option-sourceOptions*
 sourceOptions		(dictionary)
 		It is a dictionary that maps source names to its options.  The
 		options with the name "_" is used as the options for all
@@ -235,7 +235,7 @@ unique			(boolean)
 		Default: v:false
 
 ------------------------------------------------------------------------------
-FUNCTIONS 						*ddu-functions*
+FUNCTIONS						*ddu-functions*
 
 							*ddu#event()*
 ddu#event({name}, {event})
@@ -345,7 +345,7 @@ ddu#start({options})
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
 
-							*ddu#ui_async_action()*
+						*ddu#ui_async_action()*
 ddu#ui_async_action({name}, {action}, {params})
 		Do the {action} action in current UI asynchronously.
 
@@ -353,7 +353,7 @@ ddu#ui_async_action({name}, {action}, {params})
 
 		{params} is action params.
 
-							*ddu#ui_sync_action()*
+						*ddu#ui_sync_action()*
 ddu#ui_sync_action({name}, {action}, {params})
 		Do the {action} action in current UI synchronously.
 
@@ -362,7 +362,7 @@ ddu#ui_sync_action({name}, {action}, {params})
 		{params} is action params.
 
 
-CUSTOM FUNCTIONS 					*ddu-custom-functions*
+CUSTOM FUNCTIONS					*ddu-custom-functions*
 
 							*ddu#custom#action()*
 ddu#custom#action({type}, {name}, {action-name}, {func})
@@ -425,7 +425,7 @@ ddu#custom#patch_local({buffer-name}, {dict})
 		Set local options for specific |ddu-option-name|.
 		The arguments are the same as for |ddu#custom#patch_global()|.
 
-UI FUNCTIONS 					*ddu-ui-functions*
+UI FUNCTIONS					*ddu-ui-functions*
 
 						*ddu#ui#do_action()*
 ddu#ui#do_action({action-name}[, {params}])
@@ -559,12 +559,12 @@ defaultAction		(string)
 
 		Default: "default"
 
-				    		*ddu-ui-option-persist*
+						*ddu-ui-option-persist*
 persist			(boolean)
 		Redraw the UI after fire actions.
 		Default: v:false
 
-				    		*ddu-ui-option-toggle*
+						*ddu-ui-option-toggle*
 toggle			(boolean)
 		Quit the UI if the UI exists.
 		Default: v:false
@@ -591,14 +591,14 @@ Note: The sources cannot set default options for source.  If the source need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
-				    		*ddu-source-option-columns*
+						*ddu-source-option-columns*
 columns			(string[])
 		It is a list of registered column names.
 		Items will be processed in the order you specify here.
 
 		Default: []
 
-				    		*ddu-source-option-converters*
+						*ddu-source-option-converters*
 converters		(string[])
 		It is a list of registered filter names to change items
 		attributes.
@@ -613,7 +613,7 @@ defaultAction		(string)
 
 		Default: ""
 
-				    	*ddu-source-option-ignoreCase*
+					*ddu-source-option-ignoreCase*
 ignoreCase		(boolean)
 		If it is True, ddu ignores case.
 
@@ -625,7 +625,7 @@ matcherKey		(string)
 
 		Default: "word"
 
-				    		*ddu-source-option-matchers*
+						*ddu-source-option-matchers*
 matchers		(string[])
 		It is a list of registered filter names to filter items
 		by user input.
@@ -633,19 +633,19 @@ matchers		(string[])
 
 		Default: []
 
-				    		*ddu-source-option-maxItems*
+						*ddu-source-option-maxItems*
 maxItems		(number)
 		It is the max number of source items.
 		It is applyed after sorters.
 
 		Default: 10000
 
-				    		*ddu-source-option-path*
+						*ddu-source-option-path*
 path			(string)
 		Specify an initial narrowing path.
 		Note: It must be full path.
 
-				    		*ddu-source-option-sorters*
+						*ddu-source-option-sorters*
 sorters			(string[])
 		It is a list of registered filter names to sort items.
 		Items will be processed in the order you specify here.
@@ -707,7 +707,7 @@ KINDS							*ddu-kinds*
 ------------------------------------------------------------------------------
 KIND OPTIONS						*ddu-kind-options*
 
-				    	*ddu-kind-option-defaultAction*
+					*ddu-kind-option-defaultAction*
 defaultAction		(string)
 		Specify the default action.
 
@@ -728,7 +728,7 @@ ACTIONS							*ddu-actions*
 ------------------------------------------------------------------------------
 ACTION OPTIONS						*ddu-action-options*
 
-					    	*ddu-action-option-quit*
+						*ddu-action-option-quit*
 quit			(boolean)
 		Quit the UI before executing action.
 
@@ -810,7 +810,7 @@ visible			(function)			(Optional)
 
 					*ddu-ui-attribute-winId*
 winId			(function)			(Optional)
-		Called to get UI's |window-Id|.
+		Called to get UI's |window-ID|.
 
 
 ==============================================================================
