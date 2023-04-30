@@ -245,7 +245,7 @@ export class Ddu {
         userSource,
         source,
       );
-      await this.initSource(
+      await initSource(
         denops,
         source,
         sourceOptions,
@@ -403,28 +403,6 @@ export class Ddu {
     if (this.options.sync) {
       await this.redraw(denops);
     }
-  }
-
-  async initSource<
-    Params extends BaseSourceParams,
-    UserData extends unknown,
-  >(
-    denops: Denops,
-    source: BaseSource<Params, UserData>,
-    sourceOptions: SourceOptions,
-    sourceParams: Params,
-  ): Promise<void> {
-    if (!source) {
-      return;
-    }
-
-    source.isInitialized = false;
-    await source.onInit({
-      denops,
-      sourceOptions,
-      sourceParams,
-    });
-    source.isInitialized = true;
   }
 
   private newDduItem<
@@ -1877,6 +1855,28 @@ function actionArgs(
     params,
   ]);
   return [o, p];
+}
+
+async function initSource<
+  Params extends BaseSourceParams,
+  UserData extends unknown,
+>(
+  denops: Denops,
+  source: BaseSource<Params, UserData>,
+  sourceOptions: SourceOptions,
+  sourceParams: Params,
+): Promise<void> {
+  if (!source) {
+    return;
+  }
+
+  source.isInitialized = false;
+  await source.onInit({
+    denops,
+    sourceOptions,
+    sourceParams,
+  });
+  source.isInitialized = true;
 }
 
 async function checkUiOnInit(
