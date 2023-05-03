@@ -21,7 +21,7 @@ import { defaultSourceOptions } from "./base/source.ts";
 // where
 // T: Object
 // partialMerge: PartialMerge
-// partialMerge(partialMerge(a, b), c) == partialMerge(a, partialMerge(b, c))
+// partialMerge(partialMerge(a, b), c) === partialMerge(a, partialMerge(b, c))
 type PartialMerge<T> = (a: Partial<T>, b: Partial<T>) => Partial<T>;
 type Merge<T> = (a: T, b: Partial<T>) => T;
 type Default<T> = () => T;

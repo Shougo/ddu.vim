@@ -131,10 +131,11 @@ export class Ddu {
     this.context = context;
     this.userOptions = userOptions;
 
-    const resume = (userOptions?.resume == undefined && this.options?.resume) ||
+    const resume =
+      (userOptions?.resume === undefined && this.options?.resume) ||
       userOptions?.resume;
-    const uiChanged = userOptions?.ui && this.options.ui != "" &&
-      userOptions?.ui != this.options.ui;
+    const uiChanged = userOptions?.ui && this.options.ui !== "" &&
+      userOptions?.ui !== this.options.ui;
 
     if (uiChanged) {
       // Quit current UI
@@ -156,9 +157,9 @@ export class Ddu {
       this.updateOptions(userOptions);
 
       // Set input
-      if (userOptions?.input != null) {
+      if (userOptions?.input !== undefined) {
         this.setInput(userOptions.input as string);
-      } else if (prevInput != "") {
+      } else if (prevInput !== "") {
         this.setInput(prevInput);
       }
 
@@ -378,11 +379,11 @@ export class Ddu {
             }
 
             let path = sourceOptions.path;
-            if (path == "") {
+            if (path === "") {
               // Use current directory instead
               path = await fn.getcwd(denops) as string;
             }
-            if (path != this.context.path) {
+            if (path !== this.context.path) {
               if (this.context.path.length > 0) {
                 this.context.pathHistories.push(this.context.path);
               }
@@ -775,7 +776,7 @@ export class Ddu {
     const indexes = [
       ...new Set(items.map((item) => item.__sourceIndex)),
     ];
-    if (sources.length == 0 || sources.length != 1 && indexes.length != 1) {
+    if (sources.length === 0 || sources.length !== 1 && indexes.length !== 1) {
       if (sources.length > 0) {
         await denops.call(
           "ddu#util#print_error",
@@ -795,7 +796,7 @@ export class Ddu {
           : sources.map((source) => source.kind),
       ),
     ] as string[];
-    if (kinds.length != 1) {
+    if (kinds.length !== 1) {
       await denops.call(
         "ddu#util#print_error",
         `You must not mix multiple kinds: "${kinds}"`,
@@ -806,7 +807,7 @@ export class Ddu {
     await this.autoload(denops, "kind", kinds);
 
     const kindName = kinds[0];
-    if (kindName == "base") {
+    if (kindName === "base") {
       // Dummy kind
       return null;
     }
@@ -875,14 +876,14 @@ export class Ddu {
     const [kindOptions, kindParams] = kindArgs(this.options, kind);
 
     // Get default action in the first
-    if (actionName == "default") {
+    if (actionName === "default") {
       actionName = sourceOptions.defaultAction;
-      if (actionName == "") {
+      if (actionName === "") {
         // Use kind default action
         actionName = kindOptions.defaultAction;
       }
 
-      if (actionName == "") {
+      if (actionName === "") {
         await denops.call(
           "ddu#util#print_error",
           `The default action is not defined for the items`,
@@ -966,7 +967,7 @@ export class Ddu {
         actionHistory,
       });
 
-      if (typeof (ret) == "object") {
+      if (typeof (ret) === "object") {
         flags = ret.flags;
         searchPath = ret.searchPath;
       } else {
@@ -974,7 +975,7 @@ export class Ddu {
       }
 
       // Check path is changed by action
-      if (sourceOptions.path != prevPath) {
+      if (sourceOptions.path !== prevPath) {
         // Overwrite current path
         if (!userSource.options) {
           userSource.options = sourceOptions;
@@ -1026,7 +1027,7 @@ export class Ddu {
       return this.expandItem(
         denops,
         item.item,
-        item.search == undefined
+        item.search === undefined
           ? {
             maxLevel: maxLevel,
             preventRedraw: true,
@@ -1051,7 +1052,7 @@ export class Ddu {
         uiParams,
       );
 
-      if (searchedItems.length == 1) {
+      if (searchedItems.length === 1) {
         await ui.searchItem({
           denops,
           context: this.context,
@@ -1203,7 +1204,7 @@ export class Ddu {
       isParentPath(parent.treePath, options.search)
     ) {
       searchedItem = children.find((item) =>
-        options.search == item.treePath ?? item.word
+        options.search === item.treePath ?? item.word
       );
     }
 
@@ -1384,7 +1385,7 @@ export class Ddu {
 
     // Check alias
     const aliases = Object.keys(this.aliases[type]).filter(
-      (k) => this.aliases[type][k] == name,
+      (k) => this.aliases[type][k] === name,
     );
     for (const alias of aliases) {
       add(alias);
@@ -1396,7 +1397,7 @@ export class Ddu {
     type: DduExtType,
     names: string[],
   ): Promise<string[]> {
-    if (names.length == 0) {
+    if (names.length === 0) {
       return [];
     }
 
@@ -1619,7 +1620,7 @@ export class Ddu {
     columns: string[],
     items: DduItem[],
   ) {
-    if (columns.length == 0) {
+    if (columns.length === 0) {
       return items;
     }
 

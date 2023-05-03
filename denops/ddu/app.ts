@@ -62,7 +62,7 @@ export async function main(denops: Denops) {
     if (!ddus[name]) {
       ddus[name] = [];
     }
-    if (ddus[name].length == 0) {
+    if (ddus[name].length === 0) {
       ddus[name].push(new Ddu());
     }
     return ddus[name].slice(-1)[0];
@@ -79,7 +79,7 @@ export async function main(denops: Denops) {
       ddus[name] = [];
     }
 
-    if (ddus[name].length == 0) {
+    if (ddus[name].length === 0) {
       return null;
     }
 
@@ -162,7 +162,7 @@ export async function main(denops: Denops) {
 
       // Note: must be locked
       await lock.with(async () => {
-        while (queuedName != null) {
+        while (queuedName !== null) {
           const name = queuedName;
           const opt = queuedRedrawOption;
           queuedName = null;
@@ -175,14 +175,14 @@ export async function main(denops: Denops) {
             continue;
           }
 
-          if (opt?.input != null) {
+          if (opt?.input !== undefined) {
             ddu.setInput(opt.input);
           }
 
           if (opt?.updateOptions) {
             if (
               opt.updateOptions?.ui &&
-              opt.updateOptions?.ui != ddu.getOptions().ui
+              opt.updateOptions?.ui !== ddu.getOptions().ui
             ) {
               // UI is changed
               await ddu.restart(denops, aliases, opt.updateOptions);
@@ -226,9 +226,9 @@ export async function main(denops: Denops) {
 
       const ddu = getDdu(name);
 
-      if (mode == "collapse") {
+      if (mode === "collapse") {
         await ddu.collapseItems(denops, items.map((item) => item.item));
-      } else if (mode == "expand") {
+      } else if (mode === "expand") {
         ddu.expandItems(denops, items);
       }
     },
@@ -238,7 +238,7 @@ export async function main(denops: Denops) {
 
       const ddu = getDdu(name);
 
-      if (event == "close" || event == "cancel") {
+      if (event === "close" || event === "cancel") {
         ddu.quit();
       }
 
@@ -286,7 +286,7 @@ export async function main(denops: Denops) {
       const params = ensureObject(arg3);
 
       const ddu = getDdu(name);
-      if (ddu.getOptions().ui != "") {
+      if (ddu.getOptions().ui !== "") {
         await ddu.uiAction(denops, actionName, params);
       }
     },
