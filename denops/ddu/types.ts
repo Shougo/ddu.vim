@@ -29,6 +29,7 @@ export type Context = {
   done: boolean;
   input: string;
   maxItems: number;
+  mode: string;
   path: string;
   pathHistories: string[];
   winId: number;
