@@ -337,7 +337,7 @@ ddu#redraw_tree({name}, {mode}, {items})
 		{items} is target tree items.
 
 							*ddu#start()*
-ddu#start({options})
+ddu#start([{options}])
 		Creates a new Ddu.
 		Note: You cannot call it in |vim_starting|.  Because
 		denops.vim is not initialized.
@@ -346,7 +346,7 @@ ddu#start({options})
 		it uses the default value.
 
 						*ddu#ui_async_action()*
-ddu#ui_async_action({name}, {action}, {params})
+ddu#ui_async_action({name}, {action}[, {params}])
 		Do the {action} action in current UI asynchronously.
 
 		{name} is specified ddu name(|ddu-option-name|).
@@ -354,7 +354,7 @@ ddu#ui_async_action({name}, {action}, {params})
 		{params} is action params.
 
 						*ddu#ui_sync_action()*
-ddu#ui_sync_action({name}, {action}, {params})
+ddu#ui_sync_action({name}, {action}[, {params}])
 		Do the {action} action in current UI synchronously.
 
 		{name} is specified ddu name(|ddu-option-name|).
@@ -515,7 +515,7 @@ EXAMPLES						*ddu-examples*
 	"    \ })
 	
 	" Call default sources
-	"call ddu#start({})
+	"call ddu#start()
 	
 	" Set buffer-name specific configuration
 	"call ddu#custom#patch_local('files', #{
