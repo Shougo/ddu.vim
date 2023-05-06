@@ -54,7 +54,7 @@ export async function main(denops: Denops) {
   const actionHistory: ActionHistory = {
     actions: [],
   };
-  const lock = new Lock();
+  const lock = new Lock(0);
   let queuedName: string | null = null;
   let queuedRedrawOption: RedrawOption | null = null;
 
@@ -161,7 +161,7 @@ export async function main(denops: Denops) {
       queuedRedrawOption = ensureObject(arg2) as RedrawOption;
 
       // Note: must be locked
-      await lock.with(async () => {
+      await lock.lock(async () => {
         while (queuedName !== null) {
           const name = queuedName;
           const opt = queuedRedrawOption;

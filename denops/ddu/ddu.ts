@@ -108,7 +108,7 @@ export class Ddu {
   private initialized = false;
   private quitted = false;
   private cancelToRefresh = false;
-  private lock = new Lock();
+  private lock = new Lock(0);
   private startTime = 0;
   private expandedPaths = new Set<string>();
   private searchPath = "";
@@ -1911,7 +1911,7 @@ async function uiRedraw<
   Params extends BaseUiParams,
 >(
   denops: Denops,
-  lock: Lock,
+  lock: Lock<number>,
   context: Context,
   options: DduOptions,
   ui: BaseUi<Params>,
@@ -1919,7 +1919,7 @@ async function uiRedraw<
   uiParams: Params,
 ): Promise<void> {
   // NOTE: Redraw must be locked
-  await lock.with(async () => {
+  await lock.lock(async () => {
     try {
       await ui.redraw({
         denops,
