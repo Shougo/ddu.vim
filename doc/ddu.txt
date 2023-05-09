@@ -432,6 +432,9 @@ ddu#ui#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params} from current buffer
 		UI asynchronously.
 		{args} behavior depends on {action-name}.
+		Note: The action may be does not work because of asynchronous
+		execution.  If so, you should use |ddu#ui#sync_action()|
+		instead.
 
 						*ddu#ui#get_item()*
 ddu#ui#get_item()
@@ -462,6 +465,7 @@ ddu#ui#sync_action({action-name}[, {params}])
 		Fire {action-name} action with {params} from current buffer
 		UI synchronously.
 		{args} behavior depends on {action-name}.
+		Note: It is slow than |ddu#ui#do_action()|.
 
 						*ddu#ui#visible()*
 ddu#ui#visible({name}[, {tabnr}])
@@ -762,7 +766,7 @@ UI ATTRIBUTES						*ddu-ui-attributes*
 						*ddu-ui-attribute-actions*
 actions			(Record<string, function>)	(Optional)
 		Defines UI actions.
-		The actions are called from |ddu#ui_sync_action|.
+		The actions are called from |ddu#ui_sync_action()|.
 
 					*ddu-ui-attribute-collapseItem*
 collapseItem		(function)			(Optional)
