@@ -176,7 +176,7 @@ export async function main(denops: Denops) {
           }
 
           if (opt?.input !== undefined) {
-            ddu.setInput(opt.input);
+            await ddu.setInput(denops, opt.input);
           }
 
           if (opt?.updateOptions) {

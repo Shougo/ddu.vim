@@ -158,9 +158,9 @@ export class Ddu {
 
       // Set input
       if (userOptions?.input !== undefined) {
-        this.setInput(userOptions.input as string);
+        await this.setInput(denops, userOptions.input as string);
       } else if (prevInput !== "") {
-        this.setInput(prevInput);
+        await this.setInput(denops, prevInput);
       }
 
       // Set path
@@ -206,7 +206,7 @@ export class Ddu {
     } else {
       this.gatherStates = {};
       this.options = options;
-      this.setInput(this.options.input);
+      await this.setInput(denops, this.options.input);
     }
 
     if (this.options.searchPath.length > 0) {
@@ -1419,8 +1419,8 @@ export class Ddu {
     return paths;
   }
 
-  setInput(input: string) {
-    this.input = input;
+  async setInput(denops: Denops, input: string) {
+    this.input = await fn.expand(denops, input) as string;
     this.context.input = input;
   }
 

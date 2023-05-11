@@ -76,6 +76,7 @@ export function defaultDduOptions(): DduOptions {
     actionParams: {},
     columnOptions: {},
     columnParams: {},
+    expandInput: false,
     filterOptions: {},
     filterParams: {},
     kindOptions: {},

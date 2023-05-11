@@ -58,6 +58,7 @@ export type DduOptions = {
   actionParams: Record<string, Partial<BaseActionParams>>;
   columnOptions: Record<string, Partial<ColumnOptions>>;
   columnParams: Record<string, Partial<BaseColumnParams>>;
+  expandInput: boolean;
   filterOptions: Record<string, Partial<FilterOptions>>;
   filterParams: Record<string, Partial<BaseFilterParams>>;
   input: string;

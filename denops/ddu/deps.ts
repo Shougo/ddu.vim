@@ -1,22 +1,22 @@
-export type { Denops } from "https://deno.land/x/denops_std@v4.1.8/mod.ts";
+export type { Denops } from "https://deno.land/x/denops_std@v4.1.9/mod.ts";
 export {
   echo,
   execute,
-} from "https://deno.land/x/denops_std@v4.1.8/helper/mod.ts";
+} from "https://deno.land/x/denops_std@v4.1.9/helper/mod.ts";
 export {
   batch,
   gather,
-} from "https://deno.land/x/denops_std@v4.1.8/batch/mod.ts";
-export * as op from "https://deno.land/x/denops_std@v4.1.8/option/mod.ts";
-export * as fn from "https://deno.land/x/denops_std@v4.1.8/function/mod.ts";
-export * as vars from "https://deno.land/x/denops_std@v4.1.8/variable/mod.ts";
-export * as autocmd from "https://deno.land/x/denops_std@v4.1.8/autocmd/mod.ts";
+} from "https://deno.land/x/denops_std@v4.1.9/batch/mod.ts";
+export * as op from "https://deno.land/x/denops_std@v4.1.9/option/mod.ts";
+export * as fn from "https://deno.land/x/denops_std@v4.1.9/function/mod.ts";
+export * as vars from "https://deno.land/x/denops_std@v4.1.9/variable/mod.ts";
+export * as autocmd from "https://deno.land/x/denops_std@v4.1.9/autocmd/mod.ts";
 export {
   ensureArray,
   ensureNumber,
   ensureObject,
   ensureString,
-} from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
+} from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
 export {
   assertEquals,
   equal,
@@ -27,7 +27,7 @@ export {
   DeadlineError,
 } from "https://deno.land/std@0.186.0/async/mod.ts";
 export { TimeoutError } from "https://deno.land/x/msgpack_rpc@v4.0.1/response_waiter.ts";
-export { Lock } from "https://deno.land/x/async@v2.0.1/mod.ts";
+export { Lock } from "https://deno.land/x/async@v2.0.2/mod.ts";
 export {
   basename,
   dirname,

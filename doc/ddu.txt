@@ -108,6 +108,11 @@ columnParams		(dictionary)
 
 		Default: {}
 
+						*ddu-option-expandInput*
+expandInput		(boolean)
+		Expand user input by |expand()|.
+		It is useful for file path sources.
+
 						*ddu-option-filterOptions*
 filterOptions		(dictionary)
 		It is a dictionary that maps filter names to its options.
