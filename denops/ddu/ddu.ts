@@ -1420,7 +1420,10 @@ export class Ddu {
   }
 
   async setInput(denops: Denops, input: string) {
-    this.input = await fn.expand(denops, input) as string;
+    if (this.options.expandInput) {
+      input = await fn.expand(denops, input) as string;
+    }
+    this.input = input;
     this.context.input = input;
   }
 
