@@ -361,6 +361,8 @@ export class Ddu {
             });
           }
 
+          let prevLength = state.items.length;
+
           for await (
             const newItems of this.gatherItems(
               denops,
@@ -373,9 +375,6 @@ export class Ddu {
           ) {
             if (this.shouldStopCurrentContext()) {
               break;
-            }
-            if (newItems.length === 0) {
-              continue;
             }
 
             let path = sourceOptions.path;
@@ -391,12 +390,18 @@ export class Ddu {
             }
 
             state.items = state.items.concat(newItems);
-            if (!this.options.sync) {
+
+            if (prevLength !== state.items.length && !this.options.sync) {
               await this.redraw(denops);
+              prevLength = state.items.length;
             }
           }
 
           state.done = true;
+
+          if (prevLength !== state.items.length && !this.options.sync) {
+            await this.redraw(denops);
+          }
         },
       ),
     );
