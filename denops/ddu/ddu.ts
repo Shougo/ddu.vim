@@ -399,7 +399,7 @@ export class Ddu {
 
           state.done = true;
 
-          if (prevLength !== state.items.length && !this.options.sync) {
+          if (!this.options.sync) {
             await this.redraw(denops);
           }
         },
