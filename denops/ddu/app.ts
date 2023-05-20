@@ -31,6 +31,12 @@ import {
   foldMerge,
   mergeDduOptions,
 } from "./context.ts";
+import { defaultUiOptions } from "./base/ui.ts";
+import { defaultSourceOptions } from "./base/source.ts";
+import { defaultFilterOptions } from "./base/filter.ts";
+import { defaultColumnOptions } from "./base/column.ts";
+import { defaultKindOptions } from "./base/kind.ts";
+import { defaultActionOptions } from "./base/action.ts";
 
 export async function main(denops: Denops) {
   type RedrawTreeMode = "collapse" | "expand";
@@ -126,7 +132,14 @@ export async function main(denops: Denops) {
       return Promise.resolve(contextBuilder.getLocal());
     },
     getDefaultOptions(): Promise<Partial<DduOptions>> {
-      return Promise.resolve(defaultDduOptions());
+      return Promise.resolve(Object.assign(defaultDduOptions(), {
+        actionOptions: defaultActionOptions(),
+        columnOptions: defaultColumnOptions(),
+        filterOptions: defaultFilterOptions(),
+        kindOptions: defaultKindOptions(),
+        sourceOptions: defaultSourceOptions(),
+        uiOptions: defaultUiOptions(),
+      }));
     },
     getCurrent(arg1: unknown): Promise<Partial<DduOptions>> {
       const name = ensureString(arg1);

@@ -146,7 +146,8 @@ export class Ddu {
       await this.uiQuit(denops, ui, uiOptions, uiParams);
     }
 
-    const checkToggle = this.initialized && !this.quitted && !userOptions?.refresh;
+    const checkToggle = this.initialized && !this.quitted &&
+      !userOptions?.refresh;
 
     if (
       this.initialized && resume && !uiChanged &&
