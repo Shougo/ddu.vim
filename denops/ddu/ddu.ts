@@ -146,6 +146,8 @@ export class Ddu {
       await this.uiQuit(denops, ui, uiOptions, uiParams);
     }
 
+    const checkToggle = this.initialized && !this.quitted && !userOptions?.refresh;
+
     if (
       this.initialized && resume && !uiChanged &&
       (!userOptions?.sources ||
@@ -171,7 +173,8 @@ export class Ddu {
         return;
       }
 
-      if (!this.quitted && uiOptions.toggle) {
+      if (checkToggle && uiOptions.toggle) {
+        console.log("quit");
         await this.uiQuit(denops, ui, uiOptions, uiParams);
         return;
       }
@@ -218,7 +221,7 @@ export class Ddu {
     if (!ui) {
       return;
     }
-    if (this.initialized && !this.quitted && uiOptions.toggle) {
+    if (checkToggle && uiOptions.toggle) {
       await this.uiQuit(denops, ui, uiOptions, uiParams);
       return;
     }

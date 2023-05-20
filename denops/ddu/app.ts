@@ -25,7 +25,12 @@ import {
   UserOptions,
 } from "./types.ts";
 import { Ddu } from "./ddu.ts";
-import { ContextBuilder, defaultDduOptions } from "./context.ts";
+import {
+  ContextBuilder,
+  defaultDduOptions,
+  foldMerge,
+  mergeDduOptions,
+} from "./context.ts";
 
 export async function main(denops: Denops) {
   type RedrawTreeMode = "collapse" | "expand";
@@ -143,15 +148,21 @@ export async function main(denops: Denops) {
     },
     async start(arg1: unknown): Promise<void> {
       let userOptions = ensureObject(arg1);
-      const [context, options] = await contextBuilder.get(denops, userOptions);
+      let [context, options] = await contextBuilder.get(denops, userOptions);
 
       let ddu = getDdu(options.name);
 
       if (options.push) {
         const prevDdu = ddu;
         ddu = pushDdu(options.name);
+
         // Extends previous options
-        userOptions = Object.assign(prevDdu.getUserOptions(), userOptions);
+        userOptions = foldMerge(mergeDduOptions, defaultDduOptions, [
+          prevDdu.getOptions(),
+          userOptions,
+        ]);
+
+        [context, options] = await contextBuilder.get(denops, userOptions);
       }
 
       await ddu.start(denops, aliases, context, options, userOptions);
@@ -265,15 +276,18 @@ export async function main(denops: Denops) {
       }
 
       // Resume previous ddu state
-      const userOptions = {
-        refresh: true,
-        resume: true,
-      };
+      const ddu = getDdu(name);
+      const userOptions = foldMerge(mergeDduOptions, defaultDduOptions, [
+        ddu.getOptions(),
+        {
+          refresh: true,
+          resume: true,
+        },
+      ]);
       const [context, options] = await contextBuilder.get(
         denops,
         userOptions,
       );
-      const ddu = getDdu(name);
       await ddu.start(denops, aliases, context, options, userOptions);
     },
     async uiAction(
