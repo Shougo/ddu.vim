@@ -175,7 +175,6 @@ export class Ddu {
       }
 
       if (checkToggle && uiOptions.toggle) {
-        console.log("quit");
         await this.uiQuit(denops, ui, uiOptions, uiParams);
         return;
       }
