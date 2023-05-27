@@ -67,10 +67,9 @@ Please install both Deno and "denops.vim".
 https://deno.land/
 https://github.com/vim-denops/denops.vim
 
-Note: ddu.vim does not include any sources and filters.
+Note: ddu.vim does not include any UIs, sources, filters and kinds.
 You must install them you want manually.
-You can search ddu.vim plugins(sources and filters) from
-https://github.com/topics/ddu-vim.
+You can search ddu.vim plugins from https://github.com/topics/ddu-vim.
 
 
 ==============================================================================
@@ -550,6 +549,8 @@ EXAMPLES						*ddu-examples*
 ==============================================================================
 UIS							*ddu-uis*
 
+The UIs are used to display items.
+
 Note: The UIs are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-ui
 
@@ -589,6 +590,8 @@ documentation.
 ==============================================================================
 SOURCES							*ddu-sources*
 
+The sources are used to get items.
+
 Note: The sources are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-source
 
@@ -603,6 +606,7 @@ documentation instead.
 						*ddu-source-option-columns*
 columns			(string[])
 		It is a list of registered column names.
+		Please see |ddu-columns|.
 		Items will be processed in the order you specify here.
 
 		Default: []
@@ -611,6 +615,7 @@ columns			(string[])
 converters		(string[])
 		It is a list of registered filter names to change items
 		attributes.
+		Please see |ddu-filters|.
 		Items will be processed in the order you specify here.
 
 		Default: []
@@ -638,6 +643,7 @@ matcherKey		(string)
 matchers		(string[])
 		It is a list of registered filter names to filter items
 		by user input.
+		Please see |ddu-filters|.
 		Items will be processed in the order you specify here.
 
 		Default: []
@@ -657,6 +663,7 @@ path			(string)
 						*ddu-source-option-sorters*
 sorters			(string[])
 		It is a list of registered filter names to sort items.
+		Please see |ddu-filters|.
 		Items will be processed in the order you specify here.
 
 		Default: []
@@ -680,11 +687,30 @@ documentation.
 ==============================================================================
 FILTERS							*ddu-filters*
 
+The filters are used to filter items from the sources.
+
+	"matchers": Filter items by user input.
+	
+	"sorters": Sort items.
+	
+	"filters": Convert item's attributes.
+
+The filters are applyed the following order.
+
+"matchers" -> "sorters" -> "converters"
+
+Note: "matchers" must not sort items.  Because later "sorters" overwrites the
+sort.
+
+Note: The filters are not bundled in ddu.vim.  You need to install them
+to use ddu.vim.  Please search them by https://github.com/topics/ddu-filter
+
 
 ------------------------------------------------------------------------------
 FILTER OPTIONS						*ddu-filter-options*
 
 Undefined now
+
 
 ------------------------------------------------------------------------------
 FILTER PARAMS						*ddu-filter-params*
@@ -696,11 +722,20 @@ documentation.
 ==============================================================================
 COLUMNS							*ddu-columns*
 
+The columns are used to overwrite |ddu-item-attribute-display|.
+It is useful for tree items.
+
+Note: The columns are applyed before |ddu-filters|.
+
+Note: The columns are not bundled in ddu.vim.  You need to install them
+to use ddu.vim.  Please search them by https://github.com/topics/ddu-column
+
 
 ------------------------------------------------------------------------------
 COLUMN OPTIONS						*ddu-column-options*
 
 Undefined now
+
 
 ------------------------------------------------------------------------------
 COLUMN PARAMS						*ddu-column-params*
@@ -711,6 +746,11 @@ documentation.
 
 ==============================================================================
 KINDS							*ddu-kinds*
+
+The kinds are used to define item actions.
+
+Note: The kinds are not bundled in ddu.vim.  You need to install them
+to use ddu.vim.  Please search them by https://github.com/topics/ddu-kind
 
 
 ------------------------------------------------------------------------------
@@ -916,7 +956,7 @@ highlights		(object[])			(Optional)
 		width			(number)
 		The highlight end width.
 
-						*ddu-item-attribute-status*
+					*ddu-item-attribute-status*
 status			(object)			(Optional)
 		The item status.
 
@@ -946,6 +986,9 @@ The filter class must extend the BaseFilter class.
 Note: It must be written in TypeScript language.
 
 Note: If you call Vim functions, it is not asynchronous.
+
+Note: "matchers" must not sort items.  Because later "sorters" overwrites the
+sort.
 
 
 ------------------------------------------------------------------------------
