@@ -918,6 +918,10 @@ ITEM ATTRIBUTES						*ddu-item-attributes*
 action			(dictionary)			(Optional)
 		The params dictionary for actions.
 
+					*ddu-item-attribute-data*
+data			(object)			(Optional)
+		The source/filter specific data.
+
 					*ddu-item-attribute-display*
 display			(string)			(Optional)
 		The string displayed in Ddu buffer.  If it is omitted,

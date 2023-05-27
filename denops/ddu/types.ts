@@ -141,6 +141,7 @@ export type Item<
   word: string;
   display?: string;
   action?: ActionData;
+  data?: unknown;
   highlights?: ItemHighlight[];
   status?: ItemStatus;
   kind?: string;
