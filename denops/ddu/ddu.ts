@@ -1499,10 +1499,12 @@ export class Ddu {
     }
     const ui = this.uis[this.options.ui];
     if (!ui) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Invalid ui: "${this.options.ui}"`,
-      );
+      if (this.options.ui.length !== 0) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid ui: "${this.options.ui}"`,
+        );
+      }
       return [
         undefined,
         defaultUiOptions(),

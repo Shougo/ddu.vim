@@ -212,6 +212,7 @@ sync			(boolean)
 							*ddu-option-ui*
 ui			(string)
 		Specify UI name.
+		If it is empty string, it is ignored.
 		Note: You must set the option in the first.
 
 		Default: ""
@@ -1149,6 +1150,11 @@ A: The example is here. >
 	      \   ],
 	      \ })
 	endfunction
+
+Q: I want to initialize "ddu.vim".
+
+A: You can use dummy |ddu#start()| for it. >
+	call ddu#start(#{ ui: '' })
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
