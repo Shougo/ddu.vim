@@ -35,13 +35,15 @@ Create UI		|ddu-create-ui|
   UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
   Source attributes	  |ddu-source-attributes|
-  Item attributes    |ddu-item-attributes|
+  Item attributes         |ddu-item-attributes|
 Create filter		|ddu-create-filter|
   filter attributes	  |ddu-filter-attributes|
 Create column		|ddu-create-column|
   column attributes	  |ddu-column-attributes|
 Create kind		|ddu-create-kind|
   kind attributes	  |ddu-kind-attributes|
+Previewer		|ddu-previewer|
+  previewer attributes	  |ddu-previewer-attributes|
 FAQ			|ddu-faq|
 Compatibility		|ddu-compatibility|
 
@@ -1060,12 +1062,83 @@ actions			(Record<string, function>)	(Required)
 
 					*ddu-kind-attribute-getPreviewer*
 getPreviewer		(function)			(Optional)
-		Called to get previewer. Previewer defines how preview is
-		rendered in the preview window.
+		Called to get |ddu-previewer|.
 
 						*ddu-kind-attribute-params*
 params			(function)			(Required)
 		Called to get kind params.
+
+
+==============================================================================
+PREVIEWER						*ddu-previewer*
+
+Previewer defines how the preview is rendered by UI.
+
+
+					*ddu-previewer-BufferPreviewer*
+BufferPreviewer
+	Preview type which shows the contents of files or existing buffers.
+
+					*ddu-previewer-NoFilePreviewer*
+NoFilePreviewer
+	Preview type which shows the contents specified by the
+	|ddu-previewer-attribute-contents|.
+
+					*ddu-previewer-TerminalPreviewer*
+TerminalPreviewer
+	Preview type which uses Vim/Neovim's |:terminal| feature.
+
+
+------------------------------------------------------------------------------
+PREVIEWER ATTRIBUTES				*ddu-previewer-attributes*
+
+					*ddu-previewer-attribute-cmds*
+cmds			(string)			(Required)
+		Commands passed to terminal API to render the preview.
+		Note: It is only avaiable in
+		|ddu-previewer-TerminalPreviewer|.
+
+					*ddu-previewer-attribute-contents*
+contents		(string[])			(Required)
+		Contents to be shown in the preview buffer.
+		Note: It is only avaiable in |ddu-previewer-NoFilePreviewer|.
+
+					*ddu-previewer-attribute-expr*
+expr			(number | string)		(Optional)
+		Buffer expression, which is the same as the arguments of
+		|bufname()|.
+		Note: It is only avaiable in |ddu-previewer-BufferPreviewer|.
+
+					*ddu-previewer-attribute-highlights*
+highlights		(PreviewHighlight[])		(Optional)
+		Highlights to apply in the preview buffer.
+
+					*ddu-previewer-attribute-kind*
+kind			(string)			(Required)
+		Previewer type.
+		It must be "buffer" or "nofile" or "terminal".
+
+		"buffer"	BufferPreviewer
+		"nofile"	NoFilePreviewer
+		"terminal"	TerminalPreviewer
+
+					*ddu-previewer-attribute-lineNr*
+lineNr			(number)			(Optional)
+		Line number of preview buffer to be made center and
+		highlighted.
+
+					*ddu-previewer-attribute-path*
+path			(string)			(Optional)
+		Path of file to preview.
+		Note: It is only avaiable in |ddu-previewer-BufferPreviewer|.
+
+					*ddu-previewer-attribute-pattern*
+pattern			(string)			(Optional)
+		Pattern to jump to and highlight.
+
+					*ddu-previewer-attribute-syntax*
+syntax			(string)			(Optional)
+		Syntax to apply in the preview buffer.
 
 
 ==============================================================================
