@@ -744,6 +744,7 @@ export class Ddu {
         uiOptions,
         uiParams,
         actionParams,
+        getPreviewer: this.getPreviewer.bind(this),
       });
     }
 

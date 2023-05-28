@@ -10,7 +10,6 @@ import {
 } from "./deps.ts";
 import {
   ActionHistory,
-  BaseActionParams,
   BaseFilterParams,
   Clipboard,
   Context,
@@ -20,8 +19,6 @@ import {
   DduOptions,
   ExpandItem,
   FilterOptions,
-  PreviewContext,
-  Previewer,
   UserOptions,
 } from "./types.ts";
 import { Ddu } from "./ddu.ts";
@@ -354,24 +351,6 @@ export async function main(denops: Denops) {
         }
       }
       return actions;
-    },
-    async getPreviewer(
-      arg1: unknown,
-      arg2: unknown,
-      arg3: unknown,
-      arg4: unknown,
-    ): Promise<Previewer | undefined> {
-      const name = ensureString(arg1);
-      const item = ensureObject(arg2) as DduItem;
-      const actionParams = arg3 as BaseActionParams;
-      const previewContext = ensureObject(arg4) as PreviewContext;
-      const ddu = getDdu(name);
-      return await ddu.getPreviewer(
-        denops,
-        item,
-        actionParams,
-        previewContext,
-      );
     },
     async getFilter(arg1: unknown, arg2: unknown): Promise<
       [

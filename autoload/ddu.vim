@@ -29,9 +29,6 @@ endfunction
 function! ddu#get_item_actions(name, items) abort
   return ddu#_request('getItemActions', [a:name, a:items])
 endfunction
-function! ddu#get_previewer(name, item, params, context) abort
-  return ddu#_request('getPreviewer', [a:name, a:item, a:params, a:context])
-endfunction
 function! ddu#get_context(name) abort
   return ddu#_request('getContext', [a:name])
 endfunction

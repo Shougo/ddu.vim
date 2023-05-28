@@ -1,8 +1,11 @@
 import {
   ActionFlags,
+  BaseActionParams,
   Context,
   DduItem,
   DduOptions,
+  PreviewContext,
+  Previewer,
   SourceInfo,
   UiOptions,
 } from "../types.ts";
@@ -111,6 +114,12 @@ export type ActionArguments<Params extends BaseUiParams> = {
   uiOptions: UiOptions;
   uiParams: Params;
   actionParams: unknown;
+  getPreviewer: (
+    denops: Denops,
+    item: DduItem,
+    actionParams: BaseActionParams,
+    previewContext: PreviewContext,
+  ) => Promise<Previewer | undefined>;
 };
 
 export abstract class BaseUi<

@@ -182,6 +182,12 @@ export type ActionArguments<Params extends BaseActionParams> = {
   items: DduItem[];
   clipboard: Clipboard;
   actionHistory: ActionHistory;
+  getPreviewer: (
+    denops: Denops,
+    item: DduItem,
+    actionParams: BaseActionParams,
+    previewContext: PreviewContext,
+  ) => Promise<Previewer | undefined>;
 };
 
 export type Actions<Params extends BaseActionParams> = Record<
