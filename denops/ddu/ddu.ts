@@ -239,7 +239,7 @@ export class Ddu {
       if (!source) {
         await denops.call(
           "ddu#util#print_error",
-          `Invalid source: ${userSource.name}`,
+          `Not found source: ${userSource.name}`,
         );
         return;
       }
@@ -332,7 +332,7 @@ export class Ddu {
           if (!source) {
             await denops.call(
               "ddu#util#print_error",
-              `Invalid source: ${userSource.name}`,
+              `Not found source: ${userSource.name}`,
             );
             state.done = true;
             return;
@@ -505,7 +505,7 @@ export class Ddu {
       if (!source) {
         await denops.call(
           "ddu#util#print_error",
-          `Invalid source: ${userSource.name}`,
+          `Not found source: ${userSource.name}`,
         );
         return;
       }
@@ -732,7 +732,7 @@ export class Ddu {
       if (!action) {
         await denops.call(
           "ddu#util#print_error",
-          `Invalid UI action: ${actionName}`,
+          `Not found UI action: ${actionName}`,
         );
         return;
       }
@@ -825,7 +825,7 @@ export class Ddu {
     if (!kind) {
       await denops.call(
         "ddu#util#print_error",
-        `Invalid kind: ${kindName}`,
+        `Not found kind: ${kindName}`,
       );
       return null;
     }
@@ -919,7 +919,7 @@ export class Ddu {
     if (!action) {
       await denops.call(
         "ddu#util#print_error",
-        `Invalid action: ${actionName}`,
+        `Not found action: ${actionName}`,
       );
       return;
     }
@@ -1503,7 +1503,7 @@ export class Ddu {
       if (this.options.ui.length !== 0) {
         await denops.call(
           "ddu#util#print_error",
-          `Invalid ui: "${this.options.ui}"`,
+          `Not found ui: "${this.options.ui}"`,
         );
       }
       return [
@@ -1535,7 +1535,7 @@ export class Ddu {
     if (!filter) {
       await denops.call(
         "ddu#util#print_error",
-        `Invalid filter: ${filterName}`,
+        `Not found filter: ${filterName}`,
       );
       return [
         undefined,
@@ -1651,7 +1651,7 @@ export class Ddu {
       if (!column) {
         await denops.call(
           "ddu#util#print_error",
-          `Invalid column: ${columnName}`,
+          `Not found column: ${columnName}`,
         );
         continue;
       }
