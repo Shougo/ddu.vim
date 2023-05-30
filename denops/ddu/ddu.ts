@@ -857,6 +857,10 @@ export class Ddu {
     clipboard: Clipboard,
     actionHistory: ActionHistory,
   ): Promise<void> {
+    if (items.length === 0) {
+      return;
+    }
+
     const ret = await this.getItemActions(denops, items);
     if (!ret) {
       return;
