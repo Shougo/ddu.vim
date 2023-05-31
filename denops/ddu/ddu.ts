@@ -231,24 +231,17 @@ export class Ddu {
     this.initialized = false;
     this.quitted = false;
 
-    await this.autoload(denops, "source", options.sources.map((s) => s.name));
-
     // Source onInit() must be called before UI
     for (const userSource of this.options.sources) {
-      const source = this.sources[userSource.name];
+      const [source, sourceOptions, sourceParams] = await this.getSource(
+        denops,
+        userSource.name,
+        userSource,
+      );
       if (!source) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Not found source: ${userSource.name}`,
-        );
         return;
       }
 
-      const [sourceOptions, sourceParams] = sourceArgs(
-        this.options,
-        userSource,
-        source,
-      );
       await initSource(
         denops,
         source,
@@ -813,20 +806,14 @@ export class Ddu {
       return null;
     }
 
-    await this.autoload(denops, "kind", kinds);
-
     const kindName = kinds[0];
     if (kindName === "base") {
       // Dummy kind
       return null;
     }
 
-    const kind = this.kinds[kindName];
+    const kind = await this.getKind(denops, kindName);
     if (!kind) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Not found kind: ${kindName}`,
-      );
       return null;
     }
 
@@ -1408,23 +1395,17 @@ export class Ddu {
   async autoload(
     denops: Denops,
     type: DduExtType,
-    names: string[],
-  ): Promise<string[]> {
-    if (names.length === 0) {
-      return [];
-    }
-
+    name: string,
+  ) {
     const paths = await globpath(
       denops,
-      [`denops/@ddu-${type}s/`],
-      names.map((file) => this.aliases[type][file] ?? file),
+      `denops/@ddu-${type}s/`,
+      this.aliases[type][name] ?? name,
     );
 
     await Promise.all(
       paths.map((path) => this.register(type, path, parse(path).name)),
     );
-
-    return paths;
   }
 
   async setInput(denops: Denops, input: string) {
@@ -1500,8 +1481,9 @@ export class Ddu {
     ]
   > {
     if (!this.uis[this.options.ui]) {
-      await this.autoload(denops, "ui", [this.options.ui]);
+      await this.autoload(denops, "ui", this.options.ui);
     }
+
     const ui = this.uis[this.options.ui];
     if (!ui) {
       if (this.options.ui.length !== 0) {
@@ -1523,9 +1505,46 @@ export class Ddu {
     return [ui, uiOptions, uiParams];
   }
 
+  async getSource(
+    denops: Denops,
+    name: string,
+    userSource: UserSource,
+  ): Promise<
+    [
+      BaseSource<BaseSourceParams> | undefined,
+      SourceOptions,
+      BaseSourceParams,
+    ]
+  > {
+    if (!this.sources[name]) {
+      await this.autoload(denops, "source", name);
+    }
+
+    const source = this.sources[name];
+    if (!source) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Not found source: ${name}`,
+      );
+      return [
+        undefined,
+        defaultSourceOptions(),
+        defaultDummy(),
+      ];
+    }
+
+    const [sourceOptions, sourceParams] = sourceArgs(
+      this.options,
+      userSource,
+      source,
+    );
+
+    return [source, sourceOptions, sourceParams];
+  }
+
   async getFilter(
     denops: Denops,
-    filterName: string,
+    name: string,
   ): Promise<
     [
       BaseFilter<BaseFilterParams> | undefined,
@@ -1533,13 +1552,15 @@ export class Ddu {
       BaseFilterParams,
     ]
   > {
-    await this.autoload(denops, "filter", [filterName]);
+    if (!this.filters[name]) {
+      await this.autoload(denops, "filter", name);
+    }
 
-    const filter = this.filters[filterName];
+    const filter = this.filters[name];
     if (!filter) {
       await denops.call(
         "ddu#util#print_error",
-        `Not found filter: ${filterName}`,
+        `Not found filter: ${name}`,
       );
       return [
         undefined,
@@ -1552,6 +1573,61 @@ export class Ddu {
     await checkFilterOnInit(filter, denops, filterOptions, filterParams);
 
     return [filter, filterOptions, filterParams];
+  }
+
+  async getKind(
+    denops: Denops,
+    name: string,
+  ): Promise<
+    BaseKind<BaseKindParams> | undefined
+  > {
+    if (!this.kinds[name]) {
+      await this.autoload(denops, "kind", name);
+    }
+
+    const kind = this.kinds[name];
+    if (!kind) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Not found kind: ${name}`,
+      );
+      return undefined;
+    }
+
+    return kind;
+  }
+
+  async getColumn(
+    denops: Denops,
+    name: string,
+  ): Promise<
+    [
+      BaseColumn<BaseColumnParams> | undefined,
+      ColumnOptions,
+      BaseColumnParams,
+    ]
+  > {
+    if (!this.columns[name]) {
+      await this.autoload(denops, "column", name);
+    }
+
+    const column = this.columns[name];
+    if (!column) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Not found column: ${name}`,
+      );
+      return [
+        undefined,
+        defaultColumnOptions(),
+        defaultDummy(),
+      ];
+    }
+
+    const [columnOptions, columnParams] = columnArgs(this.options, column);
+    await checkColumnOnInit(column, denops, columnOptions, columnParams);
+
+    return [column, columnOptions, columnParams];
   }
 
   private async filterItems(
@@ -1609,7 +1685,6 @@ export class Ddu {
     input: string,
     items: DduItem[],
   ) {
-    await this.autoload(denops, "filter", filters);
     for (const filterName of filters) {
       const [filter, filterOptions, filterParams] = await this.getFilter(
         denops,
@@ -1642,8 +1717,6 @@ export class Ddu {
       return items;
     }
 
-    await this.autoload(denops, "column", columns);
-
     // Item highlights must be cleared
     for (const item of items) {
       item.highlights = [];
@@ -1651,18 +1724,13 @@ export class Ddu {
 
     let startCol = 1;
     for (const columnName of columns) {
-      const column = this.columns[columnName];
+      const [column, columnOptions, columnParams] = await this.getColumn(
+        denops,
+        columnName,
+      );
       if (!column) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Not found column: ${columnName}`,
-        );
         continue;
       }
-
-      const [columnOptions, columnParams] = columnArgs(this.options, column);
-
-      await checkColumnOnInit(column, denops, columnOptions, columnParams);
 
       const columnLength = await column.getLength({
         denops,
@@ -1703,9 +1771,7 @@ export class Ddu {
     const source = this.sources[item.__sourceName];
     const kindName = source.kind;
 
-    await this.autoload(denops, "kind", [kindName]);
-
-    const kind = this.kinds[kindName];
+    const kind = await this.getKind(denops, kindName);
     if (!kind || !kind.getPreviewer) {
       return;
     }
@@ -2037,33 +2103,29 @@ async function errorException(denops: Denops, e: unknown, message: string) {
 
 async function globpath(
   denops: Denops,
-  searches: string[],
-  files: string[],
+  search: string,
+  file: string,
 ): Promise<string[]> {
   const runtimepath = await op.runtimepath.getGlobal(denops);
 
   const check: Record<string, boolean> = {};
   const paths: string[] = [];
-  for (const search of searches) {
-    for (const file of files) {
-      const glob = await fn.globpath(
-        denops,
-        runtimepath,
-        search + file + ".ts",
-        1,
-        1,
-      );
+  const glob = await fn.globpath(
+    denops,
+    runtimepath,
+    search + file + ".ts",
+    1,
+    1,
+  );
 
-      for (const path of glob) {
-        // Skip already added name.
-        if (parse(path).name in check) {
-          continue;
-        }
-
-        paths.push(path);
-        check[parse(path).name] = true;
-      }
+  for (const path of glob) {
+    // Skip already added name.
+    if (parse(path).name in check) {
+      continue;
     }
+
+    paths.push(path);
+    check[parse(path).name] = true;
   }
 
   return paths;
