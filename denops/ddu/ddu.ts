@@ -1139,6 +1139,14 @@ export class Ddu {
       children,
     );
 
+    // Set parent
+    children = children.map((c) => (
+      {
+        ...c,
+        parent,
+      }
+    ));
+
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (ui && !this.shouldStopCurrentContext()) {
       await ui.expandItem({
