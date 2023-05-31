@@ -158,7 +158,6 @@ export type DduItem =
   & Item<DduActionData>
   & {
     matcherKey: string;
-    parent?: DduItem;
     __sourceIndex: number;
     __sourceName: string;
     __level: number;

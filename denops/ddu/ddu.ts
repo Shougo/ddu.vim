@@ -446,6 +446,7 @@ export class Ddu {
     sourceOptions: SourceOptions,
     sourceParams: Params,
     itemLevel?: number,
+    parent?: DduItem,
   ): AsyncGenerator<DduItem[]> {
     const sourceItems = source.gather({
       denops,
@@ -454,6 +455,7 @@ export class Ddu {
       sourceOptions,
       sourceParams,
       input: this.input,
+      parent,
     });
 
     for await (const chunk of sourceItems) {
@@ -1110,6 +1112,7 @@ export class Ddu {
         sourceOptions,
         sourceParams,
         parent.__level + 1,
+        parent,
       )
     ) {
       if (this.shouldStopCurrentContext()) {
@@ -1138,14 +1141,6 @@ export class Ddu {
       this.input,
       children,
     );
-
-    // Set parent
-    children = children.map((c) => (
-      {
-        ...c,
-        parent,
-      }
-    ));
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (ui && !this.shouldStopCurrentContext()) {

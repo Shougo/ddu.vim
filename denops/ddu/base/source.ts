@@ -2,6 +2,7 @@ import {
   Actions,
   Context,
   DduEvent,
+  DduItem,
   DduOptions,
   Item,
   SourceOptions,
@@ -30,6 +31,7 @@ export type GatherArguments<Params extends BaseSourceParams> = {
   sourceOptions: SourceOptions;
   sourceParams: Params;
   input: string;
+  parent?: DduItem;
 };
 
 export type CheckUpdatedArguments<Params extends BaseSourceParams> = {
