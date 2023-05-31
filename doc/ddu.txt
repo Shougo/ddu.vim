@@ -422,14 +422,18 @@ ddu#custom#patch_local({buffer-name}, {dict})
 
 UI FUNCTIONS					*ddu-ui-functions*
 
-						*ddu#ui#do_action()*
-ddu#ui#do_action({action-name}[, {params}])
+						*ddu#ui#async_action()*
+ddu#ui#async_action({action-name}[, {params}])
 		Fire {action-name} action with {params} from current buffer
 		UI asynchronously.
 		{args} behavior depends on {action-name}.
 		Note: The action may be does not work because of asynchronous
 		execution.  If so, you should use |ddu#ui#sync_action()|
 		instead.
+
+						*ddu#ui#do_action()*
+ddu#ui#do_action({action-name}[, {params}])
+		It is same with |ddu#ui#sync_action()|.
 
 						*ddu#ui#get_item()*
 ddu#ui#get_item()
@@ -1219,6 +1223,9 @@ A: You can use dummy |ddu#start()| for it. >
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2023.05.31
+* Change |ddu#ui#do_action()| asynchronous to synchronous.
 
 2023.05.28
 * Remove "ddu#get_previewer()".

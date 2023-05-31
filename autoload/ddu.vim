@@ -2,15 +2,27 @@ function! ddu#start(options = {}) abort
   call ddu#_notify('start', [a:options])
 endfunction
 function! ddu#redraw(name, options = {}) abort
+  if a:name ==# ''
+    return
+  endif
   call ddu#_notify('redraw', [a:name, a:options])
 endfunction
 function! ddu#redraw_tree(name, mode, items) abort
-  return ddu#_notify('redrawTree', [a:name, a:mode, a:items])
+  if a:name ==# ''
+    return
+  endif
+  call ddu#_notify('redrawTree', [a:name, a:mode, a:items])
 endfunction
 function! ddu#event(name, event) abort
+  if a:name ==# ''
+    return
+  endif
   call ddu#_request('event', [a:name, a:event])
 endfunction
 function! ddu#pop(name, options = {}) abort
+  if a:name ==# ''
+    return
+  endif
   if a:options->get('sync', v:false)
     call ddu#_request('pop', [a:name, a:options])
   else
@@ -18,18 +30,33 @@ function! ddu#pop(name, options = {}) abort
   endif
 endfunction
 function! ddu#ui_async_action(name, action, params = {}) abort
+  if a:name ==# ''
+    return
+  endif
   call ddu#_notify('uiAction', [a:name, a:action, a:params])
 endfunction
 function! ddu#ui_sync_action(name, action, params = {}) abort
+  if a:name ==# ''
+    return
+  endif
   call ddu#_request('uiAction', [a:name, a:action, a:params])
 endfunction
 function! ddu#item_action(name, action, items, params = {}) abort
+  if a:name ==# ''
+    return
+  endif
   call ddu#_request('itemAction', [a:name, a:action, a:items, a:params])
 endfunction
 function! ddu#get_item_actions(name, items) abort
+  if a:name ==# ''
+    return
+  endif
   return ddu#_request('getItemActions', [a:name, a:items])
 endfunction
 function! ddu#get_context(name) abort
+  if a:name ==# ''
+    return
+  endif
   return ddu#_request('getContext', [a:name])
 endfunction
 
