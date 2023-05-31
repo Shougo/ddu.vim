@@ -1403,8 +1403,6 @@ export class Ddu {
     for (const alias of aliases) {
       add(alias);
     }
-
-    return;
   }
 
   async autoload(
