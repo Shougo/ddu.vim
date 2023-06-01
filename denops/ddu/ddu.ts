@@ -1081,7 +1081,7 @@ export class Ddu {
       preventRedraw?: boolean;
     },
   ): Promise<DduItem /* searchedItem */ | undefined> {
-    if (parent.__level < 0) {
+    if (parent.__level < 0 || !parent.treePath) {
       return;
     }
 
@@ -1093,9 +1093,7 @@ export class Ddu {
       source,
     );
 
-    if (parent.treePath) {
-      this.setExpanded(parent.treePath);
-    }
+    this.setExpanded(parent.treePath);
     parent.__expanded = true;
 
     // Set path
@@ -1254,9 +1252,11 @@ export class Ddu {
         source,
       );
 
-      if (item.treePath) {
-        this.setUnexpanded(item.treePath);
+      if (!item.treePath) {
+        continue;
       }
+
+      this.setUnexpanded(item.treePath);
       item.__expanded = false;
       await this.callColumns(denops, sourceOptions.columns, [item]);
 
