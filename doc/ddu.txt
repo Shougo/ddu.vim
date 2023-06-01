@@ -968,6 +968,7 @@ status			(object)			(Optional)
 					*ddu-item-attribute-treePath*
 treePath		(string)			(Optional)
 		The item tree path.
+		Note: The attribute must be set to support tree feature.
 
 					*ddu-item-attribute-word*
 word			(string)			(Required)
