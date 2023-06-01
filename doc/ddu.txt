@@ -910,8 +910,10 @@ params			(function)			(Required)
 ITEM ATTRIBUTES						*ddu-item-attributes*
 
 					*ddu-item-attribute-action*
-action			(dictionary)			(Optional)
+action			(object)			(Optional)
 		The params dictionary for actions.
+		Note: It depends on kind.  Please read kind's documentation
+		for details.
 
 					*ddu-item-attribute-data*
 data			(object)			(Optional)
@@ -920,8 +922,8 @@ data			(object)			(Optional)
 					*ddu-item-attribute-display*
 display			(string)			(Optional)
 		The string displayed in Ddu buffer.  If it is omitted,
-		|ddu-item-attribute-word| attribute is used instead.  It is
-		not used for matching inputs.
+		|ddu-item-attribute-word| is used instead.  It is not used for
+		matching inputs.
 
 					*ddu-item-attribute-isExpanded*
 isExpanded		(boolean)			(Optional)
@@ -930,6 +932,7 @@ isExpanded		(boolean)			(Optional)
 					*ddu-item-attribute-isTree*
 isTree			(boolean)			(Optional)
 		The item is tree.
+		Note: The attribute must be set to support tree feature.
 
 					*ddu-item-attribute-kind*
 kind			(string)			(Optional)
@@ -972,7 +975,7 @@ treePath		(string)			(Optional)
 
 					*ddu-item-attribute-word*
 word			(string)			(Required)
-		The word of a item. It is used for matching inputs.
+		The word of a item.  It is used for matching inputs.
 
 ==============================================================================
 CREATE FILTER						*ddu-create-filter*
