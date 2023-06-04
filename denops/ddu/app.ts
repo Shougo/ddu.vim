@@ -6,6 +6,7 @@ import {
   ensureObject,
   ensureString,
   Lock,
+  toFileUrl,
   vars,
 } from "./deps.ts";
 import {
@@ -154,6 +155,13 @@ export async function main(denops: Denops) {
       const base = ensureString(arg3);
 
       aliases[extType][alias] = base;
+      return Promise.resolve();
+    },
+    async loadConfig(arg1: unknown): Promise<void> {
+      const path = ensureString(arg1);
+      const mod = await import(toFileUrl(path).href);
+      const obj = new mod.Config();
+      await obj.config({ denops, contextBuilder });
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {

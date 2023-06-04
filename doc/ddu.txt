@@ -407,6 +407,11 @@ ddu#custom#get_global()
 ddu#custom#get_local()
 		Get current buffer specific options.
 
+						*ddu#custom#load_config()*
+ddu#custom#load_config({path})
+		Load TypeScript configuration from {path} file.
+		Note: {path} must be full path.
+
 						*ddu#custom#patch_global()*
 ddu#custom#patch_global({option-name}, {value})
 ddu#custom#patch_global({dict})

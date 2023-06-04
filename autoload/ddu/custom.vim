@@ -14,6 +14,10 @@ function! ddu#custom#set_local(name, dict) abort
   call s:notify('setLocal', [a:dict, a:name])
 endfunction
 
+function! ddu#custom#load_config(path) abort
+  return s:notify('loadConfig', [a:path])
+endfunction
+
 let s:aliases = #{
       \   ui: {},
       \   source: {},

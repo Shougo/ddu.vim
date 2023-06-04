@@ -10,12 +10,15 @@ export { BaseSource } from "./base/source.ts";
 export { BaseFilter } from "./base/filter.ts";
 export { BaseKind } from "./base/kind.ts";
 export { BaseColumn } from "./base/column.ts";
+export { BaseConfig } from "./base/config.ts";
 
 export type { BaseUiParams, UiActions } from "./base/ui.ts";
 export type { BaseSourceParams } from "./base/source.ts";
 export type { BaseFilterParams } from "./base/filter.ts";
 export type { BaseKindParams } from "./base/kind.ts";
 export type { BaseColumnParams } from "./base/column.ts";
+
+export { ContextBuilder } from "./context.ts";
 
 export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
 
