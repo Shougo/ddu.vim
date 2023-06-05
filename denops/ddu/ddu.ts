@@ -1336,7 +1336,6 @@ export class Ddu {
     if (path in this.checkPaths) {
       return;
     }
-    this.checkPaths[path] = true;
 
     const mod = await import(toFileUrl(path).href);
 
@@ -1393,6 +1392,10 @@ export class Ddu {
     for (const alias of aliases) {
       add(alias);
     }
+
+    this.checkPaths[path] = true;
+
+    return;
   }
 
   async autoload(
@@ -1406,9 +1409,11 @@ export class Ddu {
       this.aliases[type][name] ?? name,
     );
 
-    await Promise.all(
-      paths.map((path) => this.register(type, path, parse(path).name)),
-    );
+    if (paths.length === 0) {
+      return;
+    }
+
+    await this.register(type, paths[0], parse(paths[0]).name);
   }
 
   async setInput(denops: Denops, input: string) {

@@ -7,7 +7,6 @@ import {
   ensureString,
   Lock,
   toFileUrl,
-  vars,
 } from "./deps.ts";
 import {
   ActionHistory,
@@ -36,7 +35,7 @@ import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 
-export async function main(denops: Denops) {
+export function main(denops: Denops) {
   type RedrawTreeMode = "collapse" | "expand";
   type RedrawOption = {
     check?: boolean;
