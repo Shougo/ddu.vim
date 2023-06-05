@@ -1225,10 +1225,20 @@ A: The example is here. >
 	      \ })
 	endfunction
 
-Q: I want to initialize "ddu.vim".
+Q: I want to initialize "ddu.vim" lazily.
 
 A: You can use dummy |ddu#start()| for it. >
-	call ddu#start(#{ ui: '' })
+
+	call timer_start(10, { _ ->
+	      \   ddu#start(#{
+	      \     ui: 'ff',
+	      \     uiParams: #{
+	      \       ff: #{
+	      \         ignoreEmpty: v:true,
+	      \       },
+	      \     },
+	      \   })
+	      \ })
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
