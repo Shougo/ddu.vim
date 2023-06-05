@@ -65,7 +65,7 @@ function! ddu#_request(method, args) abort
     return {}
   endif
 
-  " Note: If call denops#plugin#wait() in vim_starting, freezed!
+  " NOTE: If call denops#plugin#wait() in vim_starting, freezed!
   if has('vim_starting')
     call ddu#util#print_error(
           \ 'You cannot call ddu.vim in vim_starting.')
@@ -104,7 +104,7 @@ function! ddu#_notify(method, args) abort
 endfunction
 
 function! s:init() abort
-  if 'g:ddu#_initialized'->exists()
+  if 's:initialized'->exists()
     return
   endif
 
@@ -116,14 +116,14 @@ function! s:init() abort
 
   augroup ddu
     autocmd!
-    autocmd User DDUReady :
+    autocmd User DDUReady let s:initialized = v:true
   augroup END
 
   let g:ddu#_started = reltime()
 
-  " Note: ddu.vim must be registered manually.
+  " NOTE: ddu.vim must be registered manually.
 
-  " Note: denops load may be started
+  " NOTE: denops load may be started
   autocmd ddu User DenopsReady silent! call ddu#_register()
   if 'g:loaded_denops'->exists() && denops#server#status() ==# 'running'
     silent! call ddu#_register()
@@ -141,7 +141,7 @@ function! ddu#_register() abort
 endfunction
 
 function! s:stopped() abort
-  unlet! g:ddu#_initialized
+  unlet! s:initialized
 
   " Restore custom config
   if 'g:ddu#_customs'->exists()

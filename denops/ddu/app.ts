@@ -189,7 +189,7 @@ export async function main(denops: Denops) {
       queuedName = ensureString(arg1);
       queuedRedrawOption = ensureObject(arg2) as RedrawOption;
 
-      // Note: must be locked
+      // NOTE: must be locked
       await lock.lock(async () => {
         while (queuedName !== null) {
           const name = queuedName;
@@ -397,7 +397,6 @@ export async function main(denops: Denops) {
   };
 
   batch(denops, async (denops: Denops) => {
-    await vars.g.set(denops, "ddu#_initialized", 1);
     await denops.cmd("doautocmd <nomodeline> User DDUReady");
     await denops.cmd("autocmd! User DDUReady");
   });

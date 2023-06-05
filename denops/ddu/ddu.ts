@@ -894,7 +894,7 @@ export class Ddu {
       }
     }
 
-    // Note: "actionName" may be overwritten by aliases
+    // NOTE: "actionName" may be overwritten by aliases
     const [actionOptions, actionParams] = actionArgs(
       this.options,
       actionName,

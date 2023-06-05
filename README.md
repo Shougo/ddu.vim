@@ -9,7 +9,7 @@ does not work with zero configuration. You can use other plugins.
 
 Please read [help](doc/ddu.txt) for details.
 
-Note: I have created
+NOTE: I have created
 [Japanese article](https://zenn.dev/shougo/articles/ddu-vim-beta) for ddu.vim.
 
 Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible and
@@ -43,7 +43,7 @@ better than neovim Python interface.
 
 ## Install
 
-**Note:** Ddu.vim requires Neovim (0.8.0+ and of course, **latest** is
+**NOTE:** Ddu.vim requires Neovim (0.8.0+ and of course, **latest** is
 recommended) or Vim 8.2.0662. See [requirements](#requirements) if you aren't
 sure whether you have this.
 
@@ -89,7 +89,7 @@ call dein#add('Shougo/ddu.vim')
 call dein#end()
 ```
 
-**Note:** Ddu.vim does not include any extra plugins. You must install them you
+**NOTE:** Ddu.vim does not include any extra plugins. You must install them you
 want manually. You can search ddu plugins from
 [here](https://github.com/topics/ddu-vim).
 
@@ -104,14 +104,14 @@ Ddu.vim requires both Deno and denops.vim.
 
 ```vim
 " You must set the default ui.
-" Note: ff ui
+" NOTE: ff ui
 " https://github.com/Shougo/ddu-ui-ff
 call ddu#custom#patch_global({
     \ 'ui': 'ff',
     \ })
 
 " You must set the default action.
-" Note: file kind
+" NOTE: file kind
 " https://github.com/Shougo/ddu-kind-file
 call ddu#custom#patch_global({
     \   'kindOptions': {
@@ -122,7 +122,7 @@ call ddu#custom#patch_global({
     \ })
 
 " Specify matcher.
-" Note: matcher_substring filter
+" NOTE: matcher_substring filter
 " https://github.com/Shougo/ddu-filter-matcher_substring
 call ddu#custom#patch_global({
     \   'sourceOptions': {
@@ -133,7 +133,7 @@ call ddu#custom#patch_global({
     \ })
 
 " Set default sources
-" Note: file source
+" NOTE: file source
 " https://github.com/Shougo/ddu-source-file
 "call ddu#custom#patch_global({
 "    \ 'sources': [{'name': 'file', 'params': {}}],
@@ -154,7 +154,7 @@ call ddu#custom#patch_global({
 "call ddu#start({'name': 'files'})
 
 " Specify source with params
-" Note: file_rec source
+" NOTE: file_rec source
 " https://github.com/Shougo/ddu-source-file_rec
 "call ddu#start({'sources': [
 "    \ {'name': 'file_rec', 'params': {'path': expand('~')}}

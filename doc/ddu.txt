@@ -61,7 +61,7 @@ It does not work with zero configuration.  You can use other plugins.
 ==============================================================================
 INSTALL							*ddu-install*
 
-Note: ddu.vim requires Neovim (0.8.0+) or Vim8.2.0662+ (latest is
+NOTE: ddu.vim requires Neovim (0.8.0+) or Vim8.2.0662+ (latest is
 recommended).
 
 Please install both Deno and "denops.vim".
@@ -69,7 +69,7 @@ Please install both Deno and "denops.vim".
 https://deno.land/
 https://github.com/vim-denops/denops.vim
 
-Note: ddu.vim does not include any UIs, sources, filters and kinds.
+NOTE: ddu.vim does not include any UIs, sources, filters and kinds.
 You must install them you want manually.
 You can search ddu.vim plugins from https://github.com/topics/ddu-vim.
 
@@ -131,7 +131,7 @@ filterParams		(dictionary)
 							*ddu-option-input*
 input			(string)
 		Specify an initial narrowing text.
-		Note: If the input contains spaces, it means AND search.
+		NOTE: If the input contains spaces, it means AND search.
 
 		Default: ""
 
@@ -144,12 +144,12 @@ name			(string)
 							*ddu-option-profile*
 profile			(boolean)
 		Print profile result.
-		Note: It is for debug.
+		NOTE: It is for debug.
 
 							*ddu-option-push*
 push			(boolean)
 		Save the current ddu state and create new ddu state.
-		Note: The state can be restored by |ddu#pop()|.
+		NOTE: The state can be restored by |ddu#pop()|.
 
 							*ddu-option-refresh*
 refresh			(boolean)
@@ -161,7 +161,7 @@ refresh			(boolean)
 resume			(boolean)
 		Reuse the previous state.  If none exist, a new ddu
 		state is created.
-		Note: Uses |ddu-option-name| to search for previous state.
+		NOTE: Uses |ddu-option-name| to search for previous state.
 
 		Default: v:false
 
@@ -169,7 +169,7 @@ resume			(boolean)
 searchPath		(string)
 		Search the path.  This only works when specified |ddu#start()|
 		or |ddu#redraw()|.
-		Note: The path must be absolute path.
+		NOTE: The path must be absolute path.
 
 		Default: ""
 
@@ -215,7 +215,7 @@ sync			(boolean)
 ui			(string)
 		Specify UI name.
 		If it is empty string, it is ignored.
-		Note: You must set the option in the first.
+		NOTE: You must set the option in the first.
 
 		Default: ""
 
@@ -264,12 +264,12 @@ ddu#get_context({name})
 						*ddu#get_item_actions()*
 ddu#get_item_actions({name}, {items})
 		Get the {name} actions for {items}.
-		Note: You cannot mix multiple kinds/sources.
+		NOTE: You cannot mix multiple kinds/sources.
 
 							*ddu#item_action()*
 ddu#item_action({name}, {action}, {items}, {params})
 		Do the {action} action for {items}.
-		Note: You cannot mix multiple kinds/sources.
+		NOTE: You cannot mix multiple kinds/sources.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
@@ -277,7 +277,7 @@ ddu#item_action({name}, {action}, {items}, {params})
 
 		{params} is action params.
 
-		Note: It is for creating UI interface.
+		NOTE: It is for creating UI interface.
 
 							*ddu#pop()*
 ddu#pop({name}[, {opt}])
@@ -334,7 +334,7 @@ ddu#redraw_tree({name}, {mode}, {items})
 							*ddu#start()*
 ddu#start([{options}])
 		Creates a new Ddu.
-		Note: You cannot call it in |vim_starting|.  Because
+		NOTE: You cannot call it in |vim_starting|.  Because
 		denops.vim is not initialized.
 
 		Refer to |ddu-options| about {options}.  If you skip a value,
@@ -378,7 +378,7 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
 		Define {alias-name} alias based on {base-name}.
 		{type} must be "ui" or "source" or "filter" or "kind" or
 		"column" or "action".
-		Note: It must be called before sources/filters initialization.
+		NOTE: It must be called before sources/filters initialization.
 >
 		call ddu#custom#alias('source', 'foo', 'file')
 		call ddu#custom#patch_global('sourceOptions', #{
@@ -410,7 +410,7 @@ ddu#custom#get_local()
 						*ddu#custom#load_config()*
 ddu#custom#load_config({path})
 		Load TypeScript configuration from {path} file.
-		Note: {path} must be full path.
+		NOTE: {path} must be full path.
 
 						*ddu#custom#patch_global()*
 ddu#custom#patch_global({option-name}, {value})
@@ -432,7 +432,7 @@ ddu#ui#async_action({action-name}[, {params}])
 		Fire {action-name} action with {params} from current buffer
 		UI asynchronously.
 		{args} behavior depends on {action-name}.
-		Note: The action may be does not work because of asynchronous
+		NOTE: The action may be does not work because of asynchronous
 		execution.  If so, you should use |ddu#ui#sync_action()|
 		instead.
 
@@ -444,13 +444,13 @@ ddu#ui#do_action({action-name}[, {params}])
 ddu#ui#get_item()
 		Return the current cursor item as |Dictionary| from current
 		buffer UI.
-		Note: current UI must support "getItem" action.
+		NOTE: current UI must support "getItem" action.
 
 						*ddu#ui#get_selected_items()*
 ddu#ui#get_selected_items()
 		Return the selected items as |List| of |Dictionary| from
 		current buffer UI.
-		Note: current UI must support "getSelectedItems" action.
+		NOTE: current UI must support "getSelectedItems" action.
 
 						*ddu#ui#multi_actions()*
 ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
@@ -469,7 +469,7 @@ ddu#ui#sync_action({action-name}[, {params}])
 		Fire {action-name} action with {params} from current buffer
 		UI synchronously.
 		{args} behavior depends on {action-name}.
-		Note: It is slow than |ddu#ui#do_action()|.
+		NOTE: It is slow than |ddu#ui#do_action()|.
 
 						*ddu#ui#visible()*
 ddu#ui#visible({name}[, {tabnr}])
@@ -487,14 +487,14 @@ ddu#ui#winid({name})
 EXAMPLES						*ddu-examples*
 >
 	" You must set the default ui.
-	" Note: ff ui
+	" NOTE: ff ui
 	" https://github.com/Shougo/ddu-ui-ff
 	call ddu#custom#patch_global(#{
 	    \   ui: 'ff',
 	    \ })
 
 	" You must set the default action.
-	" Note: file kind
+	" NOTE: file kind
 	" https://github.com/Shougo/ddu-kind-file
 	call ddu#custom#patch_global(#{
 	    \   kindOptions: #{
@@ -505,7 +505,7 @@ EXAMPLES						*ddu-examples*
 	    \ })
 
 	" Specify matcher.
-	" Note: matcher_substring filter
+	" NOTE: matcher_substring filter
 	" https://github.com/Shougo/ddu-filter-matcher_substring
 	call ddu#custom#patch_global(#{
 	    \   sourceOptions: #{
@@ -516,7 +516,7 @@ EXAMPLES						*ddu-examples*
 	    \ })
 
 	" Set default sources
-	" Note: file source
+	" NOTE: file source
 	" https://github.com/Shougo/ddu-source-file
 	"call ddu#custom#patch_global(#{
 	"    \   'sources': [#{ name: 'file', params: {} }],
@@ -537,7 +537,7 @@ EXAMPLES						*ddu-examples*
 	"call ddu#start(#{ name: 'files' })
 
 	" Specify source with params
-	" Note: file_rec source
+	" NOTE: file_rec source
 	" https://github.com/Shougo/ddu-source-file_rec
 	"call ddu#start(#{
 	"    \   sources: [
@@ -551,21 +551,21 @@ UIS							*ddu-uis*
 
 The UIs are used to display items.
 
-Note: The UIs are not bundled in ddu.vim.  You need to install them
+NOTE: The UIs are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-ui
 
 
 ------------------------------------------------------------------------------
 UI OPTIONS						*ddu-ui-options*
 
-Note: The UIs cannot set default options for UI.  If the UI need
+NOTE: The UIs cannot set default options for UI.  If the UI need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
 						*ddu-ui-option-defaultAction*
 defaultAction		(string)
 		Specify the default action.
-		Note: It overwrites kind/source default actions.
+		NOTE: It overwrites kind/source default actions.
 
 		Default: "default"
 
@@ -592,14 +592,14 @@ SOURCES							*ddu-sources*
 
 The sources are used to get items.
 
-Note: The sources are not bundled in ddu.vim.  You need to install them
+NOTE: The sources are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-source
 
 
 ------------------------------------------------------------------------------
 SOURCE OPTIONS						*ddu-source-options*
 
-Note: The sources cannot set default options for source.  If the source need
+NOTE: The sources cannot set default options for source.  If the source need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
@@ -623,7 +623,7 @@ converters		(string[])
 					*ddu-source-option-defaultAction*
 defaultAction		(string)
 		Specify the default action.
-		Note: It overwrites kind default actions.
+		NOTE: It overwrites kind default actions.
 
 		Default: ""
 
@@ -658,7 +658,7 @@ maxItems		(number)
 						*ddu-source-option-path*
 path			(string)
 		Specify an initial narrowing path.
-		Note: It must be full path.
+		NOTE: It must be full path.
 
 						*ddu-source-option-sorters*
 sorters			(string[])
@@ -672,7 +672,7 @@ sorters			(string[])
 volatile		(boolean)
 		Refresh items when |ddu#redraw()|.
 		It is useful if the source depends on user input.
-		Note: It is slow for filtering.
+		NOTE: It is slow for filtering.
 
 		Default: v:false
 
@@ -699,10 +699,10 @@ The filters are applyed the following order.
 
 "matchers" -> "sorters" -> "converters"
 
-Note: "matchers" must not sort items.  Because later "sorters" overwrites the
+NOTE: "matchers" must not sort items.  Because later "sorters" overwrites the
 sort.
 
-Note: The filters are not bundled in ddu.vim.  You need to install them
+NOTE: The filters are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-filter
 
 
@@ -725,9 +725,9 @@ COLUMNS							*ddu-columns*
 The columns are used to overwrite |ddu-item-attribute-display|.
 It is useful for tree items.
 
-Note: The columns are applyed before |ddu-filters|.
+NOTE: The columns are applyed before |ddu-filters|.
 
-Note: The columns are not bundled in ddu.vim.  You need to install them
+NOTE: The columns are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-column
 
 
@@ -749,7 +749,7 @@ KINDS							*ddu-kinds*
 
 The kinds are used to define item actions.
 
-Note: The kinds are not bundled in ddu.vim.  You need to install them
+NOTE: The kinds are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-kind
 
 
@@ -800,9 +800,9 @@ The UIs must put under "denops/@ddu-uis/*.ts".
 
 UI class must extend the BaseUi class.
 
-Note: It must be written in TypeScript language.
+NOTE: It must be written in TypeScript language.
 
-Note: If you call Vim functions, it is not asynchronous.
+NOTE: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
@@ -871,9 +871,9 @@ The sources must put under "denops/@ddu-sources/*.ts".
 
 The source class must extend the BaseSource class.
 
-Note: It must be written in TypeScript language.
+NOTE: It must be written in TypeScript language.
 
-Note: If you call Vim functions, it is not asynchronous.
+NOTE: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
@@ -882,7 +882,7 @@ SOURCE ATTRIBUTES				*ddu-source-attributes*
 						*ddu-source-attribute-actions*
 actions			(Record<string, function>)	(Optional)
 		Defines source specific actions.
-		Note: It overwrites kind actions.
+		NOTE: It overwrites kind actions.
 
 					*ddu-source-attribute-checkUpdated*
 checkUpdated		(function)			(Optional)
@@ -917,7 +917,7 @@ ITEM ATTRIBUTES						*ddu-item-attributes*
 					*ddu-item-attribute-action*
 action			(object)			(Optional)
 		The params dictionary for actions.
-		Note: It depends on kind.  Please read kind's documentation
+		NOTE: It depends on kind.  Please read kind's documentation
 		for details.
 
 					*ddu-item-attribute-data*
@@ -937,7 +937,7 @@ isExpanded		(boolean)			(Optional)
 					*ddu-item-attribute-isTree*
 isTree			(boolean)			(Optional)
 		The item is tree.
-		Note: The attribute must be set to support tree feature.
+		NOTE: The attribute must be set to support tree feature.
 
 					*ddu-item-attribute-kind*
 kind			(string)			(Optional)
@@ -976,7 +976,7 @@ status			(object)			(Optional)
 					*ddu-item-attribute-treePath*
 treePath		(string)			(Optional)
 		The item tree path.
-		Note: The attribute must be set to support tree feature.
+		NOTE: The attribute must be set to support tree feature.
 
 					*ddu-item-attribute-word*
 word			(string)			(Required)
@@ -991,11 +991,11 @@ The filters must put under "denops/@ddu-filters/*.ts".
 
 The filter class must extend the BaseFilter class.
 
-Note: It must be written in TypeScript language.
+NOTE: It must be written in TypeScript language.
 
-Note: If you call Vim functions, it is not asynchronous.
+NOTE: If you call Vim functions, it is not asynchronous.
 
-Note: "matchers" must not sort items.  Because later "sorters" overwrites the
+NOTE: "matchers" must not sort items.  Because later "sorters" overwrites the
 sort.
 
 
@@ -1028,9 +1028,9 @@ The column must put under "denops/@ddu-columns/*.ts".
 
 The column class must extend the "BaseColumn" class.
 
-Note: It must be written in TypeScript language.
+NOTE: It must be written in TypeScript language.
 
-Note: If you call Vim functions, it is not asynchronous.
+NOTE: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
@@ -1061,9 +1061,9 @@ The kinds must put under "denops/@ddu-kinds/*.ts".
 
 The kind class must extend the BaseKind class.
 
-Note: It must be written in TypeScript language.
+NOTE: It must be written in TypeScript language.
 
-Note: If you call Vim functions, it is not asynchronous.
+NOTE: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
@@ -1108,19 +1108,19 @@ PREVIEWER ATTRIBUTES				*ddu-previewer-attributes*
 					*ddu-previewer-attribute-cmds*
 cmds			(string)			(Required)
 		Commands passed to terminal API to render the preview.
-		Note: It is only avaiable in
+		NOTE: It is only avaiable in
 		|ddu-previewer-TerminalPreviewer|.
 
 					*ddu-previewer-attribute-contents*
 contents		(string[])			(Required)
 		Contents to be shown in the preview buffer.
-		Note: It is only avaiable in |ddu-previewer-NoFilePreviewer|.
+		NOTE: It is only avaiable in |ddu-previewer-NoFilePreviewer|.
 
 					*ddu-previewer-attribute-expr*
 expr			(number | string)		(Optional)
 		Buffer expression, which is the same as the arguments of
 		|bufname()|.
-		Note: It is only avaiable in |ddu-previewer-BufferPreviewer|.
+		NOTE: It is only avaiable in |ddu-previewer-BufferPreviewer|.
 
 					*ddu-previewer-attribute-highlights*
 highlights		(PreviewHighlight[])		(Optional)
@@ -1143,7 +1143,7 @@ lineNr			(number)			(Optional)
 					*ddu-previewer-attribute-path*
 path			(string)			(Optional)
 		Path of file to preview.
-		Note: It is only avaiable in |ddu-previewer-BufferPreviewer|.
+		NOTE: It is only avaiable in |ddu-previewer-BufferPreviewer|.
 
 					*ddu-previewer-attribute-pattern*
 pattern			(string)			(Optional)
