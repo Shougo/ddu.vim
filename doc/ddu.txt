@@ -933,6 +933,7 @@ display			(string)			(Optional)
 					*ddu-item-attribute-isExpanded*
 isExpanded		(boolean)			(Optional)
 		The tree is already expanded.
+		NOTE: Expand/Collapse tree action does not work for the item.
 
 					*ddu-item-attribute-isTree*
 isTree			(boolean)			(Optional)
