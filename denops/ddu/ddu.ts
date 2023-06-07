@@ -422,6 +422,9 @@ export class Ddu {
         sourceOptions.matcherKey
       ] as string
       : item.word;
+    if (item.isExpanded && item.treePath) {
+      this.expandedPaths.add(item.treePath);
+    }
     return {
       ...item,
       kind: item.kind ?? source.kind,
@@ -589,7 +592,7 @@ export class Ddu {
         }
       }
 
-      if (item.__expanded) {
+      if (item.__expanded && !item.isExpanded) {
         await this.expandItem(
           denops,
           item,
