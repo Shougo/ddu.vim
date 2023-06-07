@@ -431,7 +431,7 @@ export class Ddu {
       matcherKey,
       __sourceIndex: sourceIndex,
       __sourceName: source.name,
-      __level: level ?? item.level ?? 0,
+      __level: (level ?? 0) + (item.level ?? 0),
       __expanded: Boolean(
         item.treePath &&
           this.isExpanded(item.treePath),
