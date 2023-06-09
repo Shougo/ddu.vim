@@ -2173,8 +2173,7 @@ Deno.test("sourceArgs", () => {
       _args: GatherArguments<{ min: number; max: number }> | Denops,
     ): ReadableStream<Item<Record<never, never>>[]> {
       return new ReadableStream({
-        // deno-lint-ignore require-await
-        async start(controller) {
+        start(controller) {
           controller.close();
         },
       });

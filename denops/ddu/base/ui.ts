@@ -147,13 +147,11 @@ export abstract class BaseUi<
 
   async quit(_args: QuitArguments<Params>): Promise<void> {}
 
-  // deno-lint-ignore require-await
-  async visible(_args: VisibleArguments<Params>): Promise<boolean> {
-    return false;
+  visible(_args: VisibleArguments<Params>): Promise<boolean> {
+    return Promise.resolve(false);
   }
-  // deno-lint-ignore require-await
-  async winId(_args: WinidArguments<Params>): Promise<number> {
-    return -1;
+  winId(_args: WinidArguments<Params>): Promise<number> {
+    return Promise.resolve(-1);
   }
 
   actions: UiActions<Params> = {};

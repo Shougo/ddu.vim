@@ -64,9 +64,8 @@ export abstract class BaseSource<
     {}: GatherArguments<Params>,
   ): ReadableStream<Item<UserData>[]>;
 
-  // deno-lint-ignore require-await
-  async checkUpdated(_args: CheckUpdatedArguments<Params>): Promise<boolean> {
-    return false;
+  checkUpdated(_args: CheckUpdatedArguments<Params>): Promise<boolean> {
+    return Promise.resolve(false);
   }
 
   abstract params(): Params;

@@ -30,11 +30,10 @@ export abstract class BaseKind<
 
   abstract params(): Params;
 
-  // deno-lint-ignore require-await
-  async getPreviewer(
+  getPreviewer(
     {}: GetPreviewerArguments,
   ): Promise<Previewer | undefined> {
-    return undefined;
+    return Promise.resolve(undefined);
   }
 }
 
