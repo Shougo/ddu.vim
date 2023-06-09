@@ -12,7 +12,7 @@ export { BaseKind } from "./base/kind.ts";
 export { BaseColumn } from "./base/column.ts";
 export { BaseConfig } from "./base/config.ts";
 
-export type { BaseUiParams, UiActions } from "./base/ui.ts";
+export type { BaseUiParams, UiActionArguments, UiActions } from "./base/ui.ts";
 export type { BaseSourceParams } from "./base/source.ts";
 export type { BaseFilterParams } from "./base/filter.ts";
 export type { BaseKindParams } from "./base/kind.ts";

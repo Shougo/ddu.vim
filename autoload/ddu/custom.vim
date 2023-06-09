@@ -32,7 +32,6 @@ function! ddu#custom#alias(type, alias, base) abort
     return
   endif
 
-  let s:aliases[a:type][a:alias] = a:base
   call s:notify('alias', [a:type, a:alias, a:base])
 endfunction
 
@@ -72,7 +71,7 @@ function! ddu#custom#get_current(name) abort
   return ddu#_request('getCurrent', [a:name])
 endfunction
 function! ddu#custom#get_aliases() abort
-  return s:aliases
+  return ddu#_request('getAliases', [])
 endfunction
 
 function! s:normalize_key_or_dict(key_or_dict, value) abort

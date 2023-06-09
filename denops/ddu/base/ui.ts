@@ -107,7 +107,7 @@ export type WinidArguments<Params extends BaseUiParams> = {
   uiParams: Params;
 };
 
-export type ActionArguments<Params extends BaseUiParams> = {
+export type UiActionArguments<Params extends BaseUiParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;

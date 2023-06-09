@@ -43,6 +43,7 @@ import {
   Previewer,
   SourceInfo,
   SourceOptions,
+  UiActionArguments,
   UiOptions,
   UserOptions,
   UserSource,
@@ -712,11 +713,22 @@ export class Ddu {
       });
     }
 
+    const action = (uiOptions.actions[actionName] ?? ui.actions[actionName]) as
+      | string
+      | ((args: UiActionArguments<BaseUiParams>) => Promise<ActionFlags>);
+    if (!action) {
+      await denops.call(
+        "ddu#util#print_error",
+        `Not found UI action: ${actionName}`,
+      );
+      return;
+    }
+
     let flags: ActionFlags;
-    if (uiOptions.actions[actionName]) {
+    if (typeof action === "string") {
       flags = await denops.call(
         "denops#callback#call",
-        uiOptions.actions[actionName],
+        action,
         {
           context: this.context,
           options: this.options,
@@ -726,15 +738,6 @@ export class Ddu {
         },
       ) as ActionFlags;
     } else {
-      const action = ui.actions[actionName];
-      if (!action) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Not found UI action: ${actionName}`,
-        );
-        return;
-      }
-
       flags = await action({
         denops,
         context: this.context,
@@ -853,8 +856,8 @@ export class Ddu {
       return;
     }
 
-    const ret = await this.getItemActions(denops, items);
-    if (!ret) {
+    const itemActions = await this.getItemActions(denops, items);
+    if (!itemActions) {
       return;
     }
 
@@ -863,7 +866,7 @@ export class Ddu {
       return;
     }
 
-    const { source, kind, actions } = ret;
+    const { source, kind, actions } = itemActions;
 
     const indexes = [
       ...new Set(items.map((item) => item.__sourceIndex)),
@@ -932,23 +935,12 @@ export class Ddu {
       this.quitted = true;
     }
 
-    let flags: ActionFlags;
-    let searchPath = "";
-    if (sourceOptions.actions[actionName]) {
-      flags = await denops.call(
+    const prevPath = sourceOptions.path;
+    let ret;
+    if (typeof action === "string") {
+      ret = await denops.call(
         "denops#callback#call",
-        sourceOptions.actions[actionName],
-        {
-          context: this.context,
-          options: this.options,
-          actionParams,
-          items: items,
-        },
-      ) as ActionFlags;
-    } else if (kindOptions.actions[actionName]) {
-      flags = await denops.call(
-        "denops#callback#call",
-        kindOptions.actions[actionName],
+        action,
         {
           context: this.context,
           options: this.options,
@@ -957,8 +949,7 @@ export class Ddu {
         },
       ) as ActionFlags;
     } else {
-      const prevPath = sourceOptions.path;
-      const ret = await action({
+      ret = await action({
         denops,
         context: this.context,
         options: this.options,
@@ -971,26 +962,28 @@ export class Ddu {
         clipboard,
         actionHistory,
       });
+    }
 
-      if (typeof (ret) === "object") {
-        flags = ret.flags;
-        searchPath = ret.searchPath;
-      } else {
-        flags = ret;
-      }
+    let flags: ActionFlags;
+    let searchPath = "";
+    if (typeof (ret) === "object") {
+      flags = ret.flags;
+      searchPath = ret.searchPath;
+    } else {
+      flags = ret;
+    }
 
-      // Check path is changed by action
-      if (sourceOptions.path !== prevPath) {
-        // Overwrite current path
-        if (!userSource.options) {
-          userSource.options = sourceOptions;
-        }
-        userSource.options.path = sourceOptions.path;
-        if (this.context.path.length > 0) {
-          this.context.pathHistories.push(this.context.path);
-        }
-        this.context.path = sourceOptions.path;
+    // Check path is changed by action
+    if (sourceOptions.path !== prevPath) {
+      // Overwrite current path
+      if (!userSource.options) {
+        userSource.options = sourceOptions;
       }
+      userSource.options.path = sourceOptions.path;
+      if (this.context.path.length > 0) {
+        this.context.pathHistories.push(this.context.path);
+      }
+      this.context.path = sourceOptions.path;
     }
 
     if (searchPath.length > 0) {

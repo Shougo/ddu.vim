@@ -43,10 +43,11 @@ export function main(denops: Denops) {
     refreshItems?: boolean;
     updateOptions?: UserOptions;
   };
+  type Aliases = Record<DduExtType | "action", Record<string, string>>;
 
   const ddus: Record<string, Ddu[]> = {};
   const contextBuilder = new ContextBuilder();
-  const aliases: Record<DduExtType | "action", Record<string, string>> = {
+  const aliases: Aliases = {
     ui: {},
     source: {},
     filter: {},
@@ -98,6 +99,9 @@ export function main(denops: Denops) {
 
     return lastDdu;
   };
+  const setAlias = (extType: DduExtType, alias: string, base: string) => {
+    aliases[extType][alias] = base;
+  };
 
   denops.dispatcher = {
     setGlobal(arg1: unknown): Promise<void> {
@@ -148,19 +152,22 @@ export function main(denops: Denops) {
       const ddu = getDdu(name);
       return Promise.resolve(ddu.getContext());
     },
+    getAliases(): Promise<Aliases> {
+      return Promise.resolve(aliases);
+    },
     alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
-      const extType = ensureString(arg1) as DduExtType;
-      const alias = ensureString(arg2);
-      const base = ensureString(arg3);
-
-      aliases[extType][alias] = base;
+      setAlias(
+        ensureString(arg1) as DduExtType,
+        ensureString(arg2),
+        ensureString(arg3),
+      );
       return Promise.resolve();
     },
     async loadConfig(arg1: unknown): Promise<void> {
       const path = ensureString(arg1);
       const mod = await import(toFileUrl(path).href);
       const obj = new mod.Config();
-      await obj.config({ denops, contextBuilder });
+      await obj.config({ denops, contextBuilder, setAlias });
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {
