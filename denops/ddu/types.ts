@@ -1,4 +1,4 @@
-import type { BaseUiParams } from "./base/ui.ts";
+import type { BaseUiParams, UiActionArguments } from "./base/ui.ts";
 import type { BaseSourceParams } from "./base/source.ts";
 import type { BaseFilterParams } from "./base/filter.ts";
 import type { BaseKindParams } from "./base/kind.ts";
@@ -21,6 +21,8 @@ export type { BaseColumnParams } from "./base/column.ts";
 export { ContextBuilder } from "./context.ts";
 
 export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
+
+export type DduAliasType = DduExtType | "action";
 
 export type DduEvent = "close" | "cancel";
 
@@ -86,14 +88,23 @@ export type DduOptions = {
 export type UserOptions = Record<string, unknown>;
 
 export type UiOptions = {
-  actions: Record<string, string>;
+  actions: Record<
+    string,
+    string | ((args: UiActionArguments<BaseUiParams>) => Promise<ActionFlags>)
+  >;
   defaultAction: string;
   persist: boolean;
   toggle: boolean;
 };
 
 export type SourceOptions = {
-  actions: Record<string, string>;
+  actions: Record<
+    string,
+    | string
+    | ((
+      args: ActionArguments<BaseActionParams>,
+    ) => Promise<ActionFlags | ActionResult>)
+  >;
   columns: string[];
   converters: string[];
   defaultAction: string;
@@ -117,7 +128,13 @@ export type ColumnOptions = {
 };
 
 export type KindOptions = {
-  actions: Record<string, string>;
+  actions: Record<
+    string,
+    | string
+    | ((
+      args: ActionArguments<BaseActionParams>,
+    ) => Promise<ActionFlags | ActionResult>)
+  >;
   defaultAction: string;
 };
 

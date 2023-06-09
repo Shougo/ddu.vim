@@ -13,6 +13,7 @@ import {
   BaseFilterParams,
   Clipboard,
   Context,
+  DduAliasType,
   DduEvent,
   DduExtType,
   DduItem,
@@ -43,7 +44,7 @@ export function main(denops: Denops) {
     refreshItems?: boolean;
     updateOptions?: UserOptions;
   };
-  type Aliases = Record<DduExtType | "action", Record<string, string>>;
+  type Aliases = Record<DduAliasType, Record<string, string>>;
 
   const ddus: Record<string, Ddu[]> = {};
   const contextBuilder = new ContextBuilder();
@@ -99,8 +100,8 @@ export function main(denops: Denops) {
 
     return lastDdu;
   };
-  const setAlias = (extType: DduExtType, alias: string, base: string) => {
-    aliases[extType][alias] = base;
+  const setAlias = (type: DduAliasType, alias: string, base: string) => {
+    aliases[type][alias] = base;
   };
 
   denops.dispatcher = {

@@ -43,7 +43,6 @@ import {
   Previewer,
   SourceInfo,
   SourceOptions,
-  UiActionArguments,
   UiOptions,
   UserOptions,
   UserSource,
@@ -713,9 +712,7 @@ export class Ddu {
       });
     }
 
-    const action = (uiOptions.actions[actionName] ?? ui.actions[actionName]) as
-      | string
-      | ((args: UiActionArguments<BaseUiParams>) => Promise<ActionFlags>);
+    const action = uiOptions.actions[actionName] ?? ui.actions[actionName];
     if (!action) {
       await denops.call(
         "ddu#util#print_error",
@@ -724,9 +721,9 @@ export class Ddu {
       return;
     }
 
-    let flags: ActionFlags;
+    let ret;
     if (typeof action === "string") {
-      flags = await denops.call(
+      ret = await denops.call(
         "denops#callback#call",
         action,
         {
@@ -738,7 +735,7 @@ export class Ddu {
         },
       ) as ActionFlags;
     } else {
-      flags = await action({
+      ret = await action({
         denops,
         context: this.context,
         options: this.options,
@@ -756,6 +753,8 @@ export class Ddu {
         uiParams,
       });
     }
+
+    const flags = typeof (ret) === "number" ? ret : ActionFlags.None;
 
     if (flags & ActionFlags.RefreshItems) {
       await this.refresh(denops);
@@ -912,9 +911,11 @@ export class Ddu {
       actionName = this.aliases.action[actionName];
     }
 
-    const action = actions[actionName] as (
-      args: ActionArguments<BaseActionParams>,
-    ) => Promise<ActionFlags | ActionResult>;
+    const action = actions[actionName] as
+      | string
+      | ((
+        args: ActionArguments<BaseActionParams>,
+      ) => Promise<ActionFlags | ActionResult>);
     if (!action) {
       await denops.call(
         "ddu#util#print_error",
@@ -964,12 +965,12 @@ export class Ddu {
       });
     }
 
-    let flags: ActionFlags;
+    let flags = ActionFlags.None;
     let searchPath = "";
     if (typeof (ret) === "object") {
       flags = ret.flags;
       searchPath = ret.searchPath;
-    } else {
+    } else if (typeof (ret) === "number") {
       flags = ret;
     }
 

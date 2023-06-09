@@ -31,6 +31,7 @@ Kinds			|ddu-kinds|
 Actions			|ddu-actions|
   Action options	  |ddu-action-options|
   Action params		  |ddu-action-params|
+  Action flags		  |ddu-action-flags|
 Create UI		|ddu-create-ui|
   UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
@@ -148,7 +149,7 @@ profile			(boolean)
 
 							*ddu-option-push*
 push			(boolean)
-		Save the current ddu state and create new ddu state.
+		Save |ddu-option-name|'s ddu state and create new ddu state.
 		NOTE: The state can be restored by |ddu#pop()|.
 
 							*ddu-option-refresh*
@@ -365,6 +366,10 @@ ddu#custom#action({type}, {name}, {action-name}, {func})
 		{type} must be "ui" or "source" or "kind".
 		{name} is {type}'s name.
 		{func} must be a |Funcref| or the name of a function.
+		Note: It overwrites |ddu-ui-option-actions| or
+		|ddu-source-option-actions| or |ddu-kind-option-actions|.
+		Note: The function must return |ddu-action-flags| as |Number|.
+		|String| is ignored.
 >
 		call ddu#custom#action('ui', 'ff', 'test3',
 		    \ { args -> execute('let g:baz = 1') })
@@ -562,6 +567,11 @@ NOTE: The UIs cannot set default options for UI.  If the UI need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
+						*ddu-ui-option-actions*
+actions			(Record<string, function>)
+		Overwrites UI actions.
+
+
 						*ddu-ui-option-defaultAction*
 defaultAction		(string)
 		Specify the default action.
@@ -602,6 +612,10 @@ SOURCE OPTIONS						*ddu-source-options*
 NOTE: The sources cannot set default options for source.  If the source need
 to specify the recommended configuration, you should write it in the
 documentation instead.
+
+						*ddu-source-option-actions*
+actions			(Record<string, function>)
+		Overwrites source actions.
 
 						*ddu-source-option-columns*
 columns			(string[])
@@ -756,6 +770,10 @@ to use ddu.vim.  Please search them by https://github.com/topics/ddu-kind
 ------------------------------------------------------------------------------
 KIND OPTIONS						*ddu-kind-options*
 
+						*ddu-kind-option-actions*
+actions			(Record<string, function>)
+		Overwrites kind actions.
+
 					*ddu-kind-option-defaultAction*
 defaultAction		(string)
 		Specify the default action.
@@ -790,6 +808,42 @@ ACTION PARAMS						*ddu-action-params*
 These are the parameters that each action can have.  Please read the kind
 documentation.
 
+
+------------------------------------------------------------------------------
+ACTION FLAGS						*ddu-action-flags*
+
+The action must return the flags.
+The flags define the behavior after execute the action.
+
+						*ddu-action-flag-None*
+None
+		Quit the UI window.
+		
+		Default: 0
+
+						*ddu-action-flag-RefreshItems*
+RefreshItems
+		Refresh the items.
+		
+		Default: 1
+
+						*ddu-action-flag-Redraw*
+Redraw
+		Redraw the UI window.
+
+		Default: 2
+
+						*ddu-action-flag-Persist*
+Persist
+		Restore the UI window.
+
+		Default: 4
+
+					*ddu-action-flag-RestoreCursor*
+RestoreCursor
+		Restore the cursor.
+
+		Default: 8
 
 ==============================================================================
 CREATE UI						*ddu-create-ui*

@@ -15,7 +15,7 @@ export type BaseUiParams = Record<string, unknown>;
 
 export type UiActions<Params extends BaseUiParams> = Record<
   string,
-  (args: ActionArguments<Params>) => Promise<ActionFlags>
+  (args: UiActionArguments<Params>) => Promise<ActionFlags>
 >;
 
 export type OnInitArguments<Params extends BaseUiParams> = {
