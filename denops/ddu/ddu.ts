@@ -946,7 +946,7 @@ export class Ddu {
           context: this.context,
           options: this.options,
           actionParams,
-          items: items,
+          items,
         },
       ) as ActionFlags;
     } else {
