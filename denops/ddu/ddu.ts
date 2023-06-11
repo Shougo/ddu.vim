@@ -109,6 +109,7 @@ export class Ddu {
   private quitted = false;
   private cancelToRefresh = false;
   private lock = new Lock(0);
+  private registerLock = new Lock(0);
   private startTime = 0;
   private expandedPaths = new Set<string>();
   private searchPath = "";
@@ -1410,7 +1411,7 @@ export class Ddu {
       return;
     }
 
-    await this.lock.lock(async () => {
+    await this.registerLock.lock(async () => {
       await this.register(type, paths[0], parse(paths[0]).name);
     });
   }
