@@ -1410,7 +1410,9 @@ export class Ddu {
       return;
     }
 
-    await this.register(type, paths[0], parse(paths[0]).name);
+    await this.lock.lock(async () => {
+      await this.register(type, paths[0], parse(paths[0]).name);
+    });
   }
 
   async setInput(denops: Denops, input: string) {
