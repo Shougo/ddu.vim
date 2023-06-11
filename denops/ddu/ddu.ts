@@ -108,7 +108,7 @@ export class Ddu {
   private initialized = false;
   private quitted = false;
   private cancelToRefresh = false;
-  private lock = new Lock(0);
+  private redrawLock = new Lock(0);
   private registerLock = new Lock(0);
   private startTime = 0;
   private expandedPaths = new Set<string>();
@@ -198,7 +198,7 @@ export class Ddu {
         this.context.done = true;
         await uiRedraw(
           denops,
-          this.lock,
+          this.redrawLock,
           this.context,
           this.options,
           ui,
@@ -624,7 +624,7 @@ export class Ddu {
 
     await uiRedraw(
       denops,
-      this.lock,
+      this.redrawLock,
       this.context,
       this.options,
       ui,
@@ -1044,7 +1044,7 @@ export class Ddu {
     if (ui && !this.shouldStopCurrentContext()) {
       await uiRedraw(
         denops,
-        this.lock,
+        this.redrawLock,
         this.context,
         this.options,
         ui,
@@ -1210,7 +1210,7 @@ export class Ddu {
     if (ui && !this.shouldStopCurrentContext() && !options.preventRedraw) {
       await uiRedraw(
         denops,
-        this.lock,
+        this.redrawLock,
         this.context,
         this.options,
         ui,
@@ -1271,7 +1271,7 @@ export class Ddu {
     if (!preventRedraw) {
       await uiRedraw(
         denops,
-        this.lock,
+        this.redrawLock,
         this.context,
         this.options,
         ui,
