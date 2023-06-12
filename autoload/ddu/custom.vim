@@ -15,6 +15,11 @@ function! ddu#custom#set_local(name, dict) abort
 endfunction
 
 function! ddu#custom#load_config(path) abort
+  if !(a:path->filereadable())
+    call ddu#util#print_error(printf('"%s" is not found.', a:path))
+    return
+  endif
+
   return s:notify('loadConfig', [a:path])
 endfunction
 
