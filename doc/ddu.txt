@@ -1248,6 +1248,19 @@ feature.
 
 https://github.com/vim-denops/denops.vim#shared-server
 
+Or you can use dummy |ddu#start()| for it. >
+
+	call timer_start(10, { _ ->
+	      \   ddu#start(#{
+	      \     ui: 'ff',
+	      \     uiParams: #{
+	      \       ff: #{
+	      \         ignoreEmpty: v:true,
+	      \       },
+	      \     },
+	      \   })
+	      \ })
+
 Q: |:cnext| / |:cprevious| like commands are available?
 
 A: Nothing.  You can send items to |quickfix| by "quickfix" action instead.
@@ -1279,21 +1292,6 @@ A: The example is here. >
 	      \   ],
 	      \ })
 	endfunction
-
-Q: I want to initialize "ddu.vim" lazily.
-
-A: You can use dummy |ddu#start()| for it. >
-
-	call timer_start(10, { _ ->
-	      \   ddu#start(#{
-	      \     ui: 'ff',
-	      \     uiParams: #{
-	      \       ff: #{
-	      \         ignoreEmpty: v:true,
-	      \       },
-	      \     },
-	      \   })
-	      \ })
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
