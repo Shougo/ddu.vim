@@ -1276,7 +1276,7 @@ A: The example is here. >
 	" https://github.com/shun/ddu-source-rg
 	call ddu#custom#action('kind', 'file', 'grep',
 	    \ { args -> GrepAction(args) })
-	function! GrepAction(args)
+	function GrepAction(args)
 	  " NOTE: param "path" must be one directory
 	  const path = a:args.items[0].action.path
 	  const directory = isdirectory(path) ? path : fnamemodify(path, ':h')
