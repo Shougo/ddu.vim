@@ -59,6 +59,9 @@ function! ddu#get_context(name) abort
   endif
   return ddu#_request('getContext', [a:name])
 endfunction
+function! ddu#register(type, path) abort
+  call ddu#_notify('register', [a:type, a:path])
+endfunction
 
 function! ddu#_request(method, args) abort
   if s:init()

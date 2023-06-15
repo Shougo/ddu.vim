@@ -29,6 +29,7 @@ import {
   foldMerge,
   mergeDduOptions,
 } from "./context.ts";
+import { Loader } from "./loader.ts";
 import { defaultUiOptions } from "./base/ui.ts";
 import { defaultSourceOptions } from "./base/source.ts";
 import { defaultFilterOptions } from "./base/filter.ts";
@@ -44,18 +45,10 @@ export function main(denops: Denops) {
     refreshItems?: boolean;
     updateOptions?: UserOptions;
   };
-  type Aliases = Record<DduAliasType, Record<string, string>>;
 
+  const loader = new Loader();
   const ddus: Record<string, Ddu[]> = {};
   const contextBuilder = new ContextBuilder();
-  const aliases: Aliases = {
-    ui: {},
-    source: {},
-    filter: {},
-    kind: {},
-    column: {},
-    action: {},
-  };
   const clipboard: Clipboard = {
     action: "none",
     items: [],
@@ -73,7 +66,7 @@ export function main(denops: Denops) {
       ddus[name] = [];
     }
     if (ddus[name].length === 0) {
-      ddus[name].push(new Ddu());
+      ddus[name].push(new Ddu(loader));
     }
     return ddus[name].slice(-1)[0];
   };
@@ -81,7 +74,7 @@ export function main(denops: Denops) {
     if (!ddus[name]) {
       ddus[name] = [];
     }
-    ddus[name].push(new Ddu());
+    ddus[name].push(new Ddu(loader));
     return ddus[name].slice(-1)[0];
   };
   const popDdu = (name: string) => {
@@ -101,10 +94,25 @@ export function main(denops: Denops) {
     return lastDdu;
   };
   const setAlias = (type: DduAliasType, alias: string, base: string) => {
-    aliases[type][alias] = base;
+    loader.registerAlias(type, alias, base);
   };
 
   denops.dispatcher = {
+    alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
+      setAlias(
+        ensureString(arg1) as DduAliasType,
+        ensureString(arg2),
+        ensureString(arg3),
+      );
+      return Promise.resolve();
+    },
+    async register(arg1: unknown, arg2: unknown): Promise<void> {
+      await loader.registerPath(
+        ensureString(arg1) as DduExtType,
+        ensureString(arg2),
+      );
+      return Promise.resolve();
+    },
     setGlobal(arg1: unknown): Promise<void> {
       const options = ensureObject(arg1);
       contextBuilder.setGlobal(options);
@@ -153,17 +161,6 @@ export function main(denops: Denops) {
       const ddu = getDdu(name);
       return Promise.resolve(ddu.getContext());
     },
-    getAliases(): Promise<Aliases> {
-      return Promise.resolve(aliases);
-    },
-    alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
-      setAlias(
-        ensureString(arg1) as DduExtType,
-        ensureString(arg2),
-        ensureString(arg3),
-      );
-      return Promise.resolve();
-    },
     async loadConfig(arg1: unknown): Promise<void> {
       const path = ensureString(arg1);
       const mod = await import(toFileUrl(path).href);
@@ -190,7 +187,7 @@ export function main(denops: Denops) {
         [context, options] = await contextBuilder.get(denops, userOptions);
       }
 
-      await ddu.start(denops, aliases, context, options, userOptions);
+      await ddu.start(denops, context, options, userOptions);
     },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
       queuedName = ensureString(arg1);
@@ -221,7 +218,7 @@ export function main(denops: Denops) {
               opt.updateOptions?.ui !== ddu.getOptions().ui
             ) {
               // UI is changed
-              await ddu.restart(denops, aliases, opt.updateOptions);
+              await ddu.restart(denops, opt.updateOptions);
               continue;
             }
 
@@ -313,7 +310,7 @@ export function main(denops: Denops) {
         denops,
         userOptions,
       );
-      await ddu.start(denops, aliases, context, options, userOptions);
+      await ddu.start(denops, context, options, userOptions);
     },
     async uiAction(
       arg1: unknown,
@@ -360,8 +357,8 @@ export function main(denops: Denops) {
       const ddu = getDdu(name);
       const ret = await ddu.getItemActions(denops, items);
       const actions = ret && ret.actions ? Object.keys(ret.actions) : [];
-      for (const aliasAction of Object.keys(aliases.action)) {
-        if (actions.indexOf(aliases.action[aliasAction]) >= 0) {
+      for (const aliasAction of loader.getAliasNames("action")) {
+        if (actions.indexOf(loader.getAlias("action", aliasAction)) >= 0) {
           actions.push(aliasAction);
         }
       }

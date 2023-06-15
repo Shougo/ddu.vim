@@ -9,7 +9,6 @@ import {
   op,
   parse,
   pathsep,
-  toFileUrl,
 } from "./deps.ts";
 import {
   ActionArguments,
@@ -72,6 +71,7 @@ import { defaultFilterOptions } from "./base/filter.ts";
 import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
+import { Loader } from "./loader.ts";
 
 type GatherState = {
   items: DduItem[];
@@ -85,21 +85,7 @@ type ItemActions = {
 };
 
 export class Ddu {
-  private uis: Record<string, BaseUi<BaseUiParams>> = {};
-  private sources: Record<string, BaseSource<BaseSourceParams>> = {};
-  private filters: Record<string, BaseFilter<BaseFilterParams>> = {};
-  private kinds: Record<string, BaseKind<BaseKindParams>> = {};
-  private columns: Record<string, BaseColumn<BaseColumnParams>> = {};
-  private aliases: Record<DduExtType | "action", Record<string, string>> = {
-    ui: {},
-    source: {},
-    filter: {},
-    kind: {},
-    column: {},
-    action: {},
-  };
-
-  private checkPaths: Record<string, boolean> = {};
+  private loader: Loader;
   private gatherStates: Record<string, GatherState> = {};
   private input = "";
   private context: Context = defaultContext();
@@ -109,10 +95,13 @@ export class Ddu {
   private quitted = false;
   private cancelToRefresh = false;
   private redrawLock = new Lock(0);
-  private registerLock = new Lock(0);
   private startTime = 0;
   private expandedPaths = new Set<string>();
   private searchPath = "";
+
+  constructor(loader: Loader) {
+    this.loader = loader;
+  }
 
   private shouldStopCurrentContext(): boolean {
     return this.quitted || this.cancelToRefresh;
@@ -120,7 +109,6 @@ export class Ddu {
 
   async start(
     denops: Denops,
-    aliases: Record<DduExtType | "action", Record<string, string>>,
     context: Context,
     options: DduOptions,
     userOptions: UserOptions,
@@ -128,7 +116,6 @@ export class Ddu {
     const prevInput = this.context.input;
     const prevPath = this.context.path;
 
-    this.aliases = aliases;
     this.context = context;
     this.userOptions = userOptions;
 
@@ -262,7 +249,6 @@ export class Ddu {
 
   async restart(
     denops: Denops,
-    aliases: Record<DduExtType | "action", Record<string, string>>,
     userOptions: UserOptions,
   ): Promise<void> {
     // Quit current UI
@@ -279,7 +265,6 @@ export class Ddu {
     this.updateOptions(userOptions);
     await this.start(
       denops,
-      aliases,
       this.context,
       this.options,
       userOptions,
@@ -321,7 +306,7 @@ export class Ddu {
 
           this.gatherStates[index] = state;
 
-          const source = this.sources[userSource.name];
+          const source = this.loader.getSource(userSource.name);
 
           if (!source) {
             await denops.call(
@@ -367,6 +352,7 @@ export class Ddu {
               source,
               sourceOptions,
               sourceParams,
+              this.loader,
               0,
             )
           ) {
@@ -449,7 +435,8 @@ export class Ddu {
     source: BaseSource<Params, UserData>,
     sourceOptions: SourceOptions,
     sourceParams: Params,
-    itemLevel?: number,
+    loader: Loader,
+    itemLevel: number,
     parent?: DduItem,
   ): AsyncGenerator<DduItem[]> {
     const sourceItems = source.gather({
@@ -460,6 +447,7 @@ export class Ddu {
       sourceParams,
       input: this.input,
       parent,
+      loader,
     });
 
     for await (const chunk of sourceItems) {
@@ -500,7 +488,7 @@ export class Ddu {
     let allItems: DduItem[] = [];
     let index = 0;
     for (const userSource of this.options.sources) {
-      const source = this.sources[userSource.name];
+      const source = this.loader.getSource(userSource.name);
       if (!source) {
         await denops.call(
           "ddu#util#print_error",
@@ -667,7 +655,7 @@ export class Ddu {
     event: DduEvent,
   ): Promise<void> {
     for (const userSource of this.options.sources) {
-      const source = this.sources[userSource.name];
+      const source = this.loader.getSource(userSource.name);
       if (!source) {
         continue;
       }
@@ -777,9 +765,9 @@ export class Ddu {
     const sources = [
       ...new Set(
         items.length > 0
-          ? items.map((item) => this.sources[item.__sourceName])
+          ? items.map((item) => this.loader.getSource(item.__sourceName))
           : this.options.sources.map((userSource) =>
-            this.sources[userSource.name]
+            this.loader.getSource(userSource.name)
           ),
       ),
     ].filter((source) => source);
@@ -908,9 +896,7 @@ export class Ddu {
     );
 
     // Check action aliases
-    if (this.aliases.action[actionName]) {
-      actionName = this.aliases.action[actionName];
-    }
+    actionName = this.loader.getAlias("action", actionName) ?? actionName;
 
     const action = actions[actionName] as
       | string
@@ -1084,7 +1070,7 @@ export class Ddu {
     }
 
     const index = parent.__sourceIndex;
-    const source = this.sources[parent.__sourceName];
+    const source = this.loader.getSource(parent.__sourceName);
     const [sourceOptions, sourceParams] = sourceArgs(
       this.options,
       this.options.sources[index],
@@ -1107,6 +1093,7 @@ export class Ddu {
         source,
         sourceOptions,
         sourceParams,
+        this.loader,
         parent.__level + 1,
         parent,
       )
@@ -1243,7 +1230,7 @@ export class Ddu {
 
     for (const item of items) {
       const index = item.__sourceIndex;
-      const source = this.sources[item.__sourceName];
+      const source = this.loader.getSource(item.__sourceName);
       const [sourceOptions, _] = sourceArgs(
         this.options,
         this.options.sources[index],
@@ -1330,72 +1317,6 @@ export class Ddu {
     });
   }
 
-  async register(type: DduExtType, path: string, name: string) {
-    if (path in this.checkPaths) {
-      return;
-    }
-
-    const mod = await import(toFileUrl(path).href);
-
-    let add;
-    switch (type) {
-      case "ui":
-        add = (name: string) => {
-          const obj = new mod.Ui();
-          obj.name = name;
-          obj.path = path;
-          this.uis[obj.name] = obj;
-        };
-        break;
-      case "source":
-        add = (name: string) => {
-          const obj = new mod.Source();
-          obj.name = name;
-          obj.path = path;
-          this.sources[obj.name] = obj;
-        };
-        break;
-      case "filter":
-        add = (name: string) => {
-          const obj = new mod.Filter();
-          obj.name = name;
-          obj.path = path;
-          this.filters[obj.name] = obj;
-        };
-        break;
-      case "kind":
-        add = (name: string) => {
-          const obj = new mod.Kind();
-          obj.name = name;
-          obj.path = path;
-          this.kinds[obj.name] = obj;
-        };
-        break;
-      case "column":
-        add = (name: string) => {
-          const obj = new mod.Column();
-          obj.name = name;
-          obj.path = path;
-          this.columns[obj.name] = obj;
-        };
-        break;
-    }
-
-    add(name);
-
-    // Check alias
-    const aliases = Object.keys(this.aliases[type]).filter(
-      (k) => this.aliases[type][k] === name,
-    );
-    for (const alias of aliases) {
-      add(alias);
-    }
-
-    this.checkPaths[path] = true;
-
-    return;
-  }
-
   async autoload(
     denops: Denops,
     type: DduExtType,
@@ -1404,16 +1325,14 @@ export class Ddu {
     const paths = await globpath(
       denops,
       `denops/@ddu-${type}s/`,
-      this.aliases[type][name] ?? name,
+      this.loader.getAlias(type, name) ?? name,
     );
 
     if (paths.length === 0) {
       return;
     }
 
-    await this.registerLock.lock(async () => {
-      await this.register(type, paths[0], parse(paths[0]).name);
-    });
+    await this.loader.registerPath(type, paths[0]);
   }
 
   async setInput(denops: Denops, input: string) {
@@ -1438,7 +1357,11 @@ export class Ddu {
 
   getSourceArgs() {
     return this.options.sources.map((userSource) =>
-      sourceArgs(this.options, userSource, this.sources[userSource.name])
+      sourceArgs(
+        this.options,
+        userSource,
+        this.loader.getSource(userSource.name),
+      )
     );
   }
 
@@ -1451,7 +1374,7 @@ export class Ddu {
 
   async checkUpdated(denops: Denops): Promise<boolean> {
     for (const userSource of this.options.sources) {
-      const source = this.sources[userSource.name];
+      const source = this.loader.getSource(userSource.name);
 
       const [sourceOptions, sourceParams] = sourceArgs(
         this.options,
@@ -1488,11 +1411,11 @@ export class Ddu {
       BaseUiParams,
     ]
   > {
-    if (!this.uis[this.options.ui]) {
+    if (!this.loader.getUi(this.options.ui)) {
       await this.autoload(denops, "ui", this.options.ui);
     }
 
-    const ui = this.uis[this.options.ui];
+    const ui = this.loader.getUi(this.options.ui);
     if (!ui) {
       if (this.options.ui.length !== 0) {
         await denops.call(
@@ -1524,11 +1447,11 @@ export class Ddu {
       BaseSourceParams,
     ]
   > {
-    if (!this.sources[name]) {
+    if (!this.loader.getSource(name)) {
       await this.autoload(denops, "source", name);
     }
 
-    const source = this.sources[name];
+    const source = this.loader.getSource(name);
     if (!source) {
       await denops.call(
         "ddu#util#print_error",
@@ -1560,11 +1483,11 @@ export class Ddu {
       BaseFilterParams,
     ]
   > {
-    if (!this.filters[name]) {
+    if (!this.loader.getFilter(name)) {
       await this.autoload(denops, "filter", name);
     }
 
-    const filter = this.filters[name];
+    const filter = this.loader.getFilter(name);
     if (!filter) {
       await denops.call(
         "ddu#util#print_error",
@@ -1589,11 +1512,11 @@ export class Ddu {
   ): Promise<
     BaseKind<BaseKindParams> | undefined
   > {
-    if (!this.kinds[name]) {
+    if (!this.loader.getKind(name)) {
       await this.autoload(denops, "kind", name);
     }
 
-    const kind = this.kinds[name];
+    const kind = this.loader.getKind(name);
     if (!kind) {
       await denops.call(
         "ddu#util#print_error",
@@ -1615,11 +1538,11 @@ export class Ddu {
       BaseColumnParams,
     ]
   > {
-    if (!this.columns[name]) {
+    if (!this.loader.getColumn(name)) {
       await this.autoload(denops, "column", name);
     }
 
-    const column = this.columns[name];
+    const column = this.loader.getColumn(name);
     if (!column) {
       await denops.call(
         "ddu#util#print_error",
@@ -1644,7 +1567,7 @@ export class Ddu {
     index: number,
     input: string,
   ): Promise<[boolean, number, DduItem[]]> {
-    const source = this.sources[userSource.name];
+    const source = this.loader.getSource(userSource.name);
     const [sourceOptions, _] = sourceArgs(
       this.options,
       userSource,
@@ -1776,7 +1699,7 @@ export class Ddu {
     actionParams: BaseActionParams,
     previewContext: PreviewContext,
   ): Promise<Previewer | undefined> {
-    const source = this.sources[item.__sourceName];
+    const source = this.loader.getSource(item.__sourceName);
     const kindName = source.kind;
 
     const kind = await this.getKind(denops, kindName);

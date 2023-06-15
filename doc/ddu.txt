@@ -332,6 +332,13 @@ ddu#redraw_tree({name}, {mode}, {items})
 
 		{items} is target tree items.
 
+							*ddu#register()*
+ddu#register({type}, {path})
+		Register ddu extension.
+		{type} is "ui" or "source" or "filter" or "kind" or "column".
+		{path} is ddc extension path.
+		NOTE: {path} must be full path.
+
 							*ddu#start()*
 ddu#start([{options}])
 		Creates a new Ddu.
@@ -391,10 +398,6 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
 		      \   foo: #{ mark: 'foo' },
 		      \ })
 <
-						*ddu#custom#get_aliases()*
-ddu#custom#get_aliases()
-		Get aliases.
-
 						*ddu#custom#get_current()*
 ddu#custom#get_current({name})
 		Get current ddu options for {name}.
@@ -1295,6 +1298,9 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2023.06.15
+* Remove "ddu#custom#get_aliases()".
 
 2023.05.31
 * Change |ddu#ui#do_action()| asynchronous to synchronous.

@@ -75,9 +75,6 @@ endfunction
 function! ddu#custom#get_current(name) abort
   return ddu#_request('getCurrent', [a:name])
 endfunction
-function! ddu#custom#get_aliases() abort
-  return ddu#_request('getAliases', [])
-endfunction
 
 function! s:normalize_key_or_dict(key_or_dict, value) abort
   if a:key_or_dict->type() == v:t_dict

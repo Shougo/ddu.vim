@@ -8,6 +8,7 @@ import {
   SourceOptions,
 } from "../types.ts";
 import { Denops } from "../deps.ts";
+import { Loader } from "../loader.ts";
 
 export type BaseSourceParams = Record<string, unknown>;
 
@@ -32,6 +33,7 @@ export type GatherArguments<Params extends BaseSourceParams> = {
   sourceParams: Params;
   input: string;
   parent?: DduItem;
+  loader: Loader;
 };
 
 export type CheckUpdatedArguments<Params extends BaseSourceParams> = {
