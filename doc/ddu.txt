@@ -419,6 +419,7 @@ ddu#custom#get_local()
 ddu#custom#load_config({path})
 		Load TypeScript configuration from {path} file.
 		NOTE: {path} must be full path.
+		NOTE: The loading is asynchronous.
 
 						*ddu#custom#patch_global()*
 ddu#custom#patch_global({option-name}, {value})

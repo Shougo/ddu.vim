@@ -1,4 +1,11 @@
 function ddu#start(options = {}) abort
+  " You cannot use ddu.vim in the command line window.
+  if getcmdwintype() !=# ''
+    call ddu#util#print_error(
+          \ 'You cannot call ddu.vim in the command line window.')
+    return
+  endif
+
   call ddu#_notify('start', [a:options])
 endfunction
 function ddu#redraw(name, options = {}) abort
@@ -68,17 +75,10 @@ function ddu#_request(method, args) abort
     return {}
   endif
 
-  " NOTE: If call denops#plugin#wait() in vim_starting, freezed!
-  if has('vim_starting')
-    call ddu#util#print_error(
-          \ 'You cannot call ddu.vim in vim_starting.')
-    return {}
-  endif
-
-  " You cannot use ddu.vim in the command line window.
-  if getcmdwintype() !=# ''
-    call ddu#util#print_error(
-          \ 'You cannot call ddu.vim in the command line window.')
+  if !ddu#_denops_running()
+    " Lazy call request
+    execute printf('autocmd User DDUReady call '
+          \ .. 'denops#request("ddu", "%s", %s)', a:method, a:args->string())
     return {}
   endif
 
@@ -92,18 +92,37 @@ function ddu#_notify(method, args) abort
     return {}
   endif
 
-  if ddu#_denops_running()
-    if denops#plugin#wait('ddu')
-      return {}
-    endif
-    call denops#notify('ddu', a:method, a:args)
-  else
+  if !ddu#_denops_running()
     " Lazy call notify
     execute printf('autocmd User DDUReady call '
-          \ .. 'denops#notify("ddu", "%s", %s)', a:method, string(a:args))
+          \ .. 'denops#notify("ddu", "%s", %s)', a:method, a:args->string())
+    return {}
   endif
 
-  return {}
+  if denops#plugin#wait('ddu')
+    return {}
+  endif
+  return denops#notify('ddu', a:method, a:args)
+endfunction
+
+const s:root_dir = '<sfile>'->expand()->fnamemodify(':h:h')
+const s:sep = has('win32') ? '\' : '/'
+function ddu#_register() abort
+  call denops#plugin#register('ddu',
+        \ [s:root_dir, 'denops', 'ddu', 'app.ts']->join(s:sep),
+        \ #{ mode: 'skip' })
+
+  autocmd ddu User DenopsClosed call s:stopped()
+endfunction
+
+function ddu#_denops_running() abort
+  return 'g:loaded_denops'->exists()
+        \ && denops#server#status() ==# 'running'
+        \ && denops#plugin#is_loaded('ddu')
+endfunction
+
+function ddu#_lazy_redraw(name, args = {}) abort
+  call timer_start(0, { -> ddu#redraw(a:name, a:args) })
 endfunction
 
 function s:init() abort
@@ -133,33 +152,14 @@ function s:init() abort
   endif
 endfunction
 
-const s:root_dir = '<sfile>'->expand()->fnamemodify(':h:h')
-const s:sep = has('win32') ? '\' : '/'
-function ddu#_register() abort
-  call denops#plugin#register('ddu',
-        \ [s:root_dir, 'denops', 'ddu', 'app.ts']->join(s:sep),
-        \ #{ mode: 'skip' })
-
-  autocmd ddu User DenopsClosed call s:stopped()
-endfunction
-
 function s:stopped() abort
   unlet! s:initialized
 
   " Restore custom config
-  if 'g:ddu#_customs'->exists()
-    for custom in g:ddu#_customs
-      call ddu#_notify(custom.method, custom.args)
-    endfor
-  endif
-endfunction
-
-function ddu#_denops_running() abort
-  return 'g:loaded_denops'->exists()
-        \ && denops#server#status() ==# 'running'
-        \ && denops#plugin#is_loaded('ddu')
-endfunction
-
-function ddu#_lazy_redraw(name, args = {}) abort
-  call timer_start(0, { -> ddu#redraw(a:name, a:args) })
+  for custom in g:->get('ddu#_notifies', [])
+    call ddu#_notify(custom.method, custom.args)
+  endfor
+  for custom in g:->get('ddu#_requests', [])
+    call ddu#_request(custom.method, custom.args)
+  endfor
 endfunction

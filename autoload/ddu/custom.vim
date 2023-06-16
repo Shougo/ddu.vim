@@ -20,7 +20,7 @@ function ddu#custom#load_config(path) abort
     return
   endif
 
-  return s:notify('loadConfig', [a:path])
+  return s:request('loadConfig', [a:path])
 endfunction
 
 let s:aliases = #{
@@ -97,12 +97,21 @@ function s:normalize_string_or_list(string_or_list) abort
 endfunction
 
 function s:notify(method, args) abort
-  " Save notify args
-  if !('g:ddu#_customs'->exists())
-    let g:ddu#_customs = []
+  " Save args
+  if !('g:ddu#_notifies'->exists())
+    let g:ddu#_notifies = []
   endif
-
-  call add(g:ddu#_customs, #{ method: a:method, args: a:args })
+  call add(g:ddu#_notifies, #{ method: a:method, args: a:args })
 
   return ddu#_notify(a:method, a:args)
+endfunction
+
+function s:request(method, args) abort
+  " Save args
+  if !('g:ddu#_requests'->exists())
+    let g:ddu#_requests = []
+  endif
+  call add(g:ddu#_requests, #{ method: a:method, args: a:args })
+
+  return ddu#_request(a:method, a:args)
 endfunction
