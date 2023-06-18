@@ -167,7 +167,7 @@ resume			(boolean)
 		Default: v:false
 
 						*ddu-option-searchPath*
-searchPath		(string)
+searchPath		(string | string[])
 		Search the path.  This only works when specified |ddu#start()|
 		or |ddu#redraw()|.
 		NOTE: The path must be absolute path.
@@ -674,7 +674,7 @@ maxItems		(number)
 		Default: 10000
 
 						*ddu-source-option-path*
-path			(string)
+path			(string | string[])
 		Specify an initial narrowing path.
 		NOTE: It must be full path.
 
@@ -1033,7 +1033,7 @@ status			(object)			(Optional)
 		The item time.
 
 					*ddu-item-attribute-treePath*
-treePath		(string)			(Optional)
+treePath		(string | string[])		(Optional)
 		The item tree path.
 		NOTE: The attribute must be set to support tree feature.
 

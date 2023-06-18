@@ -42,6 +42,7 @@ import {
   Previewer,
   SourceInfo,
   SourceOptions,
+  TreePath,
   UiOptions,
   UserOptions,
   UserSource,
@@ -96,8 +97,8 @@ export class Ddu {
   private cancelToRefresh = false;
   private redrawLock = new Lock(0);
   private startTime = 0;
-  private expandedPaths = new Set<string>();
-  private searchPath = "";
+  private expandedPaths = new Set<string[]>();
+  private searchPath: TreePath = "";
 
   constructor(loader: Loader) {
     this.loader = loader;
@@ -410,7 +411,7 @@ export class Ddu {
       ] as string
       : item.word;
     if (item.isExpanded && item.treePath) {
-      this.expandedPaths.add(item.treePath);
+      this.expandedPaths.add(convertTreePath(item.treePath));
     }
     return {
       ...item,
@@ -421,7 +422,7 @@ export class Ddu {
       __level: (level ?? 0) + (item.level ?? 0),
       __expanded: Boolean(
         item.treePath &&
-          this.isExpanded(item.treePath),
+          this.isExpanded(convertTreePath(item.treePath)),
       ),
     };
   }
@@ -517,7 +518,7 @@ export class Ddu {
       if (restoreItemState) {
         items.forEach((item) => {
           if (item.treePath) {
-            item.__expanded = this.isExpanded(item.treePath);
+            item.__expanded = this.isExpanded(convertTreePath(item.treePath));
           }
         });
       }
@@ -566,7 +567,10 @@ export class Ddu {
         }
         if (
           !searchTargetItem && item.treePath &&
-          isParentPath(item.treePath, searchPath)
+          isParentPath(
+            convertTreePath(item.treePath),
+            convertTreePath(searchPath),
+          )
         ) {
           searchTargetItem = await this.expandItem(
             denops,
@@ -953,7 +957,7 @@ export class Ddu {
     }
 
     let flags = ActionFlags.None;
-    let searchPath = "";
+    let searchPath: TreePath = "";
     if (typeof (ret) === "object") {
       flags = ret.flags;
       searchPath = ret.searchPath;
@@ -1060,7 +1064,7 @@ export class Ddu {
       preventRedraw?: boolean;
     } | {
       // Expand recursively to find the `search` path
-      search: string;
+      search: TreePath;
       maxLevel: number;
       preventRedraw?: boolean;
     },
@@ -1077,7 +1081,7 @@ export class Ddu {
       source,
     );
 
-    this.setExpanded(parent.treePath);
+    this.setExpanded(convertTreePath(parent.treePath));
     parent.__expanded = true;
 
     // Set path
@@ -1146,14 +1150,17 @@ export class Ddu {
           // Expand recursively to find the `search` path
           child.__expanded ||
           child.isTree && child.treePath &&
-            isParentPath(child.treePath, options.search)
+            isParentPath(
+              convertTreePath(child.treePath),
+              convertTreePath(options.search),
+            )
         )
         : children.filter((child) =>
           // Expand recursively to the maxLevel
           child.__expanded ||
           child.isTree && child.treePath &&
             // NOTE: Skip hidden directory
-            !basename(child.treePath).startsWith(".")
+            !basename(treePath2Filename(child.treePath)).startsWith(".")
         );
 
       if (expandTargetChildren.length > 0) {
@@ -1187,7 +1194,10 @@ export class Ddu {
     if (
       "search" in options &&
       !searchedItem && parent.treePath &&
-      isParentPath(parent.treePath, options.search)
+      isParentPath(
+        convertTreePath(parent.treePath),
+        convertTreePath(options.search),
+      )
     ) {
       searchedItem = children.find((item) =>
         options.search === item.treePath ?? item.word
@@ -1241,7 +1251,7 @@ export class Ddu {
         continue;
       }
 
-      this.setUnexpanded(item.treePath);
+      this.setUnexpanded(convertTreePath(item.treePath));
       item.__expanded = false;
       await this.callColumns(denops, sourceOptions.columns, [item]);
 
@@ -1716,19 +1726,19 @@ export class Ddu {
   }
 
   private isExpanded(
-    itemTreePath: string,
+    itemTreePath: string[],
   ): boolean {
     return Boolean(
       this.expandedPaths.has(itemTreePath),
     );
   }
   private setExpanded(
-    itemTreePath: string,
+    itemTreePath: string[],
   ): void {
     this.expandedPaths.add(itemTreePath);
   }
   private setUnexpanded(
-    itemTreePath: string,
+    itemTreePath: string[],
   ): void {
     [...this.expandedPaths].forEach((v) => {
       if (v === itemTreePath || isParentPath(itemTreePath, v)) {
@@ -2064,8 +2074,17 @@ async function globpath(
   return paths;
 }
 
-function isParentPath(checkPath: string, searchPath: string) {
-  return checkPath !== searchPath && searchPath.startsWith(checkPath + pathsep);
+function convertTreePath(treePath: TreePath) {
+  return typeof treePath === "string" ? treePath.split(pathsep) : treePath;
+}
+
+function treePath2Filename(treePath: TreePath) {
+  return typeof treePath === "string" ? treePath : treePath.join(pathsep);
+}
+
+function isParentPath(checkPath: string[], searchPath: string[]) {
+  return checkPath !== searchPath &&
+    searchPath.join(pathsep).startsWith(checkPath.join(pathsep) + pathsep);
 }
 
 Deno.test("sourceArgs", () => {
@@ -2126,13 +2145,16 @@ Deno.test("sourceArgs", () => {
 });
 
 Deno.test("isParentPath", () => {
-  assertEquals(true, isParentPath("/home", "/home/string"));
+  assertEquals(
+    true,
+    isParentPath("/home".split("/"), "/home/string".split("/")),
+  );
   assertEquals(
     true,
     isParentPath(
-      "/home/shougo/work/ddu.vim",
-      "/home/shougo/work/ddu.vim/denops/ddu/deps.ts",
+      "/home/shougo/work/ddu.vim".split("/"),
+      "/home/shougo/work/ddu.vim/denops/ddu/deps.ts".split("/"),
     ),
   );
-  assertEquals(false, isParentPath("hoge", "/home"));
+  assertEquals(false, isParentPath("hoge".split("/"), "/home".split("/")));
 });

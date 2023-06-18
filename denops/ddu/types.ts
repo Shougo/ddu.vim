@@ -28,6 +28,8 @@ export type DduEvent = "close" | "cancel";
 
 export type SourceName = string;
 
+export type TreePath = string | string[];
+
 export type Context = {
   bufName: string;
   bufNr: number;
@@ -35,8 +37,8 @@ export type Context = {
   input: string;
   maxItems: number;
   mode: string;
-  path: string;
-  pathHistories: string[];
+  path: TreePath;
+  pathHistories: TreePath[];
   winId: number;
 };
 
@@ -54,7 +56,7 @@ export type UserSource = {
 export type SourceInfo = {
   name: string;
   index: number;
-  path: string;
+  path: TreePath;
   kind: string;
 };
 
@@ -74,7 +76,7 @@ export type DduOptions = {
   push: boolean;
   refresh: boolean;
   resume: boolean;
-  searchPath: string;
+  searchPath: TreePath;
   sourceOptions: Record<SourceName, Partial<SourceOptions>>;
   sourceParams: Record<SourceName, Partial<BaseSourceParams>>;
   sources: UserSource[];
@@ -112,7 +114,7 @@ export type SourceOptions = {
   matcherKey: string;
   matchers: string[];
   maxItems: number;
-  path: string;
+  path: TreePath;
   sorters: string[];
   volatile: boolean;
 };
@@ -166,7 +168,7 @@ export type Item<
   status?: ItemStatus;
   kind?: string;
   level?: number;
-  treePath?: string;
+  treePath?: TreePath;
   isExpanded?: boolean;
   isTree?: boolean;
 };
@@ -187,7 +189,7 @@ export type DduItem =
 export type ExpandItem = {
   item: DduItem;
   maxLevel?: number;
-  search?: string;
+  search?: TreePath;
 };
 
 export type ActionArguments<Params extends BaseActionParams> = {
@@ -219,7 +221,7 @@ export enum ActionFlags {
 
 export type ActionResult = {
   flags: ActionFlags;
-  searchPath: string;
+  searchPath: TreePath;
 };
 
 /**
