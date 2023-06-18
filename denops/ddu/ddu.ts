@@ -73,7 +73,7 @@ import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 import { Loader } from "./loader.ts";
-import { treePath2Filename } from "./utils.ts";
+import { errorException, treePath2Filename } from "./utils.ts";
 
 type GatherState = {
   items: DduItem[];
@@ -2021,27 +2021,6 @@ async function checkColumnOnInit(
       e,
       `column: ${column.name} "onInit()" failed`,
     );
-  }
-}
-
-async function errorException(denops: Denops, e: unknown, message: string) {
-  await denops.call(
-    "ddu#util#print_error",
-    message,
-  );
-  if (e instanceof Error) {
-    await denops.call(
-      "ddu#util#print_error",
-      e.message,
-    );
-    if (e.stack) {
-      await denops.call(
-        "ddu#util#print_error",
-        e.stack,
-      );
-    }
-  } else {
-    console.log(e);
   }
 }
 
