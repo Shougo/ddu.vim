@@ -73,6 +73,7 @@ import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 import { Loader } from "./loader.ts";
+import { treePath2Filename } from "./utils.ts";
 
 type GatherState = {
   items: DduItem[];
@@ -2076,10 +2077,6 @@ async function globpath(
 
 function convertTreePath(treePath: TreePath) {
   return typeof treePath === "string" ? treePath.split(pathsep) : treePath;
-}
-
-function treePath2Filename(treePath: TreePath) {
-  return typeof treePath === "string" ? treePath : treePath.join(pathsep);
 }
 
 function isParentPath(checkPath: string[], searchPath: string[]) {
