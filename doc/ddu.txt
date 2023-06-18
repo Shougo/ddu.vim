@@ -1300,6 +1300,9 @@ A: The example is here. >
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
 
+2023.06.19
+* Change path type to "string | string[]".
+
 2023.06.15
 * Remove "ddu#custom#get_aliases()".
 
