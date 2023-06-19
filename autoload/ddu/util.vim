@@ -19,7 +19,7 @@ function ddu#util#execute_path(command, path) abort
   endif
 
   try
-    silent execute a:command path->fnamemodify(':.')->fnameescape()
+    execute a:command path->fnamemodify(':.')->fnameescape()
   catch /^Vim\%((\a\+)\)\=:E325\|^Vim:Interrupt/
     " Ignore swap file error
   catch
