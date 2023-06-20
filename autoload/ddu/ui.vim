@@ -16,20 +16,26 @@ function ddu#ui#multi_actions(actions) abort
   endfor
 endfunction
 
-function ddu#ui#get_item() abort
-  call ddu#ui_sync_action(get(b:, 'ddu_ui_name', ''), 'getItem', {})
+function ddu#ui#get_item(name=get(b:, 'ddu_ui_name', '')) abort
+  call ddu#ui_sync_action(a:name, 'getItem', {})
   return b:->get('ddu_ui_item', {})
 endfunction
 
-function ddu#ui#get_selected_items() abort
-  call ddu#ui_sync_action(get(b:, 'ddu_ui_name', ''), 'getSelectedItems', {})
+function ddu#ui#get_items(name=get(b:, 'ddu_ui_name', '')) abort
+  call ddu#ui_sync_action(a:name, 'getItems', {})
+  return b:->get('ddu_ui_items', {})
+endfunction
+
+function ddu#ui#get_selected_items(name=get(b:, 'ddu_ui_name', '')) abort
+  call ddu#ui_sync_action(a:name, 'getSelectedItems', {})
   return b:->get('ddu_ui_selected_items', [])
 endfunction
 
-function ddu#ui#visible(name, tabnr = tabpagenr()) abort
+function ddu#ui#visible(
+      \ name=get(b:, 'ddu_ui_name', ''), tabnr = tabpagenr()) abort
   return ddu#_request('uiVisible', [a:name, a:tabnr])
 endfunction
 
-function ddu#ui#winid(name) abort
+function ddu#ui#winid(name=get(b:, 'ddu_ui_name', '')) abort
   return ddu#_request('uiWinid', [a:name])
 endfunction
