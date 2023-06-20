@@ -457,8 +457,8 @@ ddu#ui#get_item()
 
 						*ddu#ui#get_items()*
 ddu#ui#get_items()
-		Return the current items as |Dictionary| from current buffer
-		UI.
+		Return the current items as |List| of |Dictionary| from
+		current buffer UI.
 		NOTE: current UI must support "getItems" action.
 
 						*ddu#ui#get_selected_items()*
