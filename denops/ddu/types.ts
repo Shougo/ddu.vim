@@ -53,6 +53,12 @@ export type UserSource = {
   params?: BaseSourceParams;
 };
 
+export type UserFilter = string | {
+  name: string;
+  options?: FilterOptions;
+  params?: BaseFilterParams;
+};
+
 export type SourceInfo = {
   name: string;
   index: number;
@@ -108,14 +114,14 @@ export type SourceOptions = {
     ) => Promise<ActionFlags | ActionResult>)
   >;
   columns: string[];
-  converters: string[];
+  converters: UserFilter[];
   defaultAction: string;
   ignoreCase: boolean;
   matcherKey: string;
-  matchers: string[];
+  matchers: UserFilter[];
   maxItems: number;
   path: TreePath;
-  sorters: string[];
+  sorters: UserFilter[];
   volatile: boolean;
 };
 

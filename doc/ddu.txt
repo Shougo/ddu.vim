@@ -630,9 +630,16 @@ columns			(string[])
 		Default: []
 
 						*ddu-source-option-converters*
-converters		(string[])
-		It is a list of registered filter names to change items
-		attributes.
+converters		(string[] | dictionary[])
+		It is a list of registered filter names or elements which are
+		formatted as:
+>
+		#{
+		    name: {filter-name},
+		    options: {filter-options},
+		    params: {filter-params},
+		}
+<
 		Please see |ddu-filters|.
 		Items will be processed in the order you specify here.
 
@@ -658,9 +665,16 @@ matcherKey		(string)
 		Default: "word"
 
 						*ddu-source-option-matchers*
-matchers		(string[])
-		It is a list of registered filter names to filter items
-		by user input.
+matchers		(string[] | dictionary[])
+		It is a list of registered filter names or elements which are
+		formatted as:
+>
+		#{
+		    name: {filter-name},
+		    options: {filter-options},
+		    params: {filter-params},
+		}
+<
 		Please see |ddu-filters|.
 		Items will be processed in the order you specify here.
 
@@ -679,8 +693,16 @@ path			(string | string[])
 		NOTE: It must be full path.
 
 						*ddu-source-option-sorters*
-sorters			(string[])
-		It is a list of registered filter names to sort items.
+sorters			(string[] | dictionary[])
+		It is a list of registered filter names or elements which are
+		formatted as:
+>
+		#{
+		    name: {filter-name},
+		    options: {filter-options},
+		    params: {filter-params},
+		}
+<
 		Please see |ddu-filters|.
 		Items will be processed in the order you specify here.
 

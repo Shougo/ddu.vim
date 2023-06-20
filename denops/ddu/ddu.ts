@@ -44,6 +44,7 @@ import {
   SourceOptions,
   TreePath,
   UiOptions,
+  UserFilter,
   UserOptions,
   UserSource,
 } from "./types.ts";
@@ -320,19 +321,19 @@ export class Ddu {
           }
 
           const [sourceOptions, sourceParams] = sourceArgs(
+            source,
             this.options,
             userSource,
-            source,
           );
 
           // Call "onRefreshItems" hooks
           const filters = sourceOptions.matchers.concat(
             sourceOptions.sorters,
           ).concat(sourceOptions.converters);
-          for (const filterName of filters) {
+          for (const userFilter of filters) {
             const [filter, filterOptions, filterParams] = await this.getFilter(
               denops,
-              filterName,
+              userFilter,
             );
             if (!filter || !filter.onRefreshItems) {
               continue;
@@ -499,9 +500,9 @@ export class Ddu {
         return;
       }
       const [sourceOptions, _] = sourceArgs(
+        source,
         this.options,
         userSource,
-        source,
       );
       sources.push({
         name: userSource.name,
@@ -665,9 +666,9 @@ export class Ddu {
         continue;
       }
       const [sourceOptions, sourceParams] = sourceArgs(
+        source,
         this.options,
         userSource,
-        source,
       );
 
       // The source may not have "onEvent"
@@ -818,11 +819,11 @@ export class Ddu {
       return null;
     }
 
-    const [kindOptions, _1] = kindArgs(this.options, kind);
+    const [kindOptions, _1] = kindArgs(kind, this.options);
     const [sourceOptions, _2] = sourceArgs(
+      source,
       this.options,
       this.options.sources[indexes.length > 0 ? indexes[0] : 0],
-      source,
     );
 
     return {
@@ -869,12 +870,12 @@ export class Ddu {
       indexes.length > 0 ? indexes[0] : 0
     ];
     const [sourceOptions, sourceParams] = sourceArgs(
+      source,
       this.options,
       userSource,
-      source,
     );
 
-    const [kindOptions, kindParams] = kindArgs(this.options, kind);
+    const [kindOptions, kindParams] = kindArgs(kind, this.options);
 
     // Get default action in the first
     if (actionName === "default") {
@@ -895,8 +896,8 @@ export class Ddu {
 
     // NOTE: "actionName" may be overwritten by aliases
     const [actionOptions, actionParams] = actionArgs(
-      this.options,
       actionName,
+      this.options,
       userActionParams,
     );
 
@@ -1077,9 +1078,9 @@ export class Ddu {
     const index = parent.__sourceIndex;
     const source = this.loader.getSource(parent.__sourceName);
     const [sourceOptions, sourceParams] = sourceArgs(
+      source,
       this.options,
       this.options.sources[index],
-      source,
     );
 
     this.setExpanded(convertTreePath(parent.treePath));
@@ -1243,9 +1244,9 @@ export class Ddu {
       const index = item.__sourceIndex;
       const source = this.loader.getSource(item.__sourceName);
       const [sourceOptions, _] = sourceArgs(
+        source,
         this.options,
         this.options.sources[index],
-        source,
       );
 
       if (!item.treePath) {
@@ -1369,9 +1370,9 @@ export class Ddu {
   getSourceArgs() {
     return this.options.sources.map((userSource) =>
       sourceArgs(
+        this.loader.getSource(userSource.name),
         this.options,
         userSource,
-        this.loader.getSource(userSource.name),
       )
     );
   }
@@ -1388,9 +1389,9 @@ export class Ddu {
       const source = this.loader.getSource(userSource.name);
 
       const [sourceOptions, sourceParams] = sourceArgs(
+        source,
         this.options,
         userSource,
-        source,
       );
 
       if (!source || !source.checkUpdated) {
@@ -1476,9 +1477,9 @@ export class Ddu {
     }
 
     const [sourceOptions, sourceParams] = sourceArgs(
+      source,
       this.options,
       userSource,
-      source,
     );
 
     return [source, sourceOptions, sourceParams];
@@ -1486,7 +1487,7 @@ export class Ddu {
 
   async getFilter(
     denops: Denops,
-    name: string,
+    userFilter: UserFilter,
   ): Promise<
     [
       BaseFilter<BaseFilterParams> | undefined,
@@ -1494,15 +1495,22 @@ export class Ddu {
       BaseFilterParams,
     ]
   > {
-    if (!this.loader.getFilter(name)) {
-      await this.autoload(denops, "filter", name);
+    // Convert type
+    if (typeof userFilter === "string") {
+      userFilter = {
+        name: userFilter,
+      };
     }
 
-    const filter = this.loader.getFilter(name);
+    if (!this.loader.getFilter(userFilter.name)) {
+      await this.autoload(denops, "filter", userFilter.name);
+    }
+
+    const filter = this.loader.getFilter(userFilter.name);
     if (!filter) {
       await denops.call(
         "ddu#util#print_error",
-        `Not found filter: ${name}`,
+        `Not found filter: ${userFilter.name}`,
       );
       return [
         undefined,
@@ -1511,7 +1519,11 @@ export class Ddu {
       ];
     }
 
-    const [filterOptions, filterParams] = filterArgs(this.options, filter);
+    const [filterOptions, filterParams] = filterArgs(
+      filter,
+      this.options,
+      userFilter,
+    );
     await checkFilterOnInit(filter, denops, filterOptions, filterParams);
 
     return [filter, filterOptions, filterParams];
@@ -1566,7 +1578,7 @@ export class Ddu {
       ];
     }
 
-    const [columnOptions, columnParams] = columnArgs(this.options, column);
+    const [columnOptions, columnParams] = columnArgs(column, this.options);
     await checkColumnOnInit(column, denops, columnOptions, columnParams);
 
     return [column, columnOptions, columnParams];
@@ -1580,9 +1592,9 @@ export class Ddu {
   ): Promise<[boolean, number, DduItem[]]> {
     const source = this.loader.getSource(userSource.name);
     const [sourceOptions, _] = sourceArgs(
+      source,
       this.options,
       userSource,
-      source,
     );
 
     const state = this.gatherStates[index];
@@ -1623,14 +1635,14 @@ export class Ddu {
   private async callFilters(
     denops: Denops,
     sourceOptions: SourceOptions,
-    filters: string[],
+    filters: UserFilter[],
     input: string,
     items: DduItem[],
   ) {
-    for (const filterName of filters) {
+    for (const userFilter of filters) {
       const [filter, filterOptions, filterParams] = await this.getFilter(
         denops,
-        filterName,
+        userFilter,
       );
       if (!filter) {
         continue;
@@ -1775,9 +1787,9 @@ function sourceArgs<
   Params extends BaseSourceParams,
   UserData extends unknown,
 >(
+  source: BaseSource<Params, UserData> | null,
   options: DduOptions,
   userSource: UserSource | null,
-  source: BaseSource<Params, UserData> | null,
 ): [SourceOptions, BaseSourceParams] {
   const o = foldMerge(
     mergeSourceOptions,
@@ -1788,42 +1800,60 @@ function sourceArgs<
       userSource?.options,
     ],
   );
-  const p = foldMerge(mergeSourceParams, defaultDummy, [
-    source?.params(),
-    options.sourceParams["_"],
-    source ? options.sourceParams[source.name] : {},
-    userSource?.params,
-  ]);
+  const p = foldMerge(
+    mergeSourceParams,
+    defaultDummy,
+    [
+      source?.params(),
+      options.sourceParams["_"],
+      source ? options.sourceParams[source.name] : {},
+      userSource?.params,
+    ],
+  );
   return [o, p];
 }
 
 function filterArgs<
   Params extends BaseFilterParams,
 >(
-  options: DduOptions,
   filter: BaseFilter<Params>,
+  options: DduOptions,
+  userFilter: UserFilter,
 ): [FilterOptions, BaseFilterParams] {
+  // Convert type
+  if (typeof userFilter === "string") {
+    userFilter = {
+      name: userFilter,
+    };
+  }
+
   const o = foldMerge(
     mergeFilterOptions,
     defaultFilterOptions,
     [
       options.filterOptions["_"],
       options.filterOptions[filter.name],
+      userFilter?.options,
     ],
   );
-  const p = foldMerge(mergeFilterParams, defaultDummy, [
-    filter?.params(),
-    options.filterParams["_"],
-    options.filterParams[filter.name],
-  ]);
+  const p = foldMerge(
+    mergeFilterParams,
+    defaultDummy,
+    [
+      filter?.params(),
+      options.filterParams["_"],
+      options.filterParams[filter.name],
+      userFilter?.params,
+    ],
+  );
   return [o, p];
 }
 
 function kindArgs<
   Params extends BaseKindParams,
 >(
-  options: DduOptions,
   kind: BaseKind<Params>,
+  options: DduOptions,
 ): [KindOptions, BaseKindParams] {
   const o = foldMerge(
     mergeKindOptions,
@@ -1833,19 +1863,23 @@ function kindArgs<
       options.kindOptions[kind.name],
     ],
   );
-  const p = foldMerge(mergeKindParams, defaultDummy, [
-    kind?.params(),
-    options.kindParams["_"],
-    options.kindParams[kind.name],
-  ]);
+  const p = foldMerge(
+    mergeKindParams,
+    defaultDummy,
+    [
+      kind?.params(),
+      options.kindParams["_"],
+      options.kindParams[kind.name],
+    ],
+  );
   return [o, p];
 }
 
 function columnArgs<
   Params extends BaseColumnParams,
 >(
-  options: DduOptions,
   column: BaseColumn<Params>,
+  options: DduOptions,
 ): [ColumnOptions, BaseColumnParams] {
   const o = foldMerge(
     mergeColumnOptions,
@@ -1855,17 +1889,21 @@ function columnArgs<
       options.columnOptions[column.name],
     ],
   );
-  const p = foldMerge(mergeColumnParams, defaultDummy, [
-    column?.params(),
-    options.columnParams["_"],
-    options.columnParams[column.name],
-  ]);
+  const p = foldMerge(
+    mergeColumnParams,
+    defaultDummy,
+    [
+      column?.params(),
+      options.columnParams["_"],
+      options.columnParams[column.name],
+    ],
+  );
   return [o, p];
 }
 
 function actionArgs(
-  options: DduOptions,
   actionName: string,
+  options: DduOptions,
   params: BaseActionParams,
 ): [ActionOptions, BaseActionParams] {
   const o = foldMerge(
@@ -2104,7 +2142,7 @@ Deno.test("sourceArgs", () => {
   }
   const source = new S();
   source.name = "strength";
-  const [o, p] = sourceArgs(userOptions, null, source);
+  const [o, p] = sourceArgs(source, userOptions, null);
   assertEquals(o, {
     ...defaultSourceOptions(),
     matcherKey: "bar",
