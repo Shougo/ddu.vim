@@ -1,4 +1,10 @@
-import { ColumnOptions, DduItem, DduOptions, ItemHighlight } from "../types.ts";
+import {
+  ColumnOptions,
+  Context,
+  DduItem,
+  DduOptions,
+  ItemHighlight,
+} from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type BaseColumnParams = Record<string, unknown>;
@@ -11,6 +17,7 @@ export type OnInitArguments<Params extends BaseColumnParams> = {
 
 export type GetLengthArguments<Params extends BaseColumnParams> = {
   denops: Denops;
+  context: Context;
   options: DduOptions;
   columnOptions: ColumnOptions;
   columnParams: Params;
@@ -19,6 +26,7 @@ export type GetLengthArguments<Params extends BaseColumnParams> = {
 
 export type GetTextArguments<Params extends BaseColumnParams> = {
   denops: Denops;
+  context: Context;
   options: DduOptions;
   columnOptions: ColumnOptions;
   columnParams: Params;

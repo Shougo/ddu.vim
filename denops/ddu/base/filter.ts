@@ -1,4 +1,10 @@
-import { DduItem, DduOptions, FilterOptions, SourceOptions } from "../types.ts";
+import {
+  Context,
+  DduItem,
+  DduOptions,
+  FilterOptions,
+  SourceOptions,
+} from "../types.ts";
 import { Denops } from "../deps.ts";
 
 export type BaseFilterParams = Record<string, unknown>;
@@ -17,6 +23,7 @@ export type OnRefreshItemsArguments<Params extends BaseFilterParams> = {
 
 export type FilterArguments<Params extends BaseFilterParams> = {
   denops: Denops;
+  context: Context;
   options: DduOptions;
   sourceOptions: SourceOptions;
   filterOptions: FilterOptions;

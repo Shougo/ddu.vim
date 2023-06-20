@@ -1650,6 +1650,7 @@ export class Ddu {
 
       items = await filter.filter({
         denops,
+        context: this.context,
         options: this.options,
         sourceOptions,
         filterOptions,
@@ -1688,6 +1689,7 @@ export class Ddu {
 
       const columnLength = await column.getLength({
         denops,
+        context: this.context,
         options: this.options,
         columnOptions,
         columnParams,
@@ -1697,6 +1699,7 @@ export class Ddu {
       for (const item of items) {
         const text = await column.getText({
           denops,
+          context: this.context,
           options: this.options,
           columnOptions,
           columnParams,
