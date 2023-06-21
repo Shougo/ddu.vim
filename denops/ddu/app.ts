@@ -161,6 +161,12 @@ export function main(denops: Denops) {
       const ddu = getDdu(name);
       return Promise.resolve(ddu.getContext());
     },
+    getSourceNames(): Promise<string[]> {
+      return Promise.resolve(loader.getSourceNames());
+    },
+    getAliasNames(arg1: unknown): Promise<string[]> {
+      return Promise.resolve(loader.getAliasNames(arg1 as DduAliasType));
+    },
     async loadConfig(arg1: unknown): Promise<void> {
       const path = ensureString(arg1);
       const mod = await import(toFileUrl(path).href);

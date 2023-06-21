@@ -398,6 +398,10 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
 		      \   foo: #{ mark: 'foo' },
 		      \ })
 <
+						*ddu#custom#get_alias()*
+ddu#custom#get_alias({alias-type})
+		Get {alias-type} aliases.
+
 						*ddu#custom#get_current()*
 ddu#custom#get_current({name})
 		Get current ddu options for {name}.
@@ -414,6 +418,10 @@ ddu#custom#get_global()
 						*ddu#custom#get_local()*
 ddu#custom#get_local()
 		Get current buffer specific options.
+
+					*ddu#custom#get_source_names()*
+ddu#custom#get_source_names()
+		Get loaded source names.
 
 						*ddu#custom#load_config()*
 ddu#custom#load_config({path})
