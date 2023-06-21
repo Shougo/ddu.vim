@@ -12,10 +12,8 @@ export * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
 export * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 export * as autocmd from "https://deno.land/x/denops_std@v5.0.1/autocmd/mod.ts";
 export {
-  ensureArray,
-  ensureNumber,
-  ensureObject,
-  ensureString,
+  ensure,
+  is,
 } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts";
 export {
   assertEquals,

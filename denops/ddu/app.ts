@@ -1,10 +1,8 @@
 import {
   batch,
   Denops,
-  ensureArray,
-  ensureNumber,
-  ensureObject,
-  ensureString,
+  ensure,
+  is,
   Lock,
   toFileUrl,
 } from "./deps.ts";
@@ -100,38 +98,38 @@ export function main(denops: Denops) {
   denops.dispatcher = {
     alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
       setAlias(
-        ensureString(arg1) as DduAliasType,
-        ensureString(arg2),
-        ensureString(arg3),
+        ensure(arg1, is.String) as DduAliasType,
+        ensure(arg2, is.String),
+        ensure(arg3, is.String),
       );
       return Promise.resolve();
     },
     async register(arg1: unknown, arg2: unknown): Promise<void> {
       await loader.registerPath(
-        ensureString(arg1) as DduExtType,
-        ensureString(arg2),
+        ensure(arg1, is.String) as DduExtType,
+        ensure(arg2, is.String),
       );
       return Promise.resolve();
     },
     setGlobal(arg1: unknown): Promise<void> {
-      const options = ensureObject(arg1);
+      const options = ensure(arg1, is.Record);
       contextBuilder.setGlobal(options);
       return Promise.resolve();
     },
     setLocal(arg1: unknown, arg2: unknown): Promise<void> {
-      const options = ensureObject(arg1);
-      const name = ensureString(arg2);
+      const options = ensure(arg1, is.Record);
+      const name = ensure(arg2, is.String);
       contextBuilder.setLocal(name, options);
       return Promise.resolve();
     },
     patchGlobal(arg1: unknown): Promise<void> {
-      const options = ensureObject(arg1);
+      const options = ensure(arg1, is.Record);
       contextBuilder.patchGlobal(options);
       return Promise.resolve();
     },
     patchLocal(arg1: unknown, arg2: unknown): Promise<void> {
-      const options = ensureObject(arg1);
-      const name = ensureString(arg2);
+      const options = ensure(arg1, is.Record);
+      const name = ensure(arg2, is.String);
       contextBuilder.patchLocal(name, options);
       return Promise.resolve();
     },
@@ -152,12 +150,12 @@ export function main(denops: Denops) {
       }));
     },
     getCurrent(arg1: unknown): Promise<Partial<DduOptions>> {
-      const name = ensureString(arg1);
+      const name = ensure(arg1, is.String);
       const ddu = getDdu(name);
       return Promise.resolve(ddu.getOptions());
     },
     getContext(arg1: unknown): Promise<Context> {
-      const name = ensureString(arg1);
+      const name = ensure(arg1, is.String);
       const ddu = getDdu(name);
       return Promise.resolve(ddu.getContext());
     },
@@ -168,14 +166,14 @@ export function main(denops: Denops) {
       return Promise.resolve(loader.getAliasNames(arg1 as DduAliasType));
     },
     async loadConfig(arg1: unknown): Promise<void> {
-      const path = ensureString(arg1);
+      const path = ensure(arg1, is.String);
       const mod = await import(toFileUrl(path).href);
       const obj = new mod.Config();
       await obj.config({ denops, contextBuilder, setAlias });
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {
-      let userOptions = ensureObject(arg1);
+      let userOptions = ensure(arg1, is.Record);
       let [context, options] = await contextBuilder.get(denops, userOptions);
 
       let ddu = getDdu(options.name);
@@ -196,8 +194,8 @@ export function main(denops: Denops) {
       await ddu.start(denops, context, options, userOptions);
     },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
-      queuedName = ensureString(arg1);
-      queuedRedrawOption = ensureObject(arg2) as RedrawOption;
+      queuedName = ensure(arg1, is.String);
+      queuedRedrawOption = ensure(arg2, is.Record) as RedrawOption;
 
       // NOTE: must be locked
       await lock.lock(async () => {
@@ -259,9 +257,9 @@ export function main(denops: Denops) {
       arg2: unknown,
       arg3: unknown,
     ): Promise<void> {
-      const name = ensureString(arg1);
-      const mode = ensureString(arg2) as RedrawTreeMode;
-      const items = ensureArray(arg3) as ExpandItem[];
+      const name = ensure(arg1, is.String);
+      const mode = ensure(arg2, is.String) as RedrawTreeMode;
+      const items = ensure(arg3, is.Array) as ExpandItem[];
 
       const ddu = getDdu(name);
 
@@ -272,8 +270,8 @@ export function main(denops: Denops) {
       }
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {
-      const name = ensureString(arg1);
-      const event = ensureString(arg2) as DduEvent;
+      const name = ensure(arg1, is.String);
+      const event = ensure(arg2, is.String) as DduEvent;
 
       const ddu = getDdu(name);
 
@@ -284,8 +282,8 @@ export function main(denops: Denops) {
       await ddu.onEvent(denops, event);
     },
     async pop(arg1: unknown, arg2: unknown): Promise<void> {
-      const name = ensureString(arg1);
-      const opt = ensureObject(arg2) as {
+      const name = ensure(arg1, is.String);
+      const opt = ensure(arg2, is.Record) as {
         quit?: boolean;
         sync?: boolean;
       };
@@ -323,9 +321,9 @@ export function main(denops: Denops) {
       arg2: unknown,
       arg3: unknown,
     ): Promise<void> {
-      const name = ensureString(arg1);
-      const actionName = ensureString(arg2);
-      const params = ensureObject(arg3);
+      const name = ensure(arg1, is.String);
+      const actionName = ensure(arg2, is.String);
+      const params = ensure(arg3, is.Record);
 
       const ddu = getDdu(name);
       if (ddu.getOptions().ui !== "") {
@@ -338,10 +336,10 @@ export function main(denops: Denops) {
       arg3: unknown,
       arg4: unknown,
     ): Promise<void> {
-      const name = ensureString(arg1);
-      const actionName = ensureString(arg2);
-      const items = ensureArray(arg3) as DduItem[];
-      const params = ensureObject(arg4);
+      const name = ensure(arg1, is.String);
+      const actionName = ensure(arg2, is.String);
+      const items = ensure(arg3, is.Array) as DduItem[];
+      const params = ensure(arg4, is.Record);
 
       const ddu = getDdu(name);
       await ddu.itemAction(
@@ -357,8 +355,8 @@ export function main(denops: Denops) {
       arg1: unknown,
       arg2: unknown,
     ): Promise<string[]> {
-      const name = ensureString(arg1);
-      const items = ensureArray(arg2) as DduItem[];
+      const name = ensure(arg1, is.String);
+      const items = ensure(arg2, is.Array) as DduItem[];
 
       const ddu = getDdu(name);
       const ret = await ddu.getItemActions(denops, items);
@@ -377,8 +375,8 @@ export function main(denops: Denops) {
         BaseFilterParams,
       ]
     > {
-      const name = ensureString(arg1);
-      const filterName = ensureString(arg2);
+      const name = ensure(arg1, is.String);
+      const filterName = ensure(arg2, is.String);
       const ddu = getDdu(name);
       const [filter, filterOptions, filterParams] = await ddu.getFilter(
         denops,
@@ -390,8 +388,8 @@ export function main(denops: Denops) {
       arg1: unknown,
       arg2: unknown,
     ): Promise<boolean> {
-      const name = ensureString(arg1);
-      const tabNr = ensureNumber(arg2);
+      const name = ensure(arg1, is.String);
+      const tabNr = ensure(arg2, is.Number);
 
       const ddu = getDdu(name);
       return await ddu.uiVisible(denops, tabNr);
@@ -399,7 +397,7 @@ export function main(denops: Denops) {
     async uiWinid(
       arg1: unknown,
     ): Promise<number> {
-      const name = ensureString(arg1);
+      const name = ensure(arg1, is.String);
 
       const ddu = getDdu(name);
       return await ddu.uiWinid(denops);
