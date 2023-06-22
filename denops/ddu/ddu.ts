@@ -809,11 +809,6 @@ export class Ddu {
     }
 
     const kindName = kinds[0];
-    if (kindName === "base") {
-      // Dummy kind
-      return null;
-    }
-
     const kind = await this.getKind(denops, kindName);
     if (!kind) {
       return null;
@@ -1541,10 +1536,12 @@ export class Ddu {
 
     const kind = this.loader.getKind(name);
     if (!kind) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Not found kind: ${name}`,
-      );
+      if (name !== "base") {
+        await denops.call(
+          "ddu#util#print_error",
+          `Not found kind: ${name}`,
+        );
+      }
       return undefined;
     }
 
