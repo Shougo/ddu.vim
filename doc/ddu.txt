@@ -1054,6 +1054,7 @@ highlights		(object[])			(Optional)
 
 		col			(number)
 		The highlight start column.
+		Note: 1 origin.
 
 		width			(number)
 		The highlight end width.
