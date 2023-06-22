@@ -398,9 +398,9 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
 		      \   foo: #{ mark: 'foo' },
 		      \ })
 <
-						*ddu#custom#get_alias()*
-ddu#custom#get_alias({alias-type})
-		Get {alias-type} aliases.
+						*ddu#custom#get_alias_names()*
+ddu#custom#get_alias_names({alias-type})
+		Get names of {alias-type} aliases as |List|.
 
 						*ddu#custom#get_current()*
 ddu#custom#get_current({name})
@@ -421,7 +421,7 @@ ddu#custom#get_local()
 
 					*ddu#custom#get_source_names()*
 ddu#custom#get_source_names()
-		Get loaded source names.
+		Get loaded source names as |List|.
 
 						*ddu#custom#load_config()*
 ddu#custom#load_config({path})
