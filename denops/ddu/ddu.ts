@@ -238,6 +238,7 @@ export class Ddu {
         source,
         sourceOptions,
         sourceParams,
+        this.loader,
       );
     }
 
@@ -1930,6 +1931,7 @@ async function initSource<
   source: BaseSource<Params, UserData>,
   sourceOptions: SourceOptions,
   sourceParams: Params,
+  loader: Loader,
 ): Promise<void> {
   if (!source) {
     return;
@@ -1940,6 +1942,7 @@ async function initSource<
     denops,
     sourceOptions,
     sourceParams,
+    loader,
   });
   source.isInitialized = true;
 }

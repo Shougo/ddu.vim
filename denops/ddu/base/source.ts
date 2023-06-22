@@ -16,6 +16,7 @@ export type OnInitArguments<Params extends BaseSourceParams> = {
   denops: Denops;
   sourceOptions: SourceOptions;
   sourceParams: Params;
+  loader: Loader;
 };
 
 export type OnEventArguments<Params extends BaseSourceParams> = {
