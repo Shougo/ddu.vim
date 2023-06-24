@@ -1663,16 +1663,24 @@ export class Ddu {
         continue;
       }
 
-      items = await filter.filter({
-        denops,
-        context: this.context,
-        options: this.options,
-        sourceOptions,
-        filterOptions,
-        filterParams,
-        input,
-        items,
-      });
+      try {
+        items = await filter.filter({
+          denops,
+          context: this.context,
+          options: this.options,
+          sourceOptions,
+          filterOptions,
+          filterParams,
+          input,
+          items,
+        });
+      } catch (e: unknown) {
+        await errorException(
+          denops,
+          e,
+          `filter: ${filter.name} "filter()" failed`,
+        );
+      }
     }
 
     return items;
