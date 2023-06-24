@@ -443,32 +443,40 @@ export class Ddu {
     itemLevel: number,
     parent?: DduItem,
   ): AsyncGenerator<DduItem[]> {
-    const sourceItems = source.gather({
-      denops,
-      context: this.context,
-      options: this.options,
-      sourceOptions,
-      sourceParams,
-      input: this.input,
-      parent,
-      loader,
-    });
+    try {
+      const sourceItems = source.gather({
+        denops,
+        context: this.context,
+        options: this.options,
+        sourceOptions,
+        sourceParams,
+        input: this.input,
+        parent,
+        loader,
+      });
 
-    for await (const chunk of sourceItems) {
-      if (this.shouldStopCurrentContext()) {
-        return;
+      for await (const chunk of sourceItems) {
+        if (this.shouldStopCurrentContext()) {
+          return;
+        }
+        const newItems = chunk.map((item: Item) =>
+          this.newDduItem(
+            index,
+            source,
+            sourceOptions,
+            item,
+            itemLevel,
+          )
+        );
+
+        yield newItems;
       }
-      const newItems = chunk.map((item: Item) =>
-        this.newDduItem(
-          index,
-          source,
-          sourceOptions,
-          item,
-          itemLevel,
-        )
+    } catch (e: unknown) {
+      await errorException(
+        denops,
+        e,
+        `source: ${source.name} "gather()" failed`,
       );
-
-      yield newItems;
     }
   }
 
