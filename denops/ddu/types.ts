@@ -78,6 +78,7 @@ export type DduOptions = {
   kindOptions: Record<string, Partial<KindOptions>>;
   kindParams: Record<string, Partial<BaseKindParams>>;
   name: string;
+  postFilters: UserFilter[];
   profile: boolean;
   push: boolean;
   refresh: boolean;

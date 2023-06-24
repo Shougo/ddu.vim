@@ -532,6 +532,15 @@ export class Ddu {
       index++;
     }
 
+    // Post filters
+    allItems = await this.callFilters(
+      denops,
+      defaultSourceOptions(),
+      this.options.postFilters,
+      this.input,
+      allItems,
+    );
+
     if (this.options.unique) {
       // Unique all items
 

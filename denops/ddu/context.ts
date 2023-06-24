@@ -83,6 +83,7 @@ export function defaultDduOptions(): DduOptions {
     kindParams: {},
     input: "",
     name: "default",
+    postFilters: [],
     profile: false,
     push: false,
     refresh: false,

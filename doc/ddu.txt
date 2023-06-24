@@ -142,6 +142,15 @@ name			(string)
 
 		Default: "default"
 
+						*ddu-option-postFilters*
+postFilters		(string[] | dictionary[])
+		It is a list of registered filter names.  It is called after
+		the items are filtered.
+		It is useful if you want to sort items regardless source
+		orders.
+
+		Default: []
+
 							*ddu-option-profile*
 profile			(boolean)
 		Print profile result.
