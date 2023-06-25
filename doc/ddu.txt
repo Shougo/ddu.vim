@@ -1057,13 +1057,14 @@ highlights		(object[])			(Optional)
 
 		name			(string)
 		The highlight name.
+		NOTE: Each highlight must be different name.
 
 		hl_group		(string)
 		|:highlight| group.  Please see |highlight-groups|.
 
 		col			(number)
 		The highlight start column.
-		Note: 1 origin.
+		NOTE: 1 origin.
 
 		width			(number)
 		The highlight end width.
