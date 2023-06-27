@@ -176,8 +176,11 @@ export function main(denops: Denops) {
         ddu = pushDdu(options.name);
 
         // Extends previous options
+        const prevOptions = Object.assign(prevDdu.getOptions(), {
+          input: "",
+        });
         userOptions = foldMerge(mergeDduOptions, defaultDduOptions, [
-          prevDdu.getOptions(),
+          prevOptions,
           userOptions,
         ]);
 
