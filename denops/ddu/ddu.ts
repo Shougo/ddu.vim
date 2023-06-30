@@ -992,8 +992,9 @@ export class Ddu {
       }
 
       this.context.path = sourceOptions.path;
-      this.context.input = "";
-      this.options.input = "";
+
+      // Clear input when path is changed
+      await this.setInput(denops, "");
     }
 
     if (searchPath.length > 0) {
