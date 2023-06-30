@@ -990,7 +990,10 @@ export class Ddu {
       if (this.context.path.length > 0) {
         this.context.pathHistories.push(this.context.path);
       }
+
       this.context.path = sourceOptions.path;
+      this.context.input = "";
+      this.options.input = "";
     }
 
     if (searchPath.length > 0) {
