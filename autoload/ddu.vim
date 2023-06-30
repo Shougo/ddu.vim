@@ -130,7 +130,7 @@ function s:init() abort
     return
   endif
 
-  if v:version >= 900 && !has('nvim-0.8')
+  if v:version < 900 && !has('nvim-0.8')
     call ddu#util#print_error(
           \ 'ddu requires Vim 9.0+ or neovim 0.8.0+.')
     return 1
