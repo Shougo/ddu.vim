@@ -106,10 +106,6 @@ export class Ddu {
     this.loader = loader;
   }
 
-  private shouldStopCurrentContext(): boolean {
-    return this.quitted || this.cancelToRefresh;
-  }
-
   async start(
     denops: Denops,
     context: Context,
@@ -137,7 +133,7 @@ export class Ddu {
       await this.uiQuit(denops, ui, uiOptions, uiParams);
     }
 
-    const checkToggle = this.initialized && !this.quitted &&
+    const checkToggle = this.initialized && !this.shouldStopCurrentContext() &&
       !userOptions?.refresh;
 
     if (
@@ -175,7 +171,7 @@ export class Ddu {
         this.searchPath = userOptions.searchPath as string;
       }
 
-      if (!this.options?.refresh) {
+      if (!this.options?.refresh && !this.shouldStopCurrentContext()) {
         this.quitted = false;
 
         if (this.searchPath) {
@@ -188,9 +184,8 @@ export class Ddu {
         this.context.done = true;
         await uiRedraw(
           denops,
+          this,
           this.redrawLock,
-          this.context,
-          this.options,
           ui,
           uiOptions,
           uiParams,
@@ -487,7 +482,7 @@ export class Ddu {
     restoreItemState?: boolean,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui || this.quitted) {
+    if (!ui || this.shouldStopCurrentContext()) {
       return;
     }
 
@@ -630,15 +625,14 @@ export class Ddu {
     searchItem?: DduItem,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui || this.quitted) {
+    if (!ui || this.shouldStopCurrentContext()) {
       return;
     }
 
     await uiRedraw(
       denops,
+      this,
       this.redrawLock,
-      this.context,
-      this.options,
       ui,
       uiOptions,
       uiParams,
@@ -671,7 +665,7 @@ export class Ddu {
       uiOptions,
       uiParams,
     });
-    this.quitted = true;
+    this.quit();
   }
 
   async onEvent(
@@ -932,14 +926,7 @@ export class Ddu {
 
     if (actionOptions.quit) {
       // Quit UI before action
-      await ui.quit({
-        denops,
-        context: this.context,
-        options: this.options,
-        uiOptions,
-        uiParams,
-      });
-      this.quitted = true;
+      await this.uiQuit(denops, ui, uiOptions, uiParams);
     }
 
     const prevPath = sourceOptions.path;
@@ -1053,9 +1040,8 @@ export class Ddu {
     if (ui && !this.shouldStopCurrentContext()) {
       await uiRedraw(
         denops,
+        this,
         this.redrawLock,
-        this.context,
-        this.options,
         ui,
         uiOptions,
         uiParams,
@@ -1226,9 +1212,8 @@ export class Ddu {
     if (ui && !this.shouldStopCurrentContext() && !options.preventRedraw) {
       await uiRedraw(
         denops,
+        this,
         this.redrawLock,
-        this.context,
-        this.options,
         ui,
         uiOptions,
         uiParams,
@@ -1287,9 +1272,8 @@ export class Ddu {
     if (!preventRedraw) {
       await uiRedraw(
         denops,
+        this,
         this.redrawLock,
-        this.context,
-        this.options,
         ui,
         uiOptions,
         uiParams,
@@ -1315,7 +1299,7 @@ export class Ddu {
     tabNr: number,
   ): Promise<boolean> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui || !ui.visible || this.quitted) {
+    if (!ui || !ui.visible || this.shouldStopCurrentContext()) {
       return false;
     }
 
@@ -1333,7 +1317,7 @@ export class Ddu {
     denops: Denops,
   ): Promise<number> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui || !ui.winId || this.quitted) {
+    if (!ui || !ui.winId || this.shouldStopCurrentContext()) {
       return -1;
     }
 
@@ -1370,6 +1354,10 @@ export class Ddu {
     }
     this.input = input;
     this.context.input = input;
+  }
+
+  shouldStopCurrentContext(): boolean {
+    return this.quitted || this.cancelToRefresh;
   }
 
   getContext() {
@@ -2007,16 +1995,21 @@ async function uiRedraw<
   Params extends BaseUiParams,
 >(
   denops: Denops,
+  ddu: Ddu,
   lock: Lock<number>,
-  context: Context,
-  options: DduOptions,
   ui: BaseUi<Params>,
   uiOptions: UiOptions,
   uiParams: Params,
 ): Promise<void> {
   // NOTE: Redraw must be locked
   await lock.lock(async () => {
+    const options = ddu.getOptions();
+    const context = ddu.getContext();
     try {
+      if (ddu.shouldStopCurrentContext()) {
+        return;
+      }
+
       await ui.redraw({
         denops,
         context,
