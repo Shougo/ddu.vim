@@ -9,17 +9,22 @@ import {
   BaseSourceParams,
   BaseUi,
   BaseUiParams,
+  ColumnName,
   DduAliasType,
   DduExtType,
+  FilterName,
+  KindName,
+  SourceName,
+  UiName,
 } from "./types.ts";
 import { Lock, parse, toFileUrl } from "./deps.ts";
 
 export class Loader {
-  private uis: Record<string, BaseUi<BaseUiParams>> = {};
-  private sources: Record<string, BaseSource<BaseSourceParams>> = {};
-  private filters: Record<string, BaseFilter<BaseFilterParams>> = {};
-  private kinds: Record<string, BaseKind<BaseKindParams>> = {};
-  private columns: Record<string, BaseColumn<BaseColumnParams>> = {};
+  private uis: Record<UiName, BaseUi<BaseUiParams>> = {};
+  private sources: Record<SourceName, BaseSource<BaseSourceParams>> = {};
+  private filters: Record<FilterName, BaseFilter<BaseFilterParams>> = {};
+  private kinds: Record<KindName, BaseKind<BaseKindParams>> = {};
+  private columns: Record<ColumnName, BaseColumn<BaseColumnParams>> = {};
   private aliases: Record<DduAliasType, Record<string, string>> = {
     ui: {},
     source: {},
@@ -47,22 +52,22 @@ export class Loader {
   getAlias(type: DduAliasType, name: string) {
     return this.aliases[type][name];
   }
-  getUi(name: string) {
+  getUi(name: UiName) {
     return this.uis[name];
   }
   getSourceNames() {
     return Object.keys(this.sources);
   }
-  getSource(name: string) {
+  getSource(name: SourceName) {
     return this.sources[name];
   }
-  getFilter(name: string) {
+  getFilter(name: FilterName) {
     return this.filters[name];
   }
-  getKind(name: string) {
+  getKind(name: KindName) {
     return this.kinds[name];
   }
-  getColumn(name: string) {
+  getColumn(name: ColumnName) {
     return this.columns[name];
   }
 
