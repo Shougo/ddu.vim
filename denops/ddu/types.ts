@@ -26,8 +26,12 @@ export type DduAliasType = DduExtType | "action";
 
 export type DduEvent = "close" | "cancel";
 
+export type UiName = string;
 export type SourceName = string;
 export type FilterName = string;
+export type KindName = string;
+export type ColumnName = string;
+export type ActionName = string;
 
 export type TreePath = string | string[];
 
@@ -68,16 +72,16 @@ export type SourceInfo = {
 };
 
 export type DduOptions = {
-  actionOptions: Record<string, Partial<ActionOptions>>;
-  actionParams: Record<string, Partial<BaseActionParams>>;
-  columnOptions: Record<string, Partial<ColumnOptions>>;
-  columnParams: Record<string, Partial<BaseColumnParams>>;
+  actionOptions: Record<ActionName, Partial<ActionOptions>>;
+  actionParams: Record<ActionName, Partial<BaseActionParams>>;
+  columnOptions: Record<ColumnName, Partial<ColumnOptions>>;
+  columnParams: Record<ColumnName, Partial<BaseColumnParams>>;
   expandInput: boolean;
   filterOptions: Record<FilterName, Partial<FilterOptions>>;
   filterParams: Record<FilterName, Partial<BaseFilterParams>>;
   input: string;
-  kindOptions: Record<string, Partial<KindOptions>>;
-  kindParams: Record<string, Partial<BaseKindParams>>;
+  kindOptions: Record<KindName, Partial<KindOptions>>;
+  kindParams: Record<KindName, Partial<BaseKindParams>>;
   name: string;
   postFilters: UserFilter[];
   profile: boolean;
@@ -89,9 +93,9 @@ export type DduOptions = {
   sourceParams: Record<SourceName, Partial<BaseSourceParams>>;
   sources: UserSource[];
   sync: boolean;
-  ui: string;
-  uiOptions: Record<string, Partial<UiOptions>>;
-  uiParams: Record<string, Partial<BaseUiParams>>;
+  ui: UiName;
+  uiOptions: Record<UiName, Partial<UiOptions>>;
+  uiParams: Record<UiName, Partial<BaseUiParams>>;
   unique: boolean;
 };
 
@@ -99,7 +103,7 @@ export type UserOptions = Record<string, unknown>;
 
 export type UiOptions = {
   actions: Record<
-    string,
+    ActionName,
     string | ((args: UiActionArguments<BaseUiParams>) => Promise<ActionFlags>)
   >;
   defaultAction: string;
@@ -109,13 +113,13 @@ export type UiOptions = {
 
 export type SourceOptions = {
   actions: Record<
-    string,
+    ActionName,
     | string
     | ((
       args: ActionArguments<BaseActionParams>,
     ) => Promise<ActionFlags | ActionResult>)
   >;
-  columns: string[];
+  columns: ColumnName[];
   converters: UserFilter[];
   defaultAction: string;
   ignoreCase: boolean;
@@ -139,7 +143,7 @@ export type ColumnOptions = {
 
 export type KindOptions = {
   actions: Record<
-    string,
+    ActionName,
     | string
     | ((
       args: ActionArguments<BaseActionParams>,
@@ -331,7 +335,7 @@ export type Clipboard = {
 
 export type ActionHistory = {
   actions: {
-    name: string;
+    name: ActionName;
     item?: DduItem;
     dest?: string;
   }[];
