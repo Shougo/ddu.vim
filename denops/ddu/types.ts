@@ -27,6 +27,7 @@ export type DduAliasType = DduExtType | "action";
 export type DduEvent = "close" | "cancel";
 
 export type SourceName = string;
+export type FilterName = string;
 
 export type TreePath = string | string[];
 
@@ -48,19 +49,19 @@ export type Custom = {
 };
 
 export type UserSource = {
-  name: string;
+  name: SourceName;
   options?: SourceOptions;
   params?: BaseSourceParams;
 };
 
-export type UserFilter = string | {
-  name: string;
+export type UserFilter = FilterName | {
+  name: FilterName;
   options?: FilterOptions;
   params?: BaseFilterParams;
 };
 
 export type SourceInfo = {
-  name: string;
+  name: SourceName;
   index: number;
   path: TreePath;
   kind: string;
@@ -72,8 +73,8 @@ export type DduOptions = {
   columnOptions: Record<string, Partial<ColumnOptions>>;
   columnParams: Record<string, Partial<BaseColumnParams>>;
   expandInput: boolean;
-  filterOptions: Record<string, Partial<FilterOptions>>;
-  filterParams: Record<string, Partial<BaseFilterParams>>;
+  filterOptions: Record<FilterName, Partial<FilterOptions>>;
+  filterParams: Record<FilterName, Partial<BaseFilterParams>>;
   input: string;
   kindOptions: Record<string, Partial<KindOptions>>;
   kindParams: Record<string, Partial<BaseKindParams>>;
