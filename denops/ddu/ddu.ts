@@ -2017,6 +2017,11 @@ async function uiRedraw<
         uiOptions,
         uiParams,
       });
+
+      // NOTE: ddu may be quitted after redraw
+      if (ddu.shouldStopCurrentContext()) {
+        await ddu.uiQuit(denops, ui, uiOptions, uiParams);
+      }
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes(" E523: ")) {
         // NOTE: It may be called on invalid state
