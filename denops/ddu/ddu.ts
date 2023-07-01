@@ -305,22 +305,15 @@ export class Ddu {
 
           this.gatherStates[index] = state;
 
-          const source = this.loader.getSource(userSource.name);
-
+          const [source, sourceOptions, sourceParams] = await this.getSource(
+            denops,
+            userSource.name,
+            userSource,
+          );
           if (!source) {
-            await denops.call(
-              "ddu#util#print_error",
-              `Not found source: ${userSource.name}`,
-            );
             state.done = true;
             return;
           }
-
-          const [sourceOptions, sourceParams] = sourceArgs(
-            source,
-            this.options,
-            userSource,
-          );
 
           // Call "onRefreshItems" hooks
           const filters = sourceOptions.matchers.concat(
@@ -495,19 +488,14 @@ export class Ddu {
     let allItems: DduItem[] = [];
     let index = 0;
     for (const userSource of this.options.sources) {
-      const source = this.loader.getSource(userSource.name);
-      if (!source) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Not found source: ${userSource.name}`,
-        );
-        return;
-      }
-      const [sourceOptions, _] = sourceArgs(
-        source,
-        this.options,
+      const [source, sourceOptions, _] = await this.getSource(
+        denops,
+        userSource.name,
         userSource,
       );
+      if (!source) {
+        return;
+      }
       sources.push({
         name: userSource.name,
         index,
@@ -673,15 +661,14 @@ export class Ddu {
     event: DduEvent,
   ): Promise<void> {
     for (const userSource of this.options.sources) {
-      const source = this.loader.getSource(userSource.name);
+      const [source, sourceOptions, sourceParams] = await this.getSource(
+        denops,
+        userSource.name,
+        userSource,
+      );
       if (!source) {
         continue;
       }
-      const [sourceOptions, sourceParams] = sourceArgs(
-        source,
-        this.options,
-        userSource,
-      );
 
       // The source may not have "onEvent"
       if (!source.onEvent) {
@@ -1391,11 +1378,9 @@ export class Ddu {
 
   async checkUpdated(denops: Denops): Promise<boolean> {
     for (const userSource of this.options.sources) {
-      const source = this.loader.getSource(userSource.name);
-
-      const [sourceOptions, sourceParams] = sourceArgs(
-        source,
-        this.options,
+      const [source, sourceOptions, sourceParams] = await this.getSource(
+        denops,
+        userSource.name,
         userSource,
       );
 
@@ -1597,15 +1582,14 @@ export class Ddu {
     index: number,
     input: string,
   ): Promise<[boolean, number, DduItem[]]> {
-    const source = this.loader.getSource(userSource.name);
-    const [sourceOptions, _] = sourceArgs(
-      source,
-      this.options,
+    const [source, sourceOptions, _] = await this.getSource(
+      denops,
+      userSource.name,
       userSource,
     );
 
     const state = this.gatherStates[index];
-    if (!state) {
+    if (!state || !source) {
       return [false, 0, []];
     }
 
