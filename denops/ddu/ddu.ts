@@ -172,7 +172,7 @@ export class Ddu {
         this.searchPath = userOptions.searchPath as string;
       }
 
-      if (!this.options?.refresh && !this.shouldStopCurrentContext()) {
+      if (!this.options?.refresh) {
         this.quitted = false;
 
         if (this.searchPath) {
