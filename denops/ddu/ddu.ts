@@ -162,6 +162,7 @@ export class Ddu {
       }
 
       if (checkToggle && uiOptions.toggle) {
+        this.quit();
         await this.uiQuit(denops, ui, uiOptions, uiParams);
         return;
       }
@@ -208,6 +209,7 @@ export class Ddu {
       return;
     }
     if (checkToggle && uiOptions.toggle) {
+      this.quit();
       await this.uiQuit(denops, ui, uiOptions, uiParams);
       return;
     }
@@ -255,6 +257,7 @@ export class Ddu {
     if (!ui) {
       return;
     }
+    this.quit();
     await this.uiQuit(denops, ui, uiOptions, uiParams);
 
     // Disable resume
@@ -653,7 +656,6 @@ export class Ddu {
       uiOptions,
       uiParams,
     });
-    this.quit();
   }
 
   async onEvent(
