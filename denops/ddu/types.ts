@@ -20,6 +20,8 @@ export type { BaseColumnParams } from "./base/column.ts";
 
 export { ContextBuilder } from "./context.ts";
 
+export { Ddu } from "./ddu.ts";
+
 export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
 
 export type DduAliasType = DduExtType | "action";

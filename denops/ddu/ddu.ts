@@ -731,6 +731,7 @@ export class Ddu {
     } else {
       ret = await action({
         denops,
+        ddu: this,
         context: this.context,
         options: this.options,
         uiOptions,

@@ -2,6 +2,7 @@ import {
   ActionFlags,
   BaseActionParams,
   Context,
+  Ddu,
   DduItem,
   DduOptions,
   PreviewContext,
@@ -109,6 +110,7 @@ export type WinidArguments<Params extends BaseUiParams> = {
 
 export type UiActionArguments<Params extends BaseUiParams> = {
   denops: Denops;
+  ddu: Ddu,
   context: Context;
   options: DduOptions;
   uiOptions: UiOptions;
