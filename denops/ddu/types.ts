@@ -49,11 +49,6 @@ export type Context = {
   winId: number;
 };
 
-export type Custom = {
-  source: Record<SourceName, SourceOptions>;
-  option: DduOptions;
-};
-
 export type UserSource = {
   name: SourceName;
   options?: Partial<SourceOptions>;
