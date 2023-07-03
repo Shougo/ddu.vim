@@ -1262,6 +1262,30 @@ syntax			(string)			(Optional)
 ==============================================================================
 FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-faq*
 
+FAQ 1:							|ddu-faq-1|
+	How to donate money to you?
+
+FAQ 2:							|ddu-faq-2|
+	Why does ddu.vim not include any default extra files?
+
+FAQ 3:							|ddu-faq-3|
+	Why ddu extra plugins cannot have default options(Not params)?
+
+FAQ 4:							|ddu-faq-4|
+	I want to use ":Ddu" command like ":Denite" in denite.nvim.
+
+FAQ 5:							|ddu-faq-5|
+	ddu.vim starting is slow.
+
+FAQ 6:							|ddu-faq-6|
+	|:cnext| / |:cprevious| like commands are available?
+
+FAQ 7:							|ddu-faq-7|
+	I want to execute grep action from items.
+
+
+------------------------------------------------------------------------------
+							*ddu-faq-1*
 Q: How to donate money to you?
 
 A: I have started github sponsorship to spend more time for Vim/neovim
@@ -1269,7 +1293,7 @@ plugins.  You can donate money to help me!
 
    https://github.com/sponsors/Shougo
 
-
+							*ddu-faq-2*
 Q: Why does ddu.vim not include any default extra files?
 
 A: Because I cannot determine the best default files.
@@ -1278,19 +1302,21 @@ So ddu.vim should not define the defaults.
 You must define your defaults by configuration.
 ddu.vim does not conflict with your defaults.
 
-
+							*ddu-faq-3*
 Q: Why ddu extra plugins cannot have default options(Not params)?
 
 A: Because users can customize sources perfectly.  If a source has the
 default, users have to check them.  It increases configuration cost.
 The config should work as users config.
 
-Q: I want to use ":Ddu" command like ":Denite" in denite.nvim
+							*ddu-faq-4*
+Q: I want to use ":Ddu" command like ":Denite" in denite.nvim.
 
 A: You can use ddu-commands.vim.
 https://github.com/Shougo/ddu-commands.vim
 It is not all users needed plugin and users can define the original commands.
 
+							*ddu-faq-5*
 Q: ddu.vim starting is slow.
 
 A: It may be slow in Windows environment.  You should use denops shared server
@@ -1310,11 +1336,13 @@ Or you can use dummy |ddu#start()| for it. >
 	      \     },
 	      \   })
 	      \ })
-
+<
+							*ddu-faq-6*
 Q: |:cnext| / |:cprevious| like commands are available?
 
 A: Nothing.  You can send items to |quickfix| by "quickfix" action instead.
 
+							*ddu-faq-7*
 Q: I want to execute grep action from items.
 
 A: The example is here. >
@@ -1342,6 +1370,7 @@ A: The example is here. >
 	      \   ],
 	      \ })
 	endfunction
+<
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
