@@ -77,7 +77,7 @@ function ddu#_request(method, args) abort
 
   if !ddu#_denops_running()
     " Lazy call request
-    execute printf('autocmd User DDUReady call '
+    execute printf('autocmd User DenopsPluginPost:ddu call '
           \ .. 'denops#request("ddu", "%s", %s)', a:method, a:args->string())
     return {}
   endif
@@ -94,7 +94,7 @@ function ddu#_notify(method, args) abort
 
   if !ddu#_denops_running()
     " Lazy call notify
-    execute printf('autocmd User DDUReady call '
+    execute printf('autocmd User DenopsPluginPost:ddu call '
           \ .. 'denops#notify("ddu", "%s", %s)', a:method, a:args->string())
     return {}
   endif
@@ -138,7 +138,7 @@ function s:init() abort
 
   augroup ddu
     autocmd!
-    autocmd User DDUReady let s:initialized = v:true
+    autocmd User DenopsPluginPost:ddu let s:initialized = v:true
   augroup END
 
   let g:ddu#_started = reltime()

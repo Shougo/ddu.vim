@@ -1,4 +1,4 @@
-import { batch, Denops, ensure, is, Lock, toFileUrl } from "./deps.ts";
+import { Denops, ensure, is, Lock, toFileUrl } from "./deps.ts";
 import {
   ActionHistory,
   BaseFilterParams,
@@ -399,9 +399,4 @@ export function main(denops: Denops) {
       return await ddu.uiWinid(denops);
     },
   };
-
-  batch(denops, async (denops: Denops) => {
-    await denops.cmd("doautocmd <nomodeline> User DDUReady");
-    await denops.cmd("autocmd! User DDUReady");
-  });
 }

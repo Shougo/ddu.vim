@@ -62,7 +62,8 @@ function ddu#custom#action(type, source_kind_name, action_name, func) abort
         \ ])
 endfunction
 
-" This should be called manually, so wait until dduReady by the user himself.
+" This should be called manually, so wait until DenopsPluginPost:ddu by the
+" user himself.
 function ddu#custom#get_global() abort
   return ddu#_request('getGlobal', [])
 endfunction
