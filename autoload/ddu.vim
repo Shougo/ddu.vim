@@ -114,6 +114,10 @@ function ddu#_notify(method, args) abort
 endfunction
 
 function s:notify(method, args) abort
+  if denops#plugin#is_loaded('ddu')
+    call denops#notify('ddu', a:method, a:args)
+    return
+  endif
   call denops#plugin#wait_async('ddu', { -> denops#notify('ddu', a:method, a:args) })
 endfunction
 
