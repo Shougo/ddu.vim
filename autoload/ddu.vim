@@ -148,11 +148,6 @@ function s:init() abort
     return 1
   endif
 
-  augroup ddu
-    autocmd!
-    autocmd User DDUReady let s:initialized = v:true
-  augroup END
-
   let g:ddu#_started = reltime()
 
   " NOTE: ddu.vim must be registered manually.
@@ -175,3 +170,8 @@ function s:stopped() abort
     call ddu#_request(custom.method, custom.args)
   endfor
 endfunction
+
+augroup ddu
+  autocmd!
+  autocmd User DenopsPluginPost:ddu ++once let s:initialized = v:true
+augroup END
