@@ -1,4 +1,4 @@
-import { batch, Denops, ensure, is, Lock, toFileUrl } from "./deps.ts";
+import { Denops, ensure, is, Lock, toFileUrl } from "./deps.ts";
 import {
   ActionHistory,
   BaseFilterParams,
