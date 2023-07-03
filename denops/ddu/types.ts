@@ -57,13 +57,13 @@ export type Custom = {
 export type UserSource = {
   name: SourceName;
   options?: Partial<SourceOptions>;
-  params?: BaseSourceParams;
+  params?: Partial<BaseSourceParams>;
 };
 
 export type UserFilter = FilterName | {
   name: FilterName;
   options?: Partial<FilterOptions>;
-  params?: BaseFilterParams;
+  params?: Partial<BaseFilterParams>;
 };
 
 export type SourceInfo = {
