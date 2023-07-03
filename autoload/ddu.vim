@@ -75,18 +75,28 @@ function ddu#_request(method, args) abort
     return {}
   endif
 
-  if !ddu#_denops_running()
-    " Lazy call request
-    execute printf('autocmd User DDUReady call '
-          \ .. 'denops#request("ddu", "%s", %s)', a:method, a:args->string())
+  if !'g:loaded_denops'->exists()
+    echohl WarningMsg
+    echomsg '[ddu] The ddu#_request() is called but denops.vim is not in runtimepath so ddu cannot return proper result of the request.'
+    echomsg '[ddu] Consider to use ddu#_notify() instead if the result is not actually required.'
+    echohl None
+    execute printf(
+          \ 'autocmd User DenopsPluginPost:ddu ++once call s:notify("%s", %s)',
+          \ a:method,
+          \ a:args->string(),
+          \)
     return {}
   endif
+  return s:request(a:method, a:args)
+endfunction
 
+function s:request(method, args) abort
   if denops#plugin#wait('ddu')
     return {}
   endif
   return denops#request('ddu', a:method, a:args)
 endfunction
+
 function ddu#_notify(method, args) abort
   if s:init()
     return {}
