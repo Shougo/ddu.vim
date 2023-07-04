@@ -78,7 +78,7 @@ function ddu#_request(method, args) abort
   if !ddu#_denops_running()
     " Lazy call request
     execute printf('autocmd User DenopsPluginPost:ddu call '
-          \ .. 'denops#request("ddu", "%s", %s)', a:method, a:args->string())
+          \ .. 's:notify("%s", %s)', a:method, a:args->string())
     return {}
   endif
 
@@ -95,14 +95,20 @@ function ddu#_notify(method, args) abort
   if !ddu#_denops_running()
     " Lazy call notify
     execute printf('autocmd User DenopsPluginPost:ddu call '
-          \ .. 'denops#notify("ddu", "%s", %s)', a:method, a:args->string())
+          \ .. 's:notify("%s", %s)', a:method, a:args->string())
     return {}
   endif
 
-  if denops#plugin#wait('ddu')
-    return {}
+  return s:notify(a:method, a:args)
+endfunction
+
+function s:notify(method, args) abort
+  if denops#plugin#is_loaded('ddu')
+    call denops#notify('ddu', a:method, a:args)
+  else
+    call denops#plugin#wait_async('ddu',
+          \ { -> denops#notify('ddu', a:method, a:args) })
   endif
-  return denops#notify('ddu', a:method, a:args)
 endfunction
 
 const s:root_dir = '<sfile>'->expand()->fnamemodify(':h:h')
