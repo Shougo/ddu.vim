@@ -159,35 +159,39 @@ export function main(denops: Denops) {
       return Promise.resolve(loader.getAliasNames(arg1 as DduAliasType));
     },
     async loadConfig(arg1: unknown): Promise<void> {
-      const path = ensure(arg1, is.String);
-      const mod = await import(toFileUrl(path).href);
-      const obj = new mod.Config();
-      await obj.config({ denops, contextBuilder, setAlias });
+      await lock.lock(async () => {
+        const path = ensure(arg1, is.String);
+        const mod = await import(toFileUrl(path).href);
+        const obj = new mod.Config();
+        await obj.config({ denops, contextBuilder, setAlias });
+      });
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {
-      let userOptions = ensure(arg1, is.Record);
-      let [context, options] = await contextBuilder.get(denops, userOptions);
+      await lock.lock(async () => {
+        let userOptions = ensure(arg1, is.Record);
+        let [context, options] = await contextBuilder.get(denops, userOptions);
 
-      let ddu = getDdu(options.name);
+        let ddu = getDdu(options.name);
 
-      if (options.push) {
-        const prevDdu = ddu;
-        ddu = pushDdu(options.name);
+        if (options.push) {
+          const prevDdu = ddu;
+          ddu = pushDdu(options.name);
 
-        // Extends previous options
-        const prevOptions = Object.assign(prevDdu.getOptions(), {
-          input: "",
-        });
-        userOptions = foldMerge(mergeDduOptions, defaultDduOptions, [
-          prevOptions,
-          userOptions,
-        ]);
+          // Extends previous options
+          const prevOptions = Object.assign(prevDdu.getOptions(), {
+            input: "",
+          });
+          userOptions = foldMerge(mergeDduOptions, defaultDduOptions, [
+            prevOptions,
+            userOptions,
+          ]);
 
-        [context, options] = await contextBuilder.get(denops, userOptions);
-      }
+          [context, options] = await contextBuilder.get(denops, userOptions);
+        }
 
-      await ddu.start(denops, context, options, userOptions);
+        await ddu.start(denops, context, options, userOptions);
+      });
     },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
       queuedName = ensure(arg1, is.String);
