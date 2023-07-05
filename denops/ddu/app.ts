@@ -159,6 +159,7 @@ export function main(denops: Denops) {
       return Promise.resolve(loader.getAliasNames(arg1 as DduAliasType));
     },
     async loadConfig(arg1: unknown): Promise<void> {
+      // NOTE: Lock until load finished to prevent execute start() API.
       await lock.lock(async () => {
         const path = ensure(arg1, is.String);
         const mod = await import(toFileUrl(path).href);
