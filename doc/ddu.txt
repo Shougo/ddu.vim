@@ -288,6 +288,12 @@ ddu#item_action({name}, {action}, {items}, {params})
 
 		NOTE: It is for creating UI interface.
 
+							*ddu#load()*
+ddu#load({type}, {names})
+		Load ddu extensions.
+		{type} is "ui" or "source" or "filter" or "kind" or "column".
+		{names} is array of extension name.
+
 							*ddu#pop()*
 ddu#pop({name}[, {opt}])
 		Restore the previous state.
@@ -436,6 +442,9 @@ ddu#custom#load_config({path})
 		Load TypeScript configuration from {path} file.
 		NOTE: {path} must be full path.
 		NOTE: The loading is asynchronous.
+
+						*ddu#custom#load_extensions()*
+ddu#custom#load_extensions({path})
 
 						*ddu#custom#patch_global()*
 ddu#custom#patch_global({option-name}, {value})
@@ -1324,18 +1333,9 @@ feature.
 
 https://github.com/vim-denops/denops.vim#shared-server
 
-Or you can use dummy |ddu#start()| for it. >
-
-	call timer_start(10, { _ ->
-	      \   ddu#start(#{
-	      \     ui: 'ff',
-	      \     uiParams: #{
-	      \       ff: #{
-	      \         ignoreEmpty: v:true,
-	      \       },
-	      \     },
-	      \   })
-	      \ })
+Or you can use |ddu#load()| for it.
+>
+	call timer_start(10, { _ -> ddu#load('ui', ['ff']) })
 <
 							*ddu-faq-6*
 Q: |:cnext| / |:cprevious| like commands are available?

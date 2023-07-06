@@ -168,6 +168,14 @@ export function main(denops: Denops) {
       });
       return Promise.resolve();
     },
+    async loadExtensions(arg1: unknown, arg2: unknown): Promise<void> {
+      const type = ensure(arg1, is.String) as DduExtType;
+      const names = ensure(arg2, is.ArrayOf(is.String));
+      for (const name of names) {
+        await loader.autoload(denops, type, name);
+      }
+      return Promise.resolve();
+    },
     async start(arg1: unknown): Promise<void> {
       await lock.lock(async () => {
         let userOptions = ensure(arg1, is.Record);

@@ -20,7 +20,7 @@ function ddu#custom#load_config(path) abort
     return
   endif
 
-  return s:request('loadConfig', [a:path])
+  return s:notify('loadConfig', [a:path])
 endfunction
 
 let s:aliases = #{

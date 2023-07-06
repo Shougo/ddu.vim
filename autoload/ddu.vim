@@ -69,6 +69,10 @@ endfunction
 function ddu#register(type, path) abort
   call ddu#_notify('register', [a:type, a:path])
 endfunction
+function ddu#load(type, names) abort
+  call ddu#_notify('loadExtensions', [a:type, a:names])
+endfunction
+
 
 function ddu#_request(method, args) abort
   if s:init()
