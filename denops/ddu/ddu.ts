@@ -6,8 +6,6 @@ import {
   equal,
   fn,
   Lock,
-  op,
-  parse,
   pathsep,
 } from "./deps.ts";
 import {
@@ -31,7 +29,6 @@ import {
   ColumnOptions,
   Context,
   DduEvent,
-  DduExtType,
   DduItem,
   DduOptions,
   ExpandItem,
@@ -1320,24 +1317,6 @@ export class Ddu {
     });
   }
 
-  async autoload(
-    denops: Denops,
-    type: DduExtType,
-    name: string,
-  ) {
-    const paths = await globpath(
-      denops,
-      `denops/@ddu-${type}s/`,
-      this.loader.getAlias(type, name) ?? name,
-    );
-
-    if (paths.length === 0) {
-      return;
-    }
-
-    await this.loader.registerPath(type, paths[0]);
-  }
-
   async setInput(denops: Denops, input: string) {
     if (this.options.expandInput) {
       input = await fn.expand(denops, input) as string;
@@ -1417,7 +1396,7 @@ export class Ddu {
     ]
   > {
     if (!this.loader.getUi(this.options.ui)) {
-      await this.autoload(denops, "ui", this.options.ui);
+      await this.loader.autoload(denops, "ui", this.options.ui);
     }
 
     const ui = this.loader.getUi(this.options.ui);
@@ -1453,7 +1432,7 @@ export class Ddu {
     ]
   > {
     if (!this.loader.getSource(name)) {
-      await this.autoload(denops, "source", name);
+      await this.loader.autoload(denops, "source", name);
     }
 
     const source = this.loader.getSource(name);
@@ -1496,7 +1475,7 @@ export class Ddu {
     }
 
     if (!this.loader.getFilter(userFilter.name)) {
-      await this.autoload(denops, "filter", userFilter.name);
+      await this.loader.autoload(denops, "filter", userFilter.name);
     }
 
     const filter = this.loader.getFilter(userFilter.name);
@@ -1529,7 +1508,7 @@ export class Ddu {
     BaseKind<BaseKindParams> | undefined
   > {
     if (!this.loader.getKind(name)) {
-      await this.autoload(denops, "kind", name);
+      await this.loader.autoload(denops, "kind", name);
     }
 
     const kind = this.loader.getKind(name);
@@ -1557,7 +1536,7 @@ export class Ddu {
     ]
   > {
     if (!this.loader.getColumn(name)) {
-      await this.autoload(denops, "column", name);
+      await this.loader.autoload(denops, "column", name);
     }
 
     const column = this.loader.getColumn(name);
@@ -2077,36 +2056,6 @@ async function checkColumnOnInit(
       `column: ${column.name} "onInit()" failed`,
     );
   }
-}
-
-async function globpath(
-  denops: Denops,
-  search: string,
-  file: string,
-): Promise<string[]> {
-  const runtimepath = await op.runtimepath.getGlobal(denops);
-
-  const check: Record<string, boolean> = {};
-  const paths: string[] = [];
-  const glob = await fn.globpath(
-    denops,
-    runtimepath,
-    search + file + ".ts",
-    1,
-    1,
-  );
-
-  for (const path of glob) {
-    // Skip already added name.
-    if (parse(path).name in check) {
-      continue;
-    }
-
-    paths.push(path);
-    check[parse(path).name] = true;
-  }
-
-  return paths;
 }
 
 function convertTreePath(treePath: TreePath) {
