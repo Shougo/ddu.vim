@@ -1375,6 +1375,9 @@ A: The example is here. >
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
 
+2023.06.30
+* Vim 9.0+ or neovim 0.8+ is required.
+
 2023.06.19
 * Change path type to "string | string[]".
 
