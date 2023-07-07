@@ -50,10 +50,9 @@ export abstract class BaseSource<
   UserData extends unknown = unknown,
 > {
   name = "";
-  path = "";
   isInitialized = false;
 
-  apiVersion = 2;
+  apiVersion = 3;
 
   kind = "base";
   prevMtime = new Date();

@@ -21,10 +21,9 @@ export abstract class BaseKind<
   Params extends BaseKindParams,
 > {
   name = "";
-  path = "";
   isInitialized = false;
 
-  apiVersion = 1;
+  apiVersion = 2;
 
   actions: Actions<Params> = {};
 

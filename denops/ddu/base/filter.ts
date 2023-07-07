@@ -34,10 +34,9 @@ export type FilterArguments<Params extends BaseFilterParams> = {
 
 export abstract class BaseFilter<Params extends BaseFilterParams> {
   name = "";
-  path = "";
   isInitialized = false;
 
-  apiVersion = 2;
+  apiVersion = 3;
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 

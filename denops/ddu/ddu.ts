@@ -770,9 +770,11 @@ export class Ddu {
     const sources = [
       ...new Set(
         items.length > 0
-          ? items.map((item) => this.loader.getSource(item.__sourceName))
+          ? items.map((item) =>
+            this.loader.getSource(this.options.name, item.__sourceName)
+          )
           : this.options.sources.map((userSource) =>
-            this.loader.getSource(userSource.name)
+            this.loader.getSource(this.options.name, userSource.name)
           ),
       ),
     ].filter((source) => source);
@@ -784,19 +786,22 @@ export class Ddu {
         await denops.call(
           "ddu#util#print_error",
           `You must not mix multiple sources items: "${
-            sources.map((source) => source.name)
+            sources.map((source) => source?.name)
           }"`,
         );
       }
       return null;
     }
     const source = sources[0];
+    if (!source) {
+      return null;
+    }
 
     const kinds = [
       ...new Set(
         items.length > 0
           ? items.map((item) => item.kind)
-          : sources.map((source) => source.kind),
+          : sources.map((source) => source?.kind),
       ),
     ] as string[];
     if (kinds.length !== 1) {
@@ -1066,7 +1071,13 @@ export class Ddu {
     }
 
     const index = parent.__sourceIndex;
-    const source = this.loader.getSource(parent.__sourceName);
+    const source = this.loader.getSource(
+      this.options.name,
+      parent.__sourceName,
+    );
+    if (!source) {
+      return;
+    }
     const [sourceOptions, sourceParams] = sourceArgs(
       source,
       this.options,
@@ -1231,7 +1242,10 @@ export class Ddu {
 
     for (const item of items) {
       const index = item.__sourceIndex;
-      const source = this.loader.getSource(item.__sourceName);
+      const source = this.loader.getSource(
+        this.options.name,
+        item.__sourceName,
+      );
       const [sourceOptions, _] = sourceArgs(
         source,
         this.options,
@@ -1344,7 +1358,7 @@ export class Ddu {
   getSourceArgs() {
     return this.options.sources.map((userSource) =>
       sourceArgs(
-        this.loader.getSource(userSource.name),
+        this.loader.getSource(this.options.name, userSource.name),
         this.options,
         userSource,
       )
@@ -1395,11 +1409,11 @@ export class Ddu {
       BaseUiParams,
     ]
   > {
-    if (!this.loader.getUi(this.options.ui)) {
+    if (!this.loader.getUi(this.options.name, this.options.ui)) {
       await this.loader.autoload(denops, "ui", this.options.ui);
     }
 
-    const ui = this.loader.getUi(this.options.ui);
+    const ui = this.loader.getUi(this.options.name, this.options.ui);
     if (!ui) {
       if (this.options.ui.length !== 0) {
         await denops.call(
@@ -1431,11 +1445,11 @@ export class Ddu {
       BaseSourceParams,
     ]
   > {
-    if (!this.loader.getSource(name)) {
+    if (!this.loader.getSource(this.options.name, name)) {
       await this.loader.autoload(denops, "source", name);
     }
 
-    const source = this.loader.getSource(name);
+    const source = this.loader.getSource(this.options.name, name);
     if (!source) {
       await denops.call(
         "ddu#util#print_error",
@@ -1474,11 +1488,11 @@ export class Ddu {
       };
     }
 
-    if (!this.loader.getFilter(userFilter.name)) {
+    if (!this.loader.getFilter(this.options.name, userFilter.name)) {
       await this.loader.autoload(denops, "filter", userFilter.name);
     }
 
-    const filter = this.loader.getFilter(userFilter.name);
+    const filter = this.loader.getFilter(this.options.name, userFilter.name);
     if (!filter) {
       await denops.call(
         "ddu#util#print_error",
@@ -1507,11 +1521,11 @@ export class Ddu {
   ): Promise<
     BaseKind<BaseKindParams> | undefined
   > {
-    if (!this.loader.getKind(name)) {
+    if (!this.loader.getKind(this.options.name, name)) {
       await this.loader.autoload(denops, "kind", name);
     }
 
-    const kind = this.loader.getKind(name);
+    const kind = this.loader.getKind(this.options.name, name);
     if (!kind) {
       if (name !== "base") {
         await denops.call(
@@ -1535,11 +1549,11 @@ export class Ddu {
       BaseColumnParams,
     ]
   > {
-    if (!this.loader.getColumn(name)) {
+    if (!this.loader.getColumn(this.options.name, name)) {
       await this.loader.autoload(denops, "column", name);
     }
 
-    const column = this.loader.getColumn(name);
+    const column = this.loader.getColumn(this.options.name, name);
     if (!column) {
       await denops.call(
         "ddu#util#print_error",
@@ -1706,7 +1720,10 @@ export class Ddu {
     actionParams: BaseActionParams,
     previewContext: PreviewContext,
   ): Promise<Previewer | undefined> {
-    const source = this.loader.getSource(item.__sourceName);
+    const source = this.loader.getSource(this.options.name, item.__sourceName);
+    if (!source) {
+      return;
+    }
     const kindName = source.kind;
 
     const kind = await this.getKind(denops, kindName);

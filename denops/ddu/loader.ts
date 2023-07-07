@@ -20,11 +20,14 @@ import {
 import { Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
 
 export class Loader {
-  private uis: Record<UiName, BaseUi<BaseUiParams>> = {};
-  private sources: Record<SourceName, BaseSource<BaseSourceParams>> = {};
-  private filters: Record<FilterName, BaseFilter<BaseFilterParams>> = {};
-  private kinds: Record<KindName, BaseKind<BaseKindParams>> = {};
-  private columns: Record<ColumnName, BaseColumn<BaseColumnParams>> = {};
+  private extensions: Record<string, Extension> = {};
+  private mods: Record<DduExtType, Record<string, unknown>> = {
+    ui: {},
+    source: {},
+    filter: {},
+    kind: {},
+    column: {},
+  };
   private aliases: Record<DduAliasType, Record<string, string>> = {
     ui: {},
     source: {},
@@ -64,29 +67,63 @@ export class Loader {
     });
   }
 
-  getAliasNames(type: DduAliasType) {
-    return Object.keys(this.aliases[type]);
+  getUi(index: string, name: string): BaseUi<BaseUiParams> | null {
+    const mod = this.mods["ui"][name];
+    if (!mod) {
+      return null;
+    }
+
+    return this.getExtension(index).getUi(mod, name);
   }
+  getSource(index: string, name: string): BaseSource<BaseSourceParams> | null {
+    const mod = this.mods["source"][name];
+    if (!mod) {
+      return null;
+    }
+
+    return this.getExtension(index).getSource(mod, name);
+  }
+  getFilter(index: string, name: string): BaseFilter<BaseFilterParams> | null {
+    const mod = this.mods["filter"][name];
+    if (!mod) {
+      return null;
+    }
+
+    return this.getExtension(index).getFilter(mod, name);
+  }
+  getKind(index: string, name: string): BaseKind<BaseKindParams> | null {
+    const mod = this.mods["kind"][name];
+    if (!mod) {
+      return null;
+    }
+
+    return this.getExtension(index).getKind(mod, name);
+  }
+  getColumn(index: string, name: string): BaseColumn<BaseColumnParams> | null {
+    const mod = this.mods["column"][name];
+    if (!mod) {
+      return null;
+    }
+
+    return this.getExtension(index).getColumn(mod, name);
+  }
+
   getAlias(type: DduAliasType, name: string) {
     return this.aliases[type][name];
   }
-  getUi(name: UiName) {
-    return this.uis[name];
+  getAliasNames(type: DduAliasType) {
+    return Object.keys(this.aliases[type]);
   }
   getSourceNames() {
-    return Object.keys(this.sources);
+    return Object.keys(this.mods.source);
   }
-  getSource(name: SourceName) {
-    return this.sources[name];
-  }
-  getFilter(name: FilterName) {
-    return this.filters[name];
-  }
-  getKind(name: KindName) {
-    return this.kinds[name];
-  }
-  getColumn(name: ColumnName) {
-    return this.columns[name];
+
+  private getExtension(index: string): Extension {
+    if (!this.extensions[index]) {
+      this.extensions[index] = new Extension();
+    }
+
+    return this.extensions[index];
   }
 
   private async register(type: DduExtType, path: string) {
@@ -98,61 +135,71 @@ export class Loader {
 
     const mod = await import(toFileUrl(path).href);
 
-    let add;
-    switch (type) {
-      case "ui":
-        add = (name: string) => {
-          const obj = new mod.Ui();
-          obj.name = name;
-          obj.path = path;
-          this.uis[obj.name] = obj;
-        };
-        break;
-      case "source":
-        add = (name: string) => {
-          const obj = new mod.Source();
-          obj.name = name;
-          obj.path = path;
-          this.sources[obj.name] = obj;
-        };
-        break;
-      case "filter":
-        add = (name: string) => {
-          const obj = new mod.Filter();
-          obj.name = name;
-          obj.path = path;
-          this.filters[obj.name] = obj;
-        };
-        break;
-      case "kind":
-        add = (name: string) => {
-          const obj = new mod.Kind();
-          obj.name = name;
-          obj.path = path;
-          this.kinds[obj.name] = obj;
-        };
-        break;
-      case "column":
-        add = (name: string) => {
-          const obj = new mod.Column();
-          obj.name = name;
-          obj.path = path;
-          this.columns[obj.name] = obj;
-        };
-        break;
-    }
-
-    add(name);
+    this.mods[type][name] = mod;
 
     // Check alias
     const aliases = this.getAliasNames(type).filter(
       (k) => this.getAlias(type, k) === name,
     );
     for (const alias of aliases) {
-      add(alias);
+      this.mods[type][alias] = mod;
     }
 
     this.checkPaths[path] = true;
+  }
+}
+
+class Extension {
+  private uis: Record<UiName, BaseUi<BaseUiParams>> = {};
+  private sources: Record<SourceName, BaseSource<BaseSourceParams>> = {};
+  private filters: Record<FilterName, BaseFilter<BaseFilterParams>> = {};
+  private kinds: Record<KindName, BaseKind<BaseKindParams>> = {};
+  private columns: Record<ColumnName, BaseColumn<BaseColumnParams>> = {};
+
+  // deno-lint-ignore no-explicit-any
+  getUi(mod: any, name: string): BaseUi<BaseUiParams> {
+    if (!this.uis[name]) {
+      const obj = new mod.Ui();
+      obj.name = name;
+      this.uis[obj.name] = obj;
+    }
+    return this.uis[name];
+  }
+  // deno-lint-ignore no-explicit-any
+  getSource(mod: any, name: string): BaseSource<BaseSourceParams> {
+    if (!this.sources[name]) {
+      const obj = new mod.Source();
+      obj.name = name;
+      this.sources[obj.name] = obj;
+    }
+    return this.sources[name];
+  }
+  // deno-lint-ignore no-explicit-any
+  getFilter(mod: any, name: string): BaseFilter<BaseFilterParams> {
+    if (!this.filters[name]) {
+      const obj = new mod.Filter();
+      obj.name = name;
+      this.filters[obj.name] = obj;
+    }
+    return this.filters[name];
+  }
+  // deno-lint-ignore no-explicit-any
+  getKind(mod: any, name: string): BaseKind<BaseKindParams> {
+    if (!this.kinds[name]) {
+      const obj = new mod.Kind();
+      obj.name = name;
+      this.kinds[obj.name] = obj;
+    }
+    return this.kinds[name];
+  }
+  // deno-lint-ignore no-explicit-any
+  getColumn(mod: any, name: string): BaseColumn<BaseColumnParams> {
+    if (!this.columns[name]) {
+      const obj = new mod.Column();
+      obj.name = name;
+      this.columns[obj.name] = obj;
+    }
+    return this.columns[name];
   }
 }
 

@@ -42,10 +42,9 @@ export type GetTextResult = {
 
 export abstract class BaseColumn<Params extends BaseColumnParams> {
   name = "";
-  path = "";
   isInitialized = false;
 
-  apiVersion = 1;
+  apiVersion = 2;
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 
