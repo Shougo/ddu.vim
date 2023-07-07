@@ -62,7 +62,8 @@ It does not work with zero configuration.  You can use other plugins.
 ==============================================================================
 INSTALL							*ddu-install*
 
-NOTE: ddu.vim requires Neovim (0.8.0+) or Vim9.0+ (latest is recommended).
+NOTE: ddu.vim requires Neovim (0.8.0+) or Vim 9.0.1499+ (latest is
+recommended).
 
 Please install both Deno and "denops.vim".
 
@@ -1374,6 +1375,9 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
+
+2023.07.07
+* Vim 9.0.1499+ or neovim 0.8+ is required.
 
 2023.06.30
 * Vim 9.0+ or neovim 0.8+ is required.
