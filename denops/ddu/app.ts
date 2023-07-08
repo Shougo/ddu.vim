@@ -391,7 +391,7 @@ export function main(denops: Denops) {
         denops,
         filterName,
       );
-      return [filter ? filter.path : "", filterOptions, filterParams];
+      return [filter?.path ?? "", filterOptions, filterParams];
     },
     async uiVisible(
       arg1: unknown,

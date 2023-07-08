@@ -38,6 +38,8 @@ export abstract class BaseFilter<Params extends BaseFilterParams> {
 
   apiVersion = 3;
 
+  path = "";
+
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 
   async onRefreshItems(_args: OnRefreshItemsArguments<Params>): Promise<void> {}

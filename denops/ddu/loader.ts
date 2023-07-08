@@ -21,7 +21,10 @@ import { Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
 
 export class Loader {
   private extensions: Record<string, Extension> = {};
-  private mods: Record<DduExtType, Record<string, unknown>> = {
+  private mods: Record<
+    DduExtType,
+    Record<string, { mod: unknown; path: string }>
+  > = {
     ui: {},
     source: {},
     filter: {},
@@ -135,7 +138,9 @@ export class Loader {
 
     const mod = await import(toFileUrl(path).href);
 
-    this.mods[type][name] = mod;
+    const obj = { mod, path };
+
+    this.mods[type][name] = obj;
 
     // Check alias
     const aliases = this.getAliasNames(type).filter(
@@ -157,46 +162,63 @@ class Extension {
   private columns: Record<ColumnName, BaseColumn<BaseColumnParams>> = {};
 
   // deno-lint-ignore no-explicit-any
-  getUi(mod: any, name: string): BaseUi<BaseUiParams> {
+  getUi(mod: { mod: any; path: string }, name: string): BaseUi<BaseUiParams> {
     if (!this.uis[name]) {
-      const obj = new mod.Ui();
+      const obj = new mod.mod.Ui();
       obj.name = name;
+      obj.path = mod.path;
       this.uis[obj.name] = obj;
     }
     return this.uis[name];
   }
-  // deno-lint-ignore no-explicit-any
-  getSource(mod: any, name: string): BaseSource<BaseSourceParams> {
+  getSource(
+    // deno-lint-ignore no-explicit-any
+    mod: { mod: any; path: string },
+    name: string,
+  ): BaseSource<BaseSourceParams> {
     if (!this.sources[name]) {
-      const obj = new mod.Source();
+      const obj = new mod.mod.Source();
       obj.name = name;
+      obj.path = mod.path;
       this.sources[obj.name] = obj;
     }
     return this.sources[name];
   }
-  // deno-lint-ignore no-explicit-any
-  getFilter(mod: any, name: string): BaseFilter<BaseFilterParams> {
+  getFilter(
+    // deno-lint-ignore no-explicit-any
+    mod: { mod: any; path: string },
+    name: string,
+  ): BaseFilter<BaseFilterParams> {
     if (!this.filters[name]) {
-      const obj = new mod.Filter();
+      const obj = new mod.mod.Filter();
       obj.name = name;
+      obj.path = mod.path;
       this.filters[obj.name] = obj;
     }
     return this.filters[name];
   }
-  // deno-lint-ignore no-explicit-any
-  getKind(mod: any, name: string): BaseKind<BaseKindParams> {
+  getKind(
+    // deno-lint-ignore no-explicit-any
+    mod: { mod: any; path: string },
+    name: string,
+  ): BaseKind<BaseKindParams> {
     if (!this.kinds[name]) {
-      const obj = new mod.Kind();
+      const obj = new mod.mod.Kind();
       obj.name = name;
+      obj.path = mod.path;
       this.kinds[obj.name] = obj;
     }
     return this.kinds[name];
   }
-  // deno-lint-ignore no-explicit-any
-  getColumn(mod: any, name: string): BaseColumn<BaseColumnParams> {
+  getColumn(
+    // deno-lint-ignore no-explicit-any
+    mod: { mod: any; path: string },
+    name: string,
+  ): BaseColumn<BaseColumnParams> {
     if (!this.columns[name]) {
-      const obj = new mod.Column();
+      const obj = new mod.mod.Column();
       obj.name = name;
+      obj.path = mod.path;
       this.columns[obj.name] = obj;
     }
     return this.columns[name];
