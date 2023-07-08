@@ -41,10 +41,11 @@ export type GetTextResult = {
 };
 
 export abstract class BaseColumn<Params extends BaseColumnParams> {
-  name = "";
-  isInitialized = false;
-
   apiVersion = 2;
+
+  name = "";
+  path = "";
+  isInitialized = false;
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
 

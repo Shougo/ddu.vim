@@ -20,10 +20,11 @@ export type GetPreviewerArguments = {
 export abstract class BaseKind<
   Params extends BaseKindParams,
 > {
-  name = "";
-  isInitialized = false;
-
   apiVersion = 2;
+
+  name = "";
+  path = "";
+  isInitialized = false;
 
   actions: Actions<Params> = {};
 

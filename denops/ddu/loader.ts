@@ -19,12 +19,15 @@ import {
 } from "./types.ts";
 import { Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
 
+type Mod = {
+  // deno-lint-ignore no-explicit-any
+  mod: any;
+  path: string;
+};
+
 export class Loader {
   private extensions: Record<string, Extension> = {};
-  private mods: Record<
-    DduExtType,
-    Record<string, { mod: unknown; path: string }>
-  > = {
+  private mods: Record<DduExtType, Record<string, Mod>> = {
     ui: {},
     source: {},
     filter: {},
@@ -138,9 +141,7 @@ export class Loader {
 
     const mod = await import(toFileUrl(path).href);
 
-    const obj = { mod, path };
-
-    this.mods[type][name] = obj;
+    this.mods[type][name] = { mod, path };
 
     // Check alias
     const aliases = this.getAliasNames(type).filter(
@@ -161,8 +162,7 @@ class Extension {
   private kinds: Record<KindName, BaseKind<BaseKindParams>> = {};
   private columns: Record<ColumnName, BaseColumn<BaseColumnParams>> = {};
 
-  // deno-lint-ignore no-explicit-any
-  getUi(mod: { mod: any; path: string }, name: string): BaseUi<BaseUiParams> {
+  getUi(mod: Mod, name: string): BaseUi<BaseUiParams> {
     if (!this.uis[name]) {
       const obj = new mod.mod.Ui();
       obj.name = name;
@@ -171,11 +171,7 @@ class Extension {
     }
     return this.uis[name];
   }
-  getSource(
-    // deno-lint-ignore no-explicit-any
-    mod: { mod: any; path: string },
-    name: string,
-  ): BaseSource<BaseSourceParams> {
+  getSource(mod: Mod, name: string): BaseSource<BaseSourceParams> {
     if (!this.sources[name]) {
       const obj = new mod.mod.Source();
       obj.name = name;
@@ -184,11 +180,7 @@ class Extension {
     }
     return this.sources[name];
   }
-  getFilter(
-    // deno-lint-ignore no-explicit-any
-    mod: { mod: any; path: string },
-    name: string,
-  ): BaseFilter<BaseFilterParams> {
+  getFilter(mod: Mod, name: string): BaseFilter<BaseFilterParams> {
     if (!this.filters[name]) {
       const obj = new mod.mod.Filter();
       obj.name = name;
@@ -197,11 +189,7 @@ class Extension {
     }
     return this.filters[name];
   }
-  getKind(
-    // deno-lint-ignore no-explicit-any
-    mod: { mod: any; path: string },
-    name: string,
-  ): BaseKind<BaseKindParams> {
+  getKind(mod: Mod, name: string): BaseKind<BaseKindParams> {
     if (!this.kinds[name]) {
       const obj = new mod.mod.Kind();
       obj.name = name;
@@ -210,11 +198,7 @@ class Extension {
     }
     return this.kinds[name];
   }
-  getColumn(
-    // deno-lint-ignore no-explicit-any
-    mod: { mod: any; path: string },
-    name: string,
-  ): BaseColumn<BaseColumnParams> {
+  getColumn(mod: Mod, name: string): BaseColumn<BaseColumnParams> {
     if (!this.columns[name]) {
       const obj = new mod.mod.Column();
       obj.name = name;

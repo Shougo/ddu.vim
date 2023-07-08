@@ -127,10 +127,11 @@ export type UiActionArguments<Params extends BaseUiParams> = {
 export abstract class BaseUi<
   Params extends BaseUiParams,
 > {
-  name = "";
-  isInitialized = false;
-
   apiVersion = 2;
+
+  name = "";
+  path = "";
+  isInitialized = false;
 
   async onInit(_args: OnInitArguments<Params>): Promise<void> {}
   async onBeforeAction(_args: OnBeforeActionArguments<Params>): Promise<void> {}

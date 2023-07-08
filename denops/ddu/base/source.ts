@@ -49,10 +49,11 @@ export abstract class BaseSource<
   Params extends BaseSourceParams,
   UserData extends unknown = unknown,
 > {
-  name = "";
-  isInitialized = false;
-
   apiVersion = 3;
+
+  name = "";
+  path = "";
+  isInitialized = false;
 
   kind = "base";
   prevMtime = new Date();
