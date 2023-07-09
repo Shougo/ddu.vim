@@ -1,13 +1,13 @@
-function ddu#ui#async_action(name, options = {}) abort
-  call ddu#ui_async_action(get(b:, 'ddu_ui_name', ''), a:name, a:options)
+function ddu#ui#async_action(name, params = {}) abort
+  call ddu#ui_async_action(get(b:, 'ddu_ui_name', ''), a:name, a:params)
 endfunction
 
-function ddu#ui#sync_action(name, options = {}) abort
-  call ddu#ui_sync_action(get(b:, 'ddu_ui_name', ''), a:name, a:options)
+function ddu#ui#sync_action(name, params = {}) abort
+  call ddu#ui_sync_action(get(b:, 'ddu_ui_name', ''), a:name, a:params)
 endfunction
 
-function ddu#ui#do_action(name, options = {}) abort
-  return ddu#ui#sync_action(a:name, a:options)
+function ddu#ui#do_action(name, params = {}) abort
+  return ddu#ui#sync_action(a:name, a:params)
 endfunction
 
 function ddu#ui#multi_actions(actions) abort
