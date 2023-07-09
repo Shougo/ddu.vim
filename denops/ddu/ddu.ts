@@ -1667,12 +1667,18 @@ export class Ddu {
       return items;
     }
 
-    // Item highlights must be cleared
     for (const item of items) {
+      item.display = "";
       item.highlights = [];
     }
 
-    let startCol = 1;
+    type CachedColumn = {
+      column: BaseColumn<BaseColumnParams>;
+      columnOptions: ColumnOptions;
+      columnParams: BaseColumnParams;
+      length: number;
+    };
+    const cachedColumns: Record<string, CachedColumn> = {};
     for (const columnName of columns) {
       const [column, columnOptions, columnParams] = await this.getColumn(
         denops,
@@ -1682,7 +1688,7 @@ export class Ddu {
         continue;
       }
 
-      const columnLength = await column.getLength({
+      const length = await column.getLength({
         denops,
         context: this.context,
         options: this.options,
@@ -1691,26 +1697,44 @@ export class Ddu {
         items,
       });
 
-      for (const item of items) {
-        const text = await column.getText({
+      cachedColumns[columnName] = {
+        column,
+        columnOptions,
+        columnParams,
+        length,
+      };
+    }
+
+    for (const item of items) {
+      let startCol = 1;
+      for (const columnName of columns) {
+        if (!cachedColumns[columnName]) {
+          continue;
+        }
+
+        const cachedColumn = cachedColumns[columnName];
+        const text = await cachedColumn.column.getText({
           denops,
           context: this.context,
           options: this.options,
-          columnOptions,
-          columnParams,
+          columnOptions: cachedColumn.columnOptions,
+          columnParams: cachedColumn.columnParams,
           startCol,
-          endCol: startCol + columnLength,
+          endCol: startCol + cachedColumn.length,
           item,
         });
-
-        item.display = text.text;
 
         if (text.highlights && item.highlights) {
           item.highlights = item.highlights.concat(text.highlights);
         }
-      }
 
-      startCol += columnLength;
+        if (item.display !== "") {
+          item.display += " ";
+        }
+        item.display += text.text;
+
+        startCol += cachedColumn.length + 1;
+      }
     }
   }
 
