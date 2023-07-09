@@ -35,6 +35,10 @@ export type KindName = string;
 export type ColumnName = string;
 export type ActionName = string;
 
+// TreePath is the path (string) or list of the path segments(string[])
+// You can represents two ways for one path like below.
+//    "/aa/bb/cc"
+//    ["/", "aa", "bb", "cc"]
 export type TreePath = string | string[];
 
 export type Context = {

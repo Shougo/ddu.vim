@@ -179,6 +179,9 @@ resume			(boolean)
 searchPath		(string | string[])
 		Search the path.  This only works when specified |ddu#start()|
 		or |ddu#redraw()|.
+		NOTE: You can represents a path by two way like below.
+			"/aa/bb/cc" (string)
+			["/", "aa", "bb", "cc"] (string[])
 		NOTE: The path must be absolute path.
 
 		Default: ""
@@ -722,6 +725,9 @@ maxItems		(number)
 						*ddu-source-option-path*
 path			(string | string[])
 		Specify an initial narrowing path.
+		NOTE: You can represents a path by two way like below.
+			"/aa/bb/cc" (string)
+			["/", "aa", "bb", "cc"] (string[])
 		NOTE: It must be full path.
 
 						*ddu-source-option-sorters*
@@ -1091,6 +1097,9 @@ status			(object)			(Optional)
 					*ddu-item-attribute-treePath*
 treePath		(string | string[])		(Optional)
 		The item tree path.
+		NOTE: You can represents a path by two way like below.
+			"/aa/bb/cc" (string)
+			["/", "aa", "bb", "cc"] (string[])
 		NOTE: The attribute must be set to support tree feature.
 
 					*ddu-item-attribute-word*
