@@ -137,18 +137,23 @@ export class Loader {
       return;
     }
 
+    const mods = this.mods[type];
+
     const name = parse(path).name;
 
-    const mod = await import(toFileUrl(path).href);
+    const mod: Mod = {
+      mod: await import(toFileUrl(path).href),
+      path,
+    };
 
-    this.mods[type][name] = { mod, path };
+    mods[name] = mod;
 
     // Check alias
     const aliases = this.getAliasNames(type).filter(
       (k) => this.getAlias(type, k) === name,
     );
     for (const alias of aliases) {
-      this.mods[type][alias] = mod;
+      mods[alias] = mod;
     }
 
     this.checkPaths[path] = true;
