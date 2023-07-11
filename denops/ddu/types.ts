@@ -45,6 +45,7 @@ export type Context = {
   bufName: string;
   bufNr: number;
   done: boolean;
+  doneUi: boolean;
   input: string;
   maxItems: number;
   mode: string;

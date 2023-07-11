@@ -189,6 +189,7 @@ export class Ddu {
           uiOptions,
           uiParams,
         );
+        this.context.doneUi = true;
         return;
       }
     } else {
@@ -482,6 +483,7 @@ export class Ddu {
 
     // Update current input
     this.context.done = true;
+    this.context.doneUi = false;
     this.context.input = this.input;
     this.context.maxItems = 0;
 
@@ -607,6 +609,8 @@ export class Ddu {
     }
 
     await this.uiRedraw(denops, searchTargetItem);
+
+    this.context.doneUi = this.context.done;
   }
 
   async uiRedraw(
@@ -919,6 +923,12 @@ export class Ddu {
     }
 
     if (actionOptions.quit) {
+      // NOTE: To quit UI properly, all items must be gathered.
+      if (!this.context.doneUi) {
+        echo(denops, "Current ddu UI is not done");
+        return;
+      }
+
       // Quit UI before action
       await this.uiQuit(denops, ui, uiOptions, uiParams);
     }
@@ -2016,6 +2026,7 @@ async function uiRedraw<
     const context = ddu.getContext();
     try {
       if (ddu.shouldStopCurrentContext()) {
+        await ddu.uiQuit(denops, ui, uiOptions, uiParams);
         return;
       }
 

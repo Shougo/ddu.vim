@@ -1385,6 +1385,9 @@ A: The example is here. >
 ==============================================================================
 COMPATIBILITY						*ddu-compatibility*
 
+2023.07.11
+* item actions can close UI when all items are gathered.
+
 2023.07.07
 * Vim 9.0.1276+ or neovim 0.8+ is required to support the latest MacVim.
 
