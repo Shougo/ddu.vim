@@ -128,6 +128,7 @@ export class Ddu {
         return;
       }
       await this.uiQuit(denops, ui, uiOptions, uiParams);
+      this.quit();
     }
 
     const checkToggle = this.initialized && !this.shouldStopCurrentContext() &&
@@ -159,8 +160,8 @@ export class Ddu {
       }
 
       if (checkToggle && uiOptions.toggle) {
-        this.quit();
         await this.uiQuit(denops, ui, uiOptions, uiParams);
+        this.quit();
         return;
       }
 
@@ -206,8 +207,8 @@ export class Ddu {
       return;
     }
     if (checkToggle && uiOptions.toggle) {
-      this.quit();
       await this.uiQuit(denops, ui, uiOptions, uiParams);
+      this.quit();
       return;
     }
 
@@ -254,8 +255,8 @@ export class Ddu {
     if (!ui) {
       return;
     }
-    this.quit();
     await this.uiQuit(denops, ui, uiOptions, uiParams);
+    this.quit();
 
     // Disable resume
     userOptions.resume = false;
@@ -684,6 +685,7 @@ export class Ddu {
   }
 
   quit() {
+    // NOTE: quitted flag must be called after uiQuit().
     this.quitted = true;
   }
 
