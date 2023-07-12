@@ -922,7 +922,16 @@ export class Ddu {
       return;
     }
 
-    if (actionOptions.quit) {
+    const visible = await ui.visible({
+      denops,
+      context: this.context,
+      options: this.options,
+      uiOptions,
+      uiParams,
+      tabNr: await fn.tabpagenr(denops),
+    });
+
+    if (actionOptions.quit && visible) {
       // NOTE: To quit UI properly, all items must be gathered.
       if (!this.context.doneUi) {
         echo(denops, "Current ddu UI is not done");
