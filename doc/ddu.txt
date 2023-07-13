@@ -1246,6 +1246,13 @@ expr			(number | string)		(Optional)
 		|bufname()|.
 		NOTE: It is only avaiable in |ddu-previewer-BufferPreviewer|.
 
+					*ddu-previewer-attribute-filetype*
+filetype		(string)			(Optional)
+		'filetype' to apply in the preview buffer.
+
+		Default: |filetype-detect|
+		(|ddu-previewer-BufferPreviewer| only)
+
 					*ddu-previewer-attribute-highlights*
 highlights		(PreviewHighlight[])		(Optional)
 		Highlights to apply in the preview buffer.
@@ -1275,7 +1282,7 @@ pattern			(string)			(Optional)
 
 					*ddu-previewer-attribute-syntax*
 syntax			(string)			(Optional)
-		Syntax to apply in the preview buffer.
+		'syntax' to apply in the preview buffer.
 
 
 ==============================================================================

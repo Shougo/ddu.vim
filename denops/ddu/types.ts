@@ -315,6 +315,11 @@ type PreviewerCommon = {
    * Syntax to apply in the preview buffer
    */
   syntax?: string;
+
+  /**
+   * Filetype to apply in the preview buffer
+   */
+  filetype?: string;
 };
 
 /**
