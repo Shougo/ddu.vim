@@ -93,7 +93,8 @@ export class Ddu {
   private userOptions: UserOptions = {};
   private initialized = false;
   private quitted = false;
-  private cancelToRefresh = false;
+  private cancelledToRefresh = false;
+  private abortController = new AbortController();
   private redrawLock = new Lock(0);
   private startTime = 0;
   private expandedPaths = new Set<string[]>();
@@ -171,7 +172,7 @@ export class Ddu {
       }
 
       if (!this.options?.refresh) {
-        this.quitted = false;
+        this.resetQuitted();
 
         if (this.searchPath) {
           // Redraw only without regather items.
@@ -216,7 +217,7 @@ export class Ddu {
     ui.isInitialized = false;
 
     this.initialized = false;
-    this.quitted = false;
+    this.resetQuitted();
 
     // Source onInit() must be called before UI
     for (const userSource of this.options.sources) {
@@ -279,13 +280,13 @@ export class Ddu {
     this.startTime = Date.now();
 
     // Clean up previous gather state
-    this.cancelToRefresh = true;
+    this.cancelToRefresh();
     for (const state of Object.values(this.gatherStates)) {
       while (!state.done) {
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
     }
-    this.cancelToRefresh = false;
+    this.resetCancelledToRefresh();
 
     // Initialize UI window
     if (!this.options.sync) {
@@ -350,10 +351,6 @@ export class Ddu {
               0,
             )
           ) {
-            if (this.shouldStopCurrentContext()) {
-              break;
-            }
-
             let path = sourceOptions.path;
             if (path === "") {
               // Use current directory instead
@@ -433,6 +430,11 @@ export class Ddu {
     itemLevel: number,
     parent?: DduItem,
   ): AsyncGenerator<DduItem[]> {
+    const { signal } = this.abortController;
+    if (signal.aborted) {
+      return;
+    }
+
     try {
       const sourceItems = source.gather({
         denops,
@@ -444,22 +446,32 @@ export class Ddu {
         parent,
         loader,
       });
+      const reader = sourceItems.getReader();
+      const abort = () => reader.cancel(signal.reason);
 
-      for await (const chunk of sourceItems) {
-        if (this.shouldStopCurrentContext()) {
-          return;
+      try {
+        signal.addEventListener("abort", abort);
+
+        for (;;) {
+          const chunk = await reader.read();
+          if (chunk.done || signal.aborted) {
+            break;
+          }
+          const newItems = chunk.value.map((item: Item) =>
+            this.newDduItem(
+              index,
+              source,
+              sourceOptions,
+              item,
+              itemLevel,
+            )
+          );
+
+          yield newItems;
         }
-        const newItems = chunk.map((item: Item) =>
-          this.newDduItem(
-            index,
-            source,
-            sourceOptions,
-            item,
-            itemLevel,
-          )
-        );
-
-        yield newItems;
+      } finally {
+        signal.removeEventListener("abort", abort);
+        reader.releaseLock();
       }
     } catch (e: unknown) {
       await errorException(
@@ -691,6 +703,30 @@ export class Ddu {
   quit() {
     // NOTE: quitted flag must be called after uiQuit().
     this.quitted = true;
+    this.abortController.abort("quit");
+  }
+
+  private resetQuitted() {
+    this.quitted = false;
+    this.resetAbortController();
+  }
+
+  private cancelToRefresh() {
+    this.cancelledToRefresh = true;
+    this.abortController.abort("cancelToRefresh");
+  }
+
+  private resetCancelledToRefresh() {
+    this.cancelledToRefresh = false;
+    this.resetAbortController();
+  }
+
+  private resetAbortController() {
+    if (
+      !this.shouldStopCurrentContext() && this.abortController.signal.aborted
+    ) {
+      this.abortController = new AbortController();
+    }
   }
 
   async uiAction(
@@ -1005,11 +1041,11 @@ export class Ddu {
 
     if (flags & ActionFlags.RefreshItems) {
       // Restore quitted flag before refresh and redraw
-      this.quitted = false;
+      this.resetQuitted();
       await this.refresh(denops);
     } else if (uiOptions.persist || flags & ActionFlags.Persist) {
       // Restore quitted flag before refresh and redraw
-      this.quitted = false;
+      this.resetQuitted();
       await ui.redraw({
         denops,
         context: this.context,
@@ -1126,10 +1162,6 @@ export class Ddu {
         parent,
       )
     ) {
-      if (this.shouldStopCurrentContext()) {
-        return;
-      }
-
       await this.callColumns(
         denops,
         sourceOptions.columns,
@@ -1361,7 +1393,7 @@ export class Ddu {
   }
 
   shouldStopCurrentContext(): boolean {
-    return this.quitted || this.cancelToRefresh;
+    return this.quitted || this.cancelledToRefresh;
   }
 
   getContext() {
