@@ -968,12 +968,6 @@ export class Ddu {
     });
 
     if (actionOptions.quit && visible) {
-      // NOTE: To quit UI properly, all items must be gathered.
-      if (!this.context.doneUi) {
-        echo(denops, "Current ddu UI is not done");
-        return;
-      }
-
       // Quit UI before action
       await this.uiQuit(denops, ui, uiOptions, uiParams);
     }
