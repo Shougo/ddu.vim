@@ -61,6 +61,7 @@ export function defaultContext(): Context {
     bufName: "",
     bufNr: 0,
     done: false,
+    doneUi: false,
     input: "",
     maxItems: 0,
     mode: "",
