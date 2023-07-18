@@ -5,6 +5,7 @@ import {
   echo,
   equal,
   fn,
+  is,
   Lock,
   pathsep,
 } from "./deps.ts";
@@ -1683,7 +1684,7 @@ export class Ddu {
       }
 
       try {
-        items = await filter.filter({
+        const ret = await filter.filter({
           denops,
           context: this.context,
           options: this.options,
@@ -1693,6 +1694,16 @@ export class Ddu {
           input,
           items,
         });
+
+        if (is.Array(ret)) {
+          items = ret;
+        } else {
+          if (ret.input) {
+            // Overwrite current input
+            input = ret.input;
+          }
+          items = ret.items;
+        }
       } catch (e: unknown) {
         await errorException(
           denops,

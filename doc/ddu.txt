@@ -1129,6 +1129,17 @@ FILTER ATTRIBUTES				*ddu-filter-attributes*
 						*ddu-filter-attribute-filter*
 filter			(function)			(Required)
 		It is called to filter items.
+		The return type is DduItem[] or following object.
+
+		input			(string)	(Optional)
+		Overwrite current input.
+		NOTE: The overwrite is avaiable for current filters list only.
+
+		items			(DduItem[])	(Required)
+		Filtered items.
+
+		postActionCommand	(string)	(Optional)
+		TODO.
 
 						*ddu-filter-attribute-onInit*
 onInit			(function)			(Optional)

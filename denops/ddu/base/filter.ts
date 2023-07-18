@@ -1,5 +1,6 @@
 import {
   Context,
+  DduFilterItems,
   DduItem,
   DduOptions,
   FilterOptions,
@@ -43,7 +44,7 @@ export abstract class BaseFilter<Params extends BaseFilterParams> {
 
   async onRefreshItems(_args: OnRefreshItemsArguments<Params>): Promise<void> {}
 
-  abstract filter({}: FilterArguments<Params>): Promise<DduItem[]>;
+  abstract filter({}: FilterArguments<Params>): Promise<DduFilterItems>;
 
   abstract params(): Params;
 }

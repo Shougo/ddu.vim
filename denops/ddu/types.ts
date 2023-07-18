@@ -206,6 +206,12 @@ export type ExpandItem = {
   search?: TreePath;
 };
 
+export type DduFilterItems = DduItem[] | {
+  items: DduItem[];
+  input?: string;
+  postActionCommand?: string;
+};
+
 export type ActionArguments<Params extends BaseActionParams> = {
   denops: Denops;
   context: Context;
