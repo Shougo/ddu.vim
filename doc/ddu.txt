@@ -3,7 +3,7 @@
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
-CONTENTS						*ddu-contents*
+CONTENTS                                                        *ddu-contents*
 
 Introduction		|ddu-introduction|
 Install			|ddu-install|
@@ -50,7 +50,7 @@ Compatibility		|ddu-compatibility|
 
 
 ==============================================================================
-INTRODUCTION						*ddu-introduction*
+INTRODUCTION                                                *ddu-introduction*
 
 *ddu* is the abbreviation of "dark deno-powered UI".  It provides an
 asynchronous fuzzy finder UI.
@@ -60,7 +60,7 @@ It does not work with zero configuration.  You can use other plugins.
 
 
 ==============================================================================
-INSTALL							*ddu-install*
+INSTALL                                                          *ddu-install*
 
 NOTE: ddu.vim requires Neovim (0.8.0+) or Vim 9.0.1276+ (latest is
 recommended).
@@ -76,73 +76,73 @@ You can search ddu.vim plugins from https://github.com/topics/ddu-vim.
 
 
 ==============================================================================
-INTERFACE						*ddu-interface*
+INTERFACE                                                      *ddu-interface*
 
 
 ------------------------------------------------------------------------------
-OPTIONS							*ddu-options*
+OPTIONS                                                          *ddu-options*
 
-						*ddu-option-actionOptions*
+                                                    *ddu-option-actionOptions*
 actionOptions		(dictionary)
 		It is a dictionary that maps action names to its options.
 		See also |ddu-action-options|.
 
 		Default: {}
 
-						*ddu-option-actionParams*
+                                                     *ddu-option-actionParams*
 actionParams		(dictionary)
 		It is a dictionary that maps action names to its parameters.
 		See also |ddu-action-params|.
 
 		Default: {}
 
-						*ddu-option-columnOptions*
+                                                    *ddu-option-columnOptions*
 columnOptions		(dictionary)
 		It is a dictionary that maps column names to its options.
 		See also |ddu-column-options|.
 
 		Default: {}
 
-						*ddu-option-columnParams*
+                                                     *ddu-option-columnParams*
 columnParams		(dictionary)
 		It is a dictionary that maps column names to its parameters.
 		See also |ddu-column-params|.
 
 		Default: {}
 
-						*ddu-option-expandInput*
+                                                      *ddu-option-expandInput*
 expandInput		(boolean)
 		Expand user input by |expand()|.
 		It is useful for file path sources.
 
-						*ddu-option-filterOptions*
+                                                    *ddu-option-filterOptions*
 filterOptions		(dictionary)
 		It is a dictionary that maps filter names to its options.
 		See also |ddu-filter-options|.
 
 		Default: {}
 
-						*ddu-option-filterParams*
+                                                     *ddu-option-filterParams*
 filterParams		(dictionary)
 		It is a dictionary that maps filter names to its parameters.
 		See also |ddu-filter-params|.
 
 		Default: {}
 
-							*ddu-option-input*
+                                                            *ddu-option-input*
 input			(string)
 		Specify an initial narrowing text.
 		NOTE: If the input contains spaces, it means AND search.
 
 		Default: ""
 
-							*ddu-option-name*
+                                                             *ddu-option-name*
 name			(string)
 		Specify the name.
 
 		Default: "default"
 
-						*ddu-option-postFilters*
+                                                      *ddu-option-postFilters*
 postFilters		(string[] | dictionary[])
 		It is a list of registered filter names.  It is called after
 		the items are filtered.
@@ -151,23 +151,23 @@ postFilters		(string[] | dictionary[])
 
 		Default: []
 
-							*ddu-option-profile*
+                                                          *ddu-option-profile*
 profile			(boolean)
 		Print profile result.
 		NOTE: It is for debug.
 
-							*ddu-option-push*
+                                                             *ddu-option-push*
 push			(boolean)
 		Save |ddu-option-name|'s ddu state and create new ddu state.
 		NOTE: The state can be restored by |ddu#pop()|.
 
-							*ddu-option-refresh*
+                                                          *ddu-option-refresh*
 refresh			(boolean)
 		Refresh the items when |ddu-option-resume|.
 
 		Default: v:false
 
-							*ddu-option-resume*
+                                                           *ddu-option-resume*
 resume			(boolean)
 		Reuse the previous state.  If none exist, a new ddu
 		state is created.
@@ -175,7 +175,7 @@ resume			(boolean)
 
 		Default: v:false
 
-						*ddu-option-searchPath*
+                                                       *ddu-option-searchPath*
 searchPath		(string | string[])
 		Search the path.  This only works when specified |ddu#start()|
 		or |ddu#redraw()|.
@@ -186,7 +186,7 @@ searchPath		(string | string[])
 
 		Default: ""
 
-						*ddu-option-sourceOptions*
+                                                    *ddu-option-sourceOptions*
 sourceOptions		(dictionary)
 		It is a dictionary that maps source names to its options.  The
 		options with the name "_" is used as the options for all
@@ -195,14 +195,14 @@ sourceOptions		(dictionary)
 
 		Default: {}
 
-						*ddu-option-sourceParams*
+                                                     *ddu-option-sourceParams*
 sourceParams		(dictionary)
 		It is a dictionary that maps source names to its parameters.
 		See also |ddu-source-params|.
 
 		Default: {}
 
-							*ddu-option-sources*
+                                                          *ddu-option-sources*
 sources			(list)
 		It is a list of elements which are formatted as:
 >
@@ -217,14 +217,14 @@ sources			(list)
 
 		Default: []
 
-							*ddu-option-sync*
+                                                             *ddu-option-sync*
 sync			(boolean)
 		Redraw the UI when all sources are finished.
 		It is useful for multiple sources.
 
 		Default: v:false
 
-							*ddu-option-ui*
+                                                               *ddu-option-ui*
 ui			(string)
 		Specify UI name.
 		If it is empty string, it is ignored.
@@ -232,7 +232,7 @@ ui			(string)
 
 		Default: ""
 
-							*ddu-option-uiOptions*
+                                                        *ddu-option-uiOptions*
 uiOptions		(dictionary)
 		It is a dictionary that maps UI names to its options.  The
 		options with the name "_" is used as the options for all
@@ -241,23 +241,23 @@ uiOptions		(dictionary)
 
 		Default: {}
 
-							*ddu-option-uiParams*
+                                                         *ddu-option-uiParams*
 uiParams		(dictionary)
 		It is a dictionary that maps UI names to its parameters.
 		See also |ddu-ui-params|.
 
 		Default: {}
 
-							*ddu-option-unique*
+                                                           *ddu-option-unique*
 unique			(boolean)
 		Unique the items by |ddu-item-attribute-word| attribute.
 
 		Default: v:false
 
 ------------------------------------------------------------------------------
-FUNCTIONS						*ddu-functions*
+FUNCTIONS                                                      *ddu-functions*
 
-							*ddu#event()*
+                                                                 *ddu#event()*
 ddu#event({name}, {event})
 		Call the ddu event handler.
 
@@ -268,18 +268,18 @@ ddu#event({name}, {event})
 			"cancel": After cancel the UI
 			"close": After close the UI
 
-						*ddu#get_context()*
+                                                           *ddu#get_context()*
 ddu#get_context({name})
 		Get the context information.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
-						*ddu#get_item_actions()*
+                                                      *ddu#get_item_actions()*
 ddu#get_item_actions({name}, {items})
 		Get the {name} actions for {items}.
 		NOTE: You cannot mix multiple kinds/sources.
 
-							*ddu#item_action()*
+                                                           *ddu#item_action()*
 ddu#item_action({name}, {action}, {items}, {params})
 		Do the {action} action for {items}.
 		NOTE: You cannot mix multiple kinds/sources.
@@ -292,13 +292,13 @@ ddu#item_action({name}, {action}, {items}, {params})
 
 		NOTE: It is for creating UI interface.
 
-							*ddu#load()*
+                                                                  *ddu#load()*
 ddu#load({type}, {names})
 		Load ddu extensions.
 		{type} is "ui" or "source" or "filter" or "kind" or "column".
 		{names} is array of extension name.
 
-							*ddu#pop()*
+                                                                   *ddu#pop()*
 ddu#pop({name}[, {opt}])
 		Restore the previous state.
 
@@ -316,7 +316,7 @@ ddu#pop({name}[, {opt}])
 
 		NOTE: The previous state is saved by |ddu-option-push|.
 
-							*ddu#redraw()*
+                                                                *ddu#redraw()*
 ddu#redraw({name}[, {opt}])
 		Redraw the UI.
 
@@ -336,7 +336,7 @@ ddu#redraw({name}[, {opt}])
 		updateOptions		(dictionary)
 		Overwrites options. Refer to |ddu-options| about options.
 
-							*ddu#redraw_tree()*
+                                                           *ddu#redraw_tree()*
 ddu#redraw_tree({name}, {mode}, {items})
 		Redraw the tree item.
 
@@ -350,14 +350,14 @@ ddu#redraw_tree({name}, {mode}, {items})
 
 		{items} is target tree items.
 
-							*ddu#register()*
+                                                              *ddu#register()*
 ddu#register({type}, {path})
 		Register ddu extension.
 		{type} is "ui" or "source" or "filter" or "kind" or "column".
 		{path} is ddc extension path.
 		NOTE: {path} must be full path.
 
-							*ddu#start()*
+                                                                 *ddu#start()*
 ddu#start([{options}])
 		Creates a new Ddu.
 		NOTE: You cannot call it in |vim_starting|.  Because
@@ -366,7 +366,7 @@ ddu#start([{options}])
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
 
-						*ddu#ui_async_action()*
+                                                       *ddu#ui_async_action()*
 ddu#ui_async_action({name}, {action}[, {params}])
 		Do the {action} action in current UI asynchronously.
 
@@ -374,7 +374,7 @@ ddu#ui_async_action({name}, {action}[, {params}])
 
 		{params} is action params.
 
-						*ddu#ui_sync_action()*
+                                                        *ddu#ui_sync_action()*
 ddu#ui_sync_action({name}, {action}[, {params}])
 		Do the {action} action in current UI synchronously.
 
@@ -385,7 +385,7 @@ ddu#ui_sync_action({name}, {action}[, {params}])
 
 CUSTOM FUNCTIONS					*ddu-custom-functions*
 
-							*ddu#custom#action()*
+                                                         *ddu#custom#action()*
 ddu#custom#action({type}, {name}, {action-name}, {func})
 		Define {action-name} action for {name}.
 		{type} must be "ui" or "source" or "kind".
@@ -403,7 +403,7 @@ ddu#custom#action({type}, {name}, {action-name}, {func})
 		call ddu#custom#action('kind', 'file', 'test',
 		    \ { args -> execute('let g:foo = 1') })
 <
-							*ddu#custom#alias()*
+                                                          *ddu#custom#alias()*
 ddu#custom#alias({type}, {alias-name}, {base-name})
 		Define {alias-name} alias based on {base-name}.
 		{type} must be "ui" or "source" or "filter" or "kind" or
@@ -416,48 +416,48 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
 		      \   foo: #{ mark: 'foo' },
 		      \ })
 <
-						*ddu#custom#get_alias_names()*
+                                                *ddu#custom#get_alias_names()*
 ddu#custom#get_alias_names({alias-type})
 		Get names of {alias-type} aliases as |List|.
 
-						*ddu#custom#get_current()*
+                                                    *ddu#custom#get_current()*
 ddu#custom#get_current({name})
 		Get current ddu options for {name}.
 		{name} is specified by |ddu-option-name|.
 
-					*ddu#custom#get_default_options()*
+                                            *ddu#custom#get_default_options()*
 ddu#custom#get_default_options()
 		Get the default options.
 
-						*ddu#custom#get_global()*
+                                                     *ddu#custom#get_global()*
 ddu#custom#get_global()
 		Get global options.
 
-						*ddu#custom#get_local()*
+                                                      *ddu#custom#get_local()*
 ddu#custom#get_local()
 		Get current buffer specific options.
 
-					*ddu#custom#get_source_names()*
+                                               *ddu#custom#get_source_names()*
 ddu#custom#get_source_names()
 		Get loaded source names as |List|.
 
-						*ddu#custom#load_config()*
+                                                    *ddu#custom#load_config()*
 ddu#custom#load_config({path})
 		Load TypeScript configuration from {path} file.
 		NOTE: {path} must be full path.
 		NOTE: The loading is asynchronous.
 
-						*ddu#custom#load_extensions()*
+                                                *ddu#custom#load_extensions()*
 ddu#custom#load_extensions({path})
 
-						*ddu#custom#patch_global()*
+                                                   *ddu#custom#patch_global()*
 ddu#custom#patch_global({option-name}, {value})
 ddu#custom#patch_global({dict})
 		Set {option-name} option to {value}.
 		If {dict} is available, the key is {option-name} and the value
 		is {value}. See |ddu-options| for available {option-name}.
 
-						*ddu#custom#patch_local()*
+                                                    *ddu#custom#patch_local()*
 ddu#custom#patch_local({buffer-name}, {option-name}, {value})
 ddu#custom#patch_local({buffer-name}, {dict})
 		Set local options for specific |ddu-option-name|.
@@ -465,7 +465,7 @@ ddu#custom#patch_local({buffer-name}, {dict})
 
 UI FUNCTIONS					*ddu-ui-functions*
 
-						*ddu#ui#async_action()*
+                                                       *ddu#ui#async_action()*
 ddu#ui#async_action({action-name}[, {params}])
 		Fire {action-name} action with {params} from current buffer
 		UI asynchronously.
@@ -474,29 +474,29 @@ ddu#ui#async_action({action-name}[, {params}])
 		execution.  If so, you should use |ddu#ui#sync_action()|
 		instead.
 
-						*ddu#ui#do_action()*
+                                                          *ddu#ui#do_action()*
 ddu#ui#do_action({action-name}[, {params}])
 		It is same with |ddu#ui#sync_action()|.
 
-						*ddu#ui#get_item()*
+                                                           *ddu#ui#get_item()*
 ddu#ui#get_item()
 		Return the current cursor item as |Dictionary| from current
 		buffer UI.
 		NOTE: current UI must support "getItem" action.
 
-						*ddu#ui#get_items()*
+                                                          *ddu#ui#get_items()*
 ddu#ui#get_items()
 		Return the current items as |List| of |Dictionary| from
 		current buffer UI.
 		NOTE: current UI must support "getItems" action.
 
-						*ddu#ui#get_selected_items()*
+                                                 *ddu#ui#get_selected_items()*
 ddu#ui#get_selected_items()
 		Return the selected items as |List| of |Dictionary| from
 		current buffer UI.
 		NOTE: current UI must support "getSelectedItems" action.
 
-						*ddu#ui#multi_actions()*
+                                                      *ddu#ui#multi_actions()*
 ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
 		Fire multiple actions for current buffer UI synchronously.
 
@@ -508,27 +508,27 @@ ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
 		\ ['clearSelectAllItems'],
 		\ ])<CR>
 <
-						*ddu#ui#sync_action()*
+                                                        *ddu#ui#sync_action()*
 ddu#ui#sync_action({action-name}[, {params}])
 		Fire {action-name} action with {params} from current buffer
 		UI synchronously.
 		{args} behavior depends on {action-name}.
 		NOTE: It is slow than |ddu#ui#do_action()|.
 
-						*ddu#ui#visible()*
+                                                            *ddu#ui#visible()*
 ddu#ui#visible({name}[, {tabnr}])
 		Return v:true if UI is visible.
 		{name} is specified ddu name(|ddu-option-name|).
 		{tabnr} is tabpage number.  If it is omitted, current tabpage
 		is used.  If it is less than 1, it means search from all tabs.
 
-						*ddu#ui#winid()*
+                                                              *ddu#ui#winid()*
 ddu#ui#winid({name})
 		Return UI window ID.
 		{name} is specified ddu name(|ddu-option-name|).
 
 ==============================================================================
-EXAMPLES						*ddu-examples*
+EXAMPLES                                                        *ddu-examples*
 >
 	" You must set the default ui.
 	" NOTE: ff ui
@@ -591,7 +591,7 @@ EXAMPLES						*ddu-examples*
 <
 
 ==============================================================================
-UIS							*ddu-uis*
+UIS                                                                  *ddu-uis*
 
 The UIs are used to display items.
 
@@ -606,24 +606,24 @@ NOTE: The UIs cannot set default options for UI.  If the UI need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
-						*ddu-ui-option-actions*
+                                                       *ddu-ui-option-actions*
 actions			(Record<string, function>)
 		Overwrites UI actions.
 
 
-						*ddu-ui-option-defaultAction*
+                                                 *ddu-ui-option-defaultAction*
 defaultAction		(string)
 		Specify the default action.
 		NOTE: It overwrites kind/source default actions.
 
 		Default: "default"
 
-						*ddu-ui-option-persist*
+                                                       *ddu-ui-option-persist*
 persist			(boolean)
 		Redraw the UI after fire actions.
 		Default: v:false
 
-						*ddu-ui-option-toggle*
+                                                        *ddu-ui-option-toggle*
 toggle			(boolean)
 		Quit the UI if the UI exists.
 		Default: v:false
@@ -637,7 +637,7 @@ documentation.
 
 
 ==============================================================================
-SOURCES							*ddu-sources*
+SOURCES                                                          *ddu-sources*
 
 The sources are used to get items.
 
@@ -652,11 +652,11 @@ NOTE: The sources cannot set default options for source.  If the source need
 to specify the recommended configuration, you should write it in the
 documentation instead.
 
-						*ddu-source-option-actions*
+                                                   *ddu-source-option-actions*
 actions			(Record<string, function>)
 		Overwrites source actions.
 
-						*ddu-source-option-columns*
+                                                   *ddu-source-option-columns*
 columns			(string[])
 		It is a list of registered column names.
 		Please see |ddu-columns|.
@@ -664,7 +664,7 @@ columns			(string[])
 
 		Default: []
 
-						*ddu-source-option-converters*
+                                                *ddu-source-option-converters*
 converters		(string[] | dictionary[])
 		It is a list of registered filter names or elements which are
 		formatted as:
@@ -680,26 +680,26 @@ converters		(string[] | dictionary[])
 
 		Default: []
 
-					*ddu-source-option-defaultAction*
+                                             *ddu-source-option-defaultAction*
 defaultAction		(string)
 		Specify the default action.
 		NOTE: It overwrites kind default actions.
 
 		Default: ""
 
-					*ddu-source-option-ignoreCase*
+                                                *ddu-source-option-ignoreCase*
 ignoreCase		(boolean)
 		If it is True, ddu ignores case.
 
 		Default: v:false
 
-						*ddu-source-option-matcherKey*
+                                                *ddu-source-option-matcherKey*
 matcherKey		(string)
 		Matcher compare key for items.
 
 		Default: "word"
 
-						*ddu-source-option-matchers*
+                                                  *ddu-source-option-matchers*
 matchers		(string[] | dictionary[])
 		It is a list of registered filter names or elements which are
 		formatted as:
@@ -715,14 +715,14 @@ matchers		(string[] | dictionary[])
 
 		Default: []
 
-						*ddu-source-option-maxItems*
+                                                  *ddu-source-option-maxItems*
 maxItems		(number)
 		It is the max number of source items.
 		It is applyed after sorters.
 
 		Default: 10000
 
-						*ddu-source-option-path*
+                                                      *ddu-source-option-path*
 path			(string | string[])
 		Specify an initial narrowing path.
 		NOTE: You can represents a path by two way like below.
@@ -730,7 +730,7 @@ path			(string | string[])
 			["/", "aa", "bb", "cc"] (string[])
 		NOTE: It must be full path.
 
-						*ddu-source-option-sorters*
+                                                   *ddu-source-option-sorters*
 sorters			(string[] | dictionary[])
 		It is a list of registered filter names or elements which are
 		formatted as:
@@ -746,7 +746,7 @@ sorters			(string[] | dictionary[])
 
 		Default: []
 
-						*ddu-source-option-volatile*
+                                                  *ddu-source-option-volatile*
 volatile		(boolean)
 		Refresh items when |ddu#redraw()|.
 		It is useful if the source depends on user input.
@@ -763,7 +763,7 @@ documentation.
 
 
 ==============================================================================
-FILTERS							*ddu-filters*
+FILTERS                                                          *ddu-filters*
 
 The filters are used to filter items from the sources.
 
@@ -798,7 +798,7 @@ documentation.
 
 
 ==============================================================================
-COLUMNS							*ddu-columns*
+COLUMNS                                                          *ddu-columns*
 
 The columns are used to overwrite |ddu-item-attribute-display|.
 It is useful for tree items.
@@ -823,7 +823,7 @@ documentation.
 
 
 ==============================================================================
-KINDS							*ddu-kinds*
+KINDS                                                              *ddu-kinds*
 
 The kinds are used to define item actions.
 
@@ -834,11 +834,11 @@ to use ddu.vim.  Please search them by https://github.com/topics/ddu-kind
 ------------------------------------------------------------------------------
 KIND OPTIONS						*ddu-kind-options*
 
-						*ddu-kind-option-actions*
+                                                     *ddu-kind-option-actions*
 actions			(Record<string, function>)
 		Overwrites kind actions.
 
-					*ddu-kind-option-defaultAction*
+                                               *ddu-kind-option-defaultAction*
 defaultAction		(string)
 		Specify the default action.
 
@@ -853,13 +853,13 @@ documentation.
 
 
 ==============================================================================
-ACTIONS							*ddu-actions*
+ACTIONS                                                          *ddu-actions*
 
 
 ------------------------------------------------------------------------------
 ACTION OPTIONS						*ddu-action-options*
 
-						*ddu-action-option-quit*
+                                                      *ddu-action-option-quit*
 quit			(boolean)
 		Quit the UI before executing action.
 
@@ -879,31 +879,31 @@ ACTION FLAGS						*ddu-action-flags*
 The action must return the flags.
 The flags define the behavior after execute the action.
 
-						*ddu-action-flag-None*
+                                                        *ddu-action-flag-None*
 None
 		Quit the UI window.
 		
 		Default: 0
 
-						*ddu-action-flag-RefreshItems*
+                                                *ddu-action-flag-RefreshItems*
 RefreshItems
 		Refresh the items.
 		
 		Default: 1
 
-						*ddu-action-flag-Redraw*
+                                                      *ddu-action-flag-Redraw*
 Redraw
 		Redraw the UI window.
 
 		Default: 2
 
-						*ddu-action-flag-Persist*
+                                                     *ddu-action-flag-Persist*
 Persist
 		Restore the UI window.
 
 		Default: 4
 
-					*ddu-action-flag-RestoreCursor*
+                                               *ddu-action-flag-RestoreCursor*
 RestoreCursor
 		Restore the cursor.
 
@@ -926,56 +926,56 @@ NOTE: If you call Vim functions, it is not asynchronous.
 ------------------------------------------------------------------------------
 UI ATTRIBUTES						*ddu-ui-attributes*
 
-						*ddu-ui-attribute-actions*
+                                                    *ddu-ui-attribute-actions*
 actions			(Record<string, function>)	(Optional)
 		Defines UI actions.
 		The actions are called from |ddu#ui_sync_action()|.
 
-					*ddu-ui-attribute-collapseItem*
+                                               *ddu-ui-attribute-collapseItem*
 collapseItem		(function)			(Optional)
 		Called when collapse item.
 
-					*ddu-ui-attribute-expandItem*
+                                                 *ddu-ui-attribute-expandItem*
 expandItem		(function)			(Optional)
 		Called when expand item.
 
-					*ddu-ui-attribute-onAfterAction*
+                                              *ddu-ui-attribute-onAfterAction*
 onAfterAction		(function)			(Optional)
 		Called after execute UI actions.
 
-					*ddu-ui-attribute-onBeforeAction*
+                                             *ddu-ui-attribute-onBeforeAction*
 onBeforeAction		(function)			(Optional)
 		Called before execute UI actions.
 
-						*ddu-ui-attribute-onInit*
+                                                     *ddu-ui-attribute-onInit*
 onInit			(function)			(Optional)
 		Called before call UI functions.
 
-						*ddu-ui-attribute-params*
+                                                     *ddu-ui-attribute-params*
 params			(function)			(Required)
 		Called to get UI params.
 
-						*ddu-ui-attribute-quit*
+                                                       *ddu-ui-attribute-quit*
 quit			(function)			(Optional)
 		Called when quit current UI.
 
-					*ddu-ui-attribute-refreshItems*
+                                               *ddu-ui-attribute-refreshItems*
 refreshItems		(function)			(Required)
 		Called when refresh items.
 
-						*ddu-ui-attribute-redraw*
+                                                     *ddu-ui-attribute-redraw*
 redraw			(function)			(Required)
 		Called when redraw UI.
 
-					*ddu-ui-attribute-searchItem*
+                                                 *ddu-ui-attribute-searchItem*
 searchItem		(function)			(Optional)
 		Called when search item.
 
-					*ddu-ui-attribute-visible*
+                                                    *ddu-ui-attribute-visible*
 visible			(function)			(Optional)
 		Called to get UI is visible.
 
-					*ddu-ui-attribute-winId*
+                                                      *ddu-ui-attribute-winId*
 winId			(function)			(Optional)
 		Called to get UI's |window-ID|.
 
@@ -997,76 +997,76 @@ NOTE: If you call Vim functions, it is not asynchronous.
 ------------------------------------------------------------------------------
 SOURCE ATTRIBUTES				*ddu-source-attributes*
 
-						*ddu-source-attribute-actions*
+                                                *ddu-source-attribute-actions*
 actions			(Record<string, function>)	(Optional)
 		Defines source specific actions.
 		NOTE: It overwrites kind actions.
 
-					*ddu-source-attribute-checkUpdated*
+                                           *ddu-source-attribute-checkUpdated*
 checkUpdated		(function)			(Optional)
 		It is called to check items are updated.
 
-						*ddu-source-attribute-kind*
+                                                   *ddu-source-attribute-kind*
 kind			(string)
 		Source items default kind.
 
 		Default: "base"
 
-						*ddu-source-attribute-onEvent*
+                                                *ddu-source-attribute-onEvent*
 onEvent			(function)			(Optional)
 		Called for the autocommands.
 		It is useful to make cache.
 
-						*ddu-source-attribute-onInit*
+                                                 *ddu-source-attribute-onInit*
 onInit			(function)			(Optional)
 		Called before call source functions.
 
-						*ddu-source-attribute-gather*
+                                                 *ddu-source-attribute-gather*
 gather			(function)			(Required)
 		It is called to gather items.
 
-						*ddu-source-attribute-params*
+                                                 *ddu-source-attribute-params*
 params			(function)			(Required)
 		Called to get source params.
 
 ------------------------------------------------------------------------------
 ITEM ATTRIBUTES						*ddu-item-attributes*
 
-					*ddu-item-attribute-action*
+                                                   *ddu-item-attribute-action*
 action			(object)			(Optional)
 		The params dictionary for actions.
 		NOTE: It depends on kind.  Please read kind's documentation
 		for details.
 
-					*ddu-item-attribute-data*
+                                                     *ddu-item-attribute-data*
 data			(object)			(Optional)
 		The source/filter specific data.
 
-					*ddu-item-attribute-display*
+                                                  *ddu-item-attribute-display*
 display			(string)			(Optional)
 		The string displayed in Ddu buffer.  If it is omitted,
 		|ddu-item-attribute-word| is used instead.  It is not used for
 		matching inputs.
 
-					*ddu-item-attribute-isExpanded*
+                                               *ddu-item-attribute-isExpanded*
 isExpanded		(boolean)			(Optional)
 		The tree is already expanded.
 		NOTE: Expand/Collapse tree action does not work for the item.
 
-					*ddu-item-attribute-isTree*
+                                                   *ddu-item-attribute-isTree*
 isTree			(boolean)			(Optional)
 		The item is tree.
 		NOTE: The attribute must be set to support tree feature.
 
-					*ddu-item-attribute-kind*
+                                                     *ddu-item-attribute-kind*
 kind			(string)			(Optional)
 		The kind name.
 
-					*ddu-item-attribute-level*
+                                                    *ddu-item-attribute-level*
 level			(number)			(Optional)
 		The nested level.
 
-					*ddu-item-attribute-highlights*
+                                               *ddu-item-attribute-highlights*
 highlights		(object[])			(Optional)
 		The list of highlight.
 
@@ -1084,7 +1084,7 @@ highlights		(object[])			(Optional)
 		width			(number)
 		The highlight end width.
 
-					*ddu-item-attribute-status*
+                                                   *ddu-item-attribute-status*
 status			(object)			(Optional)
 		The item status.
 
@@ -1094,7 +1094,7 @@ status			(object)			(Optional)
 		time			(number)
 		The item time.
 
-					*ddu-item-attribute-treePath*
+                                                 *ddu-item-attribute-treePath*
 treePath		(string | string[])		(Optional)
 		The item tree path.
 		NOTE: You can represents a path by two way like below.
@@ -1102,7 +1102,7 @@ treePath		(string | string[])		(Optional)
 			["/", "aa", "bb", "cc"] (string[])
 		NOTE: The attribute must be set to support tree feature.
 
-					*ddu-item-attribute-word*
+                                                     *ddu-item-attribute-word*
 word			(string)			(Required)
 		The word of a item.  It is used for matching inputs.
 
@@ -1126,7 +1126,7 @@ sort.
 ------------------------------------------------------------------------------
 FILTER ATTRIBUTES				*ddu-filter-attributes*
 
-						*ddu-filter-attribute-filter*
+                                                 *ddu-filter-attribute-filter*
 filter			(function)			(Required)
 		It is called to filter items.
 		The return type is DduItem[] or following object.
@@ -1141,15 +1141,15 @@ filter			(function)			(Required)
 		postActionCommand	(string)	(Optional)
 		TODO.
 
-						*ddu-filter-attribute-onInit*
+                                                 *ddu-filter-attribute-onInit*
 onInit			(function)			(Optional)
 		Called before call filter functions.
 
-					*ddu-filter-attribute-onRefreshItems*
+                                         *ddu-filter-attribute-onRefreshItems*
 onRefreshItems		(function)			(Optional)
 		Called before refresh items.
 
-						*ddu-filter-attribute-params*
+                                                 *ddu-filter-attribute-params*
 params			(function)			(Required)
 		Called to get filter params.
 
@@ -1171,19 +1171,19 @@ NOTE: If you call Vim functions, it is not asynchronous.
 ------------------------------------------------------------------------------
 COLUMN ATTRIBUTES				*ddu-column-attributes*
 
-					*ddu-column-attribute-getLength*
+                                              *ddu-column-attribute-getLength*
 getLength		(function)			(Required)
 		It is called to get column length.
 
-						*ddu-column-attribute-getText*
+                                                *ddu-column-attribute-getText*
 getText			(function)			(Required)
 		It is called to get column text with highlights.
 
-						*ddu-column-attribute-onInit*
+                                                 *ddu-column-attribute-onInit*
 onInit			(function)			(Optional)
 		Called before call column functions.
 
-						*ddu-column-attribute-params*
+                                                 *ddu-column-attribute-params*
 params			(function)			(Required)
 		Called to get column params.
 
@@ -1204,35 +1204,35 @@ NOTE: If you call Vim functions, it is not asynchronous.
 ------------------------------------------------------------------------------
 KIND ATTRIBUTES						*ddu-kind-attributes*
 
-						*ddu-kind-attribute-actions*
+                                                  *ddu-kind-attribute-actions*
 actions			(Record<string, function>)	(Required)
 		Defines kind specific actions.
 
-					*ddu-kind-attribute-getPreviewer*
+                                             *ddu-kind-attribute-getPreviewer*
 getPreviewer		(function)			(Optional)
 		Called to get |ddu-previewer|.
 
-						*ddu-kind-attribute-params*
+                                                   *ddu-kind-attribute-params*
 params			(function)			(Required)
 		Called to get kind params.
 
 
 ==============================================================================
-PREVIEWER						*ddu-previewer*
+PREVIEWER                                                      *ddu-previewer*
 
 Previewer defines how the preview is rendered by UI.
 
 
-					*ddu-previewer-BufferPreviewer*
+                                               *ddu-previewer-BufferPreviewer*
 BufferPreviewer
 	Preview type which shows the contents of files or existing buffers.
 
-					*ddu-previewer-NoFilePreviewer*
+                                               *ddu-previewer-NoFilePreviewer*
 NoFilePreviewer
 	Preview type which shows the contents specified by the
 	|ddu-previewer-attribute-contents|.
 
-					*ddu-previewer-TerminalPreviewer*
+                                             *ddu-previewer-TerminalPreviewer*
 TerminalPreviewer
 	Preview type which uses Vim/Neovim's |:terminal| feature.
 
@@ -1240,35 +1240,35 @@ TerminalPreviewer
 ------------------------------------------------------------------------------
 PREVIEWER ATTRIBUTES				*ddu-previewer-attributes*
 
-					*ddu-previewer-attribute-cmds*
+                                                *ddu-previewer-attribute-cmds*
 cmds			(string)			(Required)
 		Commands passed to terminal API to render the preview.
 		NOTE: It is only avaiable in
 		|ddu-previewer-TerminalPreviewer|.
 
-					*ddu-previewer-attribute-contents*
+                                            *ddu-previewer-attribute-contents*
 contents		(string[])			(Required)
 		Contents to be shown in the preview buffer.
 		NOTE: It is only avaiable in |ddu-previewer-NoFilePreviewer|.
 
-					*ddu-previewer-attribute-expr*
+                                                *ddu-previewer-attribute-expr*
 expr			(number | string)		(Optional)
 		Buffer expression, which is the same as the arguments of
 		|bufname()|.
 		NOTE: It is only avaiable in |ddu-previewer-BufferPreviewer|.
 
-					*ddu-previewer-attribute-filetype*
+                                            *ddu-previewer-attribute-filetype*
 filetype		(string)			(Optional)
 		'filetype' to apply in the preview buffer.
 
 		Default: |filetype-detect|
 		(|ddu-previewer-BufferPreviewer| only)
 
-					*ddu-previewer-attribute-highlights*
+                                          *ddu-previewer-attribute-highlights*
 highlights		(PreviewHighlight[])		(Optional)
 		Highlights to apply in the preview buffer.
 
-					*ddu-previewer-attribute-kind*
+                                                *ddu-previewer-attribute-kind*
 kind			(string)			(Required)
 		Previewer type.
 		It must be "buffer" or "nofile" or "terminal".
@@ -1277,21 +1277,21 @@ kind			(string)			(Required)
 		"nofile"	NoFilePreviewer
 		"terminal"	TerminalPreviewer
 
-					*ddu-previewer-attribute-lineNr*
+                                              *ddu-previewer-attribute-lineNr*
 lineNr			(number)			(Optional)
 		Line number of preview buffer to be made center and
 		highlighted.
 
-					*ddu-previewer-attribute-path*
+                                                *ddu-previewer-attribute-path*
 path			(string)			(Optional)
 		Path of file to preview.
 		NOTE: It is only avaiable in |ddu-previewer-BufferPreviewer|.
 
-					*ddu-previewer-attribute-pattern*
+                                             *ddu-previewer-attribute-pattern*
 pattern			(string)			(Optional)
 		Pattern to jump to and highlight.
 
-					*ddu-previewer-attribute-syntax*
+                                              *ddu-previewer-attribute-syntax*
 syntax			(string)			(Optional)
 		'syntax' to apply in the preview buffer.
 
@@ -1322,7 +1322,7 @@ FAQ 7:							|ddu-faq-7|
 
 
 ------------------------------------------------------------------------------
-							*ddu-faq-1*
+                                                                   *ddu-faq-1*
 Q: How to donate money to you?
 
 A: I have started github sponsorship to spend more time for Vim/neovim
@@ -1330,7 +1330,7 @@ plugins.  You can donate money to help me!
 
    https://github.com/sponsors/Shougo
 
-							*ddu-faq-2*
+                                                                   *ddu-faq-2*
 Q: Why does ddu.vim not include any default extra files?
 
 A: Because I cannot determine the best default files.
@@ -1339,21 +1339,21 @@ So ddu.vim should not define the defaults.
 You must define your defaults by configuration.
 ddu.vim does not conflict with your defaults.
 
-							*ddu-faq-3*
+                                                                   *ddu-faq-3*
 Q: Why ddu extra plugins cannot have default options(Not params)?
 
 A: Because users can customize sources perfectly.  If a source has the
 default, users have to check them.  It increases configuration cost.
 The config should work as users config.
 
-							*ddu-faq-4*
+                                                                   *ddu-faq-4*
 Q: I want to use ":Ddu" command like ":Denite" in denite.nvim.
 
 A: You can use ddu-commands.vim.
 https://github.com/Shougo/ddu-commands.vim
 It is not all users needed plugin and users can define the original commands.
 
-							*ddu-faq-5*
+                                                                   *ddu-faq-5*
 Q: ddu.vim starting is slow.
 
 A: It may be slow in Windows environment.  You should use denops shared server
@@ -1365,12 +1365,12 @@ Or you can use |ddu#load()| for it.
 >
 	call timer_start(10, { _ -> ddu#load('ui', ['ff']) })
 <
-							*ddu-faq-6*
+                                                                   *ddu-faq-6*
 Q: |:cnext| / |:cprevious| like commands are available?
 
 A: Nothing.  You can send items to |quickfix| by "quickfix" action instead.
 
-							*ddu-faq-7*
+                                                                   *ddu-faq-7*
 Q: I want to execute grep action from items.
 
 A: The example is here. >
@@ -1401,7 +1401,7 @@ A: The example is here. >
 <
 
 ==============================================================================
-COMPATIBILITY						*ddu-compatibility*
+COMPATIBILITY                                              *ddu-compatibility*
 
 2023.07.11
 * item actions can close UI when all items are gathered.
