@@ -383,7 +383,7 @@ ddu#ui_sync_action({name}, {action}[, {params}])
 		{params} is action params.
 
 
-CUSTOM FUNCTIONS					*ddu-custom-functions*
+CUSTOM FUNCTIONS                                        *ddu-custom-functions*
 
                                                          *ddu#custom#action()*
 ddu#custom#action({type}, {name}, {action-name}, {func})
@@ -463,7 +463,7 @@ ddu#custom#patch_local({buffer-name}, {dict})
 		Set local options for specific |ddu-option-name|.
 		The arguments are the same as for |ddu#custom#patch_global()|.
 
-UI FUNCTIONS					*ddu-ui-functions*
+UI FUNCTIONS                                                *ddu-ui-functions*
 
                                                        *ddu#ui#async_action()*
 ddu#ui#async_action({action-name}[, {params}])
@@ -600,7 +600,7 @@ to use ddu.vim.  Please search them by https://github.com/topics/ddu-ui
 
 
 ------------------------------------------------------------------------------
-UI OPTIONS						*ddu-ui-options*
+UI OPTIONS                                                    *ddu-ui-options*
 
 NOTE: The UIs cannot set default options for UI.  If the UI need
 to specify the recommended configuration, you should write it in the
@@ -630,7 +630,7 @@ toggle			(boolean)
 
 
 ------------------------------------------------------------------------------
-UI PARAMS						*ddu-ui-params*
+UI PARAMS                                                      *ddu-ui-params*
 
 These are the parameters that each UI can have.  Please read the UI
 documentation.
@@ -646,7 +646,7 @@ to use ddu.vim.  Please search them by https://github.com/topics/ddu-source
 
 
 ------------------------------------------------------------------------------
-SOURCE OPTIONS						*ddu-source-options*
+SOURCE OPTIONS                                            *ddu-source-options*
 
 NOTE: The sources cannot set default options for source.  If the source need
 to specify the recommended configuration, you should write it in the
@@ -756,7 +756,7 @@ volatile		(boolean)
 
 
 ------------------------------------------------------------------------------
-SOURCE PARAMS					*ddu-source-params*
+SOURCE PARAMS                                              *ddu-source-params*
 
 These are the parameters that each source can have.  Please read the source
 documentation.
@@ -785,13 +785,13 @@ to use ddu.vim.  Please search them by https://github.com/topics/ddu-filter
 
 
 ------------------------------------------------------------------------------
-FILTER OPTIONS						*ddu-filter-options*
+FILTER OPTIONS                                            *ddu-filter-options*
 
 Undefined now
 
 
 ------------------------------------------------------------------------------
-FILTER PARAMS						*ddu-filter-params*
+FILTER PARAMS                                              *ddu-filter-params*
 
 These are the parameters that each filter can have.  Please read the filter
 documentation.
@@ -810,13 +810,13 @@ to use ddu.vim.  Please search them by https://github.com/topics/ddu-column
 
 
 ------------------------------------------------------------------------------
-COLUMN OPTIONS						*ddu-column-options*
+COLUMN OPTIONS                                            *ddu-column-options*
 
 Undefined now
 
 
 ------------------------------------------------------------------------------
-COLUMN PARAMS						*ddu-column-params*
+COLUMN PARAMS                                              *ddu-column-params*
 
 These are the parameters that each column can have.  Please read the column
 documentation.
@@ -832,7 +832,7 @@ to use ddu.vim.  Please search them by https://github.com/topics/ddu-kind
 
 
 ------------------------------------------------------------------------------
-KIND OPTIONS						*ddu-kind-options*
+KIND OPTIONS                                                *ddu-kind-options*
 
                                                      *ddu-kind-option-actions*
 actions			(Record<string, function>)
@@ -846,7 +846,7 @@ defaultAction		(string)
 
 
 ------------------------------------------------------------------------------
-KIND PARAMS						*ddu-kind-params*
+KIND PARAMS                                                  *ddu-kind-params*
 
 These are the parameters that each kind can have.  Please read the kind
 documentation.
@@ -857,7 +857,7 @@ ACTIONS                                                          *ddu-actions*
 
 
 ------------------------------------------------------------------------------
-ACTION OPTIONS						*ddu-action-options*
+ACTION OPTIONS                                            *ddu-action-options*
 
                                                       *ddu-action-option-quit*
 quit			(boolean)
@@ -867,14 +867,14 @@ quit			(boolean)
 
 
 ------------------------------------------------------------------------------
-ACTION PARAMS						*ddu-action-params*
+ACTION PARAMS                                              *ddu-action-params*
 
 These are the parameters that each action can have.  Please read the kind
 documentation.
 
 
 ------------------------------------------------------------------------------
-ACTION FLAGS						*ddu-action-flags*
+ACTION FLAGS                                                *ddu-action-flags*
 
 The action must return the flags.
 The flags define the behavior after execute the action.
@@ -910,7 +910,7 @@ RestoreCursor
 		Default: 8
 
 ==============================================================================
-CREATE UI						*ddu-create-ui*
+CREATE UI                                                      *ddu-create-ui*
 
 To create UI, you should read other UIs implementation.
 
@@ -924,7 +924,7 @@ NOTE: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
-UI ATTRIBUTES						*ddu-ui-attributes*
+UI ATTRIBUTES                                              *ddu-ui-attributes*
 
                                                     *ddu-ui-attribute-actions*
 actions			(Record<string, function>)	(Optional)
@@ -981,7 +981,7 @@ winId			(function)			(Optional)
 
 
 ==============================================================================
-CREATE SOURCE						*ddu-create-source*
+CREATE SOURCE                                              *ddu-create-source*
 
 To create source, you should read other sources implementation.
 
@@ -995,7 +995,7 @@ NOTE: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
-SOURCE ATTRIBUTES				*ddu-source-attributes*
+SOURCE ATTRIBUTES                                      *ddu-source-attributes*
 
                                                 *ddu-source-attribute-actions*
 actions			(Record<string, function>)	(Optional)
@@ -1030,7 +1030,7 @@ params			(function)			(Required)
 		Called to get source params.
 
 ------------------------------------------------------------------------------
-ITEM ATTRIBUTES						*ddu-item-attributes*
+ITEM ATTRIBUTES                                          *ddu-item-attributes*
 
                                                    *ddu-item-attribute-action*
 action			(object)			(Optional)
@@ -1107,7 +1107,7 @@ word			(string)			(Required)
 		The word of a item.  It is used for matching inputs.
 
 ==============================================================================
-CREATE FILTER						*ddu-create-filter*
+CREATE FILTER                                              *ddu-create-filter*
 
 To create filter, you should read other filters implementation.
 
@@ -1124,7 +1124,7 @@ sort.
 
 
 ------------------------------------------------------------------------------
-FILTER ATTRIBUTES				*ddu-filter-attributes*
+FILTER ATTRIBUTES                                      *ddu-filter-attributes*
 
                                                  *ddu-filter-attribute-filter*
 filter			(function)			(Required)
@@ -1155,7 +1155,7 @@ params			(function)			(Required)
 
 
 ==============================================================================
-CREATE COLUMN						*ddu-create-column*
+CREATE COLUMN                                              *ddu-create-column*
 
 To create column, you should read other columns implementation.
 
@@ -1169,7 +1169,7 @@ NOTE: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
-COLUMN ATTRIBUTES				*ddu-column-attributes*
+COLUMN ATTRIBUTES                                      *ddu-column-attributes*
 
                                               *ddu-column-attribute-getLength*
 getLength		(function)			(Required)
@@ -1188,7 +1188,7 @@ params			(function)			(Required)
 		Called to get column params.
 
 ==============================================================================
-CREATE KIND						*ddu-create-kind*
+CREATE KIND                                                  *ddu-create-kind*
 
 To create kind, you should read other kinds implementation.
 
@@ -1202,7 +1202,7 @@ NOTE: If you call Vim functions, it is not asynchronous.
 
 
 ------------------------------------------------------------------------------
-KIND ATTRIBUTES						*ddu-kind-attributes*
+KIND ATTRIBUTES                                          *ddu-kind-attributes*
 
                                                   *ddu-kind-attribute-actions*
 actions			(Record<string, function>)	(Required)
@@ -1238,7 +1238,7 @@ TerminalPreviewer
 
 
 ------------------------------------------------------------------------------
-PREVIEWER ATTRIBUTES				*ddu-previewer-attributes*
+PREVIEWER ATTRIBUTES                                *ddu-previewer-attributes*
 
                                                 *ddu-previewer-attribute-cmds*
 cmds			(string)			(Required)
