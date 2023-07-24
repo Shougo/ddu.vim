@@ -1140,45 +1140,51 @@ export class Ddu {
     parent.__expanded = true;
 
     // Set path
+    const savePath = this.context.path;
     sourceOptions.path = parent.treePath ?? parent.word;
     this.context.path = sourceOptions.path;
 
     let children: DduItem[] = [];
 
-    for await (
-      const newItems of this.gatherItems(
+    try {
+      for await (
+        const newItems of this.gatherItems(
+          denops,
+          index,
+          source,
+          sourceOptions,
+          sourceParams,
+          this.loader,
+          parent.__level + 1,
+          parent,
+        )
+      ) {
+        await this.callColumns(
+          denops,
+          sourceOptions.columns,
+          [parent].concat(newItems),
+        );
+        children = children.concat(newItems);
+      }
+      if (this.shouldStopCurrentContext()) {
+        return;
+      }
+
+      const filters = sourceOptions.matchers.concat(
+        sourceOptions.sorters,
+      ).concat(sourceOptions.converters);
+
+      children = await this.callFilters(
         denops,
-        index,
-        source,
         sourceOptions,
-        sourceParams,
-        this.loader,
-        parent.__level + 1,
-        parent,
-      )
-    ) {
-      await this.callColumns(
-        denops,
-        sourceOptions.columns,
-        [parent].concat(newItems),
+        filters,
+        this.input,
+        children,
       );
-      children = children.concat(newItems);
+    } finally {
+      // Restore path
+      this.context.path = savePath;
     }
-    if (this.shouldStopCurrentContext()) {
-      return;
-    }
-
-    const filters = sourceOptions.matchers.concat(
-      sourceOptions.sorters,
-    ).concat(sourceOptions.converters);
-
-    children = await this.callFilters(
-      denops,
-      sourceOptions,
-      filters,
-      this.input,
-      children,
-    );
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (ui && !this.shouldStopCurrentContext()) {
