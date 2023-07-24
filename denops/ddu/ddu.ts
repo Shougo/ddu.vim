@@ -1118,7 +1118,7 @@ export class Ddu {
       preventRedraw?: boolean;
     },
   ): Promise<DduItem /* searchedItem */ | undefined> {
-    if (parent.__level < 0 || !parent.treePath) {
+    if (parent.__level < 0 || !parent.isTree || !parent.treePath) {
       return;
     }
 
