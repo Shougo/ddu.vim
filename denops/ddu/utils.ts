@@ -25,5 +25,11 @@ export async function errorException(
         e.stack,
       );
     }
+  } else {
+    await denops.call(
+      "ddu#util#print_error",
+      "unknown error object",
+    );
+    console.error(e);
   }
 }
