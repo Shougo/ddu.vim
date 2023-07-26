@@ -202,6 +202,28 @@ export function main(denops: Denops) {
         await ddu.start(denops, context, options, userOptions);
       });
     },
+    async getItems(arg1: unknown): Promise<DduItem[]> {
+      let items: DduItem[] = [];
+
+      await lock.lock(async () => {
+        const userOptions = ensure(arg1, is.Record);
+        userOptions.ui = "";
+        userOptions.sync = true;
+
+        const [context, options] = await contextBuilder.get(
+          denops,
+          userOptions,
+        );
+
+        const ddu = getDdu(options.name);
+
+        await ddu.start(denops, context, options, userOptions);
+
+        items = ddu.getItems();
+      });
+
+      return items;
+    },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
       queuedName = ensure(arg1, is.String);
       queuedRedrawOption = ensure(arg2, is.Record) as RedrawOption;

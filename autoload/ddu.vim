@@ -49,9 +49,6 @@ function ddu#ui_sync_action(name, action, params = {}) abort
   call ddu#_request('uiAction', [a:name, a:action, a:params])
 endfunction
 function ddu#item_action(name, action, items, params = {}) abort
-  if a:name ==# ''
-    return
-  endif
   call ddu#_request('itemAction', [a:name, a:action, a:items, a:params])
 endfunction
 function ddu#get_item_actions(name, items) abort
@@ -71,6 +68,9 @@ function ddu#register(type, path) abort
 endfunction
 function ddu#load(type, names) abort
   call ddu#_notify('loadExtensions', [a:type, a:names])
+endfunction
+function ddu#get_items(options = {}) abort
+  return ddu#_request('getItems', [a:options])
 endfunction
 
 

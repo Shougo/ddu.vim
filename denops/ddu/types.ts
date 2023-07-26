@@ -54,7 +54,7 @@ export type Context = {
   winId: number;
 };
 
-export type UserSource = {
+export type UserSource = SourceName | {
   name: SourceName;
   options?: Partial<SourceOptions>;
   params?: Partial<BaseSourceParams>;

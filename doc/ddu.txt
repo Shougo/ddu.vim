@@ -203,8 +203,9 @@ sourceParams		(dictionary)
 		Default: {}
 
                                                           *ddu-option-sources*
-sources			(list)
-		It is a list of elements which are formatted as:
+sources			(string[] | dictionary[])
+		It is a list of registered source names or elements which are
+		formatted as:
 >
 		#{
 		    name: {source-name},
@@ -273,6 +274,16 @@ ddu#get_context({name})
 		Get the context information.
 
 		{name} is specified ddu name(|ddu-option-name|).
+
+                                                             *ddu#get_items()*
+ddu#get_items([{options}])
+		Creates a new Ddu and get items without UI.
+		NOTE: You cannot call it in |vim_starting|.  Because
+		denops.vim is not initialized.
+		NOTE: It blocks Vim/neovim UI.
+
+		Refer to |ddu-options| about {options}.  If you skip a value,
+		it uses the default value.
 
                                                       *ddu#get_item_actions()*
 ddu#get_item_actions({name}, {items})

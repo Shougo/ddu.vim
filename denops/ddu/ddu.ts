@@ -100,6 +100,7 @@ export class Ddu {
   private startTime = 0;
   private expandedPaths = new Set<string[]>();
   private searchPath: TreePath = "";
+  private items: DduItem[] = [];
 
   constructor(loader: Loader) {
     this.loader = loader;
@@ -206,22 +207,26 @@ export class Ddu {
 
     // NOTE: UI must be reset.
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui) {
-      return;
-    }
-    if (checkToggle && uiOptions.toggle) {
+
+    if (checkToggle && ui && uiOptions.toggle) {
       await this.uiQuit(denops, ui, uiOptions, uiParams);
       this.quit();
       return;
     }
 
-    ui.isInitialized = false;
+    if (ui) {
+      ui.isInitialized = false;
+    }
 
     this.initialized = false;
     this.resetQuitted();
 
     // Source onInit() must be called before UI
-    for (const userSource of this.options.sources) {
+    for (
+      const userSource of this.options.sources.map((source) =>
+        convertUserString(source)
+      )
+    ) {
       const [source, sourceOptions, sourceParams] = await this.getSource(
         denops,
         userSource.name,
@@ -301,6 +306,8 @@ export class Ddu {
             // Skip
             return;
           }
+
+          userSource = convertUserString(userSource);
 
           const state: GatherState = {
             items: [],
@@ -489,11 +496,6 @@ export class Ddu {
     // item's states reset to gathered.
     restoreItemState?: boolean,
   ): Promise<void> {
-    const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui || this.shouldStopCurrentContext()) {
-      return;
-    }
-
     // Update current input
     this.context.done = true;
     this.context.doneUi = false;
@@ -503,7 +505,11 @@ export class Ddu {
     const sources: SourceInfo[] = [];
     let allItems: DduItem[] = [];
     let index = 0;
-    for (const userSource of this.options.sources) {
+    for (
+      const userSource of this.options.sources.map((source) =>
+        convertUserString(source)
+      )
+    ) {
       const [source, sourceOptions, _] = await this.getSource(
         denops,
         userSource.name,
@@ -560,6 +566,13 @@ export class Ddu {
         return items;
       }, []);
       this.context.maxItems = allItems.length;
+    }
+
+    this.items = allItems;
+
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (!ui || this.shouldStopCurrentContext()) {
+      return;
     }
 
     await ui.refreshItems({
@@ -677,7 +690,11 @@ export class Ddu {
     denops: Denops,
     event: DduEvent,
   ): Promise<void> {
-    for (const userSource of this.options.sources) {
+    for (
+      const userSource of this.options.sources.map((source) =>
+        convertUserString(source)
+      )
+    ) {
       const [source, sourceOptions, sourceParams] = await this.getSource(
         denops,
         userSource.name,
@@ -817,7 +834,10 @@ export class Ddu {
             this.loader.getSource(this.options.name, item.__sourceName)
           )
           : this.options.sources.map((userSource) =>
-            this.loader.getSource(this.options.name, userSource.name)
+            this.loader.getSource(
+              this.options.name,
+              convertUserString(userSource).name,
+            )
           ),
       ),
     ].filter((source) => source);
@@ -897,18 +917,13 @@ export class Ddu {
       return;
     }
 
-    const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui) {
-      return;
-    }
-
     const { source, kind, actions } = itemActions;
 
     const indexes = [
       ...new Set(items.map((item) => item.__sourceIndex)),
     ];
 
-    const userSource = this.options.sources[
+    let userSource = this.options.sources[
       indexes.length > 0 ? indexes[0] : 0
     ];
     const [sourceOptions, sourceParams] = sourceArgs(
@@ -959,18 +974,21 @@ export class Ddu {
       return;
     }
 
-    const visible = await ui.visible({
-      denops,
-      context: this.context,
-      options: this.options,
-      uiOptions,
-      uiParams,
-      tabNr: await fn.tabpagenr(denops),
-    });
+    const [ui, uiOptions, uiParams] = await this.getUi(denops);
+    if (ui) {
+      const visible = await ui.visible({
+        denops,
+        context: this.context,
+        options: this.options,
+        uiOptions,
+        uiParams,
+        tabNr: await fn.tabpagenr(denops),
+      });
 
-    if (actionOptions.quit && visible) {
-      // Quit UI before action
-      await this.uiQuit(denops, ui, uiOptions, uiParams);
+      if (actionOptions.quit && visible) {
+        // Quit UI before action
+        await this.uiQuit(denops, ui, uiOptions, uiParams);
+      }
     }
 
     const prevPath = sourceOptions.path;
@@ -1013,6 +1031,7 @@ export class Ddu {
 
     // Check path is changed by action
     if (sourceOptions.path !== prevPath) {
+      userSource = convertUserString(userSource);
       // Overwrite current path
       if (!userSource.options) {
         userSource.options = sourceOptions;
@@ -1041,13 +1060,16 @@ export class Ddu {
     } else if (uiOptions.persist || flags & ActionFlags.Persist) {
       // Restore quitted flag before refresh and redraw
       this.resetQuitted();
-      await ui.redraw({
-        denops,
-        context: this.context,
-        options: this.options,
-        uiOptions,
-        uiParams,
-      });
+
+      if (ui) {
+        await ui.redraw({
+          denops,
+          context: this.context,
+          options: this.options,
+          uiOptions,
+          uiParams,
+        });
+      }
     }
 
     if (flags & ActionFlags.RestoreCursor) {
@@ -1412,11 +1434,18 @@ export class Ddu {
   getSourceArgs() {
     return this.options.sources.map((userSource) =>
       sourceArgs(
-        this.loader.getSource(this.options.name, userSource.name),
+        this.loader.getSource(
+          this.options.name,
+          convertUserString(userSource).name,
+        ),
         this.options,
         userSource,
       )
     );
+  }
+
+  getItems() {
+    return this.items;
   }
 
   updateOptions(userOptions: UserOptions) {
@@ -1427,7 +1456,11 @@ export class Ddu {
   }
 
   async checkUpdated(denops: Denops): Promise<boolean> {
-    for (const userSource of this.options.sources) {
+    for (
+      const userSource of this.options.sources.map((source) =>
+        convertUserString(source)
+      )
+    ) {
       const [source, sourceOptions, sourceParams] = await this.getSource(
         denops,
         userSource.name,
@@ -1535,12 +1568,7 @@ export class Ddu {
       BaseFilterParams,
     ]
   > {
-    // Convert type
-    if (typeof userFilter === "string") {
-      userFilter = {
-        name: userFilter,
-      };
-    }
+    userFilter = convertUserString(userFilter);
 
     if (!this.loader.getFilter(this.options.name, userFilter.name)) {
       await this.loader.autoload(denops, "filter", userFilter.name);
@@ -1632,6 +1660,8 @@ export class Ddu {
     index: number,
     input: string,
   ): Promise<[boolean, number, DduItem[]]> {
+    userSource = convertUserString(userSource);
+
     const [source, sourceOptions, _] = await this.getSource(
       denops,
       userSource.name,
@@ -1880,6 +1910,8 @@ function sourceArgs<
   options: DduOptions,
   userSource: UserSource | null,
 ): [SourceOptions, BaseSourceParams] {
+  userSource = convertUserString(userSource);
+
   const o = foldMerge(
     mergeSourceOptions,
     defaultSourceOptions,
@@ -1909,12 +1941,7 @@ function filterArgs<
   options: DduOptions,
   userFilter: UserFilter,
 ): [FilterOptions, BaseFilterParams] {
-  // Convert type
-  if (typeof userFilter === "string") {
-    userFilter = {
-      name: userFilter,
-    };
-  }
+  userFilter = convertUserString(userFilter);
 
   const o = foldMerge(
     mergeFilterOptions,
@@ -2166,6 +2193,10 @@ async function checkColumnOnInit(
 
 function convertTreePath(treePath: TreePath) {
   return typeof treePath === "string" ? treePath.split(pathsep) : treePath;
+}
+
+function convertUserString<T>(user: string | T) {
+  return typeof user === "string" ? { name: user } : user;
 }
 
 function isParentPath(checkPath: string[], searchPath: string[]) {
