@@ -32,6 +32,7 @@ Actions			|ddu-actions|
   Action options	  |ddu-action-options|
   Action params		  |ddu-action-params|
   Action flags		  |ddu-action-flags|
+Types			|ddu-types|
 Create UI		|ddu-create-ui|
   UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
@@ -919,6 +920,14 @@ RestoreCursor
 		Restore the cursor.
 
 		Default: 8
+
+==============================================================================
+TYPES                                                              *ddu-types*
+
+Please see the TypeScript definition.
+
+https://deno.land/x/ddu_vim/types.ts?doc
+
 
 ==============================================================================
 CREATE UI                                                      *ddu-create-ui*
