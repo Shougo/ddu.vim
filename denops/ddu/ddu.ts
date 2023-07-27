@@ -97,7 +97,7 @@ export class Ddu {
   private quitted = false;
   private cancelledToRefresh = false;
   private abortController = new AbortController();
-  private redrawLock = new Lock(0);
+  private uiRedrawLock = new Lock(0);
   private startTime = 0;
   private expandedPaths = new Set<string[]>();
   private searchPath: TreePath = "";
@@ -188,7 +188,7 @@ export class Ddu {
         await uiRedraw(
           denops,
           this,
-          this.redrawLock,
+          this.uiRedrawLock,
           ui,
           uiOptions,
           uiParams,
@@ -652,7 +652,7 @@ export class Ddu {
     await uiRedraw(
       denops,
       this,
-      this.redrawLock,
+      this.uiRedrawLock,
       ui,
       uiOptions,
       uiParams,
@@ -1108,7 +1108,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this,
-        this.redrawLock,
+        this.uiRedrawLock,
         ui,
         uiOptions,
         uiParams,
@@ -1288,7 +1288,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this,
-        this.redrawLock,
+        this.uiRedrawLock,
         ui,
         uiOptions,
         uiParams,
@@ -1351,7 +1351,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this,
-        this.redrawLock,
+        this.uiRedrawLock,
         ui,
         uiOptions,
         uiParams,
