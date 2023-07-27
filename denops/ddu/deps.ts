@@ -28,3 +28,4 @@ export {
   dirname,
   SEP as pathsep,
 } from "https://deno.land/std@0.194.0/path/mod.ts";
+export { deferred } from "https://deno.land/std@0.196.0/async/deferred.ts";

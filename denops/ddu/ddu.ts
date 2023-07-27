@@ -1,6 +1,7 @@
 import {
   assertEquals,
   basename,
+  deferred,
   Denops,
   echo,
   equal,
@@ -86,6 +87,14 @@ type ItemActions = {
   actions: Record<string, unknown>;
 };
 
+type RedrawOptions = {
+  /**
+   * NOTE: Set restoreItemState to true if redraw without regather because
+   * item's states reset to gathered.
+   */
+  restoreItemState?: boolean;
+};
+
 export class Ddu {
   private loader: Loader;
   private gatherStates: Record<string, GatherState> = {};
@@ -97,7 +106,9 @@ export class Ddu {
   private quitted = false;
   private cancelledToRefresh = false;
   private abortController = new AbortController();
-  private redrawLock = new Lock(0);
+  private uiRedrawLock = new Lock(0);
+  private waitRedrawComplete?: Promise<void>;
+  private scheduledRedrawOptions?: RedrawOptions;
   private startTime = 0;
   private expandedPaths = new Set<string[]>();
   private searchPath: TreePath = "";
@@ -179,7 +190,7 @@ export class Ddu {
 
         if (this.searchPath) {
           // Redraw only without regather items.
-          return this.redraw(denops, true);
+          return this.redraw(denops, { restoreItemState: true });
         }
 
         // UI Redraw only
@@ -188,7 +199,7 @@ export class Ddu {
         await uiRedraw(
           denops,
           this,
-          this.redrawLock,
+          this.uiRedrawLock,
           ui,
           uiOptions,
           uiParams,
@@ -297,7 +308,8 @@ export class Ddu {
 
     // Initialize UI window
     if (!this.options.sync) {
-      await this.redraw(denops);
+      // Do not await here
+      this.redraw(denops);
     }
 
     await Promise.all(
@@ -327,44 +339,41 @@ export class Ddu {
             return;
           }
 
+          // Start gather asynchronously
+          const gatherItems = this.gatherItems(
+            denops,
+            index,
+            source,
+            sourceOptions,
+            sourceParams,
+            this.loader,
+            0,
+          );
+
           // Call "onRefreshItems" hooks
           const filters = sourceOptions.matchers.concat(
             sourceOptions.sorters,
           ).concat(sourceOptions.converters);
-          for (const userFilter of filters) {
+          await Promise.all(filters.map(async (userFilter) => {
             const [filter, filterOptions, filterParams] = await this.getFilter(
               denops,
               userFilter,
             );
-            if (!filter || !filter.onRefreshItems) {
-              continue;
-            }
-
-            await filter.onRefreshItems({
+            await filter?.onRefreshItems?.({
               denops,
               filterOptions,
               filterParams,
             });
-          }
+          }));
+
+          // Get path option, or current directory instead if it is empty
+          const path = sourceOptions.path.length > 0
+            ? sourceOptions.path
+            : await fn.getcwd(denops);
 
           let prevLength = state.items.length;
 
-          for await (
-            const newItems of this.gatherItems(
-              denops,
-              index,
-              source,
-              sourceOptions,
-              sourceParams,
-              this.loader,
-              0,
-            )
-          ) {
-            let path = sourceOptions.path;
-            if (path === "") {
-              // Use current directory instead
-              path = await fn.getcwd(denops) as string;
-            }
+          for await (const newItems of gatherItems) {
             if (path !== this.context.path) {
               if (this.context.path.length > 0) {
                 this.context.pathHistories.push(this.context.path);
@@ -374,8 +383,9 @@ export class Ddu {
 
             state.items = state.items.concat(newItems);
 
-            if (prevLength !== state.items.length && !this.options.sync) {
-              await this.redraw(denops);
+            if (!this.options.sync && prevLength !== state.items.length) {
+              // Do not await inside loop
+              this.redraw(denops);
               prevLength = state.items.length;
             }
           }
@@ -391,6 +401,9 @@ export class Ddu {
 
     if (this.options.sync) {
       await this.redraw(denops);
+    } else {
+      // Wait complete redraw
+      await this.waitRedrawComplete;
     }
   }
 
@@ -483,11 +496,49 @@ export class Ddu {
     }
   }
 
-  async redraw(
+  redraw(
     denops: Denops,
-    // NOTE: Set restoreItemState to true if redraw without regather because
-    // item's states reset to gathered.
-    restoreItemState?: boolean,
+    opts?: RedrawOptions,
+  ): Promise<void> {
+    if (this.waitRedrawComplete) {
+      // Already redrawing, so adding to schedule
+      this.scheduledRedrawOptions = {
+        // Override with true
+        restoreItemState: opts?.restoreItemState ||
+          this.scheduledRedrawOptions?.restoreItemState,
+      };
+    } else {
+      // Start redraw
+      const complete = this.waitRedrawComplete = deferred<void>();
+
+      const scheduleRunner = async (opts?: RedrawOptions) => {
+        try {
+          await this.redrawInternal(denops, opts);
+
+          opts = this.scheduledRedrawOptions;
+          if (opts) {
+            // Scheduled to redraw
+            this.scheduledRedrawOptions = undefined;
+            scheduleRunner(opts);
+          } else {
+            // All schedules completed
+            this.waitRedrawComplete = undefined;
+            complete.resolve();
+          }
+        } catch (e: unknown) {
+          complete.reject(e);
+        }
+      };
+
+      scheduleRunner(opts);
+    }
+
+    return this.waitRedrawComplete;
+  }
+
+  private async redrawInternal(
+    denops: Denops,
+    opts?: RedrawOptions,
   ): Promise<void> {
     // Update current input
     this.context.done = true;
@@ -524,7 +575,7 @@ export class Ddu {
         index,
         this.input,
       );
-      if (restoreItemState) {
+      if (opts?.restoreItemState) {
         items.forEach((item) => {
           if (item.treePath) {
             item.__expanded = this.isExpanded(convertTreePath(item.treePath));
@@ -644,7 +695,7 @@ export class Ddu {
     await uiRedraw(
       denops,
       this,
-      this.redrawLock,
+      this.uiRedrawLock,
       ui,
       uiOptions,
       uiParams,
@@ -1100,7 +1151,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this,
-        this.redrawLock,
+        this.uiRedrawLock,
         ui,
         uiOptions,
         uiParams,
@@ -1280,7 +1331,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this,
-        this.redrawLock,
+        this.uiRedrawLock,
         ui,
         uiOptions,
         uiParams,
@@ -1343,7 +1394,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this,
-        this.redrawLock,
+        this.uiRedrawLock,
         ui,
         uiOptions,
         uiParams,
