@@ -42,6 +42,7 @@ import {
   SourceOptions,
   TreePath,
   UiOptions,
+  UserColumn,
   UserFilter,
   UserOptions,
   UserSource,
@@ -1496,16 +1497,17 @@ export class Ddu {
       BaseUiParams,
     ]
   > {
-    if (!this.loader.getUi(this.options.name, this.options.ui)) {
-      await this.loader.autoload(denops, "ui", this.options.ui);
+    const userUi = convertUserString(this.options.ui);
+    if (!this.loader.getUi(this.options.name, userUi.name)) {
+      await this.loader.autoload(denops, "ui", userUi.name);
     }
 
-    const ui = this.loader.getUi(this.options.name, this.options.ui);
+    const ui = this.loader.getUi(this.options.name, userUi.name);
     if (!ui) {
-      if (this.options.ui.length !== 0) {
+      if (userUi.name.length !== 0) {
         await denops.call(
           "ddu#util#print_error",
-          `Not found ui: "${this.options.ui}"`,
+          `Not found ui: "${userUi.name}"`,
         );
       }
       return [
@@ -1623,7 +1625,7 @@ export class Ddu {
 
   async getColumn(
     denops: Denops,
-    name: string,
+    userColumn: UserColumn,
   ): Promise<
     [
       BaseColumn<BaseColumnParams> | undefined,
@@ -1631,15 +1633,17 @@ export class Ddu {
       BaseColumnParams,
     ]
   > {
-    if (!this.loader.getColumn(this.options.name, name)) {
-      await this.loader.autoload(denops, "column", name);
+    userColumn = convertUserString(userColumn);
+
+    if (!this.loader.getColumn(this.options.name, userColumn.name)) {
+      await this.loader.autoload(denops, "column", userColumn.name);
     }
 
-    const column = this.loader.getColumn(this.options.name, name);
+    const column = this.loader.getColumn(this.options.name, userColumn.name);
     if (!column) {
       await denops.call(
         "ddu#util#print_error",
-        `Not found column: ${name}`,
+        `Not found column: ${userColumn.name}`,
       );
       return [
         undefined,
@@ -1648,7 +1652,11 @@ export class Ddu {
       ];
     }
 
-    const [columnOptions, columnParams] = columnArgs(column, this.options);
+    const [columnOptions, columnParams] = columnArgs(
+      column,
+      this.options,
+      userColumn,
+    );
     await checkColumnOnInit(column, denops, columnOptions, columnParams);
 
     return [column, columnOptions, columnParams];
@@ -1754,7 +1762,7 @@ export class Ddu {
 
   private async callColumns(
     denops: Denops,
-    columns: string[],
+    columns: UserColumn[],
     items: DduItem[],
   ) {
     if (columns.length === 0) {
@@ -1773,10 +1781,12 @@ export class Ddu {
       length: number;
     };
     const cachedColumns: Record<string, CachedColumn> = {};
-    for (const columnName of columns) {
+    for (
+      const userColumn of columns.map((column) => convertUserString(column))
+    ) {
       const [column, columnOptions, columnParams] = await this.getColumn(
         denops,
-        columnName,
+        userColumn,
       );
       if (!column) {
         continue;
@@ -1791,7 +1801,7 @@ export class Ddu {
         items,
       });
 
-      cachedColumns[columnName] = {
+      cachedColumns[userColumn.name] = {
         column,
         columnOptions,
         columnParams,
@@ -1801,12 +1811,14 @@ export class Ddu {
 
     for (const item of items) {
       let startCol = 1;
-      for (const columnName of columns) {
-        if (!cachedColumns[columnName]) {
+      for (
+        const userColumn of columns.map((column) => convertUserString(column))
+      ) {
+        if (!cachedColumns[userColumn.name]) {
           continue;
         }
 
-        const cachedColumn = cachedColumns[columnName];
+        const cachedColumn = cachedColumns[userColumn.name];
         const text = await cachedColumn.column.getText({
           denops,
           context: this.context,
@@ -1996,13 +2008,17 @@ function columnArgs<
 >(
   column: BaseColumn<Params>,
   options: DduOptions,
+  userColumn: UserColumn,
 ): [ColumnOptions, BaseColumnParams] {
+  userColumn = convertUserString(userColumn);
+
   const o = foldMerge(
     mergeColumnOptions,
     defaultColumnOptions,
     [
       options.columnOptions["_"],
       options.columnOptions[column.name],
+      userColumn?.options,
     ],
   );
   const p = foldMerge(
@@ -2012,6 +2028,7 @@ function columnArgs<
       column?.params(),
       options.columnParams["_"],
       options.columnParams[column.name],
+      userColumn?.params,
     ],
   );
   return [o, p];

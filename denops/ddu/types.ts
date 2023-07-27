@@ -54,6 +54,12 @@ export type Context = {
   winId: number;
 };
 
+export type UserUi = UiName | {
+  name: UiName;
+  options?: Partial<UiOptions>;
+  params?: Partial<BaseUiParams>;
+};
+
 export type UserSource = SourceName | {
   name: SourceName;
   options?: Partial<SourceOptions>;
@@ -64,6 +70,12 @@ export type UserFilter = FilterName | {
   name: FilterName;
   options?: Partial<FilterOptions>;
   params?: Partial<BaseFilterParams>;
+};
+
+export type UserColumn = ColumnName | {
+  name: ColumnName;
+  options?: Partial<ColumnOptions>;
+  params?: Partial<BaseColumnParams>;
 };
 
 export type SourceInfo = {
@@ -95,7 +107,7 @@ export type DduOptions = {
   sourceParams: Record<SourceName, Partial<BaseSourceParams>>;
   sources: UserSource[];
   sync: boolean;
-  ui: UiName;
+  ui: UserUi;
   uiOptions: Record<UiName, Partial<UiOptions>>;
   uiParams: Record<UiName, Partial<BaseUiParams>>;
   unique: boolean;
@@ -121,7 +133,7 @@ export type SourceOptions = {
       args: ActionArguments<BaseActionParams>,
     ) => Promise<ActionFlags | ActionResult>)
   >;
-  columns: ColumnName[];
+  columns: UserColumn[];
   converters: UserFilter[];
   defaultAction: string;
   ignoreCase: boolean;

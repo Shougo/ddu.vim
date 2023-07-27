@@ -1,4 +1,4 @@
-*ddu.txt*	Dark deno-powered UI framework for neovim/Vim8
+*ddu.txt*	Dark deno-powered UI framework for neovim/Vim
 
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
@@ -227,8 +227,15 @@ sync			(boolean)
 		Default: v:false
 
                                                                *ddu-option-ui*
-ui			(string)
-		Specify UI name.
+ui			(string | dictionary)
+		Specify UI name or elements which are formatted as:
+>
+		#{
+		    name: {ui-name},
+		    options: {ui-options},
+		    params: {ui-params},
+		}
+<
 		If it is empty string, it is ignored.
 		NOTE: You must set the option in the first.
 
@@ -669,8 +676,16 @@ actions			(Record<string, function>)
 		Overwrites source actions.
 
                                                    *ddu-source-option-columns*
-columns			(string[])
-		It is a list of registered column names.
+columns			(string[] | dictionary[])
+		It is a list of registered column names or elements which are
+		formatted as:
+>
+		#{
+		    name: {column-name},
+		    options: {column-options},
+		    params: {column-params},
+		}
+<
 		Please see |ddu-columns|.
 		Items will be processed in the order you specify here.
 
