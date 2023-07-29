@@ -477,8 +477,8 @@ ddu#custom#patch_global({dict})
 		is {value}. See |ddu-options| for available {option-name}.
 
                                                     *ddu#custom#patch_local()*
-ddu#custom#patch_local({buffer-name}, {option-name}, {value})
-ddu#custom#patch_local({buffer-name}, {dict})
+ddu#custom#patch_local({ddu-name}, {option-name}, {value})
+ddu#custom#patch_local({ddu-name}, {dict})
 		Set local options for specific |ddu-option-name|.
 		The arguments are the same as for |ddu#custom#patch_global()|.
 
