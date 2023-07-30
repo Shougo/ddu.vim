@@ -83,6 +83,18 @@ INTERFACE                                                      *ddu-interface*
 ------------------------------------------------------------------------------
 OPTIONS                                                          *ddu-options*
 
+There're 4 layers of options for the ddu.vim in order of priority:
+
+	user: set by |ddu#start()| or |ddu#get_items()|.
+	local: set by |ddu#custom#patch_local()| with a name.
+	global: set by |ddu#custom#patch_global()|.
+	default: as described in each |ddu-options|.
+
+ddu.vim merges them recursively.
+
+The |ddu-option-name| describes the name which local option be used.
+And |ddu-option-name| value is also decided by user, global and
+default options.
                                                     *ddu-option-actionOptions*
 actionOptions		(dictionary)
 		It is a dictionary that maps action names to its options.
@@ -465,9 +477,6 @@ ddu#custom#load_config({path})
 		Load TypeScript configuration from {path} file.
 		NOTE: {path} must be full path.
 		NOTE: The loading is asynchronous.
-
-                                                *ddu#custom#load_extensions()*
-ddu#custom#load_extensions({path})
 
                                                    *ddu#custom#patch_global()*
 ddu#custom#patch_global({option-name}, {value})
@@ -1355,9 +1364,6 @@ FAQ 6:							|ddu-faq-6|
 FAQ 7:							|ddu-faq-7|
 	I want to execute grep action from items.
 
-FAQ 8:							|ddu-faq-8|
-	How ddu.vim use options?
-
 
 ------------------------------------------------------------------------------
                                                                    *ddu-faq-1*
@@ -1437,23 +1443,6 @@ A: The example is here. >
 	      \ })
 	endfunction
 <
-                                                                   *ddu-faq-8*
-Q: How ddu.vim use options?
-
-	There're 4 layers of options for the ddu.vim in the order of the
-	priority:
-
-		user: set by |ddu#start()| or |ddu#get_items()|.
-		local: set by |ddu#custom#patch_local()| with a name.
-		global: set by |ddu#custom#patch_global()|.
-		default: as described in each |ddu-options|.
-
-	ddu.vim merges them recursively.
-
-	The |ddu-option-name| describes the name which local option be used.
-	And |ddu-option-name| value is also decided by user, global and
-	default options.
-
 
 ==============================================================================
 COMPATIBILITY                                              *ddu-compatibility*
