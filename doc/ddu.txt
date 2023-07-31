@@ -1115,8 +1115,11 @@ highlights		(object[])			(Optional)
 		The list of highlight.
 
 		name			(string)
-		The highlight name.
-		NOTE: Each highlight must be different name.
+		The highlight name. It is used for |prop_type_add()| in Vim.
+		It is not used in Neovim.
+		NOTE: Each name must be unique for the highlight group.
+		Because of possible interference with other plugins, a naming
+		convention like `ddu-{type}-{name}-{group}` is recommended.
 
 		hl_group		(string)
 		|:highlight| group.  Please see |highlight-groups|.
