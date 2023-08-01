@@ -1724,7 +1724,8 @@ export class Ddu {
       return [false, 0, []];
     }
 
-    let items = state.items;
+    // NOTE: Use deepcopy.  Because of filters may break original items.
+    let items = structuredClone(state.items);
     const allItems = items.length;
 
     // NOTE: Call columns before filters
