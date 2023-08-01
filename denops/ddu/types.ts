@@ -44,6 +44,7 @@ export type TreePath = string | string[];
 export type Context = {
   bufName: string;
   bufNr: number;
+  cwd: string;
   done: boolean;
   doneUi: boolean;
   input: string;

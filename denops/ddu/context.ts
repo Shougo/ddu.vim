@@ -60,6 +60,7 @@ export function defaultContext(): Context {
   return {
     bufName: "",
     bufNr: 0,
+    cwd: "",
     done: false,
     doneUi: false,
     input: "",
@@ -339,6 +340,7 @@ export class ContextBuilder {
         ...defaultContext(),
         bufName: await fn.bufname(denops, "%"),
         bufNr: await fn.bufnr(denops, "%"),
+        cwd: await fn.getcwd(denops),
         mode: await fn.mode(denops),
         winId: await fn.win_getid(denops) as number,
       },

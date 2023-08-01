@@ -124,8 +124,7 @@ export class Ddu {
     options: DduOptions,
     userOptions: UserOptions,
   ): Promise<void> {
-    const prevInput = this.context.input;
-    const prevPath = this.context.path;
+    const prevContext = { ...this.context };
 
     this.context = context;
     this.userOptions = userOptions;
@@ -151,6 +150,7 @@ export class Ddu {
 
     if (
       this.initialized && resume && !uiChanged &&
+      prevContext.done && this.context.cwd === prevContext.cwd &&
       (!userOptions?.sources ||
         equal(userOptions.sources, this.options.sources))
     ) {
@@ -162,12 +162,13 @@ export class Ddu {
       // Set input
       if (userOptions?.input !== undefined) {
         await this.setInput(denops, userOptions.input as string);
-      } else if (prevInput !== "") {
-        await this.setInput(denops, prevInput);
+      } else if (prevContext.input !== "") {
+        await this.setInput(denops, prevContext.input);
       }
 
-      // Set path
-      this.context.path = prevPath;
+      // Restore
+      this.context.path = prevContext.path;
+      this.context.maxItems = prevContext.maxItems;
 
       const [ui, uiOptions, uiParams] = await this.getUi(denops);
       if (!ui) {
