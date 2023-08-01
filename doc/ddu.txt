@@ -33,6 +33,7 @@ Actions			|ddu-actions|
   Action params		  |ddu-action-params|
   Action flags		  |ddu-action-flags|
 Types			|ddu-types|
+Autocmds		|ddu-autocmds|
 Create UI		|ddu-create-ui|
   UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
@@ -951,6 +952,16 @@ TYPES                                                              *ddu-types*
 Please see the TypeScript definition.
 
 https://deno.land/x/ddu_vim/types.ts?doc
+
+
+==============================================================================
+AUTOCMDS                                                        *ddu-autocmds*
+
+ddu.vim defines some |User| autocmds.
+
+                                                      *ddu-autocmd-Ddu:redraw*
+Ddu:redraw
+		Called after |ddu-ui-attribute-redraw| is called.
 
 
 ==============================================================================
