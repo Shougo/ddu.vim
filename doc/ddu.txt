@@ -733,6 +733,8 @@ ignoreCase		(boolean)
                                                 *ddu-source-option-matcherKey*
 matcherKey		(string)
 		Matcher compare key for items.
+		It is used for |ddu-source-option-matchers|.
+		NOTE: The key is set before call filters.
 
 		Default: "word"
 
