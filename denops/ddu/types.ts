@@ -297,12 +297,11 @@ export type NoFilePreviewer = {
   contents: string[];
 } & PreviewerCommon;
 
-/**
- * Preview type which shows the contents of files or existing buffers
- */
-export type BufferPreviewer = {
+type BufferPreviewerBase = {
   kind: "buffer";
+} & PreviewerCommon;
 
+type NewBufferPreviewer = {
   /**
    * Buffer expression, which is the same as the arguments of `bufname()`
    */
@@ -312,7 +311,27 @@ export type BufferPreviewer = {
    * Path of file to preview
    */
   path?: string;
-} & PreviewerCommon;
+
+  useExisting?: false;
+};
+
+type ExistingBufferPreviewer = {
+  expr: number | string;
+
+  path?: undefined;
+
+  /**
+   * Use existing buffer
+   */
+  useExisting: true;
+};
+
+/**
+ * Preview type which shows the contents of files or existing buffers
+ */
+export type BufferPreviewer =
+  & BufferPreviewerBase
+  & (NewBufferPreviewer | ExistingBufferPreviewer);
 
 type PreviewerCommon = {
   /**
