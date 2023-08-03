@@ -114,7 +114,7 @@ export class Loader {
     return this.getExtension(index).getColumn(mod, name);
   }
 
-  getAlias(type: DduAliasType, name: string) {
+  getAlias(type: DduAliasType, name: string): string | undefined {
     return this.aliases[type][name];
   }
   getAliasNames(type: DduAliasType) {
