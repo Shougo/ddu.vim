@@ -676,7 +676,10 @@ export class Ddu {
     }));
 
     if (this.context.done && this.options.profile) {
-      echo(denops, `Refresh all items: ${Date.now() - this.startTime} ms`);
+      await denops.call(
+        "ddu#util#print_error",
+        `Refresh all items: ${Date.now() - this.startTime} ms`,
+      );
     }
 
     await this.uiRedraw(denops, searchTargetItem);
@@ -1543,7 +1546,16 @@ export class Ddu {
   > {
     const userUi = convertUserString(this.options.ui);
     if (!this.loader.getUi(this.options.name, userUi.name)) {
+      const startTime = Date.now();
+
       await this.loader.autoload(denops, "ui", userUi.name);
+
+      if (this.options.profile) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Load ${userUi.name}: ${Date.now() - startTime} ms`,
+        );
+      }
     }
 
     const ui = this.loader.getUi(this.options.name, userUi.name);
@@ -1579,7 +1591,16 @@ export class Ddu {
     ]
   > {
     if (!this.loader.getSource(this.options.name, name)) {
+      const startTime = Date.now();
+
       await this.loader.autoload(denops, "source", name);
+
+      if (this.options.profile) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Load ${name}: ${Date.now() - startTime} ms`,
+        );
+      }
     }
 
     const source = this.loader.getSource(this.options.name, name);
@@ -1617,7 +1638,16 @@ export class Ddu {
     userFilter = convertUserString(userFilter);
 
     if (!this.loader.getFilter(this.options.name, userFilter.name)) {
+      const startTime = Date.now();
+
       await this.loader.autoload(denops, "filter", userFilter.name);
+
+      if (this.options.profile) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Load ${userFilter.name}: ${Date.now() - startTime} ms`,
+        );
+      }
     }
 
     const filter = this.loader.getFilter(this.options.name, userFilter.name);
@@ -1650,7 +1680,16 @@ export class Ddu {
     BaseKind<BaseKindParams> | undefined
   > {
     if (!this.loader.getKind(this.options.name, name)) {
+      const startTime = Date.now();
+
       await this.loader.autoload(denops, "kind", name);
+
+      if (this.options.profile) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Load ${name}: ${Date.now() - startTime} ms`,
+        );
+      }
     }
 
     const kind = this.loader.getKind(this.options.name, name);
@@ -1680,7 +1719,16 @@ export class Ddu {
     userColumn = convertUserString(userColumn);
 
     if (!this.loader.getColumn(this.options.name, userColumn.name)) {
+      const startTime = Date.now();
+
       await this.loader.autoload(denops, "column", userColumn.name);
+
+      if (this.options.profile) {
+        await denops.call(
+          "ddu#util#print_error",
+          `Load ${userColumn.name}: ${Date.now() - startTime} ms`,
+        );
+      }
     }
 
     const column = this.loader.getColumn(this.options.name, userColumn.name);

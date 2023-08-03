@@ -1425,6 +1425,8 @@ Or you can use |ddu#load()| for it.
 >
 	call timer_start(10, { _ -> ddu#load('ui', ['ff']) })
 <
+Or ignore deno cache directory "%LOCALAPPDATA%\deno" from anti virus scan.
+
                                                                    *ddu-faq-6*
 Q: |:cnext| / |:cprevious| like commands are available?
 
