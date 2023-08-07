@@ -773,6 +773,8 @@ path			(string | string[])
 smartCase		(boolean)
 		If it is True, |ddu-filters| don't ignore case when input
 		contains upper case characters.
+		NOTE: It works only when |ddu-source-option-ignoreCase| is
+		True.
 
 		Default: v:false
 
