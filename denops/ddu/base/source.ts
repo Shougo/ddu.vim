@@ -85,6 +85,7 @@ export function defaultSourceOptions(): SourceOptions {
     matchers: [],
     maxItems: 10000,
     path: "",
+    smartCase: false,
     sorters: [],
     volatile: false,
   };

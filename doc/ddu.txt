@@ -726,7 +726,7 @@ defaultAction		(string)
 
                                                 *ddu-source-option-ignoreCase*
 ignoreCase		(boolean)
-		If it is True, ddu ignores case.
+		If it is True, |ddu-filters| ignores case when input match.
 
 		Default: v:false
 
@@ -768,6 +768,13 @@ path			(string | string[])
 			"/aa/bb/cc" (string)
 			["/", "aa", "bb", "cc"] (string[])
 		NOTE: It must be full path.
+
+                                                *ddu-source-option-smartCase*
+smartCase		(boolean)
+		If it is True, |ddu-filters| don't ignore case when input
+		contains upper case characters.
+
+		Default: v:false
 
                                                    *ddu-source-option-sorters*
 sorters			(string[] | dictionary[])
