@@ -770,6 +770,7 @@ export class Ddu {
     // NOTE: quitted flag must be called after uiQuit().
     this.quitted = true;
     this.abortController.abort("quit");
+    this.context.done = true;
   }
 
   private resetQuitted() {
