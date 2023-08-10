@@ -1310,7 +1310,7 @@ TerminalPreviewer
 PREVIEWER ATTRIBUTES                                *ddu-previewer-attributes*
 
                                                 *ddu-previewer-attribute-cmds*
-cmds			(string)			(Required)
+cmds			(string[])			(Required)
 		Commands passed to terminal API to render the preview.
 		NOTE: It is only avaiable in
 		|ddu-previewer-TerminalPreviewer|.
