@@ -40,11 +40,15 @@ export abstract class BaseFilter<Params extends BaseFilterParams> {
   path = "";
   isInitialized = false;
 
-  async onInit(_args: OnInitArguments<Params>): Promise<void> {}
+  onInit(_args: OnInitArguments<Params>): void | Promise<void> {}
 
-  async onRefreshItems(_args: OnRefreshItemsArguments<Params>): Promise<void> {}
+  onRefreshItems(
+    _args: OnRefreshItemsArguments<Params>,
+  ): void | Promise<void> {}
 
-  abstract filter({}: FilterArguments<Params>): Promise<DduFilterItems>;
+  abstract filter(
+    {}: FilterArguments<Params>,
+  ): DduFilterItems | Promise<DduFilterItems>;
 
   abstract params(): Params;
 }

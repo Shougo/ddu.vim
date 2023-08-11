@@ -3,7 +3,6 @@ import {
   basename,
   deferred,
   Denops,
-  echo,
   equal,
   fn,
   is,

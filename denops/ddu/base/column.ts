@@ -47,11 +47,13 @@ export abstract class BaseColumn<Params extends BaseColumnParams> {
   path = "";
   isInitialized = false;
 
-  async onInit(_args: OnInitArguments<Params>): Promise<void> {}
+  onInit(_args: OnInitArguments<Params>): void | Promise<void> {}
 
-  abstract getLength({}: GetLengthArguments<Params>): Promise<number>;
+  abstract getLength({}: GetLengthArguments<Params>): number | Promise<number>;
 
-  abstract getText({}: GetTextArguments<Params>): Promise<GetTextResult>;
+  abstract getText(
+    {}: GetTextArguments<Params>,
+  ): GetTextResult | Promise<GetTextResult>;
 
   abstract params(): Params;
 }

@@ -59,16 +59,18 @@ export abstract class BaseSource<
   prevMtime = new Date();
   actions: Actions<Params> = {};
 
-  async onInit(_args: OnInitArguments<Params>): Promise<void> {}
+  onInit(_args: OnInitArguments<Params>): void | Promise<void> {}
 
-  async onEvent(_args: OnEventArguments<Params>): Promise<void> {}
+  onEvent(_args: OnEventArguments<Params>): void | Promise<void> {}
 
   abstract gather(
     {}: GatherArguments<Params>,
   ): ReadableStream<Item<UserData>[]>;
 
-  checkUpdated(_args: CheckUpdatedArguments<Params>): Promise<boolean> {
-    return Promise.resolve(false);
+  checkUpdated(
+    _args: CheckUpdatedArguments<Params>,
+  ): boolean | Promise<boolean> {
+    return false;
   }
 
   abstract params(): Params;

@@ -35,6 +35,13 @@ export type KindName = string;
 export type ColumnName = string;
 export type ActionName = string;
 
+export type UiActionCallback<Params extends BaseUiParams> = (
+  args: UiActionArguments<Params>,
+) => ActionFlags | Promise<ActionFlags>;
+export type ActionCallback<Params extends BaseUiParams> = (
+  args: ActionArguments<Params>,
+) => ActionFlags | ActionResult | Promise<ActionFlags | ActionResult>;
+
 // TreePath is the path (string) or list of the path segments(string[])
 // You can represents two ways for one path like below.
 //    "/aa/bb/cc"
@@ -117,23 +124,14 @@ export type DduOptions = {
 export type UserOptions = Record<string, unknown>;
 
 export type UiOptions = {
-  actions: Record<
-    ActionName,
-    string | ((args: UiActionArguments<BaseUiParams>) => Promise<ActionFlags>)
-  >;
+  actions: Record<ActionName, string | UiActionCallback<BaseUiParams>>;
   defaultAction: string;
   persist: boolean;
   toggle: boolean;
 };
 
 export type SourceOptions = {
-  actions: Record<
-    ActionName,
-    | string
-    | ((
-      args: ActionArguments<BaseActionParams>,
-    ) => Promise<ActionFlags | ActionResult>)
-  >;
+  actions: Record<ActionName, string | ActionCallback<BaseSourceParams>>;
   columns: UserColumn[];
   converters: UserFilter[];
   defaultAction: string;
@@ -242,7 +240,7 @@ export type ActionArguments<Params extends BaseActionParams> = {
 
 export type Actions<Params extends BaseActionParams> = Record<
   string,
-  (args: ActionArguments<Params>) => Promise<ActionFlags | ActionResult>
+  ActionCallback<Params>
 >;
 
 export enum ActionFlags {

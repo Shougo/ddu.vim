@@ -11,5 +11,5 @@ export type ConfigArguments = {
 export abstract class BaseConfig {
   apiVersion = 1;
 
-  async config(_args: ConfigArguments): Promise<void> {}
+  config(_args: ConfigArguments): void | Promise<void> {}
 }

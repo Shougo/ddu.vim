@@ -1,5 +1,4 @@
 import {
-  ActionFlags,
   BaseActionParams,
   Context,
   Ddu,
@@ -8,6 +7,7 @@ import {
   PreviewContext,
   Previewer,
   SourceInfo,
+  UiActionCallback,
   UiOptions,
 } from "../types.ts";
 import { Denops } from "../deps.ts";
@@ -16,7 +16,7 @@ export type BaseUiParams = Record<string, unknown>;
 
 export type UiActions<Params extends BaseUiParams> = Record<
   string,
-  (args: UiActionArguments<Params>) => Promise<ActionFlags>
+  UiActionCallback<Params>
 >;
 
 export type OnInitArguments<Params extends BaseUiParams> = {
@@ -116,7 +116,7 @@ export type UiActionArguments<Params extends BaseUiParams> = {
   uiOptions: UiOptions;
   uiParams: Params;
   actionParams: unknown;
-  getPreviewer: (
+  getPreviewer?: (
     denops: Denops,
     item: DduItem,
     actionParams: BaseActionParams,
@@ -133,27 +133,30 @@ export abstract class BaseUi<
   path = "";
   isInitialized = false;
 
-  async onInit(_args: OnInitArguments<Params>): Promise<void> {}
-  async onBeforeAction(_args: OnBeforeActionArguments<Params>): Promise<void> {}
-  async onAfterAction(_args: OnAfterActionArguments<Params>): Promise<void> {}
+  onInit(_args: OnInitArguments<Params>): void | Promise<void> {}
+  onBeforeAction(
+    _args: OnBeforeActionArguments<Params>,
+  ): void | Promise<void> {}
+  onAfterAction(_args: OnAfterActionArguments<Params>): void | Promise<void> {}
 
-  async refreshItems(_args: RefreshItemsArguments<Params>): Promise<void> {}
+  refreshItems(_args: RefreshItemsArguments<Params>): void | Promise<void> {}
 
-  async collapseItem(_args: CollapseItemArguments<Params>): Promise<void> {}
+  collapseItem(_args: CollapseItemArguments<Params>): void | Promise<void> {}
 
-  async expandItem(_args: ExpandItemArguments<Params>): Promise<void> {}
+  expandItem(_args: ExpandItemArguments<Params>): void | Promise<void> {}
 
-  async searchItem(_args: SearchItemArguments<Params>): Promise<void> {}
+  searchItem(_args: SearchItemArguments<Params>): void | Promise<void> {}
 
-  async redraw(_args: RedrawArguments<Params>): Promise<void> {}
+  redraw(_args: RedrawArguments<Params>): void | Promise<void> {}
 
-  async quit(_args: QuitArguments<Params>): Promise<void> {}
+  quit(_args: QuitArguments<Params>): void | Promise<void> {}
 
-  visible(_args: VisibleArguments<Params>): Promise<boolean> {
-    return Promise.resolve(false);
+  visible(_args: VisibleArguments<Params>): boolean | Promise<boolean> {
+    return false;
   }
-  winId(_args: WinidArguments<Params>): Promise<number> {
-    return Promise.resolve(-1);
+
+  winId(_args: WinidArguments<Params>): number | Promise<number> {
+    return -1;
   }
 
   actions: UiActions<Params> = {};
