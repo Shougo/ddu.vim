@@ -131,7 +131,7 @@ export type UiOptions = {
 };
 
 export type SourceOptions = {
-  actions: Record<ActionName, string | ActionCallback<BaseSourceParams>>;
+  actions: Record<ActionName, string | ActionCallback<BaseActionParams>>;
   columns: UserColumn[];
   converters: UserFilter[];
   defaultAction: string;
@@ -156,13 +156,7 @@ export type ColumnOptions = {
 };
 
 export type KindOptions = {
-  actions: Record<
-    ActionName,
-    | string
-    | ((
-      args: ActionArguments<BaseActionParams>,
-    ) => Promise<ActionFlags | ActionResult>)
-  >;
+  actions: Record<ActionName, string | ActionCallback<BaseActionParams>>;
   defaultAction: string;
 };
 
@@ -239,7 +233,7 @@ export type ActionArguments<Params extends BaseActionParams> = {
 };
 
 export type Actions<Params extends BaseActionParams> = Record<
-  string,
+  ActionName,
   ActionCallback<Params>
 >;
 
