@@ -857,7 +857,7 @@ export class Ddu {
       });
     }
 
-    const flags = typeof (ret) === "number" ? ret : ActionFlags.None;
+    const flags = typeof ret === "number" ? ret : ActionFlags.None;
 
     if (flags & ActionFlags.RefreshItems) {
       await this.refresh(denops);
@@ -1071,10 +1071,10 @@ export class Ddu {
 
     let flags = ActionFlags.None;
     let searchPath: TreePath = "";
-    if (typeof (ret) === "object") {
+    if (typeof ret === "object") {
       flags = ret.flags;
       searchPath = ret.searchPath;
-    } else if (typeof (ret) === "number") {
+    } else if (typeof ret === "number") {
       flags = ret;
     }
 
