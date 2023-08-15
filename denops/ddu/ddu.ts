@@ -2347,7 +2347,7 @@ Deno.test("sourceArgs", () => {
     }
     gather(
       _args: GatherArguments<{ min: number; max: number }> | Denops,
-    ): ReadableStream<Item<Record<never, never>>[]> {
+    ): ReadableStream<Item<Record<string, never>>[]> {
       return new ReadableStream({
         start(controller) {
           controller.close();
