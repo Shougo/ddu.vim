@@ -714,6 +714,8 @@ converters		(string[] | dictionary[])
 <
 		Please see |ddu-filters|.
 		Items will be processed in the order you specify here.
+		NOTE: The items are already filtered by
+		|ddu-source-option-maxItems| to optimize.
 
 		Default: []
 
