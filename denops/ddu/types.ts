@@ -276,6 +276,11 @@ export type TerminalPreviewer = {
    * Commands passed to `termopen()` or `term_start()` to render the preview
    */
   cmds: string[];
+
+  /**
+   * Current working directory
+   */
+  cwd?: string;
 };
 
 /**

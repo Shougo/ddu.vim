@@ -1344,6 +1344,12 @@ contents		(string[])			(Required)
 		Contents to be shown in the preview buffer.
 		NOTE: It is only avaiable in |ddu-previewer-NoFilePreviewer|.
 
+                                                 *ddu-previewer-attribute-cwd*
+cwd			(string)			(Optional)
+		Current working directory.
+		NOTE: It is only avaiable in
+		|ddu-previewer-TerminalPreviewer|.
+
                                                 *ddu-previewer-attribute-expr*
 expr			(number | string)		(Optional)
 		Buffer expression, which is the same as the arguments of
