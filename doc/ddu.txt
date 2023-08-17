@@ -99,6 +99,8 @@ default options.
                                                     *ddu-option-actionOptions*
 actionOptions		(dictionary)
 		It is a dictionary that maps action names to its options.
+		The options with the name "_" is used as the options for all
+		names.
 		See also |ddu-action-options|.
 
 		Default: {}
@@ -113,6 +115,8 @@ actionParams		(dictionary)
                                                     *ddu-option-columnOptions*
 columnOptions		(dictionary)
 		It is a dictionary that maps column names to its options.
+		The options with the name "_" is used as the options for all
+		names.
 		See also |ddu-column-options|.
 
 		Default: {}
@@ -132,6 +136,8 @@ expandInput		(boolean)
                                                     *ddu-option-filterOptions*
 filterOptions		(dictionary)
 		It is a dictionary that maps filter names to its options.
+		The options with the name "_" is used as the options for all
+		names.
 		See also |ddu-filter-options|.
 
 		Default: {}
@@ -149,6 +155,22 @@ input			(string)
 		NOTE: If the input contains spaces, it means AND search.
 
 		Default: ""
+
+                                                      *ddu-option-kindOptions*
+kindOptions		(dictionary)
+		It is a dictionary that maps kind names to its options.
+		The options with the name "_" is used as the options for all
+		names.
+		See also |ddu-kind-options|.
+
+		Default: {}
+
+                                                       *ddu-option-kindParams*
+kindParams		(dictionary)
+		It is a dictionary that maps kind names to its parameters.
+		See also |ddu-kind-params|.
+
+		Default: {}
 
                                                              *ddu-option-name*
 name			(string)
@@ -202,9 +224,9 @@ searchPath		(string | string[])
 
                                                     *ddu-option-sourceOptions*
 sourceOptions		(dictionary)
-		It is a dictionary that maps source names to its options.  The
-		options with the name "_" is used as the options for all
-		sources.
+		It is a dictionary that maps source names to its options.
+		The options with the name "_" is used as the options for all
+		names.
 		See also |ddu-source-options|.
 
 		Default: {}
@@ -256,9 +278,9 @@ ui			(string | dictionary)
 
                                                         *ddu-option-uiOptions*
 uiOptions		(dictionary)
-		It is a dictionary that maps UI names to its options.  The
-		options with the name "_" is used as the options for all
-		UIs.
+		It is a dictionary that maps UI names to its options.
+		The options with the name "_" is used as the options for all
+		names.
 		See also |ddu-ui-options|.
 
 		Default: {}
