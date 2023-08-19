@@ -52,28 +52,29 @@ export function main(denops: Denops) {
   let queuedName: string | null = null;
   let queuedRedrawOption: RedrawOption | null = null;
 
-  const getDdu = (name: string) => {
-    if (!ddus[name]) {
-      ddus[name] = [];
-    }
-    if (ddus[name].length === 0) {
-      ddus[name].push(new Ddu(loader));
-    }
-    return ddus[name].slice(-1)[0];
-  };
-  const pushDdu = (name: string) => {
-    if (!ddus[name]) {
-      ddus[name] = [];
-    }
-    ddus[name].push(new Ddu(loader));
-    return ddus[name].slice(-1)[0];
-  };
-  const popDdu = (name: string) => {
+  const checkDdu = (name: string) => {
     if (!ddus[name]) {
       ddus[name] = [];
     }
 
-    if (ddus[name].length === 0) {
+    return ddus[name].length !== 0;
+  }
+  const getDdu = (name: string) => {
+    if (!checkDdu(name)) {
+      ddus[name].push(new Ddu(loader));
+    }
+
+    return ddus[name].slice(-1)[0];
+  };
+  const pushDdu = (name: string) => {
+    checkDdu(name);
+
+    ddus[name].push(new Ddu(loader));
+
+    return ddus[name].slice(-1)[0];
+  };
+  const popDdu = (name: string) => {
+    if (!checkDdu(name)) {
       return null;
     }
 
@@ -185,10 +186,11 @@ export function main(denops: Denops) {
         let userOptions = ensure(arg1, is.Record);
         let [context, options] = await contextBuilder.get(denops, userOptions);
 
-        let ddu = getDdu(options.name);
+        let ddu: Ddu;
 
-        if (options.push) {
-          const prevDdu = ddu;
+        // NOTE: Check if previous ddu exists
+        if (options.push && checkDdu(options.name)) {
+          const prevDdu = getDdu(options.name);
           ddu = pushDdu(options.name);
 
           // Extends previous options
@@ -202,6 +204,8 @@ export function main(denops: Denops) {
           ]);
 
           [context, options] = await contextBuilder.get(denops, userOptions);
+        } else {
+          ddu = getDdu(options.name);
         }
 
         await ddu.start(denops, context, options, userOptions);
