@@ -522,6 +522,7 @@ ddu#ui#async_action({action-name}[, {params}[, {ui-name}]])
 		UI asynchronously.
 		{params} behavior depends on {action-name}.
 		{ui-name} is specified ddu name(|ddu-option-name|).
+		If {ui-name} is not specified, current buffer UI name is used.
 		NOTE: The action may be does not work because of asynchronous
 		execution.  If so, you should use |ddu#ui#sync_action()|
 		instead.
@@ -553,6 +554,7 @@ ddu#ui#multi_actions([{action-name1}[, {params1}], ...][, {ui-name}])
 		Fire multiple actions for current buffer UI synchronously.
 		{params} behavior depends on {action-name}.
 		{ui-name} is specified ddu name(|ddu-option-name|).
+		If {ui-name} is not specified, current buffer UI name is used.
 
 		Example: >
 
@@ -568,6 +570,7 @@ ddu#ui#sync_action({action-name}[, {params}[, {ui-name}]])
 		UI synchronously.
 		{params} behavior depends on {action-name}.
 		{ui-name} is specified ddu name(|ddu-option-name|).
+		If {ui-name} is not specified, current buffer UI name is used.
 		NOTE: It is slow than |ddu#ui#do_action()|.
 
                                                             *ddu#ui#visible()*
