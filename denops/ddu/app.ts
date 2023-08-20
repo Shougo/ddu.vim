@@ -58,7 +58,7 @@ export function main(denops: Denops) {
     }
 
     return ddus[name].length !== 0;
-  }
+  };
   const getDdu = (name: string) => {
     if (!checkDdu(name)) {
       ddus[name].push(new Ddu(loader));
@@ -257,16 +257,18 @@ export function main(denops: Denops) {
           }
 
           if (opt?.updateOptions) {
+            const updateOptions = opt.updateOptions;
             if (
-              opt.updateOptions?.ui &&
-              opt.updateOptions?.ui !== ddu.getOptions().ui
+              (updateOptions.ui && updateOptions.ui !== ddu.getOptions().ui) ||
+              (updateOptions.uiOptions !== ddu.getOptions().uiOptions) ||
+              (updateOptions.uiParams !== ddu.getOptions().uiParams)
             ) {
               // UI is changed
-              await ddu.restart(denops, opt.updateOptions);
+              await ddu.restart(denops, updateOptions);
               continue;
             }
 
-            ddu.updateOptions(opt.updateOptions);
+            ddu.updateOptions(updateOptions);
           }
 
           if (opt?.refreshItems || opt?.updateOptions) {
