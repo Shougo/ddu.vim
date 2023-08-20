@@ -1,18 +1,23 @@
-function ddu#ui#async_action(name, params = {}) abort
-  call ddu#ui_async_action(get(b:, 'ddu_ui_name', ''), a:name, a:params)
+function ddu#ui#async_action(
+      \ action_name, params = {}, ui_name=get(b:, 'ddu_ui_name', '')) abort
+  call ddu#ui_async_action(a:ui_name, a:action_name, a:params)
 endfunction
 
-function ddu#ui#sync_action(name, params = {}) abort
-  call ddu#ui_sync_action(get(b:, 'ddu_ui_name', ''), a:name, a:params)
+function ddu#ui#sync_action(
+      \ action_name, params = {}, ui_name=get(b:, 'ddu_ui_name', '')) abort
+  call ddu#ui_sync_action(a:ui_name, a:action_name, a:params)
 endfunction
 
-function ddu#ui#do_action(name, params = {}) abort
-  return ddu#ui#sync_action(a:name, a:params)
+function ddu#ui#do_action(
+      \ action_name, params = {}, ui_name=get(b:, 'ddu_ui_name', '')) abort
+  return ddu#ui#sync_action(a:action_name, a:params, a:ui_name)
 endfunction
 
-function ddu#ui#multi_actions(actions) abort
+function ddu#ui#multi_actions(
+      \ actions, ui_name=get(b:, 'ddu_ui_name', '')) abort
   for action in a:actions
-    call call('ddu#ui#sync_action', action)
+    call call('ddu#ui_sync_action',
+          \ [a:ui_name] + (type(action) == v:t_list ? action : [action]))
   endfor
 endfunction
 

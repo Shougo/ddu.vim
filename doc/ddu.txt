@@ -517,16 +517,17 @@ ddu#custom#patch_local({ddu-name}, {dict})
 UI FUNCTIONS                                                *ddu-ui-functions*
 
                                                        *ddu#ui#async_action()*
-ddu#ui#async_action({action-name}[, {params}])
+ddu#ui#async_action({action-name}[, {params}[, {ui-name}]])
 		Fire {action-name} action with {params} from current buffer
 		UI asynchronously.
-		{args} behavior depends on {action-name}.
+		{params} behavior depends on {action-name}.
+		{ui-name} is specified ddu name(|ddu-option-name|).
 		NOTE: The action may be does not work because of asynchronous
 		execution.  If so, you should use |ddu#ui#sync_action()|
 		instead.
 
                                                           *ddu#ui#do_action()*
-ddu#ui#do_action({action-name}[, {params}])
+ddu#ui#do_action({action-name}[, {params}[, {ui-name}]])
 		It is same with |ddu#ui#sync_action()|.
 
                                                            *ddu#ui#get_item()*
@@ -548,8 +549,10 @@ ddu#ui#get_selected_items()
 		NOTE: current UI must support "getSelectedItems" action.
 
                                                       *ddu#ui#multi_actions()*
-ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
+ddu#ui#multi_actions([{action-name1}[, {params1}], ...][, {ui-name}])
 		Fire multiple actions for current buffer UI synchronously.
+		{params} behavior depends on {action-name}.
+		{ui-name} is specified ddu name(|ddu-option-name|).
 
 		Example: >
 
@@ -560,10 +563,11 @@ ddu#ui#multi_actions([{action-name1}[, {params1}], ...])
 		\ ])<CR>
 <
                                                         *ddu#ui#sync_action()*
-ddu#ui#sync_action({action-name}[, {params}])
+ddu#ui#sync_action({action-name}[, {params}[, {ui-name}]])
 		Fire {action-name} action with {params} from current buffer
 		UI synchronously.
-		{args} behavior depends on {action-name}.
+		{params} behavior depends on {action-name}.
+		{ui-name} is specified ddu name(|ddu-option-name|).
 		NOTE: It is slow than |ddu#ui#do_action()|.
 
                                                             *ddu#ui#visible()*
