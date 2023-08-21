@@ -48,7 +48,7 @@ function ddu#util#input_list(message, list) abort
   let ret = ''
   let s:input_completion_list = a:list->copy()
   while a:list->index(ret) < 0
-    let ret = a:message->input('', 'customlist,ddu#util#_complete_ddu_input')
+    let ret = a:message->input('', 'custom,ddu#util#_complete_ddu_input')
     redraw
 
     if ret ==# ''
@@ -72,8 +72,7 @@ function ddu#util#benchmark(msg = '') abort
 endfunction
 
 function ddu#util#_complete_ddu_input(ArgLead, CmdLine, CursorPos) abort
-  return s:input_completion_list->copy()->filter(
-        \ { _, val -> val->stridx(a:ArgLead) == 0 })
+  return s:input_completion_list->copy()->join("\n")
 endfunction
 
 function s:path2directory(path) abort
