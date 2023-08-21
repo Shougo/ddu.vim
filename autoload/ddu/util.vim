@@ -33,13 +33,10 @@ function ddu#util#input_yesno(message) abort
   while yesno !~? '^\%(y\%[es]\|n\%[o]\)$'
     let yesno = (a:message .. ' [yes/no]: ')->input()
     redraw
+
     if yesno ==# ''
-      echo 'Canceled.'
       break
     endif
-
-    " Retry.
-    call ddu#util#print_error('Invalid input.')
   endwhile
 
   redraw
@@ -53,13 +50,10 @@ function ddu#util#input_list(message, list) abort
   while a:list->index(ret) < 0
     let ret = a:message->input('', 'customlist,ddu#util#_complete_ddu_input')
     redraw
+
     if ret ==# ''
-      echo 'Canceled.'
       break
     endif
-
-    " Retry.
-    call ddu#util#print_error('Invalid input.')
   endwhile
 
   redraw
