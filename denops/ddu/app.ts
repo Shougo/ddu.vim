@@ -323,7 +323,7 @@ export function main(denops: Denops) {
 
       await ddu.onEvent(denops, event);
     },
-    async pop(arg1: unknown, arg2: unknown): Promise<void> {
+    async pop(arg1: unknown, arg2: unknown = {}): Promise<void> {
       const name = ensure(arg1, is.String);
       const opt = ensure(arg2, is.Record) as {
         quit?: boolean;

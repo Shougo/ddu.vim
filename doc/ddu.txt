@@ -304,6 +304,7 @@ FUNCTIONS                                                      *ddu-functions*
                                                                  *ddu#event()*
 ddu#event({name}, {event})
 		Call the ddu event handler.
+		NOTE: It can be called by "event" dispatcher in TypeScript.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
@@ -355,6 +356,7 @@ ddu#load({type}, {names})
                                                                    *ddu#pop()*
 ddu#pop({name}[, {opt}])
 		Restore the previous state.
+		NOTE: It can be called by "pop" dispatcher in TypeScript.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
@@ -373,6 +375,7 @@ ddu#pop({name}[, {opt}])
                                                                 *ddu#redraw()*
 ddu#redraw({name}[, {opt}])
 		Redraw the UI.
+		NOTE: It can be called by "redraw" dispatcher in TypeScript.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
@@ -393,6 +396,8 @@ ddu#redraw({name}[, {opt}])
                                                            *ddu#redraw_tree()*
 ddu#redraw_tree({name}, {mode}, {items})
 		Redraw the tree item.
+		NOTE: It can be called by "redrawTree" dispatcher in
+		TypeScript.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
@@ -416,6 +421,7 @@ ddu#start([{options}])
 		Creates a new Ddu.
 		NOTE: You cannot call it in |vim_starting|.  Because
 		denops.vim is not initialized.
+		NOTE: It can be called by "start" dispatcher in TypeScript.
 
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
