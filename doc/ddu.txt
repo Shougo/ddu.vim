@@ -1409,7 +1409,7 @@ syntax			(string)			(Optional)
 
 
 ==============================================================================
-FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-faq*
+FAQ                                                                  *ddu-faq*
 
 FAQ 1:							|ddu-faq-1|
 	How to donate money to you?
