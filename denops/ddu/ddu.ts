@@ -10,11 +10,10 @@ import {
   pathsep,
 } from "./deps.ts";
 import {
-  ActionArguments,
+  Action,
   ActionFlags,
   ActionHistory,
   ActionOptions,
-  ActionResult,
   BaseActionParams,
   BaseColumn,
   BaseColumnParams,
@@ -92,6 +91,17 @@ type RedrawOptions = {
    * item's states reset to gathered.
    */
   restoreItemState?: boolean;
+};
+
+type ItemAction = {
+  userSource: UserSource;
+  sourceOptions: SourceOptions;
+  sourceParams: BaseSourceParams;
+  kindOptions: KindOptions;
+  kindParams: BaseKindParams;
+  actionOptions: ActionOptions;
+  actionParams: BaseActionParams;
+  action: string | Action<BaseActionParams>;
 };
 
 export class Ddu {
@@ -871,7 +881,7 @@ export class Ddu {
     }
   }
 
-  async getItemActions(
+  async getItemActionNames(
     denops: Denops,
     items: DduItem[],
   ): Promise<ItemActions | null> {
@@ -948,19 +958,17 @@ export class Ddu {
     };
   }
 
-  async itemAction(
+  async getItemAction(
     denops: Denops,
     actionName: string,
     items: DduItem[],
     userActionParams: BaseActionParams,
-    clipboard: Clipboard,
-    actionHistory: ActionHistory,
-  ): Promise<void> {
+  ): Promise<ItemAction | undefined> {
     if (items.length === 0) {
       return;
     }
 
-    const itemActions = await this.getItemActions(denops, items);
+    const itemActions = await this.getItemActionNames(denops, items);
     if (!itemActions) {
       return;
     }
@@ -971,7 +979,7 @@ export class Ddu {
       ...new Set(items.map((item) => item.__sourceIndex)),
     ];
 
-    let userSource = this.options.sources[
+    const userSource = this.options.sources[
       indexes.length > 0 ? indexes[0] : 0
     ];
     const [sourceOptions, sourceParams] = sourceArgs(
@@ -1011,14 +1019,42 @@ export class Ddu {
 
     const action = actions[actionName] as
       | string
-      | ((
-        args: ActionArguments<BaseActionParams>,
-      ) => Promise<ActionFlags | ActionResult>);
+      | Action<BaseActionParams>;
     if (!action) {
       await denops.call(
         "ddu#util#print_error",
         `Not found action: ${actionName}`,
       );
+      return;
+    }
+
+    return {
+      userSource,
+      sourceOptions,
+      sourceParams,
+      kindOptions,
+      kindParams,
+      actionOptions,
+      actionParams,
+      action,
+    };
+  }
+
+  async itemAction(
+    denops: Denops,
+    actionName: string,
+    items: DduItem[],
+    userActionParams: BaseActionParams,
+    clipboard: Clipboard,
+    actionHistory: ActionHistory,
+  ): Promise<void> {
+    const itemAction = await this.getItemAction(
+      denops,
+      actionName,
+      items,
+      userActionParams,
+    );
+    if (!itemAction) {
       return;
     }
 
@@ -1033,35 +1069,39 @@ export class Ddu {
         tabNr: await fn.tabpagenr(denops),
       });
 
-      if (actionOptions.quit && visible) {
+      if (itemAction.actionOptions.quit && visible) {
         // Quit UI before action
         await this.uiQuit(denops, ui, uiOptions, uiParams);
       }
     }
 
-    const prevPath = sourceOptions.path;
+    const prevPath = itemAction.sourceOptions.path;
     let ret;
-    if (typeof action === "string") {
+    if (typeof itemAction.action === "string") {
       ret = await denops.call(
         "denops#callback#call",
-        action,
+        itemAction.action,
         {
           context: this.context,
           options: this.options,
-          actionParams,
+          actionParams: itemAction.actionParams,
           items,
         },
       ) as ActionFlags;
     } else {
-      ret = await action({
+      const func = typeof itemAction.action === "object"
+        ? itemAction.action.callback
+        : itemAction.action;
+
+      ret = await func({
         denops,
         context: this.context,
         options: this.options,
-        sourceOptions,
-        sourceParams,
-        kindOptions,
-        kindParams,
-        actionParams,
+        sourceOptions: itemAction.sourceOptions,
+        sourceParams: itemAction.sourceParams,
+        kindOptions: itemAction.kindOptions,
+        kindParams: itemAction.kindParams,
+        actionParams: itemAction.actionParams,
         items,
         clipboard,
         actionHistory,
@@ -1078,18 +1118,18 @@ export class Ddu {
     }
 
     // Check path is changed by action
-    if (sourceOptions.path !== prevPath) {
-      userSource = convertUserString(userSource);
+    if (itemAction.sourceOptions.path !== prevPath) {
+      itemAction.userSource = convertUserString(itemAction.userSource);
       // Overwrite current path
-      if (!userSource.options) {
-        userSource.options = sourceOptions;
+      if (!itemAction.userSource.options) {
+        itemAction.userSource.options = itemAction.sourceOptions;
       }
-      userSource.options.path = sourceOptions.path;
+      itemAction.userSource.options.path = itemAction.sourceOptions.path;
       if (this.context.path.length > 0) {
         this.context.pathHistories.push(this.context.path);
       }
 
-      this.context.path = sourceOptions.path;
+      this.context.path = itemAction.sourceOptions.path;
 
       // Clear input when path is changed
       await this.setInput(denops, "");
@@ -1956,9 +1996,10 @@ export class Ddu {
 
     return kind.getPreviewer({
       denops,
-      item,
+      options: this.options,
       actionParams,
       previewContext,
+      item,
     });
   }
 

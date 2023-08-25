@@ -1,6 +1,8 @@
 import { Denops, ensure, is, Lock, toFileUrl } from "./deps.ts";
 import {
+  Action,
   ActionHistory,
+  BaseActionParams,
   BaseFilterParams,
   Clipboard,
   Context,
@@ -393,7 +395,20 @@ export function main(denops: Denops) {
         actionHistory,
       );
     },
-    async getItemActions(
+    async getItemAction(
+      arg1: unknown,
+      arg2: unknown,
+      arg3: unknown,
+    ): Promise<string | Action<BaseActionParams> | undefined> {
+      const name = ensure(arg1, is.String);
+      const items = ensure(arg2, is.Array) as DduItem[];
+      const action = ensure(arg3, is.String);
+
+      const ddu = getDdu(name);
+      const itemsAction = await ddu.getItemAction(denops, action, items, {});
+      return itemsAction ? itemsAction.action : undefined;
+    },
+    async getItemActionNames(
       arg1: unknown,
       arg2: unknown,
     ): Promise<string[]> {
@@ -401,7 +416,7 @@ export function main(denops: Denops) {
       const items = ensure(arg2, is.Array) as DduItem[];
 
       const ddu = getDdu(name);
-      const ret = await ddu.getItemActions(denops, items);
+      const ret = await ddu.getItemActionNames(denops, items);
       const actions = ret && ret.actions ? Object.keys(ret.actions) : [];
       for (const aliasAction of loader.getAliasNames("action")) {
         const alias = loader.getAlias("action", aliasAction);

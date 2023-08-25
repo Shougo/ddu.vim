@@ -55,7 +55,7 @@ function ddu#get_item_actions(name, items) abort
   if a:name ==# ''
     return
   endif
-  return ddu#_request('getItemActions', [a:name, a:items])
+  return ddu#_request('getItemActionNames', [a:name, a:items])
 endfunction
 function ddu#get_context(name) abort
   if a:name ==# ''

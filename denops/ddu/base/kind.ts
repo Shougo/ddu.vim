@@ -2,6 +2,7 @@ import {
   ActionOptions,
   Actions,
   DduItem,
+  DduOptions,
   KindOptions,
   PreviewContext,
   Previewer,
@@ -12,8 +13,9 @@ export type BaseKindParams = Record<string, unknown>;
 
 export type GetPreviewerArguments = {
   denops: Denops;
-  previewContext: PreviewContext;
+  options: DduOptions;
   actionParams: unknown;
+  previewContext: PreviewContext;
   item: DduItem;
 };
 

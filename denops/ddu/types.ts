@@ -234,8 +234,13 @@ export type ActionArguments<Params extends BaseActionParams> = {
 
 export type Actions<Params extends BaseActionParams> = Record<
   ActionName,
-  ActionCallback<Params>
+  Action<Params>
 >;
+
+export type Action<Params extends BaseActionParams> = {
+  description: string;
+  callback: ActionCallback<Params>;
+} | ActionCallback<Params>;
 
 export enum ActionFlags {
   None = 0,
