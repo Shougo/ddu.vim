@@ -329,11 +329,6 @@ ddu#get_items([{options}])
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
 
-                                                      *ddu#get_item_actions()*
-ddu#get_item_actions({name}, {items})
-		Get the {name} actions for {items}.
-		NOTE: You cannot mix multiple kinds/sources.
-
                                                            *ddu#item_action()*
 ddu#item_action({name}, {action}, {items}, {params})
 		Do the {action} action for {items}.
@@ -1516,6 +1511,9 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY                                              *ddu-compatibility*
+
+2023.08.25
+* Remove "ddu#get_item_actions()".  It can be get from dispatcher.
 
 2023.07.11
 * item actions can close UI when all items are gathered.
