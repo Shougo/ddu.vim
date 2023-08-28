@@ -322,92 +322,100 @@ export class Ddu {
       this.redraw(denops);
     }
 
-    await Promise.all(
-      this.options.sources.map(
-        async (userSource: UserSource, index: number): Promise<void> => {
-          if (refreshIndexes.length > 0 && !refreshIndexes.includes(index)) {
-            // Skip
-            return;
-          }
+    const rs = this.options.sources.map(
+      async (userSource: UserSource, index: number): Promise<void> => {
+        if (refreshIndexes.length > 0 && !refreshIndexes.includes(index)) {
+          // Skip
+          return;
+        }
 
-          userSource = convertUserString(userSource);
+        userSource = convertUserString(userSource);
 
-          const state: GatherState = {
-            items: [],
-            done: false,
-          };
+        const state: GatherState = {
+          items: [],
+          done: false,
+        };
 
-          this.gatherStates[index] = state;
+        this.gatherStates[index] = state;
 
-          const [source, sourceOptions, sourceParams] = await this.getSource(
-            denops,
-            userSource.name,
-            userSource,
-          );
-          if (!source) {
-            state.done = true;
-            return;
-          }
-
-          // Start gather asynchronously
-          const gatherItems = this.gatherItems(
-            denops,
-            index,
-            source,
-            sourceOptions,
-            sourceParams,
-            this.loader,
-            0,
-          );
-
-          // Call "onRefreshItems" hooks
-          const filters = sourceOptions.matchers.concat(
-            sourceOptions.sorters,
-          ).concat(sourceOptions.converters);
-          await Promise.all(filters.map(async (userFilter) => {
-            const [filter, filterOptions, filterParams] = await this.getFilter(
-              denops,
-              userFilter,
-            );
-            await filter?.onRefreshItems?.({
-              denops,
-              filterOptions,
-              filterParams,
-            });
-          }));
-
-          // Get path option, or current directory instead if it is empty
-          const path = sourceOptions.path.length > 0
-            ? sourceOptions.path
-            : await fn.getcwd(denops);
-
-          let prevLength = state.items.length;
-
-          for await (const newItems of gatherItems) {
-            if (path !== this.context.path) {
-              if (this.context.path.length > 0) {
-                this.context.pathHistories.push(this.context.path);
-              }
-              this.context.path = path;
-            }
-
-            state.items = state.items.concat(newItems);
-
-            if (!this.options.sync && prevLength !== state.items.length) {
-              // Do not await inside loop
-              this.redraw(denops);
-              prevLength = state.items.length;
-            }
-          }
-
+        const [source, sourceOptions, sourceParams] = await this.getSource(
+          denops,
+          userSource.name,
+          userSource,
+        );
+        if (!source) {
           state.done = true;
+          return;
+        }
 
-          if (!this.options.sync) {
-            await this.redraw(denops);
+        // Start gather asynchronously
+        const gatherItems = this.gatherItems(
+          denops,
+          index,
+          source,
+          sourceOptions,
+          sourceParams,
+          this.loader,
+          0,
+        );
+
+        // Call "onRefreshItems" hooks
+        const filters = sourceOptions.matchers.concat(
+          sourceOptions.sorters,
+        ).concat(sourceOptions.converters);
+        const rs = filters.map(async (userFilter) => {
+          const [filter, filterOptions, filterParams] = await this.getFilter(
+            denops,
+            userFilter,
+          );
+          await filter?.onRefreshItems?.({
+            denops,
+            filterOptions,
+            filterParams,
+          });
+        });
+
+        // NOTE: denops cannot use Promise.all()
+        for (const r of rs) {
+          await r;
+        }
+
+        // Get path option, or current directory instead if it is empty
+        const path = sourceOptions.path.length > 0
+          ? sourceOptions.path
+          : await fn.getcwd(denops);
+
+        let prevLength = state.items.length;
+
+        for await (const newItems of gatherItems) {
+          if (path !== this.context.path) {
+            if (this.context.path.length > 0) {
+              this.context.pathHistories.push(this.context.path);
+            }
+            this.context.path = path;
           }
-        },
-      ),
+
+          state.items = state.items.concat(newItems);
+
+          if (!this.options.sync && prevLength !== state.items.length) {
+            // Do not await inside loop
+            this.redraw(denops);
+            prevLength = state.items.length;
+          }
+        }
+
+        state.done = true;
+
+        if (!this.options.sync) {
+          await this.redraw(denops);
+        }
+      },
     );
+
+    // NOTE: denops cannot use Promise.all()
+    for (const r of rs) {
+      await r;
+    }
 
     if (this.options.sync) {
       await this.redraw(denops);
@@ -646,7 +654,7 @@ export class Ddu {
 
     let searchTargetItem: DduItem | undefined;
 
-    await Promise.all(allItems.map(async (item: DduItem): Promise<void> => {
+    const rs = allItems.map(async (item: DduItem): Promise<void> => {
       if (searchPath) {
         if (searchPath === item.treePath ?? item.word) {
           searchTargetItem = item;
@@ -682,7 +690,12 @@ export class Ddu {
           },
         );
       }
-    }));
+    });
+
+    // NOTE: denops cannot use Promise.all()
+    for (const r of rs) {
+      await r;
+    }
 
     if (this.context.done && this.options.profile) {
       await denops.call(
@@ -1170,7 +1183,7 @@ export class Ddu {
     denops: Denops,
     items: ExpandItem[],
   ): Promise<void> {
-    const searchedItems = await Promise.all(items.map((item) => {
+    const rs = items.map((item) => {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
@@ -1188,7 +1201,13 @@ export class Ddu {
             preventRedraw: true,
           },
       );
-    }));
+    });
+
+    // NOTE: denops cannot use Promise.all()
+    const searchedItems = [];
+    for (const r of rs) {
+      searchedItems.push(await r);
+    }
 
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
     if (ui && !this.shouldStopCurrentContext()) {
@@ -1337,18 +1356,21 @@ export class Ddu {
           preventRedraw: true,
         };
 
-        await Promise.all(
-          expandTargetChildren.map(async (child: DduItem) => {
-            const hit = await this.expandItem(
-              denops,
-              child,
-              childOptions,
-            );
-            if (hit) {
-              searchedItem = hit;
-            }
-          }),
-        );
+        const rs = expandTargetChildren.map(async (child: DduItem) => {
+          const hit = await this.expandItem(
+            denops,
+            child,
+            childOptions,
+          );
+          if (hit) {
+            searchedItem = hit;
+          }
+        });
+
+        // NOTE: denops cannot use Promise.all()
+        for (const r of rs) {
+          await r;
+        }
       }
     } else {
       // Collapse children exceed the maxLevel
