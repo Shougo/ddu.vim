@@ -2273,7 +2273,7 @@ async function uiRedraw<
         await ddu.uiQuit(denops, ui, uiOptions, uiParams);
       }
 
-      await denops.cmd("doautocmd User Ddu:redraw");
+      await denops.cmd("doautocmd <nomodeline> User Ddu:redraw");
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes(" E523: ")) {
         // NOTE: It may be called on invalid state
