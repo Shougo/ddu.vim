@@ -74,7 +74,7 @@ export class Loader {
   }
 
   getUi(index: string, name: string): BaseUi<BaseUiParams> | null {
-    const mod = this.mods["ui"][name];
+    const mod = this.mods.ui[name];
     if (!mod) {
       return null;
     }
@@ -82,7 +82,7 @@ export class Loader {
     return this.getExtension(index).getUi(mod, name);
   }
   getSource(index: string, name: string): BaseSource<BaseSourceParams> | null {
-    const mod = this.mods["source"][name];
+    const mod = this.mods.source[name];
     if (!mod) {
       return null;
     }
@@ -90,7 +90,7 @@ export class Loader {
     return this.getExtension(index).getSource(mod, name);
   }
   getFilter(index: string, name: string): BaseFilter<BaseFilterParams> | null {
-    const mod = this.mods["filter"][name];
+    const mod = this.mods.filter[name];
     if (!mod) {
       return null;
     }
@@ -98,7 +98,7 @@ export class Loader {
     return this.getExtension(index).getFilter(mod, name);
   }
   getKind(index: string, name: string): BaseKind<BaseKindParams> | null {
-    const mod = this.mods["kind"][name];
+    const mod = this.mods.kind[name];
     if (!mod) {
       return null;
     }
@@ -106,7 +106,7 @@ export class Loader {
     return this.getExtension(index).getKind(mod, name);
   }
   getColumn(index: string, name: string): BaseColumn<BaseColumnParams> | null {
-    const mod = this.mods["column"][name];
+    const mod = this.mods.column[name];
     if (!mod) {
       return null;
     }
