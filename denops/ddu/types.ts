@@ -5,17 +5,16 @@ import type { BaseKindParams } from "./base/kind.ts";
 import type { BaseColumnParams } from "./base/column.ts";
 import { Denops } from "./deps.ts";
 
-export { BaseUi } from "./base/ui.ts";
-export { BaseSource } from "./base/source.ts";
-export { BaseFilter } from "./base/filter.ts";
-export { BaseKind } from "./base/kind.ts";
-export { BaseColumn } from "./base/column.ts";
 export { BaseConfig } from "./base/config.ts";
-
+export { BaseUi } from "./base/ui.ts";
 export type { BaseUiParams, UiActionArguments, UiActions } from "./base/ui.ts";
+export { BaseSource } from "./base/source.ts";
 export type { BaseSourceParams } from "./base/source.ts";
+export { BaseFilter } from "./base/filter.ts";
 export type { BaseFilterParams } from "./base/filter.ts";
+export { BaseKind } from "./base/kind.ts";
 export type { BaseKindParams } from "./base/kind.ts";
+export { BaseColumn } from "./base/column.ts";
 export type { BaseColumnParams } from "./base/column.ts";
 
 export { ContextBuilder } from "./context.ts";
@@ -48,20 +47,6 @@ export type ActionCallback<Params extends BaseUiParams> = (
 //    ["/", "aa", "bb", "cc"]
 export type TreePath = string | string[];
 
-export type Context = {
-  bufName: string;
-  bufNr: number;
-  cwd: string;
-  done: boolean;
-  doneUi: boolean;
-  input: string;
-  maxItems: number;
-  mode: string;
-  path: TreePath;
-  pathHistories: TreePath[];
-  winId: number;
-};
-
 export type UserUi = UiName | {
   name: UiName;
   options?: Partial<UiOptions>;
@@ -91,6 +76,20 @@ export type SourceInfo = {
   index: number;
   path: TreePath;
   kind: string;
+};
+
+export type Context = {
+  bufName: string;
+  bufNr: number;
+  cwd: string;
+  done: boolean;
+  doneUi: boolean;
+  input: string;
+  maxItems: number;
+  mode: string;
+  path: TreePath;
+  pathHistories: TreePath[];
+  winId: number;
 };
 
 export type DduOptions = {
