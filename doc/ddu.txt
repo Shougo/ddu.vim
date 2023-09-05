@@ -661,9 +661,8 @@ to use ddu.vim.  Please search them by https://github.com/topics/ddu-ui
 ------------------------------------------------------------------------------
 UI OPTIONS                                                    *ddu-ui-options*
 
-NOTE: The UIs cannot set default options for UI.  If the UI need
-to specify the recommended configuration, you should write it in the
-documentation instead.
+NOTE: The UIs cannot set default options.  If they need to specify the
+recommended configuration, you should write it in the documentation instead.
 
                                                        *ddu-ui-option-actions*
 actions			(Record<string, function>)
@@ -707,9 +706,8 @@ to use ddu.vim.  Please search them by https://github.com/topics/ddu-source
 ------------------------------------------------------------------------------
 SOURCE OPTIONS                                            *ddu-source-options*
 
-NOTE: The sources cannot set default options for source.  If the source need
-to specify the recommended configuration, you should write it in the
-documentation instead.
+NOTE: The sources cannot set default options.  If they need to specify the
+recommended configuration, you should write it in the documentation instead.
 
                                                    *ddu-source-option-actions*
 actions			(Record<string, function>)
