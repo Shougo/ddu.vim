@@ -741,9 +741,6 @@ export class Ddu {
       uiOptions,
       uiParams,
     });
-
-    // UI must be re-initialized
-    ui.isInitialized = false;
   }
 
   async onEvent(
