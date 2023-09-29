@@ -1122,7 +1122,7 @@ export class Ddu {
       itemAction.userSource = convertUserString(itemAction.userSource);
       // Overwrite current path
       if (!itemAction.userSource.options) {
-        itemAction.userSource.options = itemAction.sourceOptions;
+        itemAction.userSource.options = {};
       }
       itemAction.userSource.options.path = itemAction.sourceOptions.path;
       if (this.context.path.length > 0) {

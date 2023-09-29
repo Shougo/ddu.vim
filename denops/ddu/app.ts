@@ -260,6 +260,7 @@ export function main(denops: Denops) {
 
           if (opt?.updateOptions) {
             const updateOptions = opt.updateOptions;
+
             if (
               (updateOptions.ui && updateOptions.ui !== ddu.getOptions().ui) ||
               (updateOptions.uiOptions !== ddu.getOptions().uiOptions) ||
