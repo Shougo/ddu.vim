@@ -17,7 +17,7 @@ import {
   SourceName,
   UiName,
 } from "./types.ts";
-import { Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
+import { basename, Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
 
 type Mod = {
   // deno-lint-ignore no-explicit-any
@@ -44,23 +44,30 @@ export class Loader {
   };
   private checkPaths: Record<string, boolean> = {};
   private registerLock = new Lock(0);
+  private cachedPaths: Record<string, string> = {};
+  private prevRuntimepath = "";
 
   async autoload(
     denops: Denops,
     type: DduExtType,
     name: string,
   ) {
-    const paths = await globpath(
-      denops,
-      `denops/@ddu-${type}s/`,
-      this.getAlias(type, name) ?? name,
-    );
+    const runtimepath = await op.runtimepath.getGlobal(denops);
+    if (runtimepath !== this.prevRuntimepath) {
+      this.cachedPaths = await globpath(
+        denops,
+        "denops/@ddu-*s",
+      );
+      this.prevRuntimepath = runtimepath;
+    }
 
-    if (paths.length === 0) {
+    const key = `@ddu-${type}s/${this.getAlias(type, name) ?? name}`;
+
+    if (!this.cachedPaths[key]) {
       return;
     }
 
-    await this.registerPath(type, paths[0]);
+    await this.registerPath(type, this.cachedPaths[key]);
   }
 
   registerAlias(type: DduAliasType, alias: string, base: string) {
@@ -217,28 +224,27 @@ class Extension {
 async function globpath(
   denops: Denops,
   search: string,
-  file: string,
-): Promise<string[]> {
+): Promise<Record<string, string>> {
   const runtimepath = await op.runtimepath.getGlobal(denops);
 
-  const check: Record<string, boolean> = {};
-  const paths: string[] = [];
+  const paths: Record<string, string> = {};
   const glob = await fn.globpath(
     denops,
     runtimepath,
-    search + file + ".ts",
+    search + "/*.ts",
     1,
     1,
   );
 
   for (const path of glob) {
     // Skip already added name.
-    if (parse(path).name in check) {
+    const parsed = parse(path);
+    const key = `${basename(parsed.dir)}/${parsed.name}`;
+    if (key in paths) {
       continue;
     }
 
-    paths.push(path);
-    check[parse(path).name] = true;
+    paths[key] = path;
   }
 
   return paths;
