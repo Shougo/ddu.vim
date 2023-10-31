@@ -787,12 +787,12 @@ export class Ddu {
     this.resetAbortController();
   }
 
-  private cancelToRefresh() {
+  cancelToRefresh() {
     this.cancelledToRefresh = true;
     this.abortController.abort("cancelToRefresh");
   }
 
-  private resetCancelledToRefresh() {
+  resetCancelledToRefresh() {
     this.cancelledToRefresh = false;
     this.resetAbortController();
   }
