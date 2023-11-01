@@ -243,9 +243,9 @@ export function main(denops: Denops) {
         // Abort the previous execution
         // Because the previous state may be freezed.
         const ddu = getDdu(queuedName);
-        const volatiles = ddu.getSourceArgs().filter((sourceArgs) =>
-          sourceArgs[0].volatile
-        );
+        const volatiles = ddu.getSourceArgs().map(
+          (sourceArgs, index) => sourceArgs[0].volatile ? index : -1
+        ).filter((index) => index >= 0);
         if (
           queuedRedrawOption?.refreshItems ||
           queuedRedrawOption?.updateOptions ||
@@ -292,14 +292,9 @@ export function main(denops: Denops) {
           }
 
           // Check volatile sources
-          const volatiles = [];
-          let index = 0;
-          for (const sourceArgs of ddu.getSourceArgs()) {
-            if (sourceArgs[0].volatile) {
-              volatiles.push(index);
-            }
-            index++;
-          }
+          const volatiles = ddu.getSourceArgs().map(
+            (sourceArgs, index) => sourceArgs[0].volatile ? index : -1
+          ).filter((index) => index >= 0);
 
           if (volatiles.length > 0 || opt?.refreshItems || opt?.updateOptions) {
             await ddu.refresh(denops, volatiles);
