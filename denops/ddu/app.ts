@@ -292,11 +292,6 @@ export function main(denops: Denops) {
             ddu.updateOptions(updateOptions);
           }
 
-          if (opt?.refreshItems || opt?.updateOptions) {
-            await ddu.refresh(denops);
-            continue;
-          }
-
           // Check volatile sources
           const volatiles = [];
           let index = 0;
@@ -307,7 +302,7 @@ export function main(denops: Denops) {
             index++;
           }
 
-          if (volatiles.length > 0) {
+          if (volatiles.length > 0 || opt?.refreshItems || opt?.updateOptions) {
             await ddu.refresh(denops, volatiles);
           } else {
             await ddu.redraw(denops);
