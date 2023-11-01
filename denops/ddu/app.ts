@@ -238,6 +238,24 @@ export function main(denops: Denops) {
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
       queuedName = ensure(arg1, is.String);
       queuedRedrawOption = ensure(arg2, is.Record) as RedrawOption;
+      const ddu = getDdu(queuedName);
+      // Check volatile sources
+      const volatiles = [];
+      let index = 0;
+      for (const sourceArgs of ddu.getSourceArgs()) {
+        if (sourceArgs[0].volatile) {
+          volatiles.push(index);
+        }
+        index++;
+      }
+      if (
+        queuedRedrawOption?.refreshItems ||
+        queuedRedrawOption?.updateOptions ||
+        volatiles.length > 0
+      ) {
+        ddu.cancelToRefresh();
+        ddu.resetCancelledToRefresh();
+      }
 
       // NOTE: must be locked
       await lock.lock(async () => {
