@@ -243,8 +243,17 @@ export function main(denops: Denops) {
         // Abort the previous execution
         // Because the previous state may be freezed.
         const ddu = getDdu(queuedName);
-        ddu.cancelToRefresh();
-        ddu.resetCancelledToRefresh();
+        const volatiles = ddu.getSourceArgs().filter((sourceArgs) =>
+          sourceArgs[0].volatile
+        );
+        if (
+          queuedRedrawOption?.refreshItems ||
+          queuedRedrawOption?.updateOptions ||
+          volatiles.length > 0
+        ) {
+          ddu.cancelToRefresh();
+          ddu.resetCancelledToRefresh();
+        }
       }
 
       // NOTE: must be locked
