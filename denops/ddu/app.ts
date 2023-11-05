@@ -244,7 +244,7 @@ export function main(denops: Denops) {
         // Because the previous state may be freezed.
         const ddu = getDdu(queuedName);
         const volatiles = ddu.getSourceArgs().map(
-          (sourceArgs, index) => sourceArgs[0].volatile ? index : -1
+          (sourceArgs, index) => sourceArgs[0].volatile ? index : -1,
         ).filter((index) => index >= 0);
         if (
           queuedRedrawOption?.refreshItems ||
@@ -293,7 +293,7 @@ export function main(denops: Denops) {
 
           // Check volatile sources
           const volatiles = ddu.getSourceArgs().map(
-            (sourceArgs, index) => sourceArgs[0].volatile ? index : -1
+            (sourceArgs, index) => sourceArgs[0].volatile ? index : -1,
           ).filter((index) => index >= 0);
 
           if (volatiles.length > 0 || opt?.refreshItems || opt?.updateOptions) {
