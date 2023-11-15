@@ -1000,6 +1000,10 @@ AUTOCMDS                                                        *ddu-autocmds*
 
 ddu.vim defines some |User| autocmds.
 
+                                                       *ddu-autocmd-Ddu:start*
+Ddu:start
+		Called after ddu UI is started.
+
                                                       *ddu-autocmd-Ddu:redraw*
 Ddu:redraw
 		Called after |ddu-ui-attribute-redraw| is called.

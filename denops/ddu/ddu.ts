@@ -273,6 +273,7 @@ export class Ddu {
 
     await this.refresh(denops);
 
+    await denops.cmd("doautocmd <nomodeline> User Ddu:start");
     this.initialized = true;
   }
 
