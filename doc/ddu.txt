@@ -476,9 +476,10 @@ ddu#custom#get_alias_names({alias-type})
 		Get names of {alias-type} aliases as |List|.
 
                                                     *ddu#custom#get_current()*
-ddu#custom#get_current({name})
+ddu#custom#get_current([{name}])
 		Get current ddu options for {name}.
 		{name} is specified by |ddu-option-name|.
+		If {name} is omitted, current buffer UI name is used.
 
                                             *ddu#custom#get_default_options()*
 ddu#custom#get_default_options()

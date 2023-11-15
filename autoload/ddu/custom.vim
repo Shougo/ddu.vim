@@ -73,8 +73,8 @@ endfunction
 function ddu#custom#get_default_options() abort
   return ddu#_request('getDefaultOptions', [])
 endfunction
-function ddu#custom#get_current(name) abort
-  return ddu#_request('getCurrent', [a:name])
+function ddu#custom#get_current(name = b:->get('ddu_ui_name', '')) abort
+  return name ==# '' ? {} : ddu#_request('getCurrent', [a:name])
 endfunction
 function ddu#custom#get_source_names() abort
   return ddu#_request('getSourceNames', [])
