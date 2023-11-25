@@ -162,6 +162,7 @@ export function main(denops: Denops) {
       return Promise.resolve(loader.getAliasNames(arg1 as DduAliasType));
     },
     async loadConfig(arg1: unknown): Promise<void> {
+      //const startTime = Date.now();
       // NOTE: Lock until load finished to prevent execute start() API.
       await lock.lock(async () => {
         const path = ensure(arg1, is.String);
@@ -173,14 +174,17 @@ export function main(denops: Denops) {
         const obj = new mod.Config();
         await obj.config({ denops, contextBuilder, setAlias });
       });
+      //console.log(`${arg1}: ${Date.now() - startTime} ms`);
       return Promise.resolve();
     },
     async loadExtensions(arg1: unknown, arg2: unknown): Promise<void> {
+      //const startTime = Date.now();
       const type = ensure(arg1, is.String) as DduExtType;
       const names = ensure(arg2, is.ArrayOf(is.String));
       for (const name of names) {
         await loader.autoload(denops, type, name);
       }
+      //console.log(`${type} ${names}: ${Date.now() - startTime} ms`);
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {
