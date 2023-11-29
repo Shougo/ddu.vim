@@ -301,7 +301,10 @@ export function main(denops: Denops) {
           ).filter((index) => index >= 0);
 
           if (volatiles.length > 0 || opt?.refreshItems || opt?.updateOptions) {
-            await ddu.refresh(denops, volatiles);
+            await ddu.refresh(
+              denops,
+              opt?.refreshItems || opt?.updateOptions ? [] : volatiles,
+            );
           } else {
             await ddu.redraw(denops);
           }
