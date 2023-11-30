@@ -63,6 +63,9 @@ endfunction
 function ddu#load(type, names) abort
   call ddu#_notify('loadExtensions', [a:type, a:names])
 endfunction
+function ddu#set_static_import_path(path) abort
+  call ddu#_notify('setStaticImportPath', [a:path])
+endfunction
 function ddu#get_items(options = {}) abort
   return ddu#_request('getItems', [a:options])
 endfunction

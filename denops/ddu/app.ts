@@ -187,7 +187,12 @@ export function main(denops: Denops) {
       //console.log(`${type} ${names}: ${Date.now() - startTime} ms`);
       return Promise.resolve();
     },
+    async setStaticImportPath(arg1: unknown): Promise<void> {
+      await loader.initStaticImportPath(denops, arg1 as string);
+      return Promise.resolve();
+    },
     async start(arg1: unknown): Promise<void> {
+      //const startTime = Date.now();
       await lock.lock(async () => {
         let userOptions = ensure(arg1, is.Record);
         let [context, options] = await contextBuilder.get(denops, userOptions);
@@ -216,6 +221,7 @@ export function main(denops: Denops) {
 
         await ddu.start(denops, context, options, userOptions);
       });
+      //console.log(`${Date.now() - startTime} ms`);
     },
     async getItems(arg1: unknown): Promise<DduItem[]> {
       let items: DduItem[] = [];

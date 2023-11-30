@@ -18,6 +18,7 @@ import {
   UiName,
 } from "./types.ts";
 import { basename, Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
+import { safeStat } from "./utils.ts";
 
 type Mod = {
   // deno-lint-ignore no-explicit-any
@@ -46,6 +47,22 @@ export class Loader {
   private registerLock = new Lock(0);
   private cachedPaths: Record<string, string> = {};
   private prevRuntimepath = "";
+  private staticImportMod = null;
+
+  async initStaticImportPath(denops: Denops, path: string) {
+    if (this.staticImportMod) {
+      return;
+    }
+
+    path = await fn.expand(denops, path) as string;
+    if (!await safeStat(path)) {
+      return;
+    }
+
+    //const startTime = Date.now();
+    this.staticImportMod = (await import(toFileUrl(path).href)).mods;
+    //console.log(`${Date.now() - startTime} ms`);
+  }
 
   async autoload(
     denops: Denops,
@@ -149,7 +166,9 @@ export class Loader {
     const name = parse(path).name;
 
     const mod: Mod = {
-      mod: await import(toFileUrl(path).href),
+      mod: this.staticImportMod
+        ? this.staticImportMod[path]
+        : await import(toFileUrl(path).href),
       path,
     };
 
