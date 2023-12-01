@@ -131,7 +131,7 @@ export class Ddu {
     context: Context,
     options: DduOptions,
     userOptions: UserOptions,
-  ): Promise<void> {
+  ): Promise<unknown> {
     const prevContext = { ...this.context };
 
     this.context = context;
