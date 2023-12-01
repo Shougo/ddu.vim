@@ -344,9 +344,12 @@ ddu#item_action({name}, {action}, {items}, {params})
 
                                                                   *ddu#load()*
 ddu#load({type}, {names})
-		Load ddu extensions.
+		Load ddu extensions in background.
+		It is useful to optimize ddu loading time.
 		{type} is "ui" or "source" or "filter" or "kind" or "column".
 		{names} is array of extension name.
+		NOTE: It does not work if you use
+		|ddu#set_static_import_path()|.
 
                                                                    *ddu#pop()*
 ddu#pop({name}[, {opt}])
