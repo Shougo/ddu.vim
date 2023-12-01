@@ -1,7 +1,6 @@
 import {
   assertEquals,
   basename,
-  deferred,
   Denops,
   equal,
   fn,
@@ -116,7 +115,7 @@ export class Ddu {
   private cancelledToRefresh = false;
   private abortController = new AbortController();
   private uiRedrawLock = new Lock(0);
-  private waitRedrawComplete?: Promise<void>;
+  private waitRedrawComplete?: Promise<unknown>;
   private scheduledRedrawOptions?: RedrawOptions;
   private startTime = 0;
   private expandedPaths = new Set<string[]>();
@@ -509,7 +508,7 @@ export class Ddu {
   redraw(
     denops: Denops,
     opts?: RedrawOptions,
-  ): Promise<void> {
+  ): Promise<unknown> {
     if (this.waitRedrawComplete) {
       // Already redrawing, so adding to schedule
       this.scheduledRedrawOptions = {
@@ -519,7 +518,8 @@ export class Ddu {
       };
     } else {
       // Start redraw
-      const complete = this.waitRedrawComplete = deferred<void>();
+      const { promise: complete, resolve, reject } = Promise.withResolvers();
+      this.waitRedrawComplete = complete;
 
       const scheduleRunner = async (opts?: RedrawOptions) => {
         try {
@@ -533,10 +533,10 @@ export class Ddu {
           } else {
             // All schedules completed
             this.waitRedrawComplete = undefined;
-            complete.resolve();
+            resolve(null);
           }
         } catch (e: unknown) {
-          complete.reject(e);
+          reject(e);
         }
       };
 
