@@ -47,10 +47,10 @@ export class Loader {
   private registerLock = new Lock(0);
   private cachedPaths: Record<string, string> = {};
   private prevRuntimepath = "";
-  private staticImportMod = null;
+  private staticImportMod: Record<string, unknown> = {};
 
   async initStaticImportPath(denops: Denops, path: string) {
-    if (this.staticImportMod) {
+    if (Object.values(this.staticImportMod).length !== 0) {
       return;
     }
 
@@ -166,9 +166,8 @@ export class Loader {
     const name = parse(path).name;
 
     const mod: Mod = {
-      mod: this.staticImportMod
-        ? this.staticImportMod[path]
-        : await import(toFileUrl(path).href),
+      mod: this.staticImportMod[path] ??
+        await import(toFileUrl(path).href),
       path,
     };
 
