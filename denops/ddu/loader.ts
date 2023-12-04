@@ -19,8 +19,9 @@ import {
 } from "./types.ts";
 import { basename, Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
 import { safeStat } from "./utils.ts";
+import { mods } from "./_mods.ts";
 
-type Mod = {
+export type Mod = {
   // deno-lint-ignore no-explicit-any
   mod: any;
   path: string;
@@ -28,13 +29,7 @@ type Mod = {
 
 export class Loader {
   private extensions: Record<string, Extension> = {};
-  private mods: Record<DduExtType, Record<string, Mod>> = {
-    ui: {},
-    source: {},
-    filter: {},
-    kind: {},
-    column: {},
-  };
+  private mods: Record<DduExtType, Record<string, Mod>> = mods;
   private aliases: Record<DduAliasType, Record<string, string>> = {
     ui: {},
     source: {},
@@ -165,7 +160,7 @@ export class Loader {
 
     const name = parse(path).name;
 
-    const mod: Mod = {
+    const mod: Mod = mods[name] ?? {
       mod: this.staticImportMod[path] ??
         await import(toFileUrl(path).href),
       path,
