@@ -25,6 +25,7 @@ jobs:
 
       - name: Check Type
         run: |
+          echo "export const mods = {};" > denops/ddu/_mods.js
           find denops -name "*.ts"| xargs deno test --unstable --no-run -A
 
       - name: Check with deno lint
