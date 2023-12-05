@@ -19,6 +19,7 @@ import {
 } from "./types.ts";
 import { basename, Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
 import { safeStat } from "./utils.ts";
+import { mods } from "./_mods.js";
 
 type Mod = {
   // deno-lint-ignore no-explicit-any
@@ -161,24 +162,24 @@ export class Loader {
       return;
     }
 
-    const mods = this.mods[type];
+    const typeMods = this.mods[type];
 
     const name = parse(path).name;
 
     const mod: Mod = {
-      mod: this.staticImportMod[path] ??
+      mod: (mods as Record<string, unknown>)[path] ??
         await import(toFileUrl(path).href),
       path,
     };
 
-    mods[name] = mod;
+    typeMods[name] = mod;
 
     // Check alias
     const aliases = this.getAliasNames(type).filter(
       (k) => this.getAlias(type, k) === name,
     );
     for (const alias of aliases) {
-      mods[alias] = mod;
+      typeMods[alias] = mod;
     }
 
     this.checkPaths[path] = true;
