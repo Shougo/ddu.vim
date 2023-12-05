@@ -45,5 +45,6 @@ jobs:
 
       - name: Test
         run: |
+          echo "export const mods = {};" > denops/ddu/_mods.js
           grep -rl Deno.test denops| xargs deno test --unstable -A
         timeout-minutes: 5
