@@ -143,6 +143,14 @@ function s:init() abort
     return 1
   endif
 
+  " Create default mods file.
+  const mods = [s:root_dir, 'denops', 'ddu', '_mods.js']->join(s:sep)
+  if !(mods->filereadable())
+    call writefile([
+          \   'export const mods = {};',
+          \ ], mods)
+  endif
+
   augroup ddu
     autocmd!
     autocmd User DenopsPluginPost:ddu let s:initialized = v:true
@@ -150,6 +158,7 @@ function s:init() abort
   augroup END
 
   let g:ddu#_started = reltime()
+  let g:ddu#_mods = mods
 
   " NOTE: ddu.vim must be registered manually.
 

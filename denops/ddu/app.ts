@@ -188,7 +188,7 @@ export function main(denops: Denops) {
       return Promise.resolve();
     },
     async setStaticImportPath(arg1: unknown): Promise<void> {
-      await loader.initStaticImportPath(denops, arg1 as string);
+      await loader.initStaticImportPath(denops, arg1 as string[]);
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {
