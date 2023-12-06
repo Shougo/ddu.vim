@@ -187,8 +187,8 @@ export function main(denops: Denops) {
       //console.log(`${type} ${names}: ${Date.now() - startTime} ms`);
       return Promise.resolve();
     },
-    async setStaticImportPath(arg1: unknown): Promise<void> {
-      await loader.initStaticImportPath(denops, arg1 as string[]);
+    async setStaticImportPath(): Promise<void> {
+      await loader.initStaticImportPath(denops);
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {

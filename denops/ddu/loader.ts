@@ -57,11 +57,19 @@ export class Loader {
   private cachedPaths: Record<string, string> = {};
   private prevRuntimepath = "";
 
-  async initStaticImportPath(denops: Denops, globs: string[]) {
+  async initStaticImportPath(denops: Denops) {
     // Generate _mods.ts
     let mods: string[] = [];
     const runtimepath = await op.runtimepath.getGlobal(denops);
-    for (const glob of globs) {
+    for (
+      const glob of [
+        "denops/@ddu-columns/*.ts",
+        "denops/@ddu-filters/*.ts",
+        "denops/@ddu-kinds/*.ts",
+        "denops/@ddu-sources/*.ts",
+        "denops/@ddu-uis/*.ts",
+      ]
+    ) {
       mods = mods.concat(
         await fn.globpath(
           denops,

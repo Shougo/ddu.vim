@@ -425,19 +425,10 @@ ddu#start([{options}])
 		it uses the default value.
 
                                                 *ddu#set_static_import_path()*
-ddu#set_static_import_path({globs})
-		Make static import file to optimize load ddu extensions.
-		{globs} is cache pattern files list.
+ddu#set_static_import_path()
+		Make static import file to optimize load ddu extensions from
+		current 'runtimepath'.
 		NOTE: It should be called if you have updated plugins.
->
-		call ddu#set_static_import_path([
-		      \   'denops/@ddu-columns/*.ts',
-		      \   'denops/@ddu-filters/*.ts',
-		      \   'denops/@ddu-kinds/*.ts',
-		      \   'denops/@ddu-sources/*.ts',
-		      \   'denops/@ddu-uis/*.ts',
-		      \ ])
-<
 
                                                        *ddu#ui_async_action()*
 ddu#ui_async_action({name}, {action}[, {params}])
