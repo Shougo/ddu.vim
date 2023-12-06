@@ -1471,10 +1471,12 @@ It is not all users needed plugin and users can define the original commands.
                                                                    *ddu-faq-5*
 Q: ddu.vim starting is slow.
 
-A: It may be slow in Windows environment.  You should use denops shared server
+A: It may be slow in Windows environment.  You can use denops shared server
 feature.
 
 https://github.com/vim-denops/denops.vim#shared-server
+
+Or you can create static import file by |ddu#set_static_import_path()|.
 
 Or you can use |ddu#load()| for it.
 >
