@@ -17,8 +17,17 @@ import {
   SourceName,
   UiName,
 } from "./types.ts";
-import { basename, Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
-import { safeStat } from "./utils.ts";
+import {
+  basename,
+  Denops,
+  fn,
+  Lock,
+  op,
+  parse,
+  toFileUrl,
+  vars,
+} from "./deps.ts";
+import { mods } from "./_mods.js";
 
 type Mod = {
   // deno-lint-ignore no-explicit-any
@@ -47,21 +56,45 @@ export class Loader {
   private registerLock = new Lock(0);
   private cachedPaths: Record<string, string> = {};
   private prevRuntimepath = "";
-  private staticImportMod: Record<string, unknown> = {};
 
-  async initStaticImportPath(denops: Denops, path: string) {
-    if (Object.values(this.staticImportMod).length !== 0) {
-      return;
+  async initStaticImportPath(denops: Denops) {
+    // Generate _mods.ts
+    let mods: string[] = [];
+    const runtimepath = await op.runtimepath.getGlobal(denops);
+    for (
+      const glob of [
+        "denops/@ddu-columns/*.ts",
+        "denops/@ddu-filters/*.ts",
+        "denops/@ddu-kinds/*.ts",
+        "denops/@ddu-sources/*.ts",
+        "denops/@ddu-uis/*.ts",
+      ]
+    ) {
+      mods = mods.concat(
+        await fn.globpath(
+          denops,
+          runtimepath,
+          glob,
+          1,
+          1,
+        ),
+      );
     }
 
-    path = await fn.expand(denops, path) as string;
-    if (!await safeStat(path)) {
-      return;
+    const staticLines = [];
+    for (const [index, path] of mods.entries()) {
+      staticLines.push(`import * as mod${index} from "file://${path}"`);
     }
-
-    //const startTime = Date.now();
-    this.staticImportMod = (await import(toFileUrl(path).href)).mods;
-    //console.log(`${Date.now() - startTime} ms`);
+    staticLines.push("export const mods = {");
+    for (const [index, path] of mods.entries()) {
+      staticLines.push(`  "${path}":`);
+      staticLines.push(`    mod${index},`);
+    }
+    staticLines.push("};");
+    await Deno.writeTextFile(
+      await vars.g.get(denops, "ddu#_mods"),
+      staticLines.join("\n"),
+    );
   }
 
   async autoload(
@@ -161,24 +194,24 @@ export class Loader {
       return;
     }
 
-    const mods = this.mods[type];
+    const typeMods = this.mods[type];
 
     const name = parse(path).name;
 
     const mod: Mod = {
-      mod: this.staticImportMod[path] ??
+      mod: (mods as Record<string, unknown>)[path] ??
         await import(toFileUrl(path).href),
       path,
     };
 
-    mods[name] = mod;
+    typeMods[name] = mod;
 
     // Check alias
     const aliases = this.getAliasNames(type).filter(
       (k) => this.getAlias(type, k) === name,
     );
     for (const alias of aliases) {
-      mods[alias] = mod;
+      typeMods[alias] = mod;
     }
 
     this.checkPaths[path] = true;
