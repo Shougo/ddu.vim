@@ -87,7 +87,7 @@ export class Loader {
     }
     staticLines.push("export const mods = {");
     for (const [index, path] of mods.entries()) {
-      staticLines.push(`  "${path}":`);
+      staticLines.push(`  "${toFileUrl(path)}":`);
       staticLines.push(`    mod${index},`);
     }
     staticLines.push("};");
@@ -199,7 +199,7 @@ export class Loader {
     const name = parse(path).name;
 
     const mod: Mod = {
-      mod: (mods as Record<string, unknown>)[path] ??
+      mod: (mods as Record<string, unknown>)[toFileUrl(path).href] ??
         await import(toFileUrl(path).href),
       path,
     };
