@@ -15,7 +15,7 @@ function ddu#custom#set_local(name, dict) abort
 endfunction
 
 function ddu#custom#load_config(path) abort
-  if !(a:path->filereadable())
+  if !a:path->filereadable()
     call ddu#util#print_error(printf('"%s" is not found.', a:path))
     return
   endif
@@ -32,7 +32,7 @@ let s:aliases = #{
       \   action: {},
       \ }
 function ddu#custom#alias(type, alias, base) abort
-  if !(s:aliases->has_key(a:type))
+  if !s:aliases->has_key(a:type)
     call ddu#util#print_error('Invalid alias type: ' .. a:type)
     return
   endif
@@ -49,7 +49,7 @@ function ddu#custom#action(type, source_kind_name, action_name, func) abort
   let dict = s:custom_actions[a:type]
 
   for key in a:source_kind_name->split('\s*,\s*')
-    if !(dict->has_key(key))
+    if !dict->has_key(key)
       let dict[key] = #{ actions: {} }
     endif
     let dict[key].actions[a:action_name] = denops#callback#register(a:func)
@@ -105,7 +105,7 @@ endfunction
 
 function s:notify(method, args) abort
   " Save args
-  if !('g:ddu#_notifies'->exists())
+  if !'g:ddu#_notifies'->exists()
     let g:ddu#_notifies = []
   endif
   call add(g:ddu#_notifies, #{ method: a:method, args: a:args })
@@ -115,7 +115,7 @@ endfunction
 
 function s:request(method, args) abort
   " Save args
-  if !('g:ddu#_requests'->exists())
+  if !'g:ddu#_requests'->exists()
     let g:ddu#_requests = []
   endif
   call add(g:ddu#_requests, #{ method: a:method, args: a:args })
