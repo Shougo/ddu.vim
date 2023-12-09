@@ -89,7 +89,7 @@ export class Loader {
     }
     staticLines.push("export const mods = {");
     for (const [index, path] of mods.entries()) {
-      staticLines.push(`  "${toFileUrl(path)}.href":`);
+      staticLines.push(`  "${toFileUrl(path).href}":`);
       staticLines.push(`    mod${index},`);
     }
     staticLines.push("};");
