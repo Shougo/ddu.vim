@@ -150,7 +150,7 @@ function s:init() abort
   augroup END
 
   let g:ddu#_started = reltime()
-  if !('g:ddu#_mods'->exists())
+  if !'g:ddu#_mods'->exists()
     const g:ddu#_mods = [s:root_dir, 'denops', 'ddu', '_mods.js']->join(s:sep)
   endif
 

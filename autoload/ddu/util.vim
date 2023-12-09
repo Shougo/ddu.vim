@@ -8,11 +8,11 @@ function ddu#util#print_error(string, name = 'ddu') abort
 endfunction
 
 function ddu#util#execute_path(command, path) abort
-  const path = s:expand(a:path)
+  const path = a:path->s:expand()
 
-  const dir = s:path2directory(path)
+  const dir = path->s:path2directory()
   " Auto make directory.
-  if dir !~# '^\a\+:' && !(dir->isdirectory())
+  if dir !~# '^\a\+:' && !dir->isdirectory()
         \ && ddu#util#input_yesno(
         \       printf('"%s" does not exist. Create?', dir))
     call mkdir(dir, 'p')
@@ -76,8 +76,8 @@ function ddu#util#_complete_ddu_input(ArgLead, CmdLine, CursorPos) abort
 endfunction
 
 function s:path2directory(path) abort
-  return s:substitute_path_separator(
-        \ a:path->isdirectory() ? a:path : a:path->fnamemodify(':p:h'))
+  return (a:path->isdirectory() ? a:path : a:path->fnamemodify(':p:h'))
+        \ ->s:substitute_path_separator()
 endfunction
 
 function s:substitute_path_separator(path) abort
@@ -85,6 +85,6 @@ function s:substitute_path_separator(path) abort
 endfunction
 
 function s:expand(path) abort
-  return s:substitute_path_separator(
-        \ (a:path =~# '^\~') ? a:path->fnamemodify(':p') : a:path)
+  return ((a:path =~# '^\~') ? a:path->fnamemodify(':p') : a:path)
+        \ ->s:substitute_path_separator()
 endfunction
