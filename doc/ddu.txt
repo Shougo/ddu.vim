@@ -1296,6 +1296,8 @@ getLength		(function)			(Required)
                                                 *ddu-column-attribute-getText*
 getText			(function)			(Required)
 		It is called to get column text with highlights.
+		The text length must be same with
+		|ddu-column-attribute-getLength|.
 
                                                  *ddu-column-attribute-onInit*
 onInit			(function)			(Optional)
