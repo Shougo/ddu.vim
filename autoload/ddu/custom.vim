@@ -76,6 +76,9 @@ endfunction
 function ddu#custom#get_current(name = b:->get('ddu_ui_name', '')) abort
   return a:name ==# '' ? {} : ddu#_request('getCurrent', [a:name])
 endfunction
+function ddu#custom#get_names() abort
+  return ddu#_request('getNames', [])
+endfunction
 function ddu#custom#get_source_names() abort
   return ddu#_request('getSourceNames', [])
 endfunction

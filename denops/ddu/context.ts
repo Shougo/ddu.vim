@@ -367,7 +367,7 @@ export class ContextBuilder {
   getGlobal(): Partial<DduOptions> {
     return this.custom.global;
   }
-  getLocal(): Record<number, Partial<DduOptions>> {
+  getLocal(): Record<string, Partial<DduOptions>> {
     return this.custom.local;
   }
 

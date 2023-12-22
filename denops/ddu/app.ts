@@ -155,6 +155,12 @@ export function main(denops: Denops) {
       const ddu = getDdu(name);
       return Promise.resolve(ddu.getContext());
     },
+    getNames(): Promise<string[]> {
+      const names = new Set(
+        Object.keys(contextBuilder.getLocal()).concat(Object.keys(ddus)),
+      );
+      return Promise.resolve(Array.from(names));
+    },
     getSourceNames(): Promise<string[]> {
       return Promise.resolve(loader.getSourceNames());
     },

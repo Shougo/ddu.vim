@@ -506,6 +506,10 @@ ddu#custom#get_global()
 ddu#custom#get_local()
 		Get current buffer specific options.
 
+                                                      *ddu#custom#get_names()*
+ddu#custom#get_names()
+		Get ddu names as |List|.
+
                                                *ddu#custom#get_source_names()*
 ddu#custom#get_source_names()
 		Get loaded source names as |List|.
