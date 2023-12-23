@@ -744,6 +744,7 @@ columns			(string[] | dictionary[])
 <
 		Please see |ddu-columns|.
 		Items will be processed in the order you specify here.
+		NOTE: The spaces are not added between each columns.
 
 		Default: []
 
@@ -1534,6 +1535,9 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY                                              *ddu-compatibility*
+
+2023.12.23
+* The spaces are not added between each columns.
 
 2023.12.05
 * Change "ddu#set_static_import_path()" interface.

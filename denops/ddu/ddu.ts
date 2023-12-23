@@ -1967,12 +1967,9 @@ export class Ddu {
           item.highlights = item.highlights.concat(text.highlights);
         }
 
-        if (item.display !== "") {
-          item.display += " ";
-        }
         item.display += text.text;
 
-        startCol += cachedColumn.length + 1;
+        startCol += cachedColumn.length;
       }
     }
   }
