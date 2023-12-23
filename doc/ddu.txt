@@ -1298,6 +1298,8 @@ getText			(function)			(Required)
 		It is called to get column text with highlights.
 		The text length must be same with
 		|ddu-column-attribute-getLength|.
+		NOTE: The highlight length is not same with display width!
+		It is Vim/neovim highlight feature.
 
                                                  *ddu-column-attribute-onInit*
 onInit			(function)			(Optional)
