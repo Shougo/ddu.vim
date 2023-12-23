@@ -1202,6 +1202,7 @@ highlights		(object[])			(Optional)
 
 		width			(number)
 		The highlight end width.
+		NOTE: It is string length instead of display width.
 
                                                    *ddu-item-attribute-status*
 status			(object)			(Optional)

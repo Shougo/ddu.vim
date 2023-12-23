@@ -1970,6 +1970,15 @@ export class Ddu {
         item.display += text.text;
 
         startCol += cachedColumn.length;
+
+        // Check text width.
+        const width = await fn.strdisplaywidth(denops, text.text);
+        const len = await fn.strlen(denops, text.text);
+        if (width < len) {
+          // NOTE: Padding is needed.  Because Vim/neovim highlight is length.
+          startCol += len - width;
+          item.display += " ".repeat(len - width);
+        }
       }
     }
   }
