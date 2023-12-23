@@ -1969,6 +1969,11 @@ export class Ddu {
 
         item.display += text.text;
 
+        if (columns.length === 1) {
+          // Optimize
+          continue;
+        }
+
         startCol += cachedColumn.length;
 
         // Check text width.
