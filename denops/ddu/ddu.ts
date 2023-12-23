@@ -1978,7 +1978,7 @@ export class Ddu {
 
         // Check text width.
         const width = await fn.strdisplaywidth(denops, text.text);
-        const len = await fn.strlen(denops, text.text);
+        const len = (new TextEncoder()).encode(text.text).length;
         if (width < len) {
           // NOTE: Padding is needed.  Because Vim/neovim highlight is length.
           startCol += len - width;

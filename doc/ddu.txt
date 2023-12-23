@@ -1202,7 +1202,7 @@ highlights		(object[])			(Optional)
 
 		width			(number)
 		The highlight end width.
-		NOTE: It is string length instead of display width.
+		NOTE: It is |strlen()| instead of |strdisplaywidth()|.
 
                                                    *ddu-item-attribute-status*
 status			(object)			(Optional)
@@ -1300,7 +1300,7 @@ getText			(function)			(Required)
 		It is called to get column text with highlights.
 		The text length must be same with
 		|ddu-column-attribute-getLength|.
-		NOTE: The highlight length is not same with display width!
+		NOTE: The highlight length is not same with display width.
 		It is Vim/neovim highlight feature.
 
                                                  *ddu-column-attribute-onInit*
