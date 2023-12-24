@@ -38,9 +38,11 @@ endfunction
 
 function ddu#ui#visible(
       \ name=b:->get('ddu_ui_name', ''), tabnr = tabpagenr()) abort
-  return ddu#_request('uiVisible', [a:name, a:tabnr])
+  return ddu#_denops_running() ?
+        \ ddu#_request('uiVisible', [a:name, a:tabnr]) : v:false
 endfunction
 
 function ddu#ui#winids(name=b:->get('ddu_ui_name', '')) abort
-  return ddu#_request('uiWinids', [a:name])
+  return ddu#_denops_running() ?
+        \ ddu#_request('uiWinids', [a:name]) : []
 endfunction
