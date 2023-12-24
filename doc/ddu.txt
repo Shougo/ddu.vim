@@ -599,9 +599,9 @@ ddu#ui#visible({name}[, {tabnr}])
 		{tabnr} is tabpage number.  If it is omitted, current tabpage
 		is used.  If it is less than 1, it means search from all tabs.
 
-                                                              *ddu#ui#winid()*
-ddu#ui#winid({name})
-		Return UI window ID.
+                                                             *ddu#ui#winids()*
+ddu#ui#winids({name})
+		Return UI window ID list.
 		{name} is specified ddu name(|ddu-option-name|).
 
 ==============================================================================
@@ -1091,8 +1091,8 @@ searchItem		(function)			(Optional)
 visible			(function)			(Optional)
 		Called to get UI is visible.
 
-                                                      *ddu-ui-attribute-winId*
-winId			(function)			(Optional)
+                                                     *ddu-ui-attribute-winIds*
+winIds			(function)			(Optional)
 		Called to get UI's |window-ID|.
 
 
@@ -1536,6 +1536,9 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY                                              *ddu-compatibility*
+
+2023.12.25
+* Rename "ddu#ui#winid()" to "ddu#ui#winids()".
 
 2023.12.23
 * The spaces are not added between each columns.

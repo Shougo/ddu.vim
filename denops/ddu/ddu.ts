@@ -1478,15 +1478,15 @@ export class Ddu {
     });
   }
 
-  async uiWinid(
+  async uiWinids(
     denops: Denops,
-  ): Promise<number> {
+  ): Promise<number[]> {
     const [ui, uiOptions, uiParams] = await this.getUi(denops);
-    if (!ui || !ui.winId || this.shouldStopCurrentContext()) {
-      return -1;
+    if (!ui || !ui.winIds || this.shouldStopCurrentContext()) {
+      return [];
     }
 
-    return await ui.winId({
+    return await ui.winIds({
       denops,
       context: this.context,
       options: this.options,

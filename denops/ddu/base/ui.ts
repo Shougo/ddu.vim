@@ -155,8 +155,8 @@ export abstract class BaseUi<
     return false;
   }
 
-  winId(_args: WinidArguments<Params>): number | Promise<number> {
-    return -1;
+  winIds(_args: WinidArguments<Params>): number[] | Promise<number[]> {
+    return [];
   }
 
   actions: UiActions<Params> = {};

@@ -41,6 +41,6 @@ function ddu#ui#visible(
   return ddu#_request('uiVisible', [a:name, a:tabnr])
 endfunction
 
-function ddu#ui#winid(name=b:->get('ddu_ui_name', '')) abort
-  return ddu#_request('uiWinid', [a:name])
+function ddu#ui#winids(name=b:->get('ddu_ui_name', '')) abort
+  return ddu#_request('uiWinids', [a:name])
 endfunction

@@ -479,13 +479,13 @@ export function main(denops: Denops) {
       const ddu = getDdu(name);
       return await ddu.uiVisible(denops, tabNr);
     },
-    async uiWinid(
+    async uiWinids(
       arg1: unknown,
     ): Promise<number> {
       const name = ensure(arg1, is.String);
 
       const ddu = getDdu(name);
-      return await ddu.uiWinid(denops);
+      return await ddu.uiWinids(denops);
     },
   };
 }
