@@ -1913,10 +1913,9 @@ export class Ddu {
       columnParams: BaseColumnParams;
       length: number;
     };
-    const cachedColumns: Record<string, CachedColumn> = {};
-    for (
-      const userColumn of columns.map((column) => convertUserString(column))
-    ) {
+    const userColumns = columns.map((column) => convertUserString(column));
+    const cachedColumns: Record<number, CachedColumn> = {};
+    for (const [index, userColumn] of userColumns.entries()) {
       const [column, columnOptions, columnParams] = await this.getColumn(
         denops,
         userColumn,
@@ -1934,7 +1933,7 @@ export class Ddu {
         items,
       });
 
-      cachedColumns[userColumn.name] = {
+      cachedColumns[index] = {
         column,
         columnOptions,
         columnParams,
@@ -1944,14 +1943,12 @@ export class Ddu {
 
     for (const item of items) {
       let startCol = 1;
-      for (
-        const userColumn of columns.map((column) => convertUserString(column))
-      ) {
-        if (!cachedColumns[userColumn.name]) {
+      for (const index of userColumns.keys()) {
+        const cachedColumn = cachedColumns[index];
+        if (!cachedColumn) {
           continue;
         }
 
-        const cachedColumn = cachedColumns[userColumn.name];
         const text = await cachedColumn.column.getText({
           denops,
           context: this.context,
