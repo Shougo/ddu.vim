@@ -481,7 +481,7 @@ export function main(denops: Denops) {
     },
     async uiWinids(
       arg1: unknown,
-    ): Promise<number> {
+    ): Promise<number[]> {
       const name = ensure(arg1, is.String);
 
       const ddu = getDdu(name);
