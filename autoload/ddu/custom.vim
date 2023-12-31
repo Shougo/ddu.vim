@@ -65,25 +65,25 @@ endfunction
 " This should be called manually, so wait until DenopsPluginPost:ddu by the
 " user himself.
 function ddu#custom#get_global() abort
-  return ddu#_request('getGlobal', [])
+  return ddu#denops#_request('getGlobal', [])
 endfunction
 function ddu#custom#get_local() abort
-  return ddu#_request('getLocal', [])
+  return ddu#denops#_request('getLocal', [])
 endfunction
 function ddu#custom#get_default_options() abort
-  return ddu#_request('getDefaultOptions', [])
+  return ddu#denops#_request('getDefaultOptions', [])
 endfunction
 function ddu#custom#get_current(name = b:->get('ddu_ui_name', '')) abort
-  return a:name ==# '' ? {} : ddu#_request('getCurrent', [a:name])
+  return a:name ==# '' ? {} : ddu#denops#_request('getCurrent', [a:name])
 endfunction
 function ddu#custom#get_names() abort
-  return ddu#_request('getNames', [])
+  return ddu#denops#_request('getNames', [])
 endfunction
 function ddu#custom#get_source_names() abort
-  return ddu#_request('getSourceNames', [])
+  return ddu#denops#_request('getSourceNames', [])
 endfunction
 function ddu#custom#get_alias_names(type) abort
-  return ddu#_request('getAliasNames', [a:type])
+  return ddu#denops#_request('getAliasNames', [a:type])
 endfunction
 
 function s:normalize_key_or_dict(key_or_dict, value) abort
@@ -113,15 +113,15 @@ function s:notify(method, args) abort
   endif
   call add(g:ddu#_notifies, #{ method: a:method, args: a:args })
 
-  return ddu#_notify(a:method, a:args)
+  return ddu#denops#_notify(a:method, a:args)
 endfunction
 
 function s:request(method, args) abort
   " Save args
-  if !'g:ddu#_requests'->exists()
-    let g:ddu#_requests = []
+  if !'g:ddu#denops#_requests'->exists()
+    let g:ddu#denops#_requests = []
   endif
-  call add(g:ddu#_requests, #{ method: a:method, args: a:args })
+  call add(g:ddu#denops#_requests, #{ method: a:method, args: a:args })
 
-  return ddu#_request(a:method, a:args)
+  return ddu#denops#_request(a:method, a:args)
 endfunction
