@@ -5,11 +5,18 @@ function ddu#denops#_register() abort
     const g:ddu#_mods = [s:root_dir, 'denops', 'ddu', '_mods.js']->join(s:sep)
   endif
 
-  call denops#plugin#register('ddu',
-        \ [s:root_dir, 'denops', 'ddu', 'app.ts']->join(s:sep),
-        \ #{ mode: 'skip' })
+  call ddu#denops#_load('ddu',
+        \ [s:root_dir, 'denops', 'ddu', 'app.ts']->join(s:sep))
 
   autocmd ddu User DenopsClosed call s:stopped()
+endfunction
+function ddu#denops#_load(name, path) abort
+  try
+    call denops#plugin#load(a:name, a:path)
+  catch /^Vim\%((\a\+)\)\=:E117:/
+    " Fallback to `register` for backward compatibility
+    call denops#plugin#register(a:name, a:path, #{ mode: 'skip' })
+  endtry
 endfunction
 
 function s:stopped() abort
@@ -70,4 +77,3 @@ function s:notify(method, args) abort
           \ { -> denops#notify('ddu', a:method, a:args) })
   endif
 endfunction
-
