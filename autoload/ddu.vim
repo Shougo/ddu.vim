@@ -71,36 +71,6 @@ function ddu#get_items(options = {}) abort
   return ddu#denops#_request('getItems', [a:options])
 endfunction
 
-
 function ddu#_lazy_redraw(name, args = {}) abort
   call timer_start(0, { -> ddu#redraw(a:name, a:args) })
-endfunction
-
-function ddu#_init() abort
-  if 'g:ddu#_initialized'->exists()
-    return
-  endif
-
-  if !has('patch-9.0.1276') && !has('nvim-0.8')
-    call ddu#util#print_error(
-          \ 'ddu requires Vim 9.0.1276+ or neovim 0.8.0+.')
-    return 1
-  endif
-
-  augroup ddu
-    autocmd!
-    autocmd User DenopsPluginPost:ddu let g:ddu#_initialized = v:true
-    autocmd User Ddu:redraw :
-  augroup END
-
-  let g:ddu#_started = reltime()
-
-  " NOTE: ddu.vim must be registered manually.
-
-  " NOTE: denops load may be started
-  if 'g:loaded_denops'->exists() && denops#server#status() ==# 'running'
-    silent! call ddu#denops#_register()
-  else
-    autocmd ddu User DenopsReady silent! call ddu#denops#_register()
-  endif
 endfunction
