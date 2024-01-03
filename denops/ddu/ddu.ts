@@ -1170,7 +1170,7 @@ export class Ddu {
     denops: Denops,
     items: ExpandItem[],
   ): Promise<void> {
-    const searchedItems = await Promise.all(items.map((item) => {
+    const _searchedItems = await Promise.all(items.map((item) => {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
@@ -1200,17 +1200,6 @@ export class Ddu {
         uiOptions,
         uiParams,
       );
-
-      if (searchedItems.length === 1) {
-        await ui.searchItem({
-          denops,
-          context: this.#context,
-          options: this.#options,
-          uiOptions,
-          uiParams,
-          item: searchedItems[0] ?? items[0].item,
-        });
-      }
     }
   }
 
