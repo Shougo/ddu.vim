@@ -317,13 +317,13 @@ class Custom {
 }
 
 export class ContextBuilder {
-  private custom: Custom = new Custom();
+  #custom: Custom = new Custom();
 
   async get(
     denops: Denops,
     options: UserOptions,
   ): Promise<[Context, DduOptions]> {
-    const userOptions = this.custom.get(options);
+    const userOptions = this.#custom.get(options);
 
     await this.validate(denops, "options", userOptions, defaultDduOptions());
     for (const key in userOptions.sourceOptions) {
@@ -365,24 +365,24 @@ export class ContextBuilder {
   }
 
   getGlobal(): Partial<DduOptions> {
-    return this.custom.global;
+    return this.#custom.global;
   }
   getLocal(): Record<string, Partial<DduOptions>> {
-    return this.custom.local;
+    return this.#custom.local;
   }
 
   setGlobal(options: Partial<DduOptions>) {
-    this.custom.setGlobal(options);
+    this.#custom.setGlobal(options);
   }
   setLocal(name: string, options: Partial<DduOptions>) {
-    this.custom.setLocal(name, options);
+    this.#custom.setLocal(name, options);
   }
 
   patchGlobal(options: Partial<DduOptions>) {
-    this.custom.patchGlobal(options);
+    this.#custom.patchGlobal(options);
   }
   patchLocal(name: string, options: Partial<DduOptions>) {
-    this.custom.patchLocal(name, options);
+    this.#custom.patchLocal(name, options);
   }
 }
 

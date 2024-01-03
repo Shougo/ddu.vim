@@ -36,15 +36,15 @@ type Mod = {
 };
 
 export class Loader {
-  private extensions: Record<string, Extension> = {};
-  private mods: Record<DduExtType, Record<string, Mod>> = {
+  #extensions: Record<string, Extension> = {};
+  #mods: Record<DduExtType, Record<string, Mod>> = {
     ui: {},
     source: {},
     filter: {},
     kind: {},
     column: {},
   };
-  private aliases: Record<DduAliasType, Record<string, string>> = {
+  #aliases: Record<DduAliasType, Record<string, string>> = {
     ui: {},
     source: {},
     filter: {},
@@ -52,10 +52,10 @@ export class Loader {
     column: {},
     action: {},
   };
-  private checkPaths: Record<string, boolean> = {};
-  private registerLock = new Lock(0);
-  private cachedPaths: Record<string, string> = {};
-  private prevRuntimepath = "";
+  #checkPaths: Record<string, boolean> = {};
+  #registerLock = new Lock(0);
+  #cachedPaths: Record<string, string> = {};
+  #prevRuntimepath = "";
 
   async initStaticImportPath(denops: Denops) {
     // Generate _mods.ts
@@ -105,98 +105,98 @@ export class Loader {
     name: string,
   ) {
     const runtimepath = await op.runtimepath.getGlobal(denops);
-    if (runtimepath !== this.prevRuntimepath) {
-      this.cachedPaths = await globpath(
+    if (runtimepath !== this.#prevRuntimepath) {
+      this.#cachedPaths = await globpath(
         denops,
         "denops/@ddu-*s",
       );
-      this.prevRuntimepath = runtimepath;
+      this.#prevRuntimepath = runtimepath;
     }
 
     const key = `@ddu-${type}s/${this.getAlias(type, name) ?? name}`;
 
-    if (!this.cachedPaths[key]) {
+    if (!this.#cachedPaths[key]) {
       return;
     }
 
-    await this.registerPath(type, this.cachedPaths[key]);
+    await this.registerPath(type, this.#cachedPaths[key]);
   }
 
   registerAlias(type: DduAliasType, alias: string, base: string) {
-    this.aliases[type][alias] = base;
+    this.#aliases[type][alias] = base;
   }
 
   async registerPath(type: DduExtType, path: string) {
-    await this.registerLock.lock(async () => {
-      await this.register(type, path);
+    await this.#registerLock.lock(async () => {
+      await this.#register(type, path);
     });
   }
 
   getUi(index: string, name: string): BaseUi<BaseUiParams> | null {
-    const mod = this.mods.ui[name];
+    const mod = this.#mods.ui[name];
     if (!mod) {
       return null;
     }
 
-    return this.getExtension(index).getUi(mod, name);
+    return this.#getExtension(index).getUi(mod, name);
   }
   getSource(index: string, name: string): BaseSource<BaseSourceParams> | null {
-    const mod = this.mods.source[name];
+    const mod = this.#mods.source[name];
     if (!mod) {
       return null;
     }
 
-    return this.getExtension(index).getSource(mod, name);
+    return this.#getExtension(index).getSource(mod, name);
   }
   getFilter(index: string, name: string): BaseFilter<BaseFilterParams> | null {
-    const mod = this.mods.filter[name];
+    const mod = this.#mods.filter[name];
     if (!mod) {
       return null;
     }
 
-    return this.getExtension(index).getFilter(mod, name);
+    return this.#getExtension(index).getFilter(mod, name);
   }
   getKind(index: string, name: string): BaseKind<BaseKindParams> | null {
-    const mod = this.mods.kind[name];
+    const mod = this.#mods.kind[name];
     if (!mod) {
       return null;
     }
 
-    return this.getExtension(index).getKind(mod, name);
+    return this.#getExtension(index).getKind(mod, name);
   }
   getColumn(index: string, name: string): BaseColumn<BaseColumnParams> | null {
-    const mod = this.mods.column[name];
+    const mod = this.#mods.column[name];
     if (!mod) {
       return null;
     }
 
-    return this.getExtension(index).getColumn(mod, name);
+    return this.#getExtension(index).getColumn(mod, name);
   }
 
   getAlias(type: DduAliasType, name: string): string | undefined {
-    return this.aliases[type][name];
+    return this.#aliases[type][name];
   }
   getAliasNames(type: DduAliasType) {
-    return Object.keys(this.aliases[type]);
+    return Object.keys(this.#aliases[type]);
   }
   getSourceNames() {
-    return Object.keys(this.mods.source);
+    return Object.keys(this.#mods.source);
   }
 
-  private getExtension(index: string): Extension {
-    if (!this.extensions[index]) {
-      this.extensions[index] = new Extension();
+  #getExtension(index: string): Extension {
+    if (!this.#extensions[index]) {
+      this.#extensions[index] = new Extension();
     }
 
-    return this.extensions[index];
+    return this.#extensions[index];
   }
 
-  private async register(type: DduExtType, path: string) {
-    if (path in this.checkPaths) {
+  async #register(type: DduExtType, path: string) {
+    if (path in this.#checkPaths) {
       return;
     }
 
-    const typeMods = this.mods[type];
+    const typeMods = this.#mods[type];
 
     const name = parse(path).name;
 
@@ -216,61 +216,61 @@ export class Loader {
       typeMods[alias] = mod;
     }
 
-    this.checkPaths[path] = true;
+    this.#checkPaths[path] = true;
   }
 }
 
 class Extension {
-  private uis: Record<UiName, BaseUi<BaseUiParams>> = {};
-  private sources: Record<SourceName, BaseSource<BaseSourceParams>> = {};
-  private filters: Record<FilterName, BaseFilter<BaseFilterParams>> = {};
-  private kinds: Record<KindName, BaseKind<BaseKindParams>> = {};
-  private columns: Record<ColumnName, BaseColumn<BaseColumnParams>> = {};
+  #uis: Record<UiName, BaseUi<BaseUiParams>> = {};
+  #sources: Record<SourceName, BaseSource<BaseSourceParams>> = {};
+  #filters: Record<FilterName, BaseFilter<BaseFilterParams>> = {};
+  #kinds: Record<KindName, BaseKind<BaseKindParams>> = {};
+  #columns: Record<ColumnName, BaseColumn<BaseColumnParams>> = {};
 
   getUi(mod: Mod, name: string): BaseUi<BaseUiParams> {
-    if (!this.uis[name]) {
+    if (!this.#uis[name]) {
       const obj = new mod.mod.Ui();
       obj.name = name;
       obj.path = mod.path;
-      this.uis[obj.name] = obj;
+      this.#uis[obj.name] = obj;
     }
-    return this.uis[name];
+    return this.#uis[name];
   }
   getSource(mod: Mod, name: string): BaseSource<BaseSourceParams> {
-    if (!this.sources[name]) {
+    if (!this.#sources[name]) {
       const obj = new mod.mod.Source();
       obj.name = name;
       obj.path = mod.path;
-      this.sources[obj.name] = obj;
+      this.#sources[obj.name] = obj;
     }
-    return this.sources[name];
+    return this.#sources[name];
   }
   getFilter(mod: Mod, name: string): BaseFilter<BaseFilterParams> {
-    if (!this.filters[name]) {
+    if (!this.#filters[name]) {
       const obj = new mod.mod.Filter();
       obj.name = name;
       obj.path = mod.path;
-      this.filters[obj.name] = obj;
+      this.#filters[obj.name] = obj;
     }
-    return this.filters[name];
+    return this.#filters[name];
   }
   getKind(mod: Mod, name: string): BaseKind<BaseKindParams> {
-    if (!this.kinds[name]) {
+    if (!this.#kinds[name]) {
       const obj = new mod.mod.Kind();
       obj.name = name;
       obj.path = mod.path;
-      this.kinds[obj.name] = obj;
+      this.#kinds[obj.name] = obj;
     }
-    return this.kinds[name];
+    return this.#kinds[name];
   }
   getColumn(mod: Mod, name: string): BaseColumn<BaseColumnParams> {
-    if (!this.columns[name]) {
+    if (!this.#columns[name]) {
       const obj = new mod.mod.Column();
       obj.name = name;
       obj.path = mod.path;
-      this.columns[obj.name] = obj;
+      this.#columns[obj.name] = obj;
     }
-    return this.columns[name];
+    return this.#columns[name];
   }
 }
 
