@@ -1258,13 +1258,9 @@ export class Ddu {
           parent,
         )
       ) {
-        await this.#callColumns(
-          denops,
-          sourceOptions.columns,
-          [parent].concat(newItems),
-        );
         children = children.concat(newItems);
       }
+
       if (this.shouldStopCurrentContext()) {
         return;
       }
@@ -1278,6 +1274,12 @@ export class Ddu {
         sourceOptions,
         filters,
         this.#input,
+        children,
+      );
+
+      await this.#callColumns(
+        denops,
+        sourceOptions.columns,
         children,
       );
     } finally {
@@ -1411,6 +1413,7 @@ export class Ddu {
 
       this.#setUnexpanded(convertTreePath(item.treePath));
       item.__expanded = false;
+
       await this.#callColumns(denops, sourceOptions.columns, [item]);
 
       await ui.collapseItem({
@@ -1806,9 +1809,6 @@ export class Ddu {
     let items = structuredClone(state.items);
     const allItems = items.length;
 
-    // NOTE: Call columns before filters
-    await this.#callColumns(denops, sourceOptions.columns, items);
-
     items = await this.#callFilters(
       denops,
       sourceOptions,
@@ -1829,6 +1829,9 @@ export class Ddu {
       input,
       items,
     );
+
+    // NOTE: Call columns after filters
+    await this.#callColumns(denops, sourceOptions.columns, items);
 
     return [state.done, allItems, items];
   }
