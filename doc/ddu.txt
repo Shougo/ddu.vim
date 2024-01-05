@@ -901,7 +901,7 @@ COLUMNS                                                          *ddu-columns*
 The columns are aligned by |ddu-column-attribute-getLength|.
 It is useful for tree items.
 
-NOTE: The columns are applyed before |ddu-filters|.
+NOTE: The columns are applyed after |ddu-filters|.
 
 NOTE: The columns are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-column
