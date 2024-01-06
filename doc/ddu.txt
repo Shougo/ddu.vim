@@ -745,6 +745,7 @@ columns			(string[] | dictionary[])
 		Please see |ddu-columns|.
 		Items will be processed in the order you specify here.
 		NOTE: The spaces are not added between each columns.
+		NOTE: The columns overwrites source items highlights.
 
 		Default: []
 
