@@ -1269,19 +1269,28 @@ export class Ddu {
         sourceOptions.sorters,
       ).concat(sourceOptions.converters);
 
+      // NOTE: parent must be applied columns.
+      await this.#callColumns(
+        denops,
+        sourceOptions.columns,
+        [parent].concat(children),
+      );
+
+      // NOTE: Apply filter for parent to update highlights.
+      await this.#callFilters(
+        denops,
+        sourceOptions,
+        filters,
+        this.#input,
+        [parent],
+      );
+
       children = await this.#callFilters(
         denops,
         sourceOptions,
         filters,
         this.#input,
         children,
-      );
-
-      // NOTE: parent must be applied columns.
-      await this.#callColumns(
-        denops,
-        sourceOptions.columns,
-        [parent].concat(children),
       );
     } finally {
       // Restore path
@@ -1416,6 +1425,18 @@ export class Ddu {
       item.__expanded = false;
 
       await this.#callColumns(denops, sourceOptions.columns, [item]);
+
+      // NOTE: Apply filter for parent item to update highlights.
+      const filters = sourceOptions.matchers.concat(
+        sourceOptions.sorters,
+      ).concat(sourceOptions.converters);
+      await this.#callFilters(
+        denops,
+        sourceOptions,
+        filters,
+        this.#input,
+        [item],
+      );
 
       await ui.collapseItem({
         denops,
@@ -1823,6 +1844,9 @@ export class Ddu {
       items = items.slice(0, sourceOptions.maxItems);
     }
 
+    // NOTE: Call columns before filters
+    await this.#callColumns(denops, sourceOptions.columns, items);
+
     items = await this.#callFilters(
       denops,
       sourceOptions,
@@ -1830,9 +1854,6 @@ export class Ddu {
       input,
       items,
     );
-
-    // NOTE: Call columns after filters
-    await this.#callColumns(denops, sourceOptions.columns, items);
 
     return [state.done, allItems, items];
   }
