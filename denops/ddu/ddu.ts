@@ -1280,7 +1280,7 @@ export class Ddu {
       await this.#callColumns(
         denops,
         sourceOptions.columns,
-        children,
+        [parent].concat(children),
       );
     } finally {
       // Restore path
