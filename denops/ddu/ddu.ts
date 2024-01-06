@@ -1277,7 +1277,7 @@ export class Ddu {
         children,
       );
 
-      // NOTE: parent must be applied filter.
+      // NOTE: parent must be applied columns.
       await this.#callColumns(
         denops,
         sourceOptions.columns,
