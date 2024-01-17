@@ -140,8 +140,22 @@ export class Ddu {
     const resume =
       (userOptions?.resume === undefined && this.#options?.resume) ||
       userOptions?.resume;
-    const uiChanged = userOptions?.ui && this.#options.ui !== "" &&
+
+    let uiChanged = userOptions?.ui && this.#options.ui !== "" &&
       userOptions?.ui !== this.#options.ui;
+    if (resume && userOptions?.uiParams) {
+      // Check uiParams is changed
+      for (const [uiName, uiParam] of Object.entries(userOptions.uiParams)) {
+        for (const [paramName, paramValue] of Object.entries(uiParam)) {
+          const currentParam = this.#options.uiParams[uiName];
+          if (currentParam && currentParam[paramName] !== paramValue) {
+            // uiParam is changed
+            uiChanged = true;
+            break;
+          }
+        }
+      }
+    }
 
     if (uiChanged) {
       // Quit current UI
@@ -1170,7 +1184,7 @@ export class Ddu {
     denops: Denops,
     items: ExpandItem[],
   ): Promise<void> {
-    const _searchedItems = await Promise.all(items.map((item) => {
+    await Promise.all(items.map((item) => {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
