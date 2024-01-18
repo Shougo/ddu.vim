@@ -824,6 +824,11 @@ export class Ddu {
     actionName: string,
     actionParams: BaseActionParams,
   ): Promise<void> {
+    if (await fn.getcmdwintype(denops) !== "") {
+      // Skip when Command line window
+      return;
+    }
+
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
     if (!ui) {
       return;
@@ -2291,6 +2296,11 @@ async function uiRedraw<
 ): Promise<void> {
   // NOTE: Redraw must be locked
   await lock.lock(async () => {
+    if (await fn.getcmdwintype(denops) !== "") {
+      // Skip when Command line window
+      return;
+    }
+
     const options = ddu.getOptions();
     const context = ddu.getContext();
     try {

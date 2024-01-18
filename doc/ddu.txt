@@ -374,6 +374,7 @@ ddu#pop({name}[, {opt}])
 ddu#redraw({name}[, {opt}])
 		Redraw the UI.
 		NOTE: It can be called by "redraw" dispatcher in TypeScript.
+		NOTE: It does not work in |command-line-window|.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
@@ -396,6 +397,7 @@ ddu#redraw_tree({name}, {mode}, {items})
 		Redraw the tree item.
 		NOTE: It can be called by "redrawTree" dispatcher in
 		TypeScript.
+		NOTE: It does not work in |command-line-window|.
 
 		{name} is specified ddu name(|ddu-option-name|).
 
@@ -417,9 +419,9 @@ ddu#register({type}, {path})
                                                                  *ddu#start()*
 ddu#start([{options}])
 		Creates a new Ddu.
-		NOTE: You cannot call it in |vim_starting|.  Because
-		denops.vim is not initialized.
 		NOTE: It can be called by "start" dispatcher in TypeScript.
+		NOTE: It must be called after |DenopsReady|.
+		NOTE: It does not work in |command-line-window|.
 
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
@@ -441,6 +443,7 @@ ddu#ui_async_action({name}, {action}[, {params}])
 		{name} is specified ddu name(|ddu-option-name|).
 
 		{params} is action params.
+		NOTE: It does not work in |command-line-window|.
 
                                                         *ddu#ui_sync_action()*
 ddu#ui_sync_action({name}, {action}[, {params}])
@@ -449,6 +452,7 @@ ddu#ui_sync_action({name}, {action}[, {params}])
 		{name} is specified ddu name(|ddu-option-name|).
 
 		{params} is action params.
+		NOTE: It does not work in |command-line-window|.
 
 
 CUSTOM FUNCTIONS                                        *ddu-custom-functions*
@@ -545,10 +549,12 @@ ddu#ui#async_action({action-name}[, {params}[, {ui-name}]])
 		NOTE: The action may be does not work because of asynchronous
 		execution.  If so, you should use |ddu#ui#sync_action()|
 		instead.
+		NOTE: It does not work in |command-line-window|.
 
                                                           *ddu#ui#do_action()*
 ddu#ui#do_action({action-name}[, {params}[, {ui-name}]])
 		It is same with |ddu#ui#sync_action()|.
+		NOTE: It does not work in |command-line-window|.
 
                                                            *ddu#ui#get_item()*
 ddu#ui#get_item()
