@@ -491,32 +491,39 @@ ddu#custom#alias({type}, {alias-name}, {base-name})
                                                 *ddu#custom#get_alias_names()*
 ddu#custom#get_alias_names({alias-type})
 		Get names of {alias-type} aliases as |List|.
+		NOTE: It must be called after |DenopsReady|.
 
                                                     *ddu#custom#get_current()*
 ddu#custom#get_current([{name}])
 		Get current ddu options for {name}.
 		{name} is specified by |ddu-option-name|.
 		If {name} is omitted, current buffer UI name is used.
+		NOTE: It must be called after |DenopsReady|.
 
                                             *ddu#custom#get_default_options()*
 ddu#custom#get_default_options()
 		Get the default options.
+		NOTE: It must be called after |DenopsReady|.
 
                                                      *ddu#custom#get_global()*
 ddu#custom#get_global()
 		Get global options.
+		NOTE: It must be called after |DenopsReady|.
 
                                                       *ddu#custom#get_local()*
 ddu#custom#get_local()
 		Get current buffer specific options.
+		NOTE: It must be called after |DenopsReady|.
 
                                                       *ddu#custom#get_names()*
 ddu#custom#get_names()
 		Get ddu names as |List|.
+		NOTE: It must be called after |DenopsReady|.
 
                                                *ddu#custom#get_source_names()*
 ddu#custom#get_source_names()
 		Get loaded source names as |List|.
+		NOTE: It must be called after |DenopsReady|.
 
                                                     *ddu#custom#load_config()*
 ddu#custom#load_config({path})
