@@ -171,7 +171,7 @@ export class Ddu {
       !userOptions?.refresh;
 
     if (
-      this.#initialized && resume && !uiChanged &&
+      this.#initialized && resume &&
       prevContext.done && this.#context.cwd === prevContext.cwd &&
       (!userOptions?.sources ||
         equal(userOptions.sources, this.#options.sources))
