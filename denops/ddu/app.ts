@@ -35,8 +35,8 @@ export function main(denops: Denops) {
   type RedrawOption = {
     check?: boolean;
     input?: string;
-    refreshItems?: boolean;
-    updateOptions?: UserOptions;
+    method?: "refreshItems" | "uiRedraw" | "uiRefresh";
+    searchItem?: DduItem;
   };
 
   const loader = new Loader();
@@ -145,10 +145,10 @@ export function main(denops: Denops) {
         uiOptions: defaultUiOptions(),
       }));
     },
-    getCurrent(arg1: unknown): Promise<Partial<DduOptions>> {
+    async getCurrent(arg1: unknown): Promise<Partial<DduOptions>> {
       const name = ensure(arg1, is.String);
       const ddu = getDdu(name);
-      return Promise.resolve(ddu.getOptions());
+      return Promise.resolve(await ddu.getCurrentOptions(denops));
     },
     getContext(arg1: unknown): Promise<Context> {
       const name = ensure(arg1, is.String);
@@ -263,8 +263,7 @@ export function main(denops: Denops) {
           (sourceArgs, index) => sourceArgs[0].volatile ? index : -1,
         ).filter((index) => index >= 0);
         if (
-          queuedRedrawOption?.refreshItems ||
-          queuedRedrawOption?.updateOptions ||
+          queuedRedrawOption?.method === "refreshItems" ||
           volatiles.length > 0
         ) {
           ddu.cancelToRefresh();
@@ -291,30 +290,24 @@ export function main(denops: Denops) {
             await ddu.setInput(denops, opt.input);
           }
 
-          if (opt?.updateOptions) {
-            const updateOptions = opt.updateOptions;
-
-            if (updateOptions.ui && updateOptions.ui !== ddu.getOptions().ui) {
-              // UI is changed
-              await ddu.restart(denops, updateOptions);
-              continue;
-            }
-
-            ddu.updateOptions(updateOptions);
-          }
-
           // Check volatile sources
           const volatiles = ddu.getSourceArgs().map(
             (sourceArgs, index) => sourceArgs[0].volatile ? index : -1,
           ).filter((index) => index >= 0);
 
-          if (volatiles.length > 0 || opt?.refreshItems) {
+          if (volatiles.length > 0 || opt?.method === "refreshItems") {
             await ddu.refresh(
               denops,
-              opt?.refreshItems || opt?.updateOptions ? [] : volatiles,
+              opt?.method === "refreshItems" ? [] : volatiles,
             );
+          } else if (opt?.method === "uiRedraw") {
+            await ddu.uiRedraw(denops);
           } else {
             await ddu.redraw(denops);
+          }
+
+          if (opt?.searchItem) {
+            await ddu.uiSearchItem(denops, opt.searchItem);
           }
         }
       });
@@ -334,6 +327,23 @@ export function main(denops: Denops) {
         await ddu.collapseItems(denops, items.map((item) => item.item));
       } else if (mode === "expand") {
         ddu.expandItems(denops, items);
+      }
+    },
+    async updateOptions(arg1: unknown, arg2: unknown): Promise<void> {
+      const name = ensure(arg1, is.String);
+      const updateOptions = ensure(arg2, is.Record) as UserOptions;
+
+      // Abort the previous execution
+      // Because the previous state may be freezed.
+      const ddu = getDdu(name);
+      ddu.cancelToRefresh();
+      ddu.resetCancelledToRefresh();
+
+      if (updateOptions.ui && updateOptions.ui !== ddu.getOptions().ui) {
+        // UI is changed
+        await ddu.restart(denops, updateOptions);
+      } else {
+        ddu.updateOptions(updateOptions);
       }
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {

@@ -692,14 +692,16 @@ export class Ddu {
       );
     }
 
-    await this.uiRedraw(denops, searchTargetItem);
+    await this.uiRedraw(denops);
+    if (searchTargetItem) {
+      await this.uiSearchItem(denops, searchTargetItem);
+    }
 
     this.#context.doneUi = this.#context.done;
   }
 
   async uiRedraw(
     denops: Denops,
-    searchItem?: DduItem,
   ): Promise<void> {
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
     if (!ui || this.shouldStopCurrentContext()) {
@@ -714,17 +716,25 @@ export class Ddu {
       uiOptions,
       uiParams,
     );
+  }
 
-    if (searchItem) {
-      await ui.searchItem({
-        denops,
-        context: this.#context,
-        options: this.#options,
-        uiOptions,
-        uiParams,
-        item: searchItem,
-      });
+  async uiSearchItem(
+    denops: Denops,
+    searchItem: DduItem,
+  ): Promise<void> {
+    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    if (!ui) {
+      return;
     }
+
+    await ui.searchItem({
+      denops,
+      context: this.#context,
+      options: this.#options,
+      uiOptions,
+      uiParams,
+      item: searchItem,
+    });
   }
 
   async uiQuit<
@@ -1537,6 +1547,78 @@ export class Ddu {
 
   getUserOptions() {
     return this.#userOptions;
+  }
+
+  async getCurrentOptions(denops: Denops): Promise<DduOptions> {
+    const ret = {
+      ...this.#options,
+    };
+
+    // Merge UI options
+    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    if (ui) {
+      ret.uiOptions[ui.name] = uiOptions;
+      ret.uiParams[ui.name] = uiParams;
+    }
+
+    // Merge source options
+    for (
+      const userSource of this.#options.sources.map((source) =>
+        convertUserString(source)
+      )
+    ) {
+      const [source, sourceOptions, sourceParams] = await this.getSource(
+        denops,
+        userSource.name,
+        userSource,
+      );
+
+      if (!source) {
+        continue;
+      }
+
+      ret.sourceOptions[source.name] = sourceOptions;
+      ret.sourceParams[source.name] = sourceParams;
+
+      // Merge filter options
+      const filters = sourceOptions.matchers.concat(
+        sourceOptions.sorters,
+      ).concat(sourceOptions.converters);
+      for (
+        const userFilter of filters.map((filter) => convertUserString(filter))
+      ) {
+        const [filter, filterOptions, filterParams] = await this.getFilter(
+          denops,
+          userFilter,
+        );
+        if (!filter) {
+          continue;
+        }
+
+        ret.filterOptions[filter.name] = filterOptions;
+        ret.filterParams[filter.name] = filterParams;
+      }
+
+      // Merge column options
+      for (
+        const userColumn of sourceOptions.columns.map((column) =>
+          convertUserString(column)
+        )
+      ) {
+        const [column, columnOptions, columnParams] = await this.getColumn(
+          denops,
+          userColumn,
+        );
+        if (!column) {
+          continue;
+        }
+
+        ret.columnOptions[column.name] = columnOptions;
+        ret.columnParams[column.name] = columnParams;
+      }
+    }
+
+    return ret;
   }
 
   getSourceArgs() {

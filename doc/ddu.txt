@@ -386,11 +386,15 @@ ddu#redraw({name}[, {opt}])
 		input			(string)
 		Specify narrowing text.
 
-		refreshItems		(boolean)
-		If it is true, refresh current items.
+		searchItem		(DduItem)
+		Specify search item after redraw.
 
-		updateOptions		(dictionary)
-		Overwrites options. Refer to |ddu-options| about options.
+		method		(string)
+		Specify redraw method.
+
+		"refreshItems": Gather all source items and refresh UI items.
+		"uiRedraw": Redraw current UI window.
+		"uiRefresh": Refresh all UI items. (Default)
 
                                                            *ddu#redraw_tree()*
 ddu#redraw_tree({name}, {mode}, {items})
@@ -1550,6 +1554,9 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY                                              *ddu-compatibility*
+
+2024.01.19
+* Change "ddu#redraw()" interface.
 
 2023.12.25
 * Rename "ddu#ui#winid()" to "ddu#ui#winids()".
