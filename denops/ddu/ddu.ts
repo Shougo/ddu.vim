@@ -141,21 +141,8 @@ export class Ddu {
       (userOptions?.resume === undefined && this.#options?.resume) ||
       userOptions?.resume;
 
-    let uiChanged = userOptions?.ui && this.#options.ui !== "" &&
+    const uiChanged = userOptions?.ui && this.#options.ui !== "" &&
       userOptions?.ui !== this.#options.ui;
-    if (resume && userOptions?.uiParams) {
-      // Check uiParams is changed
-      for (const [uiName, uiParam] of Object.entries(userOptions.uiParams)) {
-        for (const [paramName, paramValue] of Object.entries(uiParam)) {
-          const currentParam = this.#options.uiParams[uiName];
-          if (currentParam && currentParam[paramName] !== paramValue) {
-            // uiParam is changed
-            uiChanged = true;
-            break;
-          }
-        }
-      }
-    }
 
     if (uiChanged) {
       // Quit current UI

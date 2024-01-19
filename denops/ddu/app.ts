@@ -294,11 +294,7 @@ export function main(denops: Denops) {
           if (opt?.updateOptions) {
             const updateOptions = opt.updateOptions;
 
-            if (
-              (updateOptions.ui && updateOptions.ui !== ddu.getOptions().ui) ||
-              (updateOptions.uiOptions !== ddu.getOptions().uiOptions) ||
-              (updateOptions.uiParams !== ddu.getOptions().uiParams)
-            ) {
+            if (updateOptions.ui && updateOptions.ui !== ddu.getOptions().ui) {
               // UI is changed
               await ddu.restart(denops, updateOptions);
               continue;
@@ -312,7 +308,7 @@ export function main(denops: Denops) {
             (sourceArgs, index) => sourceArgs[0].volatile ? index : -1,
           ).filter((index) => index >= 0);
 
-          if (volatiles.length > 0 || opt?.refreshItems || opt?.updateOptions) {
+          if (volatiles.length > 0 || opt?.refreshItems) {
             await ddu.refresh(
               denops,
               opt?.refreshItems || opt?.updateOptions ? [] : volatiles,
