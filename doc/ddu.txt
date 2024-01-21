@@ -394,8 +394,8 @@ ddu#redraw({name}[, {opt}])
 
 			"refreshItems": Gather all source items and refresh UI
 			items.
-			"uiRedraw": Redraw current UI window.
 			"uiRefresh": Refresh all UI items. (Default)
+			"uiRedraw": Redraw current UI window.
 			NOTE: The expanded trees are collapsed if "method" is
 			not "uiRedraw".
 
