@@ -392,10 +392,12 @@ ddu#redraw({name}[, {opt}])
 		method		(string)
 		Specify redraw method.
 
-			"refreshItems": Gather all source items and refresh UI
-			items.
-			"uiRefresh": Refresh all UI items. (Default)
+			"refreshItems": Gather all source items and execute
+				"uiRefresh".
+			"uiRefresh": Refresh UI items and execute "uiRedraw".
+				(Default)
 			"uiRedraw": Redraw current UI window.
+
 			NOTE: The expanded trees are collapsed if "method" is
 			not "uiRedraw".
 
