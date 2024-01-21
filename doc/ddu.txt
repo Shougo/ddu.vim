@@ -927,44 +927,43 @@ It is useful for tree items.
 NOTE: The columns are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-column
 
-NOTE: The columns are applyed like bellow.
+filter items order
 
-filterItems
+	If you use |ddu-filters| and |ddu-columns|, each order is like bellow.
+	The columns are applyed before converters to change "display" text.
 
-    if you use |ddu-filters| and |ddu-columns|, each order is like bellow.
+	"matchers" -> "sorters" -> "columns" -> "converters"
 
-    "matchers" -> "sorters" -> "columns" ->"converters"
+expandItem behavior
 
-expandItem
+	A/     <-- Fire "expandItem" UI action for this item
 
-    A/     <-- fire expandItem for this item
+	↓
 
-    ↓
-
-    A/
+	A/
 	- B
 	- C
 
-    if the tree will be above after expandItem on A, the columns are applyed
-    like bellow.
+	If the tree will be above after "expandItem" UI action on A, the
+	columns are applyed like bellow.
 
-    1. "columns" for each A (parent) and B,C (children)
-    2. "matchers" -> "sorters" -> "converters" for A (parent)
-    3. "matchers" -> "sorters" -> "converters" for B,C (children)
+	1. "columns" for each A (parent) and B,C (children)
+	2. "matchers" -> "sorters" -> "converters" for A (parent)
+	3. "matchers" -> "sorters" -> "converters" for B,C (children)
 
-collapseItem
+collapseItem behavior
 
-    A/      <-- fire collapseItem for this item
+	A/      <-- Fire "collapseItem" UI action for this item
 	- B
 	- C
 
-    ↓
+	↓
 
-    A/
+	A/
 
 
-    1. "columns" for A (parent)
-    2. "matchers" -> "sorters" -> "converters" for A (parent)
+	1. "columns" for A (parent)
+	2. "matchers" -> "sorters" -> "converters" for A (parent)
 
 ------------------------------------------------------------------------------
 COLUMN OPTIONS                                            *ddu-column-options*

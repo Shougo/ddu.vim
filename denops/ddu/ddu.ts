@@ -1281,16 +1281,16 @@ export class Ddu {
         return;
       }
 
-      const filters = sourceOptions.matchers.concat(
-        sourceOptions.sorters,
-      ).concat(sourceOptions.converters);
-
       // NOTE: parent must be applied columns.
       await this.#callColumns(
         denops,
         sourceOptions.columns,
         [parent].concat(children),
       );
+
+      const filters = sourceOptions.matchers.concat(
+        sourceOptions.sorters,
+      ).concat(sourceOptions.converters);
 
       // NOTE: Apply filter for parent to update highlights.
       await this.#callFilters(
@@ -1932,7 +1932,7 @@ export class Ddu {
       items = items.slice(0, sourceOptions.maxItems);
     }
 
-    // NOTE: Call columns before filters
+    // NOTE: Call columns before converters after matchers and sorters
     await this.#callColumns(denops, sourceOptions.columns, items);
 
     items = await this.#callFilters(
