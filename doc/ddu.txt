@@ -927,8 +927,44 @@ It is useful for tree items.
 NOTE: The columns are not bundled in ddu.vim.  You need to install them
 to use ddu.vim.  Please search them by https://github.com/topics/ddu-column
 
-NOTE: The columns are applyed before |ddu-filters|.
+NOTE: The columns are applyed like bellow.
 
+filterItems
+
+    if you use |ddu-filters| and |ddu-columns|, each order is like bellow.
+
+    "matchers" -> "sorters" -> "columns" ->"converters"
+
+expandItem
+
+    A/     <-- fire expandItem for this item
+
+    ↓
+
+    A/
+	- B
+	- C
+
+    if the tree will be above after expandItem on A, the columns are applyed
+    like bellow.
+
+    1. "columns" for each A (parent) and B,C (children)
+    2. "matchers" -> "sorters" -> "converters" for A (parent)
+    3. "matchers" -> "sorters" -> "converters" for B,C (children)
+
+collapseItem
+
+    A/      <-- fire collapseItem for this item
+	- B
+	- C
+
+    ↓
+
+    A/
+
+
+    1. "columns" for A (parent)
+    2. "matchers" -> "sorters" -> "converters" for A (parent)
 
 ------------------------------------------------------------------------------
 COLUMN OPTIONS                                            *ddu-column-options*
