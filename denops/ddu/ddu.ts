@@ -1286,20 +1286,24 @@ export class Ddu {
         denops,
         sourceOptions.columns,
         [parent].concat(children),
+        this.#items.concat(children),
       );
 
       const filters = sourceOptions.matchers.concat(
         sourceOptions.sorters,
       ).concat(sourceOptions.converters);
 
-      // NOTE: Apply filter for parent to update highlights.
-      await this.#callFilters(
+      // NOTE: Apply filter for parent item to update highlights and "display".
+      const items = await this.#callFilters(
         denops,
         sourceOptions,
         filters,
         this.#input,
         [parent],
       );
+      if (items.length > 0) {
+        parent.display = items[0].display;
+      }
 
       children = await this.#callFilters(
         denops,
@@ -1440,19 +1444,27 @@ export class Ddu {
       this.#setUnexpanded(convertTreePath(item.treePath));
       item.__expanded = false;
 
-      await this.#callColumns(denops, sourceOptions.columns, [item]);
+      await this.#callColumns(
+        denops,
+        sourceOptions.columns,
+        [item],
+        this.#items,
+      );
 
-      // NOTE: Apply filter for parent item to update highlights.
+      // NOTE: Apply filter for parent item to update highlights and "display".
       const filters = sourceOptions.matchers.concat(
         sourceOptions.sorters,
       ).concat(sourceOptions.converters);
-      await this.#callFilters(
+      const items = await this.#callFilters(
         denops,
         sourceOptions,
         filters,
         this.#input,
         [item],
       );
+      if (items.length > 0) {
+        item.display = items[0].display;
+      }
 
       await ui.collapseItem({
         denops,
@@ -1933,7 +1945,7 @@ export class Ddu {
     }
 
     // NOTE: Call columns before converters after matchers and sorters
-    await this.#callColumns(denops, sourceOptions.columns, items);
+    await this.#callColumns(denops, sourceOptions.columns, items, items);
 
     items = await this.#callFilters(
       denops,
@@ -1999,6 +2011,7 @@ export class Ddu {
     denops: Denops,
     columns: UserColumn[],
     items: DduItem[],
+    allItems: DduItem[],
   ) {
     if (columns.length === 0) {
       return items;
@@ -2032,7 +2045,7 @@ export class Ddu {
         options: this.#options,
         columnOptions,
         columnParams,
-        items,
+        items: allItems,
       });
 
       cachedColumns[index] = {
