@@ -1312,6 +1312,7 @@ export class Ddu {
         this.#input,
         children,
       );
+      this.#context.maxItems += children.length;
     } finally {
       // Restore path
       this.#context.path = savePath;
@@ -1466,7 +1467,7 @@ export class Ddu {
         item.display = items[0].display;
       }
 
-      await ui.collapseItem({
+      const collapsed = await ui.collapseItem({
         denops,
         context: this.#context,
         options: this.#options,
@@ -1474,6 +1475,10 @@ export class Ddu {
         uiParams,
         item,
       });
+
+      if (collapsed) {
+        this.#context.maxItems -= collapsed;
+      }
     }
 
     if (!preventRedraw) {

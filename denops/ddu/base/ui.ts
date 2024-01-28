@@ -141,9 +141,9 @@ export abstract class BaseUi<
 
   refreshItems(_args: RefreshItemsArguments<Params>): void | Promise<void> {}
 
-  collapseItem(_args: CollapseItemArguments<Params>): void | Promise<void> {}
+  collapseItem(_args: CollapseItemArguments<Params>): number | Promise<number> {}
 
-  expandItem(_args: ExpandItemArguments<Params>): void | Promise<void> {}
+  expandItem(_args: ExpandItemArguments<Params>): number | Promise<number> {}
 
   searchItem(_args: SearchItemArguments<Params>): void | Promise<void> {}
 
