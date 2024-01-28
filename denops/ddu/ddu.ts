@@ -1282,11 +1282,12 @@ export class Ddu {
       }
 
       // NOTE: parent must be applied columns.
+      const columnItems = [parent].concat(children);
       await this.#callColumns(
         denops,
         sourceOptions.columns,
-        [parent].concat(children),
-        this.#items.concat(children),
+        columnItems,
+        this.#items.concat(columnItems),
       );
 
       const filters = sourceOptions.matchers.concat(
@@ -1445,11 +1446,12 @@ export class Ddu {
       this.#setUnexpanded(convertTreePath(item.treePath));
       item.__expanded = false;
 
+      const columnItems = [item];
       await this.#callColumns(
         denops,
         sourceOptions.columns,
-        [item],
-        this.#items,
+        columnItems,
+        this.#items.concat(columnItems),
       );
 
       // NOTE: Apply filter for parent item to update highlights and "display".
