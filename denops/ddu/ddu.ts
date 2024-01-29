@@ -1242,9 +1242,11 @@ export class Ddu {
       this.#options.name,
       parent.__sourceName,
     );
-    if (!source) {
+    const state = this.#gatherStates[index];
+    if (!source || !state) {
       return;
     }
+
     const [sourceOptions, sourceParams] = sourceArgs(
       source,
       this.#options,
@@ -1287,7 +1289,7 @@ export class Ddu {
         denops,
         sourceOptions.columns,
         columnItems,
-        this.#items.concat(columnItems),
+        state.items.concat(columnItems),
       );
 
       const filters = sourceOptions.matchers.concat(
@@ -1438,8 +1440,8 @@ export class Ddu {
         this.#options,
         this.#options.sources[index],
       );
-
-      if (!item.treePath) {
+      const state = this.#gatherStates[index];
+      if (!item.treePath || !state) {
         continue;
       }
 
@@ -1451,7 +1453,7 @@ export class Ddu {
         denops,
         sourceOptions.columns,
         columnItems,
-        this.#items.concat(columnItems),
+        state.items.concat(columnItems),
       );
 
       // NOTE: Apply filter for parent item to update highlights and "display".
