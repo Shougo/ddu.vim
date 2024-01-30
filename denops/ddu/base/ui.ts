@@ -143,9 +143,13 @@ export abstract class BaseUi<
 
   collapseItem(
     _args: CollapseItemArguments<Params>,
-  ): number | Promise<number> {}
+  ): number | Promise<number> {
+    return 0;
+  }
 
-  expandItem(_args: ExpandItemArguments<Params>): number | Promise<number> {}
+  expandItem(_args: ExpandItemArguments<Params>): number | Promise<number> {
+    return 0;
+  }
 
   searchItem(_args: SearchItemArguments<Params>): void | Promise<void> {}
 
