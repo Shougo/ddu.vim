@@ -121,6 +121,7 @@ export class Ddu {
   #expandedPaths = new Set<string[]>();
   #searchPath: TreePath = "";
   #items: DduItem[] = [];
+  #expandedItems: Set<DduItem> = new Set();
 
   constructor(loader: Loader) {
     this.#loader = loader;
@@ -219,6 +220,7 @@ export class Ddu {
       }
     } else {
       this.#gatherStates = {};
+      this.#expandedItems.clear();
       this.#options = options;
       await this.setInput(denops, this.#options.input);
     }
@@ -1186,11 +1188,11 @@ export class Ddu {
     denops: Denops,
     items: ExpandItem[],
   ): Promise<void> {
-    await Promise.all(items.map((item) => {
+    for (const item of items.sort((a, b) => a.item.__level - b.item.__level)) {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
-      return this.expandItem(
+      await this.expandItem(
         denops,
         item.item,
         item.search === undefined
@@ -1204,7 +1206,7 @@ export class Ddu {
             preventRedraw: true,
           },
       );
-    }));
+    }
 
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
     if (ui && !this.shouldStopCurrentContext()) {
@@ -1255,6 +1257,7 @@ export class Ddu {
 
     this.#setExpanded(convertTreePath(parent.treePath));
     parent.__expanded = true;
+    this.#expandedItems.add(parent);
 
     // Set path
     const savePath = this.#context.path;
@@ -1447,6 +1450,7 @@ export class Ddu {
 
       this.#setUnexpanded(convertTreePath(item.treePath));
       item.__expanded = false;
+      this.#expandedItems.delete(item);
 
       const columnItems = [item];
       await this.#callColumns(
@@ -1508,6 +1512,14 @@ export class Ddu {
         });
       }
     }
+  }
+
+  async restoreTree(
+    denops: Denops,
+  ): Promise<void> {
+    await this.expandItems(denops, [... this.#expandedItems].map((item) => ({
+      item,
+    })));
   }
 
   async uiVisible(
