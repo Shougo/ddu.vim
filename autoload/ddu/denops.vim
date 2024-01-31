@@ -100,7 +100,9 @@ function s:init() abort
   " NOTE: ddu.vim must be registered manually.
 
   " NOTE: denops load may be started
-  if 'g:loaded_denops'->exists() && denops#server#status() ==# 'running'
+  if 'g:loaded_denops'->exists() &&
+        \ (denops#server#status() ==# 'preparing' ||
+        \  denops#server#status() ==# 'running')
     silent! call s:register()
   else
     autocmd ddu User DenopsReady silent! call s:register()
