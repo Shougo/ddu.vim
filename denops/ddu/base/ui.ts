@@ -64,6 +64,7 @@ export type ExpandItemArguments<Params extends BaseUiParams> = {
   uiParams: Params;
   parent: DduItem;
   children: DduItem[];
+  isGrouped: boolean;
 };
 
 export type SearchItemArguments<Params extends BaseUiParams> = {

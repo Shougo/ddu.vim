@@ -203,12 +203,14 @@ export type DduItem =
     __sourceName: string;
     __level: number;
     __expanded: boolean;
+    __groupedPath: string;
   };
 
 export type ExpandItem = {
   item: DduItem;
   maxLevel?: number;
   search?: TreePath;
+  isGrouped?: boolean;
 };
 
 export type DduFilterItems = DduItem[] | {

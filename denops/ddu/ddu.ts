@@ -448,6 +448,7 @@ export class Ddu {
         item.treePath &&
           this.#isExpanded(convertTreePath(item.treePath)),
       ),
+      __groupedPath: "",
     };
   }
 
@@ -668,6 +669,7 @@ export class Ddu {
               maxLevel: -1,
               search: searchPath,
               preventRedraw: true,
+              isGrouped: false,
             },
           );
           return;
@@ -682,6 +684,7 @@ export class Ddu {
             maxLevel: -1,
             search: searchPath,
             preventRedraw: true,
+            isGrouped: false,
           },
         );
       }
@@ -1199,11 +1202,13 @@ export class Ddu {
           ? {
             maxLevel: maxLevel,
             preventRedraw: true,
+            isGrouped: item.isGrouped ?? false,
           }
           : {
             maxLevel: maxLevel,
             search: item.search,
             preventRedraw: true,
+            isGrouped: item.isGrouped ?? false,
           },
       );
     }
@@ -1228,11 +1233,13 @@ export class Ddu {
       // Expand recursively to the maxLevel
       maxLevel: number;
       preventRedraw?: boolean;
+      isGrouped: boolean;
     } | {
       // Expand recursively to find the `search` path
       search: TreePath;
       maxLevel: number;
       preventRedraw?: boolean;
+      isGrouped: boolean;
     },
   ): Promise<DduItem /* searchedItem */ | undefined> {
     if (parent.__level < 0 || !parent.isTree || !parent.treePath) {
@@ -1265,6 +1272,7 @@ export class Ddu {
     this.#context.path = sourceOptions.path;
 
     let children: DduItem[] = [];
+    let isGrouped = false;
 
     try {
       for await (
@@ -1284,6 +1292,13 @@ export class Ddu {
 
       if (this.shouldStopCurrentContext()) {
         return;
+      }
+
+      if (options.isGrouped && children.length === 1 && children[0].isTree) {
+        children[0].word = `${parent.word ?? ""}${children[0].word ?? ""}`;
+        children[0].__level = parent.__level;
+        children[0].__groupedPath = parent.word;
+        isGrouped = true;
       }
 
       // NOTE: parent must be applied columns.
@@ -1334,6 +1349,7 @@ export class Ddu {
         uiParams,
         parent,
         children,
+        isGrouped,
       });
     }
 
@@ -1517,9 +1533,12 @@ export class Ddu {
   async restoreTree(
     denops: Denops,
   ): Promise<void> {
-    await this.expandItems(denops, [... this.#expandedItems].map((item) => ({
-      item,
-    })));
+    await this.expandItems(
+      denops,
+      [...this.#expandedItems].map((item) => ({
+        item,
+      })),
+    );
   }
 
   async uiVisible(
