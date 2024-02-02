@@ -208,6 +208,7 @@ resume			(boolean)
 		Reuse the previous state.  If none exist, a new ddu
 		state is created.
 		NOTE: Uses |ddu-option-name| to search for previous state.
+		NOTE: Both |ddu-option-sources| must be same.
 
 		Default: v:false
 
