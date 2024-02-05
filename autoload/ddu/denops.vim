@@ -10,7 +10,7 @@ function ddu#denops#_request(method, args) abort
   endif
 
   if !ddu#denops#_running()
-    " Lazy call request
+    " Lazy call
     execute printf('autocmd User DenopsPluginPost:ddu call '
           \ .. 's:notify("%s", %s)', a:method, a:args->string())
     return {}
@@ -27,7 +27,7 @@ function ddu#denops#_notify(method, args) abort
   endif
 
   if !ddu#denops#_running()
-    " Lazy call notify
+    " Lazy call
     execute printf('autocmd User DenopsPluginPost:ddu call '
           \ .. 's:notify("%s", %s)', a:method, a:args->string())
     return {}
@@ -101,10 +101,10 @@ function s:init() abort
 
   " NOTE: denops load may be started
   if 'g:loaded_denops'->exists() &&
-        \ (denops#server#status() ==# 'preparing' ||
+        \ ('<amatch>'->expand() ==# 'DenopsReady' ||
         \  denops#server#status() ==# 'running')
-    silent! call s:register()
+    call s:register()
   else
-    autocmd ddu User DenopsReady silent! call s:register()
+    autocmd ddu User DenopsReady call s:register()
   endif
 endfunction

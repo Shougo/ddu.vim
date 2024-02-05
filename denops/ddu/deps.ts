@@ -1,16 +1,16 @@
-export type { Denops } from "https://deno.land/x/denops_std@v6.0.0/mod.ts";
+export type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
 export {
   echo,
   execute,
-} from "https://deno.land/x/denops_std@v6.0.0/helper/mod.ts";
+} from "https://deno.land/x/denops_std@v6.0.1/helper/mod.ts";
 export {
   batch,
   collect,
-} from "https://deno.land/x/denops_std@v6.0.0/batch/mod.ts";
-export * as op from "https://deno.land/x/denops_std@v6.0.0/option/mod.ts";
-export * as fn from "https://deno.land/x/denops_std@v6.0.0/function/mod.ts";
-export * as vars from "https://deno.land/x/denops_std@v6.0.0/variable/mod.ts";
-export * as autocmd from "https://deno.land/x/denops_std@v6.0.0/autocmd/mod.ts";
+} from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
+export * as op from "https://deno.land/x/denops_std@v6.0.1/option/mod.ts";
+export * as fn from "https://deno.land/x/denops_std@v6.0.1/function/mod.ts";
+export * as vars from "https://deno.land/x/denops_std@v6.0.1/variable/mod.ts";
+export * as autocmd from "https://deno.land/x/denops_std@v6.0.1/autocmd/mod.ts";
 export { ensure, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
 export {
   assertEquals,
