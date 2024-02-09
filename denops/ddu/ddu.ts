@@ -94,6 +94,7 @@ type RedrawOptions = {
 
 type ItemAction = {
   userSource: UserSource;
+  sourceIndex: number;
   sourceOptions: SourceOptions;
   sourceParams: BaseSourceParams;
   kindOptions: KindOptions;
@@ -1000,9 +1001,8 @@ export class Ddu {
       ...new Set(items.map((item) => item.__sourceIndex)),
     ];
 
-    const userSource = this.#options.sources[
-      indexes.length > 0 ? indexes[0] : 0
-    ];
+    const sourceIndex = indexes.length > 0 ? indexes[0] : 0;
+    const userSource = this.#options.sources[sourceIndex];
     const [sourceOptions, sourceParams] = sourceArgs(
       source,
       this.#options,
@@ -1051,6 +1051,7 @@ export class Ddu {
 
     return {
       userSource,
+      sourceIndex,
       sourceOptions,
       sourceParams,
       kindOptions,
@@ -1149,6 +1150,9 @@ export class Ddu {
       if (this.#context.path.length > 0) {
         this.#context.pathHistories.push(this.#context.path);
       }
+
+      // Overwrite userSource
+      this.#options.sources[itemAction.sourceIndex] = itemAction.userSource;
 
       this.#context.path = itemAction.sourceOptions.path;
 
