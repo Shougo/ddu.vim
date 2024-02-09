@@ -26,5 +26,5 @@ export { Lock } from "https://deno.land/x/async@v2.1.0/mod.ts";
 export {
   basename,
   dirname,
-  SEP as pathsep,
+  SEPARATOR as pathsep,
 } from "https://deno.land/std@0.215.0/path/mod.ts";
