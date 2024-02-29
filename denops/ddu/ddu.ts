@@ -2155,7 +2155,7 @@ export class Ddu {
     if (!source) {
       return;
     }
-    const kindName = source.kind;
+    const kindName = item.kind ?? source.kind;
 
     const kind = await this.getKind(denops, kindName);
     if (!kind || !kind.getPreviewer) {
