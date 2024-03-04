@@ -112,6 +112,12 @@ actionParams		(dictionary)
 
 		Default: {}
 
+                                                          *ddu-option-actions*
+actions			(string[])
+		It is a list of use action names instead of all actions.
+
+		Default: []
+
                                                     *ddu-option-columnOptions*
 columnOptions		(dictionary)
 		It is a dictionary that maps column names to its options.

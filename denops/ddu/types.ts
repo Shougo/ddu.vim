@@ -95,6 +95,7 @@ export type Context = {
 export type DduOptions = {
   actionOptions: Record<ActionName, Partial<ActionOptions>>;
   actionParams: Record<ActionName, Partial<BaseActionParams>>;
+  actions: string[];
   columnOptions: Record<ColumnName, Partial<ColumnOptions>>;
   columnParams: Record<ColumnName, Partial<BaseColumnParams>>;
   expandInput: boolean;
@@ -122,15 +123,18 @@ export type DduOptions = {
 
 export type UserOptions = Record<string, unknown>;
 
+export type UiAction = string | UiActionCallback<BaseUiParams>;
+export type ItemAction = string | ActionCallback<BaseActionParams>;
+
 export type UiOptions = {
-  actions: Record<ActionName, string | UiActionCallback<BaseUiParams>>;
+  actions: Record<ActionName, UiAction>;
   defaultAction: string;
   persist: boolean;
   toggle: boolean;
 };
 
 export type SourceOptions = {
-  actions: Record<ActionName, string | ActionCallback<BaseActionParams>>;
+  actions: Record<ActionName, ItemAction>;
   columns: UserColumn[];
   converters: UserFilter[];
   defaultAction: string;
@@ -155,7 +159,7 @@ export type ColumnOptions = {
 };
 
 export type KindOptions = {
-  actions: Record<ActionName, string | ActionCallback<BaseActionParams>>;
+  actions: Record<ActionName, ItemAction>;
   defaultAction: string;
 };
 

@@ -453,9 +453,13 @@ export function main(denops: Denops) {
       const ddu = getDdu(name);
       const ret = await ddu.getItemActionNames(denops, items);
       const actions = ret && ret.actions ? Object.keys(ret.actions) : [];
+      const useActions = ddu.getOptions().actions;
       for (const aliasAction of loader.getAliasNames("action")) {
         const alias = loader.getAlias("action", aliasAction);
-        if (alias && actions.indexOf(alias) >= 0) {
+        if (
+          alias && actions.indexOf(alias) >= 0 &&
+          (useActions.length === 0 || useActions.includes(aliasAction))
+        ) {
           actions.push(aliasAction);
         }
       }

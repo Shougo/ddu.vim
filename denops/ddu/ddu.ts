@@ -12,6 +12,7 @@ import {
   Action,
   ActionFlags,
   ActionHistory,
+  ActionName,
   ActionOptions,
   BaseActionParams,
   BaseColumn,
@@ -33,6 +34,7 @@ import {
   ExpandItem,
   FilterOptions,
   Item,
+  ItemAction,
   KindOptions,
   PreviewContext,
   Previewer,
@@ -92,7 +94,7 @@ type RedrawOptions = {
   restoreItemState?: boolean;
 };
 
-type ItemAction = {
+type ItemActionInfo = {
   userSource: UserSource;
   sourceIndex: number;
   sourceOptions: SourceOptions;
@@ -968,15 +970,30 @@ export class Ddu {
       this.#options.sources[indexes.length > 0 ? indexes[0] : 0],
     );
 
+    const actions = Object.assign(
+      kind.actions,
+      kindOptions.actions,
+      source.actions,
+      sourceOptions.actions,
+    );
+
+    // Filter by options.actions
+    const filteredActions = this.#options.actions.length === 0
+      ? actions
+      : Object.keys(actions).reduce(
+        (acc: Record<ActionName, ItemAction>, key) => {
+          if (this.#options.actions.includes(key)) {
+            acc[key] = actions[key];
+          }
+          return acc;
+        },
+        {},
+      );
+
     return {
       source,
       kind,
-      actions: Object.assign(
-        kind.actions,
-        kindOptions.actions,
-        source.actions,
-        sourceOptions.actions,
-      ),
+      actions: filteredActions,
     };
   }
 
@@ -985,7 +1002,7 @@ export class Ddu {
     actionName: string,
     items: DduItem[],
     userActionParams: BaseActionParams,
-  ): Promise<ItemAction | undefined> {
+  ): Promise<ItemActionInfo | undefined> {
     if (items.length === 0) {
       return;
     }
