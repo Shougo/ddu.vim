@@ -92,7 +92,7 @@ function s:init() abort
   augroup ddu
     autocmd!
     autocmd User DenopsPluginPost:ddu let g:ddu#_initialized = v:true
-    autocmd User Ddu:redraw :
+    autocmd User Ddu:redraw,Ddu:uiReady :
   augroup END
 
   let g:ddu#_started = reltime()

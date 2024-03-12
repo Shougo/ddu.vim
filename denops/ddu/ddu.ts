@@ -895,13 +895,14 @@ export class Ddu {
     if (flags & ActionFlags.RefreshItems) {
       await this.refresh(denops);
     } else if (flags & ActionFlags.Redraw) {
-      await ui.redraw({
+      await uiRedraw(
         denops,
-        context: this.#context,
-        options: this.#options,
+        this,
+        this.#uiRedrawLock,
+        ui,
         uiOptions,
         uiParams,
-      });
+      );
     }
   }
 
@@ -1192,13 +1193,14 @@ export class Ddu {
       this.#resetQuitted();
 
       if (ui) {
-        await ui.redraw({
+        await uiRedraw(
           denops,
-          context: this.#context,
-          options: this.#options,
+          this,
+          this.#uiRedrawLock,
+          ui,
           uiOptions,
           uiParams,
-        });
+        );
       }
     }
 
@@ -2450,6 +2452,14 @@ async function uiRedraw<
         return;
       }
 
+      const prevWinids = await ui.winIds({
+        denops,
+        context,
+        options,
+        uiOptions,
+        uiParams,
+      });
+
       await ui.redraw({
         denops,
         context,
@@ -2464,6 +2474,19 @@ async function uiRedraw<
       }
 
       await denops.cmd("doautocmd <nomodeline> User Ddu:redraw");
+
+      const winIds = await ui.winIds({
+        denops,
+        context,
+        options,
+        uiOptions,
+        uiParams,
+      });
+
+      if (winIds.length > prevWinids.length) {
+        // NOTE: UI window is generated.
+        await denops.cmd("doautocmd <nomodeline> User Ddu:uiReady");
+      }
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes(" E523: ")) {
         // NOTE: It may be called on invalid state
