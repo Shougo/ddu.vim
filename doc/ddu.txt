@@ -1499,25 +1499,25 @@ syntax			(string)			(Optional)
 ==============================================================================
 FAQ                                                                  *ddu-faq*
 
-FAQ 1:							|ddu-faq-1|
+FAQ 1:                                                             |ddu-faq-1|
 	How to donate money to you?
 
-FAQ 2:							|ddu-faq-2|
+FAQ 2:                                                             |ddu-faq-2|
 	Why does ddu.vim not include any default extra files?
 
-FAQ 3:							|ddu-faq-3|
+FAQ 3:                                                             |ddu-faq-3|
 	Why ddu extra plugins cannot have default options(Not params)?
 
-FAQ 4:							|ddu-faq-4|
+FAQ 4:                                                             |ddu-faq-4|
 	I want to use ":Ddu" command like ":Denite" in denite.nvim.
 
-FAQ 5:							|ddu-faq-5|
+FAQ 5:                                                             |ddu-faq-5|
 	ddu.vim starting is slow.
 
-FAQ 6:							|ddu-faq-6|
+FAQ 6:                                                             |ddu-faq-6|
 	|:cnext| / |:cprevious| like commands are available?
 
-FAQ 7:							|ddu-faq-7|
+FAQ 7:                                                             |ddu-faq-7|
 	I want to execute grep action from items.
 
 
