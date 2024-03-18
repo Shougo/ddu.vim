@@ -1625,7 +1625,9 @@ export class Ddu {
   }
 
   async getCurrentOptions(denops: Denops): Promise<DduOptions> {
-    const ret = structuredClone(this.#options);
+    // NOTE: Cannot use structuredClone().
+    // It may contain functions.
+    const ret = Object.assign(this.#options);
 
     // Merge UI options
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
