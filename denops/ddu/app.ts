@@ -463,7 +463,7 @@ export function main(denops: Denops) {
           actions.push(aliasAction);
         }
       }
-      return actions;
+      return actions.sort();
     },
     async getFilter(arg1: unknown, arg2: unknown): Promise<
       [
