@@ -906,7 +906,7 @@ export class Ddu {
     }
   }
 
-  async getItemActionNames(
+  async getItemActions(
     denops: Denops,
     items: DduItem[],
   ): Promise<ItemActions | null> {
@@ -1008,7 +1008,7 @@ export class Ddu {
       return;
     }
 
-    const itemActions = await this.getItemActionNames(denops, items);
+    const itemActions = await this.getItemActions(denops, items);
     if (!itemActions) {
       return;
     }

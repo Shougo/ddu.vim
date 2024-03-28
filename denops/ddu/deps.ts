@@ -15,16 +15,16 @@ export { ensure, is } from "https://deno.land/x/unknownutil@v3.17.0/mod.ts";
 export {
   assertEquals,
   equal,
-} from "https://deno.land/std@0.220.1/assert/mod.ts";
-export { parse, toFileUrl } from "https://deno.land/std@0.220.1/path/mod.ts";
+} from "https://deno.land/std@0.221.0/assert/mod.ts";
+export { parse, toFileUrl } from "https://deno.land/std@0.221.0/path/mod.ts";
 export {
   deadline,
   DeadlineError,
-} from "https://deno.land/std@0.220.1/async/mod.ts";
+} from "https://deno.land/std@0.221.0/async/mod.ts";
 export { TimeoutError } from "https://deno.land/x/msgpack_rpc@v4.0.1/response_waiter.ts";
 export { Lock } from "https://deno.land/x/async@v2.1.0/mod.ts";
 export {
   basename,
   dirname,
   SEPARATOR as pathsep,
-} from "https://deno.land/std@0.220.1/path/mod.ts";
+} from "https://deno.land/std@0.221.0/path/mod.ts";
