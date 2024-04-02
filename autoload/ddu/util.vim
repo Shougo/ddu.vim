@@ -2,8 +2,7 @@ const s:is_windows = has('win32') || has('win64')
 
 function ddu#util#print_error(string, name = 'ddu') abort
   echohl Error
-  echomsg printf('[%s] %s', a:name,
-        \ a:string->type() ==# v:t_string ? a:string : a:string->string())
+  echomsg printf('[%s] %s', a:name, a:string->string())
   echohl None
 endfunction
 
