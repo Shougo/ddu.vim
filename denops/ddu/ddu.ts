@@ -2245,7 +2245,7 @@ export class Ddu {
     }
 
     // NOTE: Use deepcopy.  Because of filters may break original items.
-    let items = structuredClone(state.items);
+    let items = structuredClone(state.items) as DduItem[];
     const allItems = items.length;
 
     items = await this.#callFilters(
