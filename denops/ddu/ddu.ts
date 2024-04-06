@@ -184,7 +184,7 @@ class GatherState<
         // Do not abort output stream.
         preventAbort: true,
       })
-      .catch((reason) => {
+      .catch(() => {
         appendStream.writable.close().catch(() => {
           // Prevent errors if already closed.
         });
