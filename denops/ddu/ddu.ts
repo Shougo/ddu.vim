@@ -726,7 +726,7 @@ export class Ddu {
         restoreItemState: opts.restoreItemState || restoreItemState,
         // Merge all signals
         signal: signal && opts.signal && signal !== opts.signal
-          ? chainSignal(new AbortController(), signal, opts.signal).signal
+          ? AbortSignal.any([signal, opts.signal])
           : opts.signal ?? signal,
       };
     } else {
@@ -2821,15 +2821,6 @@ function convertUserString<T>(user: string | T) {
 function isParentPath(checkPath: string[], searchPath: string[]) {
   return checkPath !== searchPath &&
     searchPath.join(pathsep).startsWith(checkPath.join(pathsep) + pathsep);
-}
-
-function chainSignal(controller: AbortController, ...signals: AbortSignal[]) {
-  for (const signal of signals) {
-    signal.addEventListener("abort", () => controller.abort(signal.reason), {
-      signal: controller.signal,
-    });
-  }
-  return controller;
 }
 
 Deno.test("sourceArgs", () => {
