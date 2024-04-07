@@ -53,7 +53,7 @@ sure whether you have this.
 
 ### Requirements
 
-Ddu.vim requires both Deno 1.38+ and denops.vim.
+Ddu.vim requires both Deno 1.40+ and denops.vim.
 
 - <https://deno.land/>
 - <https://github.com/vim-denops/denops.vim>

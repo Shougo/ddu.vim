@@ -67,7 +67,7 @@ INSTALL                                                          *ddu-install*
 NOTE: ddu.vim requires Neovim (0.8.0+) or Vim 9.0.1276+ (latest is
 recommended).
 
-Please install both Deno 1.38+ and "denops.vim".
+Please install both Deno 1.40+ and "denops.vim".
 
 https://deno.land/
 https://github.com/vim-denops/denops.vim
@@ -1606,6 +1606,9 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY                                              *ddu-compatibility*
+
+2024.04.07
+* Deno 1.40+ is required.
 
 2024.01.19
 * Change "ddu#redraw()" interface.
