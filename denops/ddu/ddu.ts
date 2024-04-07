@@ -381,7 +381,7 @@ export class Ddu {
       .pipeThrough(this.#createGatherStateTransformer(denops))
       .tee();
 
-    // Wait initialized all sources. Source onInit() must be called before UI
+    // Wait until initialized all sources. Source onInit() must be called before UI.
     await Array.fromAsync(sourcesInitialized);
 
     // UI should load before refresh.
@@ -554,7 +554,7 @@ export class Ddu {
 
     await this.#callOnRefreshItemsHooks(denops, sourceOptions);
 
-    // Get path option, or current directory instead if it is empty
+    // Get path option, or current directory instead if it is empty.
     const path = sourceOptions.path.length > 0
       ? sourceOptions.path
       : await fn.getcwd(denops);
@@ -568,7 +568,7 @@ export class Ddu {
       }
 
       if (!this.#options.sync && newItems.length > 0) {
-        // Do not await inside loop
+        // Do not await inside loop.
         this.redraw(denops);
       }
     }
@@ -1481,7 +1481,7 @@ export class Ddu {
     options: {
       /**
        * If specified, expand recursively to find it path.
-       * Otherwise, Expand recursively to the maxLevel
+       * Otherwise, Expand recursively to the maxLevel.
        */
       search?: TreePath;
       maxLevel?: number;
