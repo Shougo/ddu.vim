@@ -54,7 +54,7 @@ import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 import { Loader } from "./loader.ts";
-import { convertUserString, errorException } from "./utils.ts";
+import { convertUserString, errorException, printError } from "./utils.ts";
 
 type ItemActions = {
   source: BaseSource<BaseSourceParams, unknown>;
@@ -97,8 +97,8 @@ export async function getItemActions(
   ];
   if (sources.length === 0 || sources.length !== 1 && indexes.length !== 1) {
     if (sources.length > 0) {
-      await denops.call(
-        "ddu#util#print_error",
+      await printError(
+        denops,
         `You must not mix multiple sources items: "${
           sources.map((source) => source?.name)
         }"`,
@@ -119,10 +119,7 @@ export async function getItemActions(
     ),
   ] as string[];
   if (kinds.length !== 1) {
-    await denops.call(
-      "ddu#util#print_error",
-      `You must not mix multiple kinds: "${kinds}"`,
-    );
+    await printError(denops, `You must not mix multiple kinds: "${kinds}"`);
     return null;
   }
 
@@ -208,8 +205,8 @@ export async function getItemAction(
     }
 
     if (actionName === "") {
-      await denops.call(
-        "ddu#util#print_error",
+      await printError(
+        denops,
         `The default action is not defined for the items`,
       );
       return;
@@ -230,10 +227,7 @@ export async function getItemAction(
     | string
     | Action<BaseActionParams>;
   if (!action) {
-    await denops.call(
-      "ddu#util#print_error",
-      `Not found action: ${actionName}`,
-    );
+    await printError(denops, `Not found action: ${actionName}`);
     return;
   }
 
@@ -320,8 +314,8 @@ export async function getUi(
     await loader.autoload(denops, "ui", userUi.name);
 
     if (options.profile) {
-      await denops.call(
-        "ddu#util#print_error",
+      await printError(
+        denops,
         `Load ${userUi.name}: ${Date.now() - startTime} ms`,
       );
     }
@@ -330,10 +324,7 @@ export async function getUi(
   const ui = loader.getUi(options.name, userUi.name);
   if (!ui) {
     if (userUi.name.length !== 0) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Not found ui: "${userUi.name}"`,
-      );
+      await printError(denops, `Not found ui: "${userUi.name}"`);
     }
     return [
       undefined,
@@ -367,19 +358,13 @@ export async function getSource(
     await loader.autoload(denops, "source", name);
 
     if (options.profile) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Load ${name}: ${Date.now() - startTime} ms`,
-      );
+      await printError(denops, `Load ${name}: ${Date.now() - startTime} ms`);
     }
   }
 
   const source = loader.getSource(options.name, name);
   if (!source) {
-    await denops.call(
-      "ddu#util#print_error",
-      `Not found source: ${name}`,
-    );
+    await printError(denops, `Not found source: ${name}`);
     return [
       undefined,
       defaultSourceOptions(),
@@ -416,8 +401,8 @@ export async function getFilter(
     await loader.autoload(denops, "filter", userFilter.name);
 
     if (options.profile) {
-      await denops.call(
-        "ddu#util#print_error",
+      await printError(
+        denops,
         `Load ${userFilter.name}: ${Date.now() - startTime} ms`,
       );
     }
@@ -425,10 +410,7 @@ export async function getFilter(
 
   const filter = loader.getFilter(options.name, userFilter.name);
   if (!filter) {
-    await denops.call(
-      "ddu#util#print_error",
-      `Not found filter: ${userFilter.name}`,
-    );
+    await printError(denops, `Not found filter: ${userFilter.name}`);
     return [
       undefined,
       defaultFilterOptions(),
@@ -460,20 +442,14 @@ async function getKind(
     await loader.autoload(denops, "kind", name);
 
     if (options.profile) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Load ${name}: ${Date.now() - startTime} ms`,
-      );
+      await printError(denops, `Load ${name}: ${Date.now() - startTime} ms`);
     }
   }
 
   const kind = loader.getKind(options.name, name);
   if (!kind) {
     if (name !== "base") {
-      await denops.call(
-        "ddu#util#print_error",
-        `Not found kind: ${name}`,
-      );
+      await printError(denops, `Not found kind: ${name}`);
     }
     return undefined;
   }
@@ -501,8 +477,8 @@ export async function getColumn(
     await loader.autoload(denops, "column", userColumn.name);
 
     if (options.profile) {
-      await denops.call(
-        "ddu#util#print_error",
+      await printError(
+        denops,
         `Load ${userColumn.name}: ${Date.now() - startTime} ms`,
       );
     }
@@ -510,10 +486,7 @@ export async function getColumn(
 
   const column = loader.getColumn(options.name, userColumn.name);
   if (!column) {
-    await denops.call(
-      "ddu#util#print_error",
-      `Not found column: ${userColumn.name}`,
-    );
+    await printError(denops, `Not found column: ${userColumn.name}`);
     return [
       undefined,
       defaultColumnOptions(),
