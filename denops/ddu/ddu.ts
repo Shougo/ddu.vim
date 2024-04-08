@@ -6,6 +6,7 @@ import {
   fn,
   is,
   Lock,
+  maybe,
   pathsep,
 } from "./deps.ts";
 import {
@@ -131,7 +132,7 @@ type GatherStateAbortable = {
 class GatherState<
   Params extends BaseSourceParams = BaseSourceParams,
   UserData extends unknown = unknown,
-> implements GatherStateAbortable {
+> {
   readonly sourceInfo: AvailableSourceInfo<Params, UserData>;
   readonly itemsStream: ReadableStream<DduItem[]>;
   #items: DduItem[] = [];
@@ -147,37 +148,50 @@ class GatherState<
     },
   ) {
     const { signal: parentSignal } = options ?? {};
-
-    // Chain abort signals.
-    if (parentSignal) {
-      const abortIfMatch = () => {
-        const reason = (parentSignal.reason ?? {}) as GatherStateAbortReason;
-        if (
-          reason.reason !== "cancelToRefresh" ||
-          reason.refreshIndexes.length === 0 ||
-          reason.refreshIndexes.includes(sourceInfo.sourceIndex)
-        ) {
-          this.#aborter.abort(parentSignal.reason);
-        }
-      };
-
-      if (parentSignal.aborted) {
-        abortIfMatch();
-      } else {
-        parentSignal.addEventListener("abort", () => abortIfMatch(), {
-          signal: this.#aborter.signal,
-        });
-      }
-    }
-
     this.sourceInfo = sourceInfo;
+    if (parentSignal) {
+      this.#chainAbortSignal(parentSignal);
+    }
+    this.itemsStream = this.#processItemsStream(itemsStream);
+  }
 
+  #chainAbortSignal(parentSignal: AbortSignal): void {
+    const abortIfTarget = () => {
+      const reason = maybe(
+        parentSignal.reason,
+        is.ObjectOf({ reason: is.String }),
+      ) as GatherStateAbortReason | undefined;
+      if (
+        reason?.reason !== "cancelToRefresh" ||
+        isRefreshTarget(this.sourceInfo.sourceIndex, reason.refreshIndexes)
+      ) {
+        this.#aborter.abort(parentSignal.reason);
+      }
+    };
+
+    if (parentSignal.aborted) {
+      abortIfTarget();
+    } else {
+      parentSignal.addEventListener("abort", () => abortIfTarget(), {
+        signal: this.#aborter.signal,
+      });
+    }
+  }
+
+  #processItemsStream(
+    itemsStream: ReadableStream<DduItem[]>,
+  ): ReadableStream<DduItem[]> {
     const appendStream = new TransformStream<DduItem[], DduItem[]>({
       transform: (newItems, controller) => {
         this.#items = this.#items.concat(newItems);
         controller.enqueue(newItems);
       },
+      flush: () => {
+        // Set done flag before stream closed.
+        this.#isDone = true;
+      },
     });
+
     itemsStream
       .pipeTo(appendStream.writable, {
         signal: this.#aborter.signal,
@@ -190,10 +204,10 @@ class GatherState<
         });
       })
       .finally(() => {
-        this.#isDone = true;
         this.#waitDone.resolve();
       });
-    this.itemsStream = appendStream.readable;
+
+    return appendStream.readable;
   }
 
   get items(): readonly DduItem[] {
@@ -210,10 +224,6 @@ class GatherState<
 
   get signal(): AbortSignal {
     return this.#aborter.signal;
-  }
-
-  abort(reason: GatherStateAbortReason): void {
-    this.#aborter.abort(reason);
   }
 
   async readAll(): Promise<void> {
@@ -237,7 +247,7 @@ export class Ddu {
     & GatherStateAbortable;
   readonly #uiRedrawLock = new Lock(0);
   #waitRedrawComplete?: Promise<void>;
-  #scheduledRedrawOptions?: RedrawOptions;
+  #scheduledRedrawOptions?: Required<RedrawOptions>;
   #startTime = 0;
   readonly #expandedPaths = new Set<string[]>();
   #searchPath: TreePath = "";
@@ -388,7 +398,7 @@ export class Ddu {
     // NOTE: If UI is blocked until refresh, user input will break UI.
     await this.uiRedraw(denops, { signal });
 
-    await this.#refreshSources(denops, gatherStates);
+    await this.#refreshSources(denops, gatherStates, { signal });
 
     this.#initialized = true;
   }
@@ -428,8 +438,7 @@ export class Ddu {
 
     // Initialize UI window
     if (!this.#options.sync) {
-      // Do not await here
-      this.redraw(denops);
+      /* no await */ this.redraw(denops);
     }
 
     const [gatherStates] = this
@@ -521,8 +530,10 @@ export class Ddu {
   async #refreshSources(
     denops: Denops,
     gatherStates: ReadableStream<GatherState>,
+    opts?: { signal?: AbortSignal },
   ): Promise<void> {
-    const aborter = new AbortController();
+    const { signal = this.#aborter.signal } = opts ?? {};
+    const refreshErrorHandler = new AbortController();
     const refreshedSources: Promise<void>[] = [];
 
     await gatherStates.pipeTo(
@@ -530,7 +541,7 @@ export class Ddu {
         write: (state) => {
           refreshedSources.push(
             this.#refreshItems(denops, state).catch((e) => {
-              aborter.abort(e);
+              refreshErrorHandler.abort(e);
             }),
           );
         },
@@ -538,19 +549,16 @@ export class Ddu {
           await Promise.all(refreshedSources);
         },
       }),
-      { signal: aborter.signal },
+      { signal: refreshErrorHandler.signal },
     );
 
-    if (this.#options.sync) {
-      await this.redraw(denops);
-    } else {
-      // Wait complete redraw
-      await this.#waitRedrawComplete;
+    if (!this.#context.done) {
+      await this.redraw(denops, { signal });
     }
   }
 
   async #refreshItems(denops: Denops, state: GatherState): Promise<void> {
-    const { sourceInfo: { sourceOptions }, itemsStream } = state;
+    const { sourceInfo: { sourceOptions }, itemsStream, signal } = state;
 
     await this.#callOnRefreshItemsHooks(denops, sourceOptions);
 
@@ -568,8 +576,7 @@ export class Ddu {
       }
 
       if (!this.#options.sync && newItems.length > 0) {
-        // Do not await inside loop.
-        this.redraw(denops);
+        /* no await */ this.redraw(denops, { signal });
       }
     }
   }
@@ -689,15 +696,8 @@ export class Ddu {
         });
 
         // Wait until the stream closes.
-        await itemsStream.pipeTo(itemTransformer.writable, {
-          // Do not output errors to the stream.
-          preventAbort: true,
-        });
+        await itemsStream.pipeTo(itemTransformer.writable);
       } catch (e: unknown) {
-        itemTransformer.writable.close().catch(() => {
-          // Prevent errors if already closed.
-        });
-
         if (state.signal.aborted && e === state.signal.reason) {
           // Aborted by signal, so do nothing.
         } else {
@@ -716,31 +716,37 @@ export class Ddu {
 
   redraw(
     denops: Denops,
-    opts: RedrawOptions = {},
+    opts?: RedrawOptions,
   ): Promise<unknown> {
+    const newOpts = {
+      restoreItemState: false,
+      signal: this.#aborter.signal,
+      ...opts,
+    };
+
     if (this.#waitRedrawComplete) {
       // Already redrawing, so adding to schedule
-      const { restoreItemState, signal } = this.#scheduledRedrawOptions ?? {};
+      const prevOpts: RedrawOptions = this.#scheduledRedrawOptions ?? {};
       this.#scheduledRedrawOptions = {
         // Override with true
-        restoreItemState: opts.restoreItemState || restoreItemState,
+        restoreItemState: prevOpts.restoreItemState || newOpts.restoreItemState,
         // Merge all signals
-        signal: signal && opts.signal && signal !== opts.signal
-          ? AbortSignal.any([signal, opts.signal])
-          : opts.signal ?? signal,
+        signal: prevOpts.signal && newOpts.signal !== prevOpts.signal
+          ? AbortSignal.any([newOpts.signal, prevOpts.signal])
+          : prevOpts.signal ?? newOpts.signal,
       };
     } else {
       // Start redraw
       const { resolve, reject } = { promise: this.#waitRedrawComplete } =
         Promise.withResolvers<void>();
-      this.#scheduledRedrawOptions = opts;
+      this.#scheduledRedrawOptions = newOpts;
 
       (async () => {
         try {
           while (this.#scheduledRedrawOptions) {
-            const opts = this.#scheduledRedrawOptions;
+            const nextOpts = this.#scheduledRedrawOptions;
             this.#scheduledRedrawOptions = undefined;
-            await this.#redrawInternal(denops, opts);
+            await this.#redrawInternal(denops, nextOpts);
           }
           // All schedules completed
           this.#waitRedrawComplete = undefined;
@@ -756,17 +762,13 @@ export class Ddu {
 
   async #redrawInternal(
     denops: Denops,
-    opts?: RedrawOptions,
+    { restoreItemState, signal }: Required<RedrawOptions>,
   ): Promise<void> {
-    const { restoreItemState = false, signal = this.#aborter.signal } = opts ??
-      {};
-
     if (signal.aborted) {
       return;
     }
 
     // Update current input
-    this.#context.done = true;
     this.#context.doneUi = false;
     this.#context.input = this.#input;
     this.#context.maxItems = 0;
@@ -1034,13 +1036,8 @@ export class Ddu {
     this.#aborter.abort({ reason: "cancelToRefresh", refreshIndexes });
     await Promise.all(
       [...this.#gatherStates]
-        .filter(
-          refreshIndexes.length === 0
-            // Cancel all states.
-            ? () => true
-            // Cancel selected states.
-            : ([_source, state]) =>
-              refreshIndexes.includes(state.sourceInfo.sourceIndex),
+        .filter(([, state]) =>
+          isRefreshTarget(state.sourceInfo.sourceIndex, refreshIndexes)
         )
         .map(([source, state]) => {
           this.#gatherStates.delete(source);
@@ -2821,6 +2818,17 @@ function convertUserString<T>(user: string | T) {
 function isParentPath(checkPath: string[], searchPath: string[]) {
   return checkPath !== searchPath &&
     searchPath.join(pathsep).startsWith(checkPath.join(pathsep) + pathsep);
+}
+
+function isRefreshTarget(
+  sourceIndex: number,
+  refreshIndexes: number[],
+): boolean {
+  return refreshIndexes.length === 0
+    // Target all states.
+    ? true
+    // Target included states.
+    : refreshIndexes.includes(sourceIndex);
 }
 
 Deno.test("sourceArgs", () => {

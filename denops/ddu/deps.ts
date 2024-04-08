@@ -11,7 +11,11 @@ export * as op from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 export * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 export * as vars from "https://deno.land/x/denops_std@v6.4.0/variable/mod.ts";
 export * as autocmd from "https://deno.land/x/denops_std@v6.4.0/autocmd/mod.ts";
-export { ensure, is } from "https://deno.land/x/unknownutil@v3.17.0/mod.ts";
+export {
+  ensure,
+  is,
+  maybe,
+} from "https://deno.land/x/unknownutil@v3.17.0/mod.ts";
 export {
   assertEquals,
   equal,
