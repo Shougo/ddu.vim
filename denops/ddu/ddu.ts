@@ -1036,9 +1036,7 @@ export class Ddu {
     this.#aborter.abort({ reason: "cancelToRefresh", refreshIndexes });
     await Promise.all(
       [...this.#gatherStates]
-        .filter(([sourceIndex]) =>
-          isRefreshTarget(sourceIndex, refreshIndexes)
-        )
+        .filter(([sourceIndex]) => isRefreshTarget(sourceIndex, refreshIndexes))
         .map(([sourceIndex, state]) => {
           this.#gatherStates.delete(sourceIndex);
           return state.waitDone;
