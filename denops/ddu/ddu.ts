@@ -76,9 +76,6 @@ import { defaultActionOptions } from "./base/action.ts";
 import { Loader } from "./loader.ts";
 import { errorException, treePath2Filename } from "./utils.ts";
 
-// deno-lint-ignore no-explicit-any
-type AnySource = BaseSource<any>;
-
 type ItemActions = {
   source: BaseSource<BaseSourceParams, unknown>;
   kind: BaseKind<BaseKindParams>;
@@ -235,7 +232,7 @@ class GatherState<
 
 export class Ddu {
   #loader: Loader;
-  readonly #gatherStates = new Map<AnySource, GatherState>();
+  readonly #gatherStates = new Map<number, GatherState>();
   #input = "";
   #context: Context = defaultContext();
   #options: DduOptions = defaultDduOptions();
@@ -520,7 +517,7 @@ export class Ddu {
           0,
           { signal },
         );
-        this.#gatherStates.set(source, state);
+        this.#gatherStates.set(sourceIndex, state);
 
         controller.enqueue(state);
       },
@@ -776,7 +773,7 @@ export class Ddu {
     const filterResults = (await Promise.all(
       this.#options.sources
         .map((source) => convertUserString(source))
-        .map(async (userSource, index) => {
+        .map(async (userSource, sourceIndex) => {
           const [source, sourceOptions, _] = await this.getSource(
             denops,
             userSource.name,
@@ -788,7 +785,7 @@ export class Ddu {
 
           const sourceInfo: SourceInfo = {
             name: userSource.name,
-            index,
+            index: sourceIndex,
             path: sourceOptions.path,
             kind: source.kind ?? "base",
           };
@@ -796,6 +793,7 @@ export class Ddu {
           const [done, maxItems, items] = await this.#filterItems(
             denops,
             userSource,
+            sourceIndex,
             this.#input,
           );
 
@@ -893,6 +891,7 @@ export class Ddu {
               search: searchPath,
               preventRedraw: true,
               isGrouped: false,
+              signal,
             },
           );
           return;
@@ -908,6 +907,7 @@ export class Ddu {
             search: searchPath,
             preventRedraw: true,
             isGrouped: false,
+            signal,
           },
         );
       }
@@ -1036,11 +1036,11 @@ export class Ddu {
     this.#aborter.abort({ reason: "cancelToRefresh", refreshIndexes });
     await Promise.all(
       [...this.#gatherStates]
-        .filter(([, state]) =>
-          isRefreshTarget(state.sourceInfo.sourceIndex, refreshIndexes)
+        .filter(([sourceIndex]) =>
+          isRefreshTarget(sourceIndex, refreshIndexes)
         )
-        .map(([source, state]) => {
-          this.#gatherStates.delete(source);
+        .map(([sourceIndex, state]) => {
+          this.#gatherStates.delete(sourceIndex);
           return state.waitDone;
         }),
     );
@@ -1508,7 +1508,7 @@ export class Ddu {
     if (source == null) {
       return;
     }
-    const state = this.#gatherStates.get(source);
+    const state = this.#gatherStates.get(sourceIndex);
     if (state == null) {
       return;
     }
@@ -1720,7 +1720,7 @@ export class Ddu {
       if (!item.treePath) {
         continue;
       }
-      const index = item.__sourceIndex;
+      const sourceIndex = item.__sourceIndex;
       const source = this.#loader.getSource(
         this.#options.name,
         item.__sourceName,
@@ -1731,9 +1731,9 @@ export class Ddu {
       const [sourceOptions, _] = sourceArgs(
         source,
         this.#options,
-        this.#options.sources[index],
+        this.#options.sources[sourceIndex],
       );
-      const state = this.#gatherStates.get(source);
+      const state = this.#gatherStates.get(sourceIndex);
       if (state == null) {
         continue;
       }
@@ -2226,6 +2226,7 @@ export class Ddu {
   async #filterItems(
     denops: Denops,
     userSource: UserSource,
+    sourceIndex: number,
     input: string,
   ): Promise<[boolean, number, DduItem[]]> {
     userSource = convertUserString(userSource);
@@ -2236,7 +2237,7 @@ export class Ddu {
       userSource,
     );
 
-    const state = this.#gatherStates.get(source!);
+    const state = this.#gatherStates.get(sourceIndex);
     if (!state || !source) {
       return [false, 0, []];
     }
