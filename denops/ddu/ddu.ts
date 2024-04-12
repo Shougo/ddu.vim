@@ -430,6 +430,7 @@ export class Ddu {
     refreshIndexes: number[] = [],
   ): Promise<void> {
     this.#startTime = Date.now();
+    this.#context.done = false;
 
     await this.cancelToRefresh(refreshIndexes);
 
