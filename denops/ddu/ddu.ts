@@ -1027,13 +1027,14 @@ export class Ddu {
 
   #resetQuitted() {
     this.#quitted = false;
-    this.#resetAbortController();
+    this.#resetAborter();
   }
 
   async cancelToRefresh(
     refreshIndexes: number[] = [],
   ): Promise<void> {
     this.#aborter.abort({ reason: "cancelToRefresh", refreshIndexes });
+
     await Promise.all(
       [...this.#gatherStates]
         .filter(([sourceIndex]) => isRefreshTarget(sourceIndex, refreshIndexes))
@@ -1043,10 +1044,10 @@ export class Ddu {
         }),
     );
 
-    this.#resetAbortController();
+    this.#resetAborter();
   }
 
-  #resetAbortController() {
+  #resetAborter() {
     if (!this.#quitted && this.#aborter.signal.aborted) {
       this.#aborter = new AbortController();
     }
