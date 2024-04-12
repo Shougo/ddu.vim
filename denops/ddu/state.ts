@@ -1,0 +1,145 @@
+import { is, maybe } from "./deps.ts";
+import {
+  BaseSource,
+  BaseSourceParams,
+  DduItem,
+  SourceOptions,
+} from "./types.ts";
+
+export type AvailableSourceInfo<
+  Params extends BaseSourceParams = BaseSourceParams,
+  UserData extends unknown = unknown,
+> = {
+  sourceIndex: number;
+  source: BaseSource<Params, UserData>;
+  sourceOptions: SourceOptions;
+  sourceParams: Params;
+};
+
+type GatherStateAbortReason =
+  | {
+    reason: "quit";
+  }
+  | {
+    reason: "cancelToRefresh";
+    refreshIndexes: number[];
+  };
+
+export type GatherStateAbortable = {
+  abort(reason: GatherStateAbortReason): void;
+};
+
+export class GatherState<
+  Params extends BaseSourceParams = BaseSourceParams,
+  UserData extends unknown = unknown,
+> {
+  readonly sourceInfo: AvailableSourceInfo<Params, UserData>;
+  readonly itemsStream: ReadableStream<DduItem[]>;
+  #items: DduItem[] = [];
+  #isDone = false;
+  #waitDone = Promise.withResolvers<void>();
+  #aborter = new AbortController();
+
+  constructor(
+    sourceInfo: AvailableSourceInfo<Params, UserData>,
+    itemsStream: ReadableStream<DduItem[]>,
+    options?: {
+      signal?: AbortSignal;
+    },
+  ) {
+    const { signal: parentSignal } = options ?? {};
+    this.sourceInfo = sourceInfo;
+    if (parentSignal) {
+      this.#chainAbortSignal(parentSignal);
+    }
+    this.itemsStream = this.#processItemsStream(itemsStream);
+  }
+
+  #chainAbortSignal(parentSignal: AbortSignal): void {
+    const abortIfTarget = () => {
+      const reason = maybe(
+        parentSignal.reason,
+        is.ObjectOf({ reason: is.String }),
+      ) as GatherStateAbortReason | undefined;
+      if (
+        reason?.reason !== "cancelToRefresh" ||
+        isRefreshTarget(this.sourceInfo.sourceIndex, reason.refreshIndexes)
+      ) {
+        this.#aborter.abort(parentSignal.reason);
+      }
+    };
+
+    if (parentSignal.aborted) {
+      abortIfTarget();
+    } else {
+      parentSignal.addEventListener("abort", () => abortIfTarget(), {
+        signal: this.#aborter.signal,
+      });
+    }
+  }
+
+  #processItemsStream(
+    itemsStream: ReadableStream<DduItem[]>,
+  ): ReadableStream<DduItem[]> {
+    const appendStream = new TransformStream<DduItem[], DduItem[]>({
+      transform: (newItems, controller) => {
+        this.#items = this.#items.concat(newItems);
+        controller.enqueue(newItems);
+      },
+      flush: () => {
+        // Set done flag before stream closed.
+        this.#isDone = true;
+      },
+    });
+
+    itemsStream
+      .pipeTo(appendStream.writable, {
+        signal: this.#aborter.signal,
+        // Do not abort output stream.
+        preventAbort: true,
+      })
+      .catch(() => {
+        appendStream.writable.close().catch(() => {
+          // Prevent errors if already closed.
+        });
+      })
+      .finally(() => {
+        this.#waitDone.resolve();
+      });
+
+    return appendStream.readable;
+  }
+
+  get items(): readonly DduItem[] {
+    return this.#items;
+  }
+
+  get isDone(): boolean {
+    return this.#isDone;
+  }
+
+  get waitDone(): Promise<void> {
+    return this.#waitDone.promise;
+  }
+
+  get signal(): AbortSignal {
+    return this.#aborter.signal;
+  }
+
+  async readAll(): Promise<void> {
+    if (this.itemsStream != null) {
+      await Array.fromAsync(this.itemsStream);
+    }
+  }
+}
+
+export function isRefreshTarget(
+  sourceIndex: number,
+  refreshIndexes: number[],
+): boolean {
+  return refreshIndexes.length === 0
+    // Target all states.
+    ? true
+    // Target included states.
+    : refreshIndexes.includes(sourceIndex);
+}
