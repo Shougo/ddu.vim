@@ -13,8 +13,6 @@ import {
   BaseActionParams,
   BaseSource,
   BaseSourceParams,
-  BaseUi,
-  BaseUiParams,
   Clipboard,
   Context,
   DduEvent,
@@ -26,7 +24,6 @@ import {
   SourceInfo,
   SourceOptions,
   TreePath,
-  UiOptions,
   UserOptions,
   UserSource,
 } from "./types.ts";
@@ -52,6 +49,7 @@ import {
 import {
   callColumns,
   callFilters,
+  callOnRefreshItemsHooks,
   getColumn,
   getFilter,
   getItemAction,
@@ -61,6 +59,7 @@ import {
   initSource,
   sourceArgs,
   uiRedraw,
+  uiSearchItem,
 } from "./ext.ts";
 
 type RedrawOptions = {
@@ -126,7 +125,13 @@ export class Ddu {
       if (!ui) {
         return;
       }
-      await this.uiQuit(denops, ui, uiOptions, uiParams);
+      await ui.quit({
+        denops,
+        context: this.#context,
+        options: this.#options,
+        uiOptions,
+        uiParams,
+      });
       this.quit();
     }
 
@@ -165,7 +170,13 @@ export class Ddu {
       }
 
       if (checkToggle && uiOptions.toggle) {
-        await this.uiQuit(denops, ui, uiOptions, uiParams);
+        await ui.quit({
+          denops,
+          context: this.#context,
+          options: this.#options,
+          uiOptions,
+          uiParams,
+        });
         this.quit();
         return;
       }
@@ -188,8 +199,9 @@ export class Ddu {
         this.#context.done = true;
         await uiRedraw(
           denops,
-          this,
           this.#uiRedrawLock,
+          this.#context,
+          this.#options,
           ui,
           uiOptions,
           uiParams,
@@ -220,7 +232,13 @@ export class Ddu {
     );
 
     if (checkToggle && ui && uiOptions.toggle) {
-      await this.uiQuit(denops, ui, uiOptions, uiParams);
+      await ui.quit({
+        denops,
+        context: this.#context,
+        options: this.#options,
+        uiOptions,
+        uiParams,
+      });
       this.quit();
       return;
     }
@@ -267,7 +285,13 @@ export class Ddu {
     if (!ui) {
       return;
     }
-    await this.uiQuit(denops, ui, uiOptions, uiParams);
+    await ui.quit({
+      denops,
+      context: this.#context,
+      options: this.#options,
+      uiOptions,
+      uiParams,
+    });
     this.quit();
 
     // Disable resume
@@ -419,7 +443,12 @@ export class Ddu {
   async #refreshItems(denops: Denops, state: GatherState): Promise<void> {
     const { sourceInfo: { sourceOptions }, itemsStream, signal } = state;
 
-    await this.#callOnRefreshItemsHooks(denops, sourceOptions);
+    await callOnRefreshItemsHooks(
+      denops,
+      this.#loader,
+      this.#options,
+      sourceOptions,
+    );
 
     // Get path option, or current directory instead if it is empty.
     const path = sourceOptions.path.length > 0
@@ -438,30 +467,6 @@ export class Ddu {
         /* no await */ this.redraw(denops, { signal });
       }
     }
-  }
-
-  async #callOnRefreshItemsHooks(
-    denops: Denops,
-    sourceOptions: SourceOptions,
-  ): Promise<void> {
-    const filters = [
-      ...sourceOptions.matchers,
-      ...sourceOptions.sorters,
-      ...sourceOptions.converters,
-    ];
-    await Promise.all(filters.map(async (userFilter) => {
-      const [filter, filterOptions, filterParams] = await getFilter(
-        denops,
-        this.#loader,
-        this.#options,
-        userFilter,
-      );
-      await filter?.onRefreshItems?.({
-        denops,
-        filterOptions,
-        filterParams,
-      });
-    }));
   }
 
   #newDduItem<
@@ -795,7 +800,13 @@ export class Ddu {
 
     await this.uiRedraw(denops, { signal });
     if (searchTargetItem && !signal.aborted) {
-      await this.uiSearchItem(denops, searchTargetItem);
+      await uiSearchItem(
+        denops,
+        this.#loader,
+        this.#context,
+        this.#options,
+        searchTargetItem,
+      );
     }
 
     this.#context.doneUi = this.#context.done;
@@ -818,53 +829,14 @@ export class Ddu {
 
     await uiRedraw(
       denops,
-      this,
       this.#uiRedrawLock,
+      this.#context,
+      this.#options,
       ui,
       uiOptions,
       uiParams,
       signal,
     );
-  }
-
-  async uiSearchItem(
-    denops: Denops,
-    searchItem: DduItem,
-  ): Promise<void> {
-    const [ui, uiOptions, uiParams] = await getUi(
-      denops,
-      this.#loader,
-      this.#options,
-    );
-    if (!ui) {
-      return;
-    }
-
-    await ui.searchItem({
-      denops,
-      context: this.#context,
-      options: this.#options,
-      uiOptions,
-      uiParams,
-      item: searchItem,
-    });
-  }
-
-  async uiQuit<
-    Params extends BaseUiParams,
-  >(
-    denops: Denops,
-    ui: BaseUi<Params>,
-    uiOptions: UiOptions,
-    uiParams: Params,
-  ): Promise<void> {
-    await ui.quit({
-      denops,
-      context: this.#context,
-      options: this.#options,
-      uiOptions,
-      uiParams,
-    });
   }
 
   async onEvent(
@@ -902,7 +874,7 @@ export class Ddu {
   }
 
   quit() {
-    // NOTE: quitted flag must be called after uiQuit().
+    // NOTE: quitted flag must be called after ui.quit().
     this.#quitted = true;
     this.#aborter.abort({ reason: "quit" });
     this.#context.done = true;
@@ -1028,8 +1000,9 @@ export class Ddu {
     } else if (flags & ActionFlags.Redraw) {
       await uiRedraw(
         denops,
-        this,
         this.#uiRedrawLock,
+        this.#context,
+        this.#options,
         ui,
         uiOptions,
         uiParams,
@@ -1077,7 +1050,13 @@ export class Ddu {
 
       if (itemAction.actionOptions.quit && visible) {
         // Quit UI before action
-        await this.uiQuit(denops, ui, uiOptions, uiParams);
+        await ui.quit({
+          denops,
+          context: this.#context,
+          options: this.#options,
+          uiOptions,
+          uiParams,
+        });
       }
     }
 
@@ -1161,8 +1140,9 @@ export class Ddu {
       if (ui) {
         await uiRedraw(
           denops,
-          this,
           this.#uiRedrawLock,
+          this.#context,
+          this.#options,
           ui,
           uiOptions,
           uiParams,
@@ -1422,8 +1402,9 @@ export class Ddu {
     if (ui && !signal.aborted && !preventRedraw) {
       await uiRedraw(
         denops,
-        this,
         this.#uiRedrawLock,
+        this.#context,
+        this.#options,
         ui,
         uiOptions,
         uiParams,
@@ -1540,8 +1521,9 @@ export class Ddu {
     if (!preventRedraw && !signal.aborted) {
       await uiRedraw(
         denops,
-        this,
         this.#uiRedrawLock,
+        this.#context,
+        this.#options,
         ui,
         uiOptions,
         uiParams,

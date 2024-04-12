@@ -54,7 +54,6 @@ import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 import { Loader } from "./loader.ts";
-import { Ddu } from "./ddu.ts";
 import { convertUserString, errorException } from "./utils.ts";
 
 type ItemActions = {
@@ -251,6 +250,58 @@ export async function getItemAction(
   };
 }
 
+export async function callOnRefreshItemsHooks(
+  denops: Denops,
+  loader: Loader,
+  options: DduOptions,
+  sourceOptions: SourceOptions,
+): Promise<void> {
+  const filters = [
+    ...sourceOptions.matchers,
+    ...sourceOptions.sorters,
+    ...sourceOptions.converters,
+  ];
+  await Promise.all(filters.map(async (userFilter) => {
+    const [filter, filterOptions, filterParams] = await getFilter(
+      denops,
+      loader,
+      options,
+      userFilter,
+    );
+    await filter?.onRefreshItems?.({
+      denops,
+      filterOptions,
+      filterParams,
+    });
+  }));
+}
+
+export async function uiSearchItem(
+  denops: Denops,
+  loader: Loader,
+  context: Context,
+  options: DduOptions,
+  searchItem: DduItem,
+): Promise<void> {
+  const [ui, uiOptions, uiParams] = await getUi(
+    denops,
+    loader,
+    options,
+  );
+  if (!ui) {
+    return;
+  }
+
+  await ui.searchItem({
+    denops,
+    context,
+    options,
+    uiOptions,
+    uiParams,
+    item: searchItem,
+  });
+}
+
 export async function getUi(
   denops: Denops,
   loader: Loader,
@@ -395,7 +446,7 @@ export async function getFilter(
   return [filter, filterOptions, filterParams];
 }
 
-export async function getKind(
+async function getKind(
   denops: Denops,
   loader: Loader,
   options: DduOptions,
@@ -748,7 +799,7 @@ function filterArgs<
   return [o, p];
 }
 
-export function kindArgs<
+function kindArgs<
   Params extends BaseKindParams,
 >(
   kind: BaseKind<Params>,
@@ -805,7 +856,7 @@ function columnArgs<
   return [o, p];
 }
 
-export function actionArgs(
+function actionArgs(
   actionName: string,
   options: DduOptions,
   params: BaseActionParams,
@@ -877,8 +928,9 @@ export async function uiRedraw<
   Params extends BaseUiParams,
 >(
   denops: Denops,
-  ddu: Ddu,
   lock: Lock<number>,
+  context: Context,
+  options: DduOptions,
   ui: BaseUi<Params>,
   uiOptions: UiOptions,
   uiParams: Params,
@@ -891,11 +943,15 @@ export async function uiRedraw<
       return;
     }
 
-    const options = ddu.getOptions();
-    const context = ddu.getContext();
     try {
       if (signal.aborted) {
-        await ddu.uiQuit(denops, ui, uiOptions, uiParams);
+        await ui.quit({
+          denops,
+          context,
+          options,
+          uiOptions,
+          uiParams,
+        });
         return;
       }
 
@@ -917,7 +973,13 @@ export async function uiRedraw<
 
       // NOTE: ddu may be quitted after redraw
       if (signal.aborted) {
-        await ddu.uiQuit(denops, ui, uiOptions, uiParams);
+        await ui.quit({
+          denops,
+          context,
+          options,
+          uiOptions,
+          uiParams,
+        });
       }
 
       await denops.cmd("doautocmd <nomodeline> User Ddu:redraw");

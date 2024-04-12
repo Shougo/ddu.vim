@@ -23,7 +23,12 @@ import {
   mergeDduOptions,
 } from "./context.ts";
 import { Loader } from "./loader.ts";
-import { getFilter, getItemAction, getItemActions } from "./ext.ts";
+import {
+  getFilter,
+  getItemAction,
+  getItemActions,
+  uiSearchItem,
+} from "./ext.ts";
 import { defaultUiOptions } from "./base/ui.ts";
 import { defaultSourceOptions } from "./base/source.ts";
 import { defaultFilterOptions } from "./base/filter.ts";
@@ -294,7 +299,13 @@ export function main(denops: Denops) {
           }
 
           if (opt?.searchItem) {
-            await ddu.uiSearchItem(denops, opt.searchItem);
+            await uiSearchItem(
+              denops,
+              loader,
+              ddu.getContext(),
+              ddu.getOptions(),
+              opt.searchItem,
+            );
           }
         }
       });
