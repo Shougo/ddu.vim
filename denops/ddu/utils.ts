@@ -53,3 +53,7 @@ export async function safeStat(path: string): Promise<Deno.FileInfo | null> {
   }
   return null;
 }
+
+export function convertUserString<T>(user: string | T) {
+  return typeof user === "string" ? { name: user } : user;
+}

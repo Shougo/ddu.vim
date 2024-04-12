@@ -4,88 +4,64 @@ import {
   Denops,
   equal,
   fn,
-  is,
   Lock,
   pathsep,
 } from "./deps.ts";
 import {
-  Action,
   ActionFlags,
   ActionHistory,
-  ActionName,
-  ActionOptions,
   BaseActionParams,
-  BaseColumn,
-  BaseColumnParams,
-  BaseFilter,
-  BaseFilterParams,
-  BaseKind,
-  BaseKindParams,
   BaseSource,
   BaseSourceParams,
   BaseUi,
   BaseUiParams,
   Clipboard,
-  ColumnOptions,
   Context,
   DduEvent,
   DduItem,
   DduOptions,
   ExpandItem,
-  FilterOptions,
   Item,
-  ItemAction,
-  KindOptions,
   PreviewContext,
-  Previewer,
   SourceInfo,
   SourceOptions,
   TreePath,
   UiOptions,
-  UserColumn,
-  UserFilter,
   UserOptions,
   UserSource,
 } from "./types.ts";
 import {
   defaultContext,
   defaultDduOptions,
-  defaultDummy,
   foldMerge,
-  mergeActionOptions,
-  mergeActionParams,
-  mergeColumnOptions,
-  mergeColumnParams,
   mergeDduOptions,
-  mergeFilterOptions,
-  mergeFilterParams,
-  mergeKindOptions,
-  mergeKindParams,
-  mergeSourceOptions,
-  mergeSourceParams,
-  mergeUiOptions,
-  mergeUiParams,
 } from "./context.ts";
-import { defaultUiOptions } from "./base/ui.ts";
-import { defaultSourceOptions, GatherArguments } from "./base/source.ts";
-import { defaultFilterOptions } from "./base/filter.ts";
-import { defaultColumnOptions } from "./base/column.ts";
-import { defaultKindOptions } from "./base/kind.ts";
-import { defaultActionOptions } from "./base/action.ts";
+import { defaultSourceOptions } from "./base/source.ts";
 import { Loader } from "./loader.ts";
-import { errorException, treePath2Filename } from "./utils.ts";
+import {
+  convertUserString,
+  errorException,
+  treePath2Filename,
+} from "./utils.ts";
 import {
   AvailableSourceInfo,
   GatherState,
   GatherStateAbortable,
   isRefreshTarget,
 } from "./state.ts";
-
-type ItemActions = {
-  source: BaseSource<BaseSourceParams, unknown>;
-  kind: BaseKind<BaseKindParams>;
-  actions: Record<string, unknown>;
-};
+import {
+  callColumns,
+  callFilters,
+  getColumn,
+  getFilter,
+  getItemAction,
+  getPreviewer,
+  getSource,
+  getUi,
+  initSource,
+  sourceArgs,
+  uiRedraw,
+} from "./ext.ts";
 
 type RedrawOptions = {
   /**
@@ -94,18 +70,6 @@ type RedrawOptions = {
    */
   restoreItemState?: boolean;
   signal?: AbortSignal;
-};
-
-type ItemActionInfo = {
-  userSource: UserSource;
-  sourceIndex: number;
-  sourceOptions: SourceOptions;
-  sourceParams: BaseSourceParams;
-  kindOptions: KindOptions;
-  kindParams: BaseKindParams;
-  actionOptions: ActionOptions;
-  actionParams: BaseActionParams;
-  action: string | Action<BaseActionParams>;
 };
 
 export class Ddu {
@@ -154,7 +118,11 @@ export class Ddu {
 
     if (uiChanged) {
       // Quit current UI
-      const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+      const [ui, uiOptions, uiParams] = await getUi(
+        denops,
+        this.#loader,
+        this.#options,
+      );
       if (!ui) {
         return;
       }
@@ -187,7 +155,11 @@ export class Ddu {
       this.#context.path = prevContext.path;
       this.#context.maxItems = prevContext.maxItems;
 
-      const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+      const [ui, uiOptions, uiParams] = await getUi(
+        denops,
+        this.#loader,
+        this.#options,
+      );
       if (!ui) {
         return;
       }
@@ -241,7 +213,11 @@ export class Ddu {
     }
 
     // NOTE: UI must be reset.
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
 
     if (checkToggle && ui && uiOptions.toggle) {
       await this.uiQuit(denops, ui, uiOptions, uiParams);
@@ -283,7 +259,11 @@ export class Ddu {
     userOptions: UserOptions,
   ): Promise<void> {
     // Quit current UI
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (!ui) {
       return;
     }
@@ -344,12 +324,13 @@ export class Ddu {
                 return;
               }
 
-              const [source, sourceOptions, sourceParams] = await this
-                .getSource(
-                  denops,
-                  userSource.name,
-                  userSource,
-                );
+              const [source, sourceOptions, sourceParams] = await getSource(
+                denops,
+                this.#loader,
+                this.#options,
+                userSource.name,
+                userSource,
+              );
               if (source == null) {
                 return;
               }
@@ -469,8 +450,10 @@ export class Ddu {
       ...sourceOptions.converters,
     ];
     await Promise.all(filters.map(async (userFilter) => {
-      const [filter, filterOptions, filterParams] = await this.getFilter(
+      const [filter, filterOptions, filterParams] = await getFilter(
         denops,
+        this.#loader,
+        this.#options,
         userFilter,
       );
       await filter?.onRefreshItems?.({
@@ -655,8 +638,10 @@ export class Ddu {
       this.#options.sources
         .map((source) => convertUserString(source))
         .map(async (userSource, sourceIndex) => {
-          const [source, sourceOptions, _] = await this.getSource(
+          const [source, sourceOptions, _] = await getSource(
             denops,
+            this.#loader,
+            this.#options,
             userSource.name,
             userSource,
           );
@@ -706,8 +691,11 @@ export class Ddu {
     );
 
     // Post filters
-    allItems = await this.#callFilters(
+    allItems = await callFilters(
       denops,
+      this.#loader,
+      this.#context,
+      this.#options,
       defaultSourceOptions(),
       this.#options.postFilters,
       this.#input,
@@ -730,7 +718,11 @@ export class Ddu {
 
     this.#items = allItems;
 
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (!ui || signal.aborted) {
       return;
     }
@@ -815,7 +807,11 @@ export class Ddu {
   ): Promise<void> {
     const { signal = this.#aborter.signal } = opts ?? {};
 
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (!ui || signal.aborted) {
       return;
     }
@@ -835,7 +831,11 @@ export class Ddu {
     denops: Denops,
     searchItem: DduItem,
   ): Promise<void> {
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (!ui) {
       return;
     }
@@ -876,8 +876,10 @@ export class Ddu {
         convertUserString(source)
       )
     ) {
-      const [source, sourceOptions, sourceParams] = await this.getSource(
+      const [source, sourceOptions, sourceParams] = await getSource(
         denops,
+        this.#loader,
+        this.#options,
         userSource.name,
         userSource,
       );
@@ -946,7 +948,11 @@ export class Ddu {
       return;
     }
 
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (!ui) {
       return;
     }
@@ -990,7 +996,20 @@ export class Ddu {
         uiOptions,
         uiParams,
         actionParams,
-        getPreviewer: this.getPreviewer.bind(this),
+        getPreviewer: (
+          denops: Denops,
+          item: DduItem,
+          actionParams: BaseActionParams,
+          previewContext: PreviewContext,
+        ) =>
+          getPreviewer(
+            denops,
+            this.#loader,
+            this.#options,
+            item,
+            actionParams,
+            previewContext,
+          ),
       });
     }
 
@@ -1019,180 +1038,6 @@ export class Ddu {
     }
   }
 
-  async getItemActions(
-    denops: Denops,
-    items: DduItem[],
-  ): Promise<ItemActions | null> {
-    const sources = [
-      ...new Set(
-        items.length > 0
-          ? items.map((item) =>
-            this.#loader.getSource(this.#options.name, item.__sourceName)
-          )
-          : this.#options.sources.map((userSource) =>
-            this.#loader.getSource(
-              this.#options.name,
-              convertUserString(userSource).name,
-            )
-          ),
-      ),
-    ].filter((source) => source);
-    const indexes = [
-      ...new Set(items.map((item) => item.__sourceIndex)),
-    ];
-    if (sources.length === 0 || sources.length !== 1 && indexes.length !== 1) {
-      if (sources.length > 0) {
-        await denops.call(
-          "ddu#util#print_error",
-          `You must not mix multiple sources items: "${
-            sources.map((source) => source?.name)
-          }"`,
-        );
-      }
-      return null;
-    }
-    const source = sources[0];
-    if (!source) {
-      return null;
-    }
-
-    const kinds = [
-      ...new Set(
-        items.length > 0
-          ? items.map((item) => item.kind)
-          : sources.map((source) => source?.kind),
-      ),
-    ] as string[];
-    if (kinds.length !== 1) {
-      await denops.call(
-        "ddu#util#print_error",
-        `You must not mix multiple kinds: "${kinds}"`,
-      );
-      return null;
-    }
-
-    const kindName = kinds[0];
-    const kind = await this.getKind(denops, kindName);
-    if (!kind) {
-      return null;
-    }
-
-    const [kindOptions, _1] = kindArgs(kind, this.#options);
-    const [sourceOptions, _2] = sourceArgs(
-      source,
-      this.#options,
-      this.#options.sources[indexes.length > 0 ? indexes[0] : 0],
-    );
-
-    const actions = Object.assign(
-      kind.actions,
-      kindOptions.actions,
-      source.actions,
-      sourceOptions.actions,
-    );
-
-    // Filter by options.actions
-    const filteredActions = this.#options.actions.length === 0
-      ? actions
-      : Object.keys(actions).reduce(
-        (acc: Record<ActionName, ItemAction>, key) => {
-          if (this.#options.actions.includes(key)) {
-            acc[key] = actions[key];
-          }
-          return acc;
-        },
-        {},
-      );
-
-    return {
-      source,
-      kind,
-      actions: filteredActions,
-    };
-  }
-
-  async getItemAction(
-    denops: Denops,
-    actionName: string,
-    items: DduItem[],
-    userActionParams: BaseActionParams,
-  ): Promise<ItemActionInfo | undefined> {
-    if (items.length === 0) {
-      return;
-    }
-
-    const itemActions = await this.getItemActions(denops, items);
-    if (!itemActions) {
-      return;
-    }
-
-    const { source, kind, actions } = itemActions;
-
-    const indexes = [
-      ...new Set(items.map((item) => item.__sourceIndex)),
-    ];
-
-    const sourceIndex = indexes.length > 0 ? indexes[0] : 0;
-    const userSource = this.#options.sources[sourceIndex];
-    const [sourceOptions, sourceParams] = sourceArgs(
-      source,
-      this.#options,
-      userSource,
-    );
-
-    const [kindOptions, kindParams] = kindArgs(kind, this.#options);
-
-    // Get default action in the first
-    if (actionName === "default") {
-      actionName = sourceOptions.defaultAction;
-      if (actionName === "") {
-        // Use kind default action
-        actionName = kindOptions.defaultAction;
-      }
-
-      if (actionName === "") {
-        await denops.call(
-          "ddu#util#print_error",
-          `The default action is not defined for the items`,
-        );
-        return;
-      }
-    }
-
-    // NOTE: "actionName" may be overwritten by aliases
-    const [actionOptions, actionParams] = actionArgs(
-      actionName,
-      this.#options,
-      userActionParams,
-    );
-
-    // Check action aliases
-    actionName = this.#loader.getAlias("action", actionName) ?? actionName;
-
-    const action = actions[actionName] as
-      | string
-      | Action<BaseActionParams>;
-    if (!action) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Not found action: ${actionName}`,
-      );
-      return;
-    }
-
-    return {
-      userSource,
-      sourceIndex,
-      sourceOptions,
-      sourceParams,
-      kindOptions,
-      kindParams,
-      actionOptions,
-      actionParams,
-      action,
-    };
-  }
-
   async itemAction(
     denops: Denops,
     actionName: string,
@@ -1203,8 +1048,10 @@ export class Ddu {
   ): Promise<void> {
     const { signal } = this.#aborter;
 
-    const itemAction = await this.getItemAction(
+    const itemAction = await getItemAction(
       denops,
+      this.#loader,
+      this.#options,
       actionName,
       items,
       userActionParams,
@@ -1213,7 +1060,11 @@ export class Ddu {
       return;
     }
 
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (ui) {
       const visible = await ui.visible({
         denops,
@@ -1439,8 +1290,11 @@ export class Ddu {
 
       // NOTE: parent must be applied columns.
       const columnItems = [parent].concat(children);
-      await this.#callColumns(
+      await callColumns(
         denops,
+        this.#loader,
+        this.#context,
+        this.#options,
         sourceOptions.columns,
         columnItems,
         state.items.concat(columnItems),
@@ -1451,8 +1305,11 @@ export class Ddu {
       ).concat(sourceOptions.converters);
 
       // NOTE: Apply filter for parent item to update highlights and "display".
-      const items = await this.#callFilters(
+      const items = await callFilters(
         denops,
+        this.#loader,
+        this.#context,
+        this.#options,
         sourceOptions,
         filters,
         this.#input,
@@ -1462,8 +1319,11 @@ export class Ddu {
         parent.display = items[0].display;
       }
 
-      children = await this.#callFilters(
+      children = await callFilters(
         denops,
+        this.#loader,
+        this.#context,
+        this.#options,
         sourceOptions,
         filters,
         this.#input,
@@ -1475,7 +1335,11 @@ export class Ddu {
       this.#context.path = savePath;
     }
 
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (ui && !signal.aborted) {
       await ui.expandItem({
         denops,
@@ -1591,7 +1455,11 @@ export class Ddu {
   ): Promise<void> {
     const { preventRedraw, signal = this.#aborter.signal } = opts ?? {};
 
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (!ui || signal.aborted) {
       return;
     }
@@ -1623,8 +1491,11 @@ export class Ddu {
       this.#expandedItems.delete(item);
 
       const columnItems = [item];
-      await this.#callColumns(
+      await callColumns(
         denops,
+        this.#loader,
+        this.#context,
+        this.#options,
         sourceOptions.columns,
         columnItems,
         state.items.concat(columnItems),
@@ -1634,8 +1505,11 @@ export class Ddu {
       const filters = sourceOptions.matchers.concat(
         sourceOptions.sorters,
       ).concat(sourceOptions.converters);
-      const items = await this.#callFilters(
+      const items = await callFilters(
         denops,
+        this.#loader,
+        this.#context,
+        this.#options,
         sourceOptions,
         filters,
         this.#input,
@@ -1704,7 +1578,11 @@ export class Ddu {
     denops: Denops,
     tabNr: number,
   ): Promise<boolean> {
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (!ui?.visible || this.#quitted) {
       return false;
     }
@@ -1722,7 +1600,11 @@ export class Ddu {
   async uiWinids(
     denops: Denops,
   ): Promise<number[]> {
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (!ui?.winIds || this.#quitted) {
       return [];
     }
@@ -1762,7 +1644,11 @@ export class Ddu {
     const ret = Object.assign(this.#options);
 
     // Merge UI options
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
     if (ui) {
       ret.uiOptions[ui.name] = uiOptions;
       ret.uiParams[ui.name] = uiParams;
@@ -1774,8 +1660,10 @@ export class Ddu {
         convertUserString(source)
       )
     ) {
-      const [source, sourceOptions, sourceParams] = await this.getSource(
+      const [source, sourceOptions, sourceParams] = await getSource(
         denops,
+        this.#loader,
+        this.#options,
         userSource.name,
         userSource,
       );
@@ -1794,8 +1682,10 @@ export class Ddu {
       for (
         const userFilter of filters.map((filter) => convertUserString(filter))
       ) {
-        const [filter, filterOptions, filterParams] = await this.getFilter(
+        const [filter, filterOptions, filterParams] = await getFilter(
           denops,
+          this.#loader,
+          this.#options,
           userFilter,
         );
         if (!filter) {
@@ -1812,8 +1702,10 @@ export class Ddu {
           convertUserString(column)
         )
       ) {
-        const [column, columnOptions, columnParams] = await this.getColumn(
+        const [column, columnOptions, columnParams] = await getColumn(
           denops,
+          this.#loader,
+          this.#options,
           userColumn,
         );
         if (!column) {
@@ -1858,8 +1750,10 @@ export class Ddu {
         convertUserString(source)
       )
     ) {
-      const [source, sourceOptions, sourceParams] = await this.getSource(
+      const [source, sourceOptions, sourceParams] = await getSource(
         denops,
+        this.#loader,
+        this.#options,
         userSource.name,
         userSource,
       );
@@ -1884,225 +1778,6 @@ export class Ddu {
     return false;
   }
 
-  async #getUi(
-    denops: Denops,
-  ): Promise<
-    [
-      BaseUi<BaseUiParams> | undefined,
-      UiOptions,
-      BaseUiParams,
-    ]
-  > {
-    const userUi = convertUserString(this.#options.ui);
-    if (!this.#loader.getUi(this.#options.name, userUi.name)) {
-      const startTime = Date.now();
-
-      await this.#loader.autoload(denops, "ui", userUi.name);
-
-      if (this.#options.profile) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Load ${userUi.name}: ${Date.now() - startTime} ms`,
-        );
-      }
-    }
-
-    const ui = this.#loader.getUi(this.#options.name, userUi.name);
-    if (!ui) {
-      if (userUi.name.length !== 0) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Not found ui: "${userUi.name}"`,
-        );
-      }
-      return [
-        undefined,
-        defaultUiOptions(),
-        defaultDummy(),
-      ];
-    }
-
-    const [uiOptions, uiParams] = uiArgs(this.#options, ui);
-    await checkUiOnInit(ui, denops, uiOptions, uiParams);
-
-    return [ui, uiOptions, uiParams];
-  }
-
-  async getSource(
-    denops: Denops,
-    name: string,
-    userSource: UserSource,
-  ): Promise<
-    [
-      BaseSource<BaseSourceParams> | undefined,
-      SourceOptions,
-      BaseSourceParams,
-    ]
-  > {
-    if (!this.#loader.getSource(this.#options.name, name)) {
-      const startTime = Date.now();
-
-      await this.#loader.autoload(denops, "source", name);
-
-      if (this.#options.profile) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Load ${name}: ${Date.now() - startTime} ms`,
-        );
-      }
-    }
-
-    const source = this.#loader.getSource(this.#options.name, name);
-    if (!source) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Not found source: ${name}`,
-      );
-      return [
-        undefined,
-        defaultSourceOptions(),
-        defaultDummy(),
-      ];
-    }
-
-    const [sourceOptions, sourceParams] = sourceArgs(
-      source,
-      this.#options,
-      userSource,
-    );
-
-    return [source, sourceOptions, sourceParams];
-  }
-
-  async getFilter(
-    denops: Denops,
-    userFilter: UserFilter,
-  ): Promise<
-    [
-      BaseFilter<BaseFilterParams> | undefined,
-      FilterOptions,
-      BaseFilterParams,
-    ]
-  > {
-    userFilter = convertUserString(userFilter);
-
-    if (!this.#loader.getFilter(this.#options.name, userFilter.name)) {
-      const startTime = Date.now();
-
-      await this.#loader.autoload(denops, "filter", userFilter.name);
-
-      if (this.#options.profile) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Load ${userFilter.name}: ${Date.now() - startTime} ms`,
-        );
-      }
-    }
-
-    const filter = this.#loader.getFilter(this.#options.name, userFilter.name);
-    if (!filter) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Not found filter: ${userFilter.name}`,
-      );
-      return [
-        undefined,
-        defaultFilterOptions(),
-        defaultDummy(),
-      ];
-    }
-
-    const [filterOptions, filterParams] = filterArgs(
-      filter,
-      this.#options,
-      userFilter,
-    );
-    await checkFilterOnInit(filter, denops, filterOptions, filterParams);
-
-    return [filter, filterOptions, filterParams];
-  }
-
-  async getKind(
-    denops: Denops,
-    name: string,
-  ): Promise<
-    BaseKind<BaseKindParams> | undefined
-  > {
-    if (!this.#loader.getKind(this.#options.name, name)) {
-      const startTime = Date.now();
-
-      await this.#loader.autoload(denops, "kind", name);
-
-      if (this.#options.profile) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Load ${name}: ${Date.now() - startTime} ms`,
-        );
-      }
-    }
-
-    const kind = this.#loader.getKind(this.#options.name, name);
-    if (!kind) {
-      if (name !== "base") {
-        await denops.call(
-          "ddu#util#print_error",
-          `Not found kind: ${name}`,
-        );
-      }
-      return undefined;
-    }
-
-    return kind;
-  }
-
-  async getColumn(
-    denops: Denops,
-    userColumn: UserColumn,
-  ): Promise<
-    [
-      BaseColumn<BaseColumnParams> | undefined,
-      ColumnOptions,
-      BaseColumnParams,
-    ]
-  > {
-    userColumn = convertUserString(userColumn);
-
-    if (!this.#loader.getColumn(this.#options.name, userColumn.name)) {
-      const startTime = Date.now();
-
-      await this.#loader.autoload(denops, "column", userColumn.name);
-
-      if (this.#options.profile) {
-        await denops.call(
-          "ddu#util#print_error",
-          `Load ${userColumn.name}: ${Date.now() - startTime} ms`,
-        );
-      }
-    }
-
-    const column = this.#loader.getColumn(this.#options.name, userColumn.name);
-    if (!column) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Not found column: ${userColumn.name}`,
-      );
-      return [
-        undefined,
-        defaultColumnOptions(),
-        defaultDummy(),
-      ];
-    }
-
-    const [columnOptions, columnParams] = columnArgs(
-      column,
-      this.#options,
-      userColumn,
-    );
-    await checkColumnOnInit(column, denops, columnOptions, columnParams);
-
-    return [column, columnOptions, columnParams];
-  }
-
   async #filterItems(
     denops: Denops,
     userSource: UserSource,
@@ -2111,8 +1786,10 @@ export class Ddu {
   ): Promise<[boolean, number, DduItem[]]> {
     userSource = convertUserString(userSource);
 
-    const [source, sourceOptions, _] = await this.getSource(
+    const [source, sourceOptions, _] = await getSource(
       denops,
+      this.#loader,
+      this.#options,
       userSource.name,
       userSource,
     );
@@ -2126,8 +1803,11 @@ export class Ddu {
     let items = structuredClone(state.items) as DduItem[];
     const allItems = items.length;
 
-    items = await this.#callFilters(
+    items = await callFilters(
       denops,
+      this.#loader,
+      this.#context,
+      this.#options,
       sourceOptions,
       sourceOptions.matchers.concat(sourceOptions.sorters),
       input,
@@ -2140,10 +1820,21 @@ export class Ddu {
     }
 
     // NOTE: Call columns before converters after matchers and sorters
-    await this.#callColumns(denops, sourceOptions.columns, items, items);
-
-    items = await this.#callFilters(
+    await callColumns(
       denops,
+      this.#loader,
+      this.#context,
+      this.#options,
+      sourceOptions.columns,
+      items,
+      items,
+    );
+
+    items = await callFilters(
+      denops,
+      this.#loader,
+      this.#context,
+      this.#options,
       sourceOptions,
       sourceOptions.converters,
       input,
@@ -2151,177 +1842,6 @@ export class Ddu {
     );
 
     return [state.isDone, allItems, items];
-  }
-
-  async #callFilters(
-    denops: Denops,
-    sourceOptions: SourceOptions,
-    filters: UserFilter[],
-    input: string,
-    items: DduItem[],
-  ) {
-    for (const userFilter of filters) {
-      const [filter, filterOptions, filterParams] = await this.getFilter(
-        denops,
-        userFilter,
-      );
-      if (!filter) {
-        continue;
-      }
-
-      try {
-        const ret = await filter.filter({
-          denops,
-          context: this.#context,
-          options: this.#options,
-          sourceOptions,
-          filterOptions,
-          filterParams,
-          input,
-          items,
-        });
-
-        if (is.Array(ret)) {
-          items = ret;
-        } else {
-          if (ret.input) {
-            // Overwrite current input
-            input = ret.input;
-          }
-          items = ret.items;
-        }
-      } catch (e: unknown) {
-        await errorException(
-          denops,
-          e,
-          `filter: ${filter.name} "filter()" failed`,
-        );
-      }
-    }
-
-    return items;
-  }
-
-  async #callColumns(
-    denops: Denops,
-    columns: UserColumn[],
-    items: DduItem[],
-    allItems: DduItem[],
-  ) {
-    if (columns.length === 0) {
-      return items;
-    }
-
-    for (const item of items) {
-      item.display = "";
-      item.highlights = [];
-    }
-
-    type CachedColumn = {
-      column: BaseColumn<BaseColumnParams>;
-      columnOptions: ColumnOptions;
-      columnParams: BaseColumnParams;
-      length: number;
-    };
-    const userColumns = columns.map((column) => convertUserString(column));
-    const cachedColumns: Record<number, CachedColumn> = {};
-    for (const [index, userColumn] of userColumns.entries()) {
-      const [column, columnOptions, columnParams] = await this.getColumn(
-        denops,
-        userColumn,
-      );
-      if (!column) {
-        continue;
-      }
-
-      const length = await column.getLength({
-        denops,
-        context: this.#context,
-        options: this.#options,
-        columnOptions,
-        columnParams,
-        items: allItems,
-      });
-
-      cachedColumns[index] = {
-        column,
-        columnOptions,
-        columnParams,
-        length,
-      };
-    }
-
-    for (const item of items) {
-      let startCol = 1;
-      for (const index of userColumns.keys()) {
-        const cachedColumn = cachedColumns[index];
-        if (!cachedColumn) {
-          continue;
-        }
-
-        const text = await cachedColumn.column.getText({
-          denops,
-          context: this.#context,
-          options: this.#options,
-          columnOptions: cachedColumn.columnOptions,
-          columnParams: cachedColumn.columnParams,
-          startCol,
-          endCol: startCol + cachedColumn.length,
-          item,
-        });
-
-        if (text.highlights && item.highlights) {
-          item.highlights = item.highlights.concat(text.highlights);
-        }
-
-        item.display += text.text;
-
-        if (columns.length === 1) {
-          // Optimize
-          continue;
-        }
-
-        startCol += cachedColumn.length;
-
-        // Check text width.
-        const width = await fn.strdisplaywidth(denops, text.text);
-        const len = (new TextEncoder()).encode(text.text).length;
-        if (width < len) {
-          // NOTE: Padding is needed.  Because Vim/neovim highlight is length.
-          startCol += len - width;
-          item.display += " ".repeat(len - width);
-        }
-      }
-    }
-  }
-
-  async getPreviewer(
-    denops: Denops,
-    item: DduItem,
-    actionParams: BaseActionParams,
-    previewContext: PreviewContext,
-  ): Promise<Previewer | undefined> {
-    const source = this.#loader.getSource(
-      this.#options.name,
-      item.__sourceName,
-    );
-    if (!source) {
-      return;
-    }
-    const kindName = item.kind ?? source.kind;
-
-    const kind = await this.getKind(denops, kindName);
-    if (!kind || !kind.getPreviewer) {
-      return;
-    }
-
-    return kind.getPreviewer({
-      denops,
-      options: this.#options,
-      actionParams,
-      previewContext,
-      item,
-    });
   }
 
   #isExpanded(
@@ -2347,416 +1867,14 @@ export class Ddu {
   }
 }
 
-function uiArgs<
-  Params extends BaseUiParams,
->(
-  options: DduOptions,
-  ui: BaseUi<Params>,
-): [UiOptions, BaseUiParams] {
-  const o = foldMerge(
-    mergeUiOptions,
-    defaultUiOptions,
-    [
-      options.uiOptions["_"],
-      options.uiOptions[ui.name],
-    ],
-  );
-  const p = foldMerge(mergeUiParams, defaultDummy, [
-    ui.params(),
-    options.uiParams["_"],
-    options.uiParams[ui.name],
-  ]);
-  return [o, p];
-}
-
-function sourceArgs<
-  Params extends BaseSourceParams,
-  UserData extends unknown,
->(
-  source: BaseSource<Params, UserData> | null,
-  options: DduOptions,
-  userSource: UserSource | null,
-): [SourceOptions, BaseSourceParams] {
-  userSource = convertUserString(userSource);
-
-  const o = foldMerge(
-    mergeSourceOptions,
-    defaultSourceOptions,
-    [
-      options.sourceOptions["_"],
-      source ? options.sourceOptions[source.name] : {},
-      userSource?.options,
-    ],
-  );
-  const p = foldMerge(
-    mergeSourceParams,
-    defaultDummy,
-    [
-      source?.params(),
-      options.sourceParams["_"],
-      source ? options.sourceParams[source.name] : {},
-      userSource?.params,
-    ],
-  );
-  return [o, p];
-}
-
-function filterArgs<
-  Params extends BaseFilterParams,
->(
-  filter: BaseFilter<Params>,
-  options: DduOptions,
-  userFilter: UserFilter,
-): [FilterOptions, BaseFilterParams] {
-  userFilter = convertUserString(userFilter);
-
-  const o = foldMerge(
-    mergeFilterOptions,
-    defaultFilterOptions,
-    [
-      options.filterOptions["_"],
-      options.filterOptions[filter.name],
-      userFilter?.options,
-    ],
-  );
-  const p = foldMerge(
-    mergeFilterParams,
-    defaultDummy,
-    [
-      filter?.params(),
-      options.filterParams["_"],
-      options.filterParams[filter.name],
-      userFilter?.params,
-    ],
-  );
-  return [o, p];
-}
-
-function kindArgs<
-  Params extends BaseKindParams,
->(
-  kind: BaseKind<Params>,
-  options: DduOptions,
-): [KindOptions, BaseKindParams] {
-  const o = foldMerge(
-    mergeKindOptions,
-    defaultKindOptions,
-    [
-      options.kindOptions["_"],
-      options.kindOptions[kind.name],
-    ],
-  );
-  const p = foldMerge(
-    mergeKindParams,
-    defaultDummy,
-    [
-      kind?.params(),
-      options.kindParams["_"],
-      options.kindParams[kind.name],
-    ],
-  );
-  return [o, p];
-}
-
-function columnArgs<
-  Params extends BaseColumnParams,
->(
-  column: BaseColumn<Params>,
-  options: DduOptions,
-  userColumn: UserColumn,
-): [ColumnOptions, BaseColumnParams] {
-  userColumn = convertUserString(userColumn);
-
-  const o = foldMerge(
-    mergeColumnOptions,
-    defaultColumnOptions,
-    [
-      options.columnOptions["_"],
-      options.columnOptions[column.name],
-      userColumn?.options,
-    ],
-  );
-  const p = foldMerge(
-    mergeColumnParams,
-    defaultDummy,
-    [
-      column?.params(),
-      options.columnParams["_"],
-      options.columnParams[column.name],
-      userColumn?.params,
-    ],
-  );
-  return [o, p];
-}
-
-function actionArgs(
-  actionName: string,
-  options: DduOptions,
-  params: BaseActionParams,
-): [ActionOptions, BaseActionParams] {
-  const o = foldMerge(
-    mergeActionOptions,
-    defaultActionOptions,
-    [
-      options.actionOptions["_"],
-      options.actionOptions[actionName],
-    ],
-  );
-  const p = foldMerge(mergeActionParams, defaultDummy, [
-    options.actionParams["_"],
-    options.actionParams[actionName],
-    params,
-  ]);
-  return [o, p];
-}
-
-async function initSource<
-  Params extends BaseSourceParams,
-  UserData extends unknown,
->(
-  denops: Denops,
-  source: BaseSource<Params, UserData>,
-  sourceOptions: SourceOptions,
-  sourceParams: Params,
-  loader: Loader,
-): Promise<void> {
-  source.isInitialized = false;
-  await source.onInit({
-    denops,
-    sourceOptions,
-    sourceParams,
-    loader,
-  });
-  source.isInitialized = true;
-}
-
-async function checkUiOnInit(
-  ui: BaseUi<BaseUiParams>,
-  denops: Denops,
-  uiOptions: UiOptions,
-  uiParams: BaseUiParams,
-) {
-  if (ui.isInitialized) {
-    return;
-  }
-
-  try {
-    await ui.onInit({
-      denops,
-      uiOptions,
-      uiParams,
-    });
-
-    ui.isInitialized = true;
-  } catch (e: unknown) {
-    await errorException(
-      denops,
-      e,
-      `ui: ${ui.name} "onInit()" failed`,
-    );
-  }
-}
-
-async function uiRedraw<
-  Params extends BaseUiParams,
->(
-  denops: Denops,
-  ddu: Ddu,
-  lock: Lock<number>,
-  ui: BaseUi<Params>,
-  uiOptions: UiOptions,
-  uiParams: Params,
-  signal: AbortSignal,
-): Promise<void> {
-  // NOTE: Redraw must be locked
-  await lock.lock(async () => {
-    if (await fn.getcmdwintype(denops) !== "") {
-      // Skip when Command line window
-      return;
-    }
-
-    const options = ddu.getOptions();
-    const context = ddu.getContext();
-    try {
-      if (signal.aborted) {
-        await ddu.uiQuit(denops, ui, uiOptions, uiParams);
-        return;
-      }
-
-      const prevWinids = await ui.winIds({
-        denops,
-        context,
-        options,
-        uiOptions,
-        uiParams,
-      });
-
-      await ui.redraw({
-        denops,
-        context,
-        options,
-        uiOptions,
-        uiParams,
-      });
-
-      // NOTE: ddu may be quitted after redraw
-      if (signal.aborted) {
-        await ddu.uiQuit(denops, ui, uiOptions, uiParams);
-      }
-
-      await denops.cmd("doautocmd <nomodeline> User Ddu:redraw");
-
-      const winIds = await ui.winIds({
-        denops,
-        context,
-        options,
-        uiOptions,
-        uiParams,
-      });
-
-      if (winIds.length > prevWinids.length) {
-        // NOTE: UI window is generated.
-        await denops.cmd("doautocmd <nomodeline> User Ddu:uiReady");
-      }
-    } catch (e: unknown) {
-      if (e instanceof Error && e.message.includes(" E523: ")) {
-        // NOTE: It may be called on invalid state
-        // Ignore "E523: Not allowed here" errors
-        await denops.call("ddu#_lazy_redraw", options.name);
-      } else {
-        await errorException(
-          denops,
-          e,
-          `ui: ${ui.name} "redraw()" failed`,
-        );
-      }
-    }
-  });
-}
-
-async function checkFilterOnInit(
-  filter: BaseFilter<BaseFilterParams>,
-  denops: Denops,
-  filterOptions: FilterOptions,
-  filterParams: BaseFilterParams,
-) {
-  if (filter.isInitialized) {
-    return;
-  }
-
-  try {
-    await filter.onInit({
-      denops,
-      filterOptions,
-      filterParams,
-    });
-
-    filter.isInitialized = true;
-  } catch (e: unknown) {
-    await errorException(
-      denops,
-      e,
-      `filter: ${filter.name} "onInit()" failed`,
-    );
-  }
-}
-
-async function checkColumnOnInit(
-  column: BaseColumn<BaseColumnParams>,
-  denops: Denops,
-  columnOptions: FilterOptions,
-  columnParams: BaseColumnParams,
-) {
-  if (column.isInitialized) {
-    return;
-  }
-
-  try {
-    await column.onInit({
-      denops,
-      columnOptions,
-      columnParams,
-    });
-
-    column.isInitialized = true;
-  } catch (e: unknown) {
-    await errorException(
-      denops,
-      e,
-      `column: ${column.name} "onInit()" failed`,
-    );
-  }
-}
-
 function convertTreePath(treePath: TreePath) {
   return typeof treePath === "string" ? treePath.split(pathsep) : treePath;
-}
-
-function convertUserString<T>(user: string | T) {
-  return typeof user === "string" ? { name: user } : user;
 }
 
 function isParentPath(checkPath: string[], searchPath: string[]) {
   return checkPath !== searchPath &&
     searchPath.join(pathsep).startsWith(checkPath.join(pathsep) + pathsep);
 }
-
-Deno.test("sourceArgs", () => {
-  const userOptions: DduOptions = {
-    ...defaultDduOptions(),
-    sources: [],
-    sourceOptions: {
-      "_": {
-        matcherKey: "foo",
-        matchers: ["matcher_head"],
-      },
-      "strength": {
-        matcherKey: "bar",
-      },
-    },
-    sourceParams: {
-      "_": {
-        "by_": "bar",
-      },
-      "strength": {
-        min: 100,
-      },
-    },
-  };
-  class S extends BaseSource<{ min: number; max: number }> {
-    params() {
-      return {
-        "min": 0,
-        "max": 999,
-      };
-    }
-    gather(
-      _args: GatherArguments<{ min: number; max: number }> | Denops,
-    ): ReadableStream<Item<Record<string, never>>[]> {
-      return new ReadableStream({
-        start(controller) {
-          controller.close();
-        },
-      });
-    }
-  }
-  const source = new S();
-  source.name = "strength";
-  const [o, p] = sourceArgs(source, userOptions, null);
-  assertEquals(o, {
-    ...defaultSourceOptions(),
-    matcherKey: "bar",
-    matchers: ["matcher_head"],
-    converters: [],
-    sorters: [],
-  });
-  assertEquals(p, {
-    ...defaultDummy(),
-    by_: "bar",
-    min: 100,
-    max: 999,
-  });
-});
 
 Deno.test("isParentPath", () => {
   assertEquals(

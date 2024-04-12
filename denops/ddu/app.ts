@@ -23,6 +23,7 @@ import {
   mergeDduOptions,
 } from "./context.ts";
 import { Loader } from "./loader.ts";
+import { getFilter, getItemAction, getItemActions } from "./ext.ts";
 import { defaultUiOptions } from "./base/ui.ts";
 import { defaultSourceOptions } from "./base/source.ts";
 import { defaultFilterOptions } from "./base/filter.ts";
@@ -426,7 +427,14 @@ export function main(denops: Denops) {
       const action = ensure(arg3, is.String) as string;
 
       const ddu = getDdu(name);
-      const itemsAction = await ddu.getItemAction(denops, action, items, {});
+      const itemsAction = await getItemAction(
+        denops,
+        loader,
+        ddu.getOptions(),
+        action,
+        items,
+        {},
+      );
       return itemsAction ? itemsAction.action : undefined;
     },
     async getItemActionNames(
@@ -437,7 +445,7 @@ export function main(denops: Denops) {
       const items = ensure(arg2, is.Array) as DduItem[];
 
       const ddu = getDdu(name);
-      const ret = await ddu.getItemActions(denops, items);
+      const ret = await getItemActions(denops, loader, ddu.getOptions(), items);
       const actions = ret && ret.actions ? Object.keys(ret.actions) : [];
       const useActions = ddu.getOptions().actions;
       for (const aliasAction of loader.getAliasNames("action")) {
@@ -461,8 +469,10 @@ export function main(denops: Denops) {
       const name = ensure(arg1, is.String) as string;
       const filterName = ensure(arg2, is.String) as string;
       const ddu = getDdu(name);
-      const [filter, filterOptions, filterParams] = await ddu.getFilter(
+      const [filter, filterOptions, filterParams] = await getFilter(
         denops,
+        loader,
+        ddu.getOptions(),
         filterName,
       );
       return [filter?.path ?? "", filterOptions, filterParams];
