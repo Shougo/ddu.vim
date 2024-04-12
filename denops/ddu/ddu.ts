@@ -552,6 +552,8 @@ export class Ddu {
 
     if (!this.#context.done) {
       await this.redraw(denops, { signal });
+    } else {
+      await this.#waitRedrawComplete;
     }
   }
 
