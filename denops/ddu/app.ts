@@ -255,22 +255,6 @@ export function main(denops: Denops) {
       queuedName = ensure(arg1, is.String) as string;
       queuedRedrawOption = ensure(arg2, is.Record) as RedrawOption;
 
-      {
-        // Abort the previous execution
-        // Because the previous state may be freezed.
-        const ddu = getDdu(queuedName);
-        const volatiles = ddu.getSourceArgs().map(
-          (sourceArgs, index) => sourceArgs[0].volatile ? index : -1,
-        ).filter((index) => index >= 0);
-        if (
-          queuedRedrawOption?.method === "refreshItems" ||
-          volatiles.length > 0
-        ) {
-          ddu.cancelToRefresh();
-          ddu.resetCancelledToRefresh();
-        }
-      }
-
       // NOTE: must be locked
       await lock.lock(async () => {
         while (queuedName !== null) {
@@ -338,8 +322,7 @@ export function main(denops: Denops) {
       // Abort the previous execution
       // Because the previous state may be freezed.
       const ddu = getDdu(name);
-      ddu.cancelToRefresh();
-      ddu.resetCancelledToRefresh();
+      await ddu.cancelToRefresh();
 
       if (updateOptions.ui && updateOptions.ui !== ddu.getOptions().ui) {
         // UI is changed
@@ -367,6 +350,9 @@ export function main(denops: Denops) {
         sync?: boolean;
       };
 
+      if (!checkDdu(name)) {
+        return;
+      }
       const dduLength = ddus[name].length;
       const currentDdu = dduLength > 1 ? popDdu(name) : getDdu(name);
       if (!currentDdu) {

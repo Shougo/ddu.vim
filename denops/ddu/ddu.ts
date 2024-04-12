@@ -6,6 +6,7 @@ import {
   fn,
   is,
   Lock,
+  maybe,
   pathsep,
 } from "./deps.ts";
 import {
@@ -75,11 +76,6 @@ import { defaultActionOptions } from "./base/action.ts";
 import { Loader } from "./loader.ts";
 import { errorException, treePath2Filename } from "./utils.ts";
 
-type GatherState = {
-  items: DduItem[];
-  done: boolean;
-};
-
 type ItemActions = {
   source: BaseSource<BaseSourceParams, unknown>;
   kind: BaseKind<BaseKindParams>;
@@ -92,6 +88,7 @@ type RedrawOptions = {
    * item's states reset to gathered.
    */
   restoreItemState?: boolean;
+  signal?: AbortSignal;
 };
 
 type ItemActionInfo = {
@@ -106,25 +103,153 @@ type ItemActionInfo = {
   action: string | Action<BaseActionParams>;
 };
 
+type AvailableSourceInfo<
+  Params extends BaseSourceParams = BaseSourceParams,
+  UserData extends unknown = unknown,
+> = {
+  sourceIndex: number;
+  source: BaseSource<Params, UserData>;
+  sourceOptions: SourceOptions;
+  sourceParams: Params;
+};
+
+type GatherStateAbortReason =
+  | {
+    reason: "quit";
+  }
+  | {
+    reason: "cancelToRefresh";
+    refreshIndexes: number[];
+  };
+
+type GatherStateAbortable = {
+  abort(reason: GatherStateAbortReason): void;
+};
+
+class GatherState<
+  Params extends BaseSourceParams = BaseSourceParams,
+  UserData extends unknown = unknown,
+> {
+  readonly sourceInfo: AvailableSourceInfo<Params, UserData>;
+  readonly itemsStream: ReadableStream<DduItem[]>;
+  #items: DduItem[] = [];
+  #isDone = false;
+  #waitDone = Promise.withResolvers<void>();
+  #aborter = new AbortController();
+
+  constructor(
+    sourceInfo: AvailableSourceInfo<Params, UserData>,
+    itemsStream: ReadableStream<DduItem[]>,
+    options?: {
+      signal?: AbortSignal;
+    },
+  ) {
+    const { signal: parentSignal } = options ?? {};
+    this.sourceInfo = sourceInfo;
+    if (parentSignal) {
+      this.#chainAbortSignal(parentSignal);
+    }
+    this.itemsStream = this.#processItemsStream(itemsStream);
+  }
+
+  #chainAbortSignal(parentSignal: AbortSignal): void {
+    const abortIfTarget = () => {
+      const reason = maybe(
+        parentSignal.reason,
+        is.ObjectOf({ reason: is.String }),
+      ) as GatherStateAbortReason | undefined;
+      if (
+        reason?.reason !== "cancelToRefresh" ||
+        isRefreshTarget(this.sourceInfo.sourceIndex, reason.refreshIndexes)
+      ) {
+        this.#aborter.abort(parentSignal.reason);
+      }
+    };
+
+    if (parentSignal.aborted) {
+      abortIfTarget();
+    } else {
+      parentSignal.addEventListener("abort", () => abortIfTarget(), {
+        signal: this.#aborter.signal,
+      });
+    }
+  }
+
+  #processItemsStream(
+    itemsStream: ReadableStream<DduItem[]>,
+  ): ReadableStream<DduItem[]> {
+    const appendStream = new TransformStream<DduItem[], DduItem[]>({
+      transform: (newItems, controller) => {
+        this.#items = this.#items.concat(newItems);
+        controller.enqueue(newItems);
+      },
+      flush: () => {
+        // Set done flag before stream closed.
+        this.#isDone = true;
+      },
+    });
+
+    itemsStream
+      .pipeTo(appendStream.writable, {
+        signal: this.#aborter.signal,
+        // Do not abort output stream.
+        preventAbort: true,
+      })
+      .catch(() => {
+        appendStream.writable.close().catch(() => {
+          // Prevent errors if already closed.
+        });
+      })
+      .finally(() => {
+        this.#waitDone.resolve();
+      });
+
+    return appendStream.readable;
+  }
+
+  get items(): readonly DduItem[] {
+    return this.#items;
+  }
+
+  get isDone(): boolean {
+    return this.#isDone;
+  }
+
+  get waitDone(): Promise<void> {
+    return this.#waitDone.promise;
+  }
+
+  get signal(): AbortSignal {
+    return this.#aborter.signal;
+  }
+
+  async readAll(): Promise<void> {
+    if (this.itemsStream != null) {
+      await Array.fromAsync(this.itemsStream);
+    }
+  }
+}
+
 export class Ddu {
   #loader: Loader;
-  #gatherStates: Record<string, GatherState> = {};
+  readonly #gatherStates = new Map<number, GatherState>();
   #input = "";
   #context: Context = defaultContext();
   #options: DduOptions = defaultDduOptions();
   #userOptions: UserOptions = {};
   #initialized = false;
   #quitted = false;
-  #cancelledToRefresh = false;
-  #abortController = new AbortController();
-  #uiRedrawLock = new Lock(0);
-  #waitRedrawComplete?: Promise<unknown>;
-  #scheduledRedrawOptions?: RedrawOptions;
+  #aborter = new AbortController() as
+    & Omit<AbortController, "abort">
+    & GatherStateAbortable;
+  readonly #uiRedrawLock = new Lock(0);
+  #waitRedrawComplete?: Promise<void>;
+  #scheduledRedrawOptions?: Required<RedrawOptions>;
   #startTime = 0;
-  #expandedPaths = new Set<string[]>();
+  readonly #expandedPaths = new Set<string[]>();
   #searchPath: TreePath = "";
   #items: DduItem[] = [];
-  #expandedItems: Set<DduItem> = new Set();
+  readonly #expandedItems: Set<DduItem> = new Set();
 
   constructor(loader: Loader) {
     this.#loader = loader;
@@ -137,6 +262,7 @@ export class Ddu {
     userOptions: UserOptions,
   ): Promise<unknown> {
     const prevContext = { ...this.#context };
+    const { signal: prevSignal } = this.#aborter;
 
     this.#context = context;
     this.#userOptions = userOptions;
@@ -158,7 +284,7 @@ export class Ddu {
       this.quit();
     }
 
-    const checkToggle = this.#initialized && !this.shouldStopCurrentContext() &&
+    const checkToggle = this.#initialized && !prevSignal.aborted &&
       !userOptions?.refresh;
 
     if (
@@ -217,12 +343,16 @@ export class Ddu {
           ui,
           uiOptions,
           uiParams,
+          this.#aborter.signal,
         );
         this.#context.doneUi = true;
         return;
       }
+
+      await this.cancelToRefresh();
     } else {
-      this.#gatherStates = {};
+      await this.cancelToRefresh();
+
       this.#expandedItems.clear();
       this.#options = options;
       await this.setInput(denops, this.#options.input);
@@ -247,36 +377,25 @@ export class Ddu {
 
     this.#initialized = false;
     this.#resetQuitted();
+    this.#startTime = Date.now();
+    const { signal } = this.#aborter;
 
-    // Source onInit() must be called before UI
-    for (
-      const userSource of this.#options.sources.map((source) =>
-        convertUserString(source)
-      )
-    ) {
-      const [source, sourceOptions, sourceParams] = await this.getSource(
-        denops,
-        userSource.name,
-        userSource,
-      );
-      if (!source) {
-        return;
-      }
+    // Gather items asynchronously.
+    const [availableSources, sourcesInitialized] = this
+      .#createAvailableSourceStream(denops, { initialize: true })
+      .tee();
+    const [gatherStates] = availableSources
+      .pipeThrough(this.#createGatherStateTransformer(denops))
+      .tee();
 
-      await initSource(
-        denops,
-        source,
-        sourceOptions,
-        sourceParams,
-        this.#loader,
-      );
-    }
+    // Wait until initialized all sources. Source onInit() must be called before UI.
+    await Array.fromAsync(sourcesInitialized);
 
     // UI should load before refresh.
     // NOTE: If UI is blocked until refresh, user input will break UI.
-    await this.uiRedraw(denops);
+    await this.uiRedraw(denops, { signal });
 
-    await this.refresh(denops);
+    await this.#refreshSources(denops, gatherStates, { signal });
 
     this.#initialized = true;
   }
@@ -311,115 +430,177 @@ export class Ddu {
     refreshIndexes: number[] = [],
   ): Promise<void> {
     this.#startTime = Date.now();
+    this.#context.done = false;
 
-    // Clean up previous gather state
-    this.cancelToRefresh();
-    for (const state of Object.values(this.#gatherStates)) {
-      while (!state.done) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      }
-    }
-    this.resetCancelledToRefresh();
+    await this.cancelToRefresh(refreshIndexes);
 
     // Initialize UI window
     if (!this.#options.sync) {
-      // Do not await here
-      this.redraw(denops);
+      /* no await */ this.redraw(denops);
     }
 
-    await Promise.all(
-      this.#options.sources.map(
-        async (userSource: UserSource, index: number): Promise<void> => {
-          if (refreshIndexes.length > 0 && !refreshIndexes.includes(index)) {
-            // Skip
-            return;
-          }
+    const [gatherStates] = this
+      .#createAvailableSourceStream(denops, { indexes: refreshIndexes })
+      .pipeThrough(this.#createGatherStateTransformer(denops))
+      .tee();
 
-          userSource = convertUserString(userSource);
+    await this.#refreshSources(denops, gatherStates);
+  }
 
-          const state: GatherState = {
-            items: [],
-            done: false,
-          };
+  #createAvailableSourceStream(
+    denops: Denops,
+    options?: {
+      initialize?: boolean;
+      indexes?: number[];
+    },
+  ): ReadableStream<AvailableSourceInfo> {
+    const { initialize = false, indexes = [] } = options ?? {};
 
-          this.#gatherStates[index] = state;
-
-          const [source, sourceOptions, sourceParams] = await this.getSource(
-            denops,
-            userSource.name,
-            userSource,
-          );
-          if (!source) {
-            state.done = true;
-            return;
-          }
-
-          // Start gather asynchronously
-          const gatherItems = this.gatherItems(
-            denops,
-            index,
-            source,
-            sourceOptions,
-            sourceParams,
-            this.#loader,
-            0,
-          );
-
-          // Call "onRefreshItems" hooks
-          const filters = sourceOptions.matchers.concat(
-            sourceOptions.sorters,
-          ).concat(sourceOptions.converters);
-          await Promise.all(filters.map(async (userFilter) => {
-            const [filter, filterOptions, filterParams] = await this.getFilter(
-              denops,
-              userFilter,
-            );
-            await filter?.onRefreshItems?.({
-              denops,
-              filterOptions,
-              filterParams,
-            });
-          }));
-
-          // Get path option, or current directory instead if it is empty
-          const path = sourceOptions.path.length > 0
-            ? sourceOptions.path
-            : await fn.getcwd(denops);
-
-          let prevLength = state.items.length;
-
-          for await (const newItems of gatherItems) {
-            if (path !== this.#context.path) {
-              if (this.#context.path.length > 0) {
-                this.#context.pathHistories.push(this.#context.path);
+    return new ReadableStream({
+      start: async (controller) => {
+        await Promise.all(
+          this.#options.sources
+            .map((source) => convertUserString(source))
+            .map(async (userSource, sourceIndex) => {
+              if (indexes.length > 0 && !indexes.includes(sourceIndex)) {
+                return;
               }
-              this.#context.path = path;
-            }
 
-            state.items = state.items.concat(newItems);
+              const [source, sourceOptions, sourceParams] = await this
+                .getSource(
+                  denops,
+                  userSource.name,
+                  userSource,
+                );
+              if (source == null) {
+                return;
+              }
 
-            if (!this.#options.sync && prevLength !== state.items.length) {
-              // Do not await inside loop
-              this.redraw(denops);
-              prevLength = state.items.length;
-            }
-          }
+              if (initialize) {
+                await initSource(
+                  denops,
+                  source,
+                  sourceOptions,
+                  sourceParams,
+                  this.#loader,
+                );
+              }
 
-          state.done = true;
+              controller.enqueue({
+                sourceIndex,
+                source,
+                sourceOptions,
+                sourceParams,
+              });
+            }),
+        );
+        controller.close();
+      },
+    });
+  }
 
-          if (!this.#options.sync) {
-            await this.redraw(denops);
-          }
+  #createGatherStateTransformer(
+    denops: Denops,
+  ): TransformStream<AvailableSourceInfo, GatherState> {
+    const { signal } = this.#aborter;
+
+    return new TransformStream({
+      transform: (sourceInfo, controller) => {
+        const { sourceIndex, source, sourceOptions, sourceParams } = sourceInfo;
+
+        const state = this.#gatherItems(
+          denops,
+          sourceIndex,
+          source,
+          sourceOptions,
+          sourceParams,
+          this.#loader,
+          0,
+          { signal },
+        );
+        this.#gatherStates.set(sourceIndex, state);
+
+        controller.enqueue(state);
+      },
+    });
+  }
+
+  async #refreshSources(
+    denops: Denops,
+    gatherStates: ReadableStream<GatherState>,
+    opts?: { signal?: AbortSignal },
+  ): Promise<void> {
+    const { signal = this.#aborter.signal } = opts ?? {};
+    const refreshErrorHandler = new AbortController();
+    const refreshedSources: Promise<void>[] = [];
+
+    await gatherStates.pipeTo(
+      new WritableStream({
+        write: (state) => {
+          refreshedSources.push(
+            this.#refreshItems(denops, state).catch((e) => {
+              refreshErrorHandler.abort(e);
+            }),
+          );
         },
-      ),
+        close: async () => {
+          await Promise.all(refreshedSources);
+        },
+      }),
+      { signal: refreshErrorHandler.signal },
     );
 
-    if (this.#options.sync) {
-      await this.redraw(denops);
+    if (!this.#context.done) {
+      await this.redraw(denops, { signal });
     } else {
-      // Wait complete redraw
       await this.#waitRedrawComplete;
     }
+  }
+
+  async #refreshItems(denops: Denops, state: GatherState): Promise<void> {
+    const { sourceInfo: { sourceOptions }, itemsStream, signal } = state;
+
+    await this.#callOnRefreshItemsHooks(denops, sourceOptions);
+
+    // Get path option, or current directory instead if it is empty.
+    const path = sourceOptions.path.length > 0
+      ? sourceOptions.path
+      : await fn.getcwd(denops);
+
+    for await (const newItems of itemsStream) {
+      if (!equal(path, this.#context.path)) {
+        if (this.#context.path.length > 0) {
+          this.#context.pathHistories.push(this.#context.path);
+        }
+        this.#context.path = path;
+      }
+
+      if (!this.#options.sync && newItems.length > 0) {
+        /* no await */ this.redraw(denops, { signal });
+      }
+    }
+  }
+
+  async #callOnRefreshItemsHooks(
+    denops: Denops,
+    sourceOptions: SourceOptions,
+  ): Promise<void> {
+    const filters = [
+      ...sourceOptions.matchers,
+      ...sourceOptions.sorters,
+      ...sourceOptions.converters,
+    ];
+    await Promise.all(filters.map(async (userFilter) => {
+      const [filter, filterOptions, filterParams] = await this.getFilter(
+        denops,
+        userFilter,
+      );
+      await filter?.onRefreshItems?.({
+        denops,
+        filterOptions,
+        filterParams,
+      });
+    }));
   }
 
   #newDduItem<
@@ -455,29 +636,29 @@ export class Ddu {
     };
   }
 
-  async *gatherItems<
+  #gatherItems<
     Params extends BaseSourceParams,
     UserData extends unknown,
   >(
     denops: Denops,
-    index: number,
+    sourceIndex: number,
     source: BaseSource<Params, UserData>,
     sourceOptions: SourceOptions,
     sourceParams: Params,
     loader: Loader,
     itemLevel: number,
-    parent?: DduItem,
-  ): AsyncGenerator<DduItem[], void, undefined> {
-    const { signal } = this.#abortController;
-    if (signal.aborted) {
-      return;
-    }
+    opts?: {
+      parent?: DduItem;
+      signal?: AbortSignal;
+    },
+  ): GatherState<Params, UserData> {
+    const { parent, signal = this.#aborter.signal } = opts ?? {};
 
     const itemTransformer = new TransformStream<Item[], DduItem[]>({
       transform: (chunk, controller) => {
         const newItems = chunk.map((item: Item) =>
           this.#newDduItem(
-            index,
+            sourceIndex,
             source,
             sourceOptions,
             item,
@@ -488,66 +669,92 @@ export class Ddu {
       },
     });
 
-    try {
-      yield* source.gather({
-        denops,
-        context: this.#context,
-        options: this.#options,
+    const state = new GatherState(
+      {
+        sourceIndex,
+        source,
         sourceOptions,
         sourceParams,
-        input: this.#input,
-        parent,
-        loader,
-      }).pipeThrough(itemTransformer, { signal });
-    } catch (e: unknown) {
-      if (signal.aborted && e === signal.reason) {
-        // Aborted by signal, so do nothing.
-      } else {
-        await errorException(
+      },
+      itemTransformer.readable,
+      { signal },
+    );
+
+    // Process from stream generation to termination.
+    (async () => {
+      try {
+        // No `await` before here, to run `source.gather()` synchronously.
+        const itemsStream = source.gather({
           denops,
-          e,
-          `source: ${source.name} "gather()" failed`,
-        );
+          context: this.#context,
+          options: this.#options,
+          sourceOptions,
+          sourceParams,
+          input: this.#input,
+          parent,
+          loader,
+        });
+
+        // Wait until the stream closes.
+        await itemsStream.pipeTo(itemTransformer.writable);
+      } catch (e: unknown) {
+        if (state.signal.aborted && e === state.signal.reason) {
+          // Aborted by signal, so do nothing.
+        } else {
+          // Show error message
+          errorException(
+            denops,
+            e,
+            `source: ${source.name} "gather()" failed`,
+          );
+        }
       }
-    }
+    })();
+
+    return state;
   }
 
   redraw(
     denops: Denops,
     opts?: RedrawOptions,
   ): Promise<unknown> {
+    const newOpts = {
+      restoreItemState: false,
+      signal: this.#aborter.signal,
+      ...opts,
+    };
+
     if (this.#waitRedrawComplete) {
       // Already redrawing, so adding to schedule
+      const prevOpts: RedrawOptions = this.#scheduledRedrawOptions ?? {};
       this.#scheduledRedrawOptions = {
         // Override with true
-        restoreItemState: opts?.restoreItemState ||
-          this.#scheduledRedrawOptions?.restoreItemState,
+        restoreItemState: prevOpts.restoreItemState || newOpts.restoreItemState,
+        // Merge all signals
+        signal: prevOpts.signal && newOpts.signal !== prevOpts.signal
+          ? AbortSignal.any([newOpts.signal, prevOpts.signal])
+          : prevOpts.signal ?? newOpts.signal,
       };
     } else {
       // Start redraw
-      const { promise: complete, resolve, reject } = Promise.withResolvers();
-      this.#waitRedrawComplete = complete;
+      const { resolve, reject } = { promise: this.#waitRedrawComplete } =
+        Promise.withResolvers<void>();
+      this.#scheduledRedrawOptions = newOpts;
 
-      const scheduleRunner = async (opts?: RedrawOptions) => {
+      (async () => {
         try {
-          await this.#redrawInternal(denops, opts);
-
-          opts = this.#scheduledRedrawOptions;
-          if (opts) {
-            // Scheduled to redraw
+          while (this.#scheduledRedrawOptions) {
+            const nextOpts = this.#scheduledRedrawOptions;
             this.#scheduledRedrawOptions = undefined;
-            scheduleRunner(opts);
-          } else {
-            // All schedules completed
-            this.#waitRedrawComplete = undefined;
-            resolve(null);
+            await this.#redrawInternal(denops, nextOpts);
           }
+          // All schedules completed
+          this.#waitRedrawComplete = undefined;
+          resolve();
         } catch (e: unknown) {
           reject(e);
         }
-      };
-
-      scheduleRunner(opts);
+      })();
     }
 
     return this.#waitRedrawComplete;
@@ -555,56 +762,70 @@ export class Ddu {
 
   async #redrawInternal(
     denops: Denops,
-    opts?: RedrawOptions,
+    { restoreItemState, signal }: Required<RedrawOptions>,
   ): Promise<void> {
+    if (signal.aborted) {
+      return;
+    }
+
     // Update current input
-    this.#context.done = true;
     this.#context.doneUi = false;
     this.#context.input = this.#input;
     this.#context.maxItems = 0;
 
-    const sources: SourceInfo[] = [];
-    let allItems: DduItem[] = [];
-    let index = 0;
-    for (
-      const userSource of this.#options.sources.map((source) =>
-        convertUserString(source)
-      )
-    ) {
-      const [source, sourceOptions, _] = await this.getSource(
-        denops,
-        userSource.name,
-        userSource,
-      );
-      if (!source) {
-        return;
-      }
-      sources.push({
-        name: userSource.name,
-        index,
-        path: sourceOptions.path,
-        kind: source.kind ?? "base",
-      });
-
-      const [done, maxItems, items] = await this.#filterItems(
-        denops,
-        userSource,
-        index,
-        this.#input,
-      );
-      if (opts?.restoreItemState) {
-        items.forEach((item) => {
-          if (item.treePath) {
-            item.__expanded = this.#isExpanded(convertTreePath(item.treePath));
+    const filterResults = (await Promise.all(
+      this.#options.sources
+        .map((source) => convertUserString(source))
+        .map(async (userSource, sourceIndex) => {
+          const [source, sourceOptions, _] = await this.getSource(
+            denops,
+            userSource.name,
+            userSource,
+          );
+          if (!source) {
+            return;
           }
-        });
-      }
-      allItems = allItems.concat(items);
-      this.#context.done = done && this.#context.done;
-      this.#context.maxItems += maxItems;
 
-      index++;
-    }
+          const sourceInfo: SourceInfo = {
+            name: userSource.name,
+            index: sourceIndex,
+            path: sourceOptions.path,
+            kind: source.kind ?? "base",
+          };
+
+          const [done, maxItems, items] = await this.#filterItems(
+            denops,
+            userSource,
+            sourceIndex,
+            this.#input,
+          );
+
+          if (restoreItemState) {
+            for (const item of items) {
+              if (item.treePath) {
+                item.__expanded = this.#isExpanded(
+                  convertTreePath(item.treePath),
+                );
+              }
+            }
+          }
+
+          return {
+            sourceInfo,
+            done,
+            maxItems,
+            items,
+          };
+        }),
+    )).filter((result): result is NonNullable<typeof result> => result != null);
+
+    const sources = filterResults.map(({ sourceInfo }) => sourceInfo);
+    let allItems = filterResults.flatMap(({ items }) => items);
+    this.#context.done = filterResults.every(({ done }) => done);
+    this.#context.maxItems = filterResults.reduce(
+      (x, { maxItems }) => x + maxItems,
+      0,
+    );
 
     // Post filters
     allItems = await this.#callFilters(
@@ -632,7 +853,7 @@ export class Ddu {
     this.#items = allItems;
 
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
-    if (!ui || this.shouldStopCurrentContext()) {
+    if (!ui || signal.aborted) {
       return;
     }
 
@@ -673,6 +894,7 @@ export class Ddu {
               search: searchPath,
               preventRedraw: true,
               isGrouped: false,
+              signal,
             },
           );
           return;
@@ -688,6 +910,7 @@ export class Ddu {
             search: searchPath,
             preventRedraw: true,
             isGrouped: false,
+            signal,
           },
         );
       }
@@ -700,8 +923,8 @@ export class Ddu {
       );
     }
 
-    await this.uiRedraw(denops);
-    if (searchTargetItem) {
+    await this.uiRedraw(denops, { signal });
+    if (searchTargetItem && !signal.aborted) {
       await this.uiSearchItem(denops, searchTargetItem);
     }
 
@@ -710,9 +933,12 @@ export class Ddu {
 
   async uiRedraw(
     denops: Denops,
+    opts?: { signal?: AbortSignal },
   ): Promise<void> {
+    const { signal = this.#aborter.signal } = opts ?? {};
+
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
-    if (!ui || this.shouldStopCurrentContext()) {
+    if (!ui || signal.aborted) {
       return;
     }
 
@@ -723,6 +949,7 @@ export class Ddu {
       ui,
       uiOptions,
       uiParams,
+      signal,
     );
   }
 
@@ -797,30 +1024,35 @@ export class Ddu {
   quit() {
     // NOTE: quitted flag must be called after uiQuit().
     this.#quitted = true;
-    this.#abortController.abort("quit");
+    this.#aborter.abort({ reason: "quit" });
     this.#context.done = true;
   }
 
   #resetQuitted() {
     this.#quitted = false;
-    this.#resetAbortController();
+    this.#resetAborter();
   }
 
-  cancelToRefresh() {
-    this.#cancelledToRefresh = true;
-    this.#abortController.abort("cancelToRefresh");
+  async cancelToRefresh(
+    refreshIndexes: number[] = [],
+  ): Promise<void> {
+    this.#aborter.abort({ reason: "cancelToRefresh", refreshIndexes });
+
+    await Promise.all(
+      [...this.#gatherStates]
+        .filter(([sourceIndex]) => isRefreshTarget(sourceIndex, refreshIndexes))
+        .map(([sourceIndex, state]) => {
+          this.#gatherStates.delete(sourceIndex);
+          return state.waitDone;
+        }),
+    );
+
+    this.#resetAborter();
   }
 
-  resetCancelledToRefresh() {
-    this.#cancelledToRefresh = false;
-    this.#resetAbortController();
-  }
-
-  #resetAbortController() {
-    if (
-      !this.shouldStopCurrentContext() && this.#abortController.signal.aborted
-    ) {
-      this.#abortController = new AbortController();
+  #resetAborter() {
+    if (!this.#quitted && this.#aborter.signal.aborted) {
+      this.#aborter = new AbortController();
     }
   }
 
@@ -829,6 +1061,8 @@ export class Ddu {
     actionName: string,
     actionParams: BaseActionParams,
   ): Promise<void> {
+    const { signal } = this.#aborter;
+
     if (await fn.getcmdwintype(denops) !== "") {
       // Skip when Command line window
       return;
@@ -902,6 +1136,7 @@ export class Ddu {
         ui,
         uiOptions,
         uiParams,
+        signal,
       );
     }
   }
@@ -1088,6 +1323,8 @@ export class Ddu {
     clipboard: Clipboard,
     actionHistory: ActionHistory,
   ): Promise<void> {
+    const { signal } = this.#aborter;
+
     const itemAction = await this.getItemAction(
       denops,
       actionName,
@@ -1200,6 +1437,7 @@ export class Ddu {
           ui,
           uiOptions,
           uiParams,
+          signal,
         );
       }
     }
@@ -1213,7 +1451,9 @@ export class Ddu {
   async expandItems(
     denops: Denops,
     items: ExpandItem[],
+    opts?: { signal?: AbortSignal },
   ): Promise<void> {
+    const { signal = this.#aborter.signal } = opts ?? {};
     for (const item of items.sort((a, b) => a.item.__level - b.item.__level)) {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
@@ -1221,68 +1461,64 @@ export class Ddu {
       await this.expandItem(
         denops,
         item.item,
-        item.search === undefined
-          ? {
-            maxLevel: maxLevel,
-            preventRedraw: true,
-            isGrouped: item.isGrouped ?? false,
-          }
-          : {
-            maxLevel: maxLevel,
-            search: item.search,
-            preventRedraw: true,
-            isGrouped: item.isGrouped ?? false,
-          },
+        {
+          search: item.search,
+          maxLevel,
+          preventRedraw: true,
+          isGrouped: item.isGrouped ?? false,
+          signal,
+        },
       );
     }
 
-    const [ui, uiOptions, uiParams] = await this.#getUi(denops);
-    if (ui && !this.shouldStopCurrentContext()) {
-      await uiRedraw(
-        denops,
-        this,
-        this.#uiRedrawLock,
-        ui,
-        uiOptions,
-        uiParams,
-      );
-    }
+    await this.uiRedraw(denops, { signal });
   }
 
   async expandItem(
     denops: Denops,
     parent: DduItem,
     options: {
-      // Expand recursively to the maxLevel
-      maxLevel: number;
+      /**
+       * If specified, expand recursively to find it path.
+       * Otherwise, Expand recursively to the maxLevel.
+       */
+      search?: TreePath;
+      maxLevel?: number;
       preventRedraw?: boolean;
-      isGrouped: boolean;
-    } | {
-      // Expand recursively to find the `search` path
-      search: TreePath;
-      maxLevel: number;
-      preventRedraw?: boolean;
-      isGrouped: boolean;
+      isGrouped?: boolean;
+      signal?: AbortSignal;
     },
   ): Promise<DduItem /* searchedItem */ | undefined> {
-    if (parent.__level < 0 || !parent.isTree || !parent.treePath) {
+    const {
+      search,
+      maxLevel = -1,
+      preventRedraw = false,
+      signal = this.#aborter.signal,
+    } = options;
+
+    if (
+      parent.__level < 0 || !parent.isTree || !parent.treePath || signal.aborted
+    ) {
       return;
     }
 
-    const index = parent.__sourceIndex;
+    const sourceIndex = parent.__sourceIndex;
     const source = this.#loader.getSource(
       this.#options.name,
       parent.__sourceName,
     );
-    const state = this.#gatherStates[index];
-    if (!source || !state) {
+    if (source == null) {
+      return;
+    }
+    const state = this.#gatherStates.get(sourceIndex);
+    if (state == null) {
       return;
     }
 
     const [sourceOptions, sourceParams] = sourceArgs(
       source,
       this.#options,
-      this.#options.sources[index],
+      this.#options.sources[sourceIndex],
     );
 
     this.#setExpanded(convertTreePath(parent.treePath));
@@ -1298,22 +1534,21 @@ export class Ddu {
     let isGrouped = false;
 
     try {
-      for await (
-        const newItems of this.gatherItems(
-          denops,
-          index,
-          source,
-          sourceOptions,
-          sourceParams,
-          this.#loader,
-          parent.__level + 1,
-          parent,
-        )
-      ) {
-        children = children.concat(newItems);
-      }
+      const state = this.#gatherItems(
+        denops,
+        sourceIndex,
+        source,
+        sourceOptions,
+        sourceParams,
+        this.#loader,
+        parent.__level + 1,
+        { parent, signal },
+      );
 
-      if (this.shouldStopCurrentContext()) {
+      await state.readAll();
+      children = [...state.items];
+
+      if (signal.aborted) {
         return;
       }
 
@@ -1363,7 +1598,7 @@ export class Ddu {
     }
 
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
-    if (ui && !this.shouldStopCurrentContext()) {
+    if (ui && !signal.aborted) {
       await ui.expandItem({
         denops,
         context: this.#context,
@@ -1378,30 +1613,31 @@ export class Ddu {
 
     let searchedItem: DduItem | undefined;
 
-    if (options.maxLevel < 0 || parent.__level < options.maxLevel) {
-      const expandTargetChildren = "search" in options
-        ? children.filter((child) =>
+    if (maxLevel < 0 || parent.__level < maxLevel) {
+      const expandTargetChildren = children.filter(
+        search != null
           // Expand recursively to find the `search` path
-          child.__expanded ||
-          child.isTree && child.treePath &&
-            isParentPath(
-              convertTreePath(child.treePath),
-              convertTreePath(options.search),
-            )
-        )
-        : children.filter((child) =>
+          ? (child) =>
+            child.__expanded ||
+            child.isTree && child.treePath &&
+              isParentPath(
+                convertTreePath(child.treePath),
+                convertTreePath(search),
+              )
           // Expand recursively to the maxLevel
-          child.__expanded ||
-          child.isTree && child.treePath &&
-            // NOTE: Skip hidden directory
-            !basename(treePath2Filename(child.treePath)).startsWith(".")
-        );
+          : (child) =>
+            child.__expanded ||
+            child.isTree && child.treePath &&
+              // NOTE: Skip hidden directory
+              !basename(treePath2Filename(child.treePath)).startsWith("."),
+      );
 
       if (expandTargetChildren.length > 0) {
         // Expand is not completed yet.
         const childOptions = {
           ...options,
           preventRedraw: true,
+          signal,
         };
 
         await Promise.all(
@@ -1421,24 +1657,27 @@ export class Ddu {
       // Collapse children exceed the maxLevel
       const expandedChildren = children.filter((child) => child.__expanded);
       if (expandedChildren.length > 0) {
-        await this.collapseItems(denops, expandedChildren, true);
+        await this.collapseItems(denops, expandedChildren, {
+          preventRedraw: true,
+          signal,
+        });
       }
     }
 
     if (
-      "search" in options &&
+      search &&
       !searchedItem && parent.treePath &&
       isParentPath(
         convertTreePath(parent.treePath),
-        convertTreePath(options.search),
+        convertTreePath(search),
       )
     ) {
       searchedItem = children.find((item) =>
-        options.search === item.treePath ?? item.word
+        search === item.treePath ?? item.word
       );
     }
 
-    if (ui && !this.shouldStopCurrentContext() && !options.preventRedraw) {
+    if (ui && !signal.aborted && !preventRedraw) {
       await uiRedraw(
         denops,
         this,
@@ -1446,16 +1685,19 @@ export class Ddu {
         ui,
         uiOptions,
         uiParams,
+        signal,
       );
 
-      await ui.searchItem({
-        denops,
-        context: this.#context,
-        options: this.#options,
-        uiOptions,
-        uiParams,
-        item: searchedItem ?? parent,
-      });
+      if (!signal.aborted) {
+        await ui.searchItem({
+          denops,
+          context: this.#context,
+          options: this.#options,
+          uiOptions,
+          uiParams,
+          item: searchedItem ?? parent,
+        });
+      }
     }
 
     return searchedItem;
@@ -1464,26 +1706,37 @@ export class Ddu {
   async collapseItems(
     denops: Denops,
     items: DduItem[],
-    preventRedraw?: boolean,
+    opts?: {
+      preventRedraw?: boolean;
+      signal?: AbortSignal;
+    },
   ): Promise<void> {
+    const { preventRedraw, signal = this.#aborter.signal } = opts ?? {};
+
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
-    if (!ui) {
+    if (!ui || signal.aborted) {
       return;
     }
 
     for (const item of items) {
-      const index = item.__sourceIndex;
+      if (!item.treePath) {
+        continue;
+      }
+      const sourceIndex = item.__sourceIndex;
       const source = this.#loader.getSource(
         this.#options.name,
         item.__sourceName,
       );
+      if (source == null) {
+        continue;
+      }
       const [sourceOptions, _] = sourceArgs(
         source,
         this.#options,
-        this.#options.sources[index],
+        this.#options.sources[sourceIndex],
       );
-      const state = this.#gatherStates[index];
-      if (!item.treePath || !state) {
+      const state = this.#gatherStates.get(sourceIndex);
+      if (state == null) {
         continue;
       }
 
@@ -1514,6 +1767,10 @@ export class Ddu {
         item.display = items[0].display;
       }
 
+      if (signal.aborted) {
+        return;
+      }
+
       const collapsed = await ui.collapseItem({
         denops,
         context: this.#context,
@@ -1528,7 +1785,7 @@ export class Ddu {
       }
     }
 
-    if (!preventRedraw) {
+    if (!preventRedraw && !signal.aborted) {
       await uiRedraw(
         denops,
         this,
@@ -1536,11 +1793,12 @@ export class Ddu {
         ui,
         uiOptions,
         uiParams,
+        signal,
       );
 
       const searchItem = items.at(-1);
 
-      if (searchItem) {
+      if (searchItem && !signal.aborted) {
         await ui.searchItem({
           denops,
           context: this.#context,
@@ -1569,7 +1827,7 @@ export class Ddu {
     tabNr: number,
   ): Promise<boolean> {
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
-    if (!ui || !ui.visible || this.shouldStopCurrentContext()) {
+    if (!ui?.visible || this.#quitted) {
       return false;
     }
 
@@ -1587,7 +1845,7 @@ export class Ddu {
     denops: Denops,
   ): Promise<number[]> {
     const [ui, uiOptions, uiParams] = await this.#getUi(denops);
-    if (!ui || !ui.winIds || this.shouldStopCurrentContext()) {
+    if (!ui?.winIds || this.#quitted) {
       return [];
     }
 
@@ -1606,10 +1864,6 @@ export class Ddu {
     }
     this.#input = input;
     this.#context.input = input;
-  }
-
-  shouldStopCurrentContext(): boolean {
-    return this.#quitted || this.#cancelledToRefresh;
   }
 
   getContext() {
@@ -1974,7 +2228,7 @@ export class Ddu {
   async #filterItems(
     denops: Denops,
     userSource: UserSource,
-    index: number,
+    sourceIndex: number,
     input: string,
   ): Promise<[boolean, number, DduItem[]]> {
     userSource = convertUserString(userSource);
@@ -1985,13 +2239,13 @@ export class Ddu {
       userSource,
     );
 
-    const state = this.#gatherStates[index];
+    const state = this.#gatherStates.get(sourceIndex);
     if (!state || !source) {
       return [false, 0, []];
     }
 
     // NOTE: Use deepcopy.  Because of filters may break original items.
-    let items = structuredClone(state.items);
+    let items = structuredClone(state.items) as DduItem[];
     const allItems = items.length;
 
     items = await this.#callFilters(
@@ -2018,7 +2272,7 @@ export class Ddu {
       items,
     );
 
-    return [state.done, allItems, items];
+    return [state.isDone, allItems, items];
   }
 
   async #callFilters(
@@ -2388,10 +2642,6 @@ async function initSource<
   sourceParams: Params,
   loader: Loader,
 ): Promise<void> {
-  if (!source) {
-    return;
-  }
-
   source.isInitialized = false;
   await source.onInit({
     denops,
@@ -2438,6 +2688,7 @@ async function uiRedraw<
   ui: BaseUi<Params>,
   uiOptions: UiOptions,
   uiParams: Params,
+  signal: AbortSignal,
 ): Promise<void> {
   // NOTE: Redraw must be locked
   await lock.lock(async () => {
@@ -2449,7 +2700,7 @@ async function uiRedraw<
     const options = ddu.getOptions();
     const context = ddu.getContext();
     try {
-      if (ddu.shouldStopCurrentContext()) {
+      if (signal.aborted) {
         await ddu.uiQuit(denops, ui, uiOptions, uiParams);
         return;
       }
@@ -2471,7 +2722,7 @@ async function uiRedraw<
       });
 
       // NOTE: ddu may be quitted after redraw
-      if (ddu.shouldStopCurrentContext()) {
+      if (signal.aborted) {
         await ddu.uiQuit(denops, ui, uiOptions, uiParams);
       }
 
@@ -2570,6 +2821,17 @@ function convertUserString<T>(user: string | T) {
 function isParentPath(checkPath: string[], searchPath: string[]) {
   return checkPath !== searchPath &&
     searchPath.join(pathsep).startsWith(checkPath.join(pathsep) + pathsep);
+}
+
+function isRefreshTarget(
+  sourceIndex: number,
+  refreshIndexes: number[],
+): boolean {
+  return refreshIndexes.length === 0
+    // Target all states.
+    ? true
+    // Target included states.
+    : refreshIndexes.includes(sourceIndex);
 }
 
 Deno.test("sourceArgs", () => {
