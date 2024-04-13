@@ -1,0 +1,10 @@
+{
+  "lock": false,
+  "tasks": {
+    "check": "deno check --no-lock denops/**/*.ts",
+    "lint": "deno lint denops",
+    "fmt": "deno fmt denops",
+    "test": "deno test --no-lock -A --doc --parallel --shuffle denops/**/*.ts",
+    "upgrade": "deno run --no-lock -A https://deno.land/x/udd/main.ts denops/**/*.ts"
+  }
+}
