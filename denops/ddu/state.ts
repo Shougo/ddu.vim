@@ -37,8 +37,9 @@ export class GatherState<
   readonly itemsStream: ReadableStream<DduItem[]>;
   #items: DduItem[] = [];
   #isDone = false;
-  #waitDone = Promise.withResolvers<void>();
-  #aborter = new AbortController();
+  readonly #waitDone = Promise.withResolvers<void>();
+  readonly #aborter = new AbortController();
+  #resetParentSignal?: AbortController;
 
   constructor(
     sourceInfo: AvailableSourceInfo<Params, UserData>,
@@ -55,7 +56,19 @@ export class GatherState<
     this.itemsStream = this.#processItemsStream(itemsStream);
   }
 
+  resetSignal(signal?: AbortSignal): void {
+    // Do nothing if already aborted.
+    if (!this.#aborter.signal.aborted) {
+      this.#resetParentSignal?.abort();
+      if (signal != null) {
+        this.#chainAbortSignal(signal);
+      }
+    }
+  }
+
   #chainAbortSignal(parentSignal: AbortSignal): void {
+    this.#resetParentSignal = new AbortController();
+
     const abortIfTarget = () => {
       const reason = maybe(
         parentSignal.reason,
@@ -73,7 +86,10 @@ export class GatherState<
       abortIfTarget();
     } else {
       parentSignal.addEventListener("abort", () => abortIfTarget(), {
-        signal: this.#aborter.signal,
+        signal: AbortSignal.any([
+          this.#aborter.signal,
+          this.#resetParentSignal.signal,
+        ]),
       });
     }
   }
@@ -133,7 +149,7 @@ export class GatherState<
   }
 }
 
-export function isRefreshTarget(
+function isRefreshTarget(
   sourceIndex: number,
   refreshIndexes: number[],
 ): boolean {
