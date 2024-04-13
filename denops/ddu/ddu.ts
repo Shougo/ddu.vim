@@ -44,7 +44,6 @@ import {
   AvailableSourceInfo,
   GatherState,
   GatherStateAbortable,
-  isRefreshTarget,
 } from "./state.ts";
 import {
   callColumns,
@@ -892,10 +891,11 @@ export class Ddu {
 
     await Promise.all(
       [...this.#gatherStates]
-        .filter(([sourceIndex]) => isRefreshTarget(sourceIndex, refreshIndexes))
         .map(([sourceIndex, state]) => {
-          this.#gatherStates.delete(sourceIndex);
-          return state.waitDone;
+          if (state.signal.aborted) {
+            this.#gatherStates.delete(sourceIndex);
+            return state.waitDone;
+          }
         }),
     );
 
@@ -905,6 +905,9 @@ export class Ddu {
   #resetAborter() {
     if (!this.#quitted && this.#aborter.signal.aborted) {
       this.#aborter = new AbortController();
+      for (const state of this.#gatherStates.values()) {
+        state.resetSignal(this.#aborter.signal);
+      }
     }
   }
 
