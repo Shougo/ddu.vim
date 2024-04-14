@@ -54,7 +54,7 @@ import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 import { Loader } from "./loader.ts";
-import { convertUserString, errorException, printError } from "./utils.ts";
+import { convertUserString, printError } from "./utils.ts";
 
 type ItemActions = {
   source: BaseSource<BaseSourceParams, unknown>;
@@ -547,11 +547,7 @@ export async function callFilters(
         items = ret.items;
       }
     } catch (e: unknown) {
-      await errorException(
-        denops,
-        e,
-        `filter: ${filter.name} "filter()" failed`,
-      );
+      await printError(denops, `filter: ${filter.name} "filter()" failed`, e);
     }
   }
 
@@ -889,11 +885,7 @@ async function checkUiOnInit(
 
     ui.isInitialized = true;
   } catch (e: unknown) {
-    await errorException(
-      denops,
-      e,
-      `ui: ${ui.name} "onInit()" failed`,
-    );
+    await printError(denops, `ui: ${ui.name} "onInit()" failed`, e);
   }
 }
 
@@ -975,11 +967,7 @@ export async function uiRedraw<
         // Ignore "E523: Not allowed here" errors
         await denops.call("ddu#_lazy_redraw", options.name);
       } else {
-        await errorException(
-          denops,
-          e,
-          `ui: ${ui.name} "redraw()" failed`,
-        );
+        await printError(denops, `ui: ${ui.name} "redraw()" failed`, e);
       }
     }
   });
@@ -1004,11 +992,7 @@ async function checkFilterOnInit(
 
     filter.isInitialized = true;
   } catch (e: unknown) {
-    await errorException(
-      denops,
-      e,
-      `filter: ${filter.name} "onInit()" failed`,
-    );
+    await printError(denops, `filter: ${filter.name} "onInit()" failed`, e);
   }
 }
 
@@ -1031,11 +1015,7 @@ async function checkColumnOnInit(
 
     column.isInitialized = true;
   } catch (e: unknown) {
-    await errorException(
-      denops,
-      e,
-      `column: ${column.name} "onInit()" failed`,
-    );
+    await printError(denops, `column: ${column.name} "onInit()" failed`, e);
   }
 }
 

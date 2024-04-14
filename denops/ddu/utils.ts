@@ -22,14 +22,6 @@ export async function printError(
   await denops.call("ddu#util#print_error", message);
 }
 
-export async function errorException(
-  denops: Denops,
-  e: unknown,
-  message: string,
-) {
-  await printError(denops, message, e);
-}
-
 export async function safeStat(path: string): Promise<Deno.FileInfo | null> {
   // NOTE: Deno.stat() may be failed
   try {
