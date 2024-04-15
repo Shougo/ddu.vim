@@ -35,11 +35,7 @@ import {
 } from "./context.ts";
 import { defaultSourceOptions } from "./base/source.ts";
 import { Loader } from "./loader.ts";
-import {
-  convertUserString,
-  errorException,
-  treePath2Filename,
-} from "./utils.ts";
+import { convertUserString, printError, treePath2Filename } from "./utils.ts";
 import {
   AvailableSourceInfo,
   GatherState,
@@ -567,11 +563,7 @@ export class Ddu {
           // Aborted by signal, so do nothing.
         } else {
           // Show error message
-          errorException(
-            denops,
-            e,
-            `source: ${source.name} "gather()" failed`,
-          );
+          printError(denops, `source: ${source.name} "gather()" failed`, e);
         }
       }
     })();
@@ -791,8 +783,8 @@ export class Ddu {
     }));
 
     if (this.#context.done && this.#options.profile) {
-      await denops.call(
-        "ddu#util#print_error",
+      await printError(
+        denops,
         `Refresh all items: ${Date.now() - this.#startTime} ms`,
       );
     }
@@ -942,10 +934,7 @@ export class Ddu {
 
     const action = uiOptions.actions[actionName] ?? ui.actions[actionName];
     if (!action) {
-      await denops.call(
-        "ddu#util#print_error",
-        `Not found UI action: ${actionName}`,
-      );
+      await printError(denops, `Not found UI action: ${actionName}`);
       return;
     }
 

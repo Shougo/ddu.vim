@@ -1,8 +1,11 @@
 const s:is_windows = has('win32') || has('win64')
 
 function ddu#util#print_error(string, name = 'ddu') abort
+  let lines = a:string->string()->split("\n")
   echohl Error
-  echomsg printf('[%s] %s', a:name, a:string->string())
+  for line in lines
+    echomsg printf('[%s] %s', a:name, line)
+  endfor
   echohl None
 endfunction
 
