@@ -884,7 +884,10 @@ export class Ddu {
     await Promise.all(
       [...this.#gatherStates]
         .map(([sourceIndex, state]) => {
-          if (state.signal.aborted) {
+          if (
+            (refreshIndexes.length === 0 ||
+              refreshIndexes.includes(sourceIndex)) && state.signal.aborted
+          ) {
             this.#gatherStates.delete(sourceIndex);
             return state.waitDone;
           }
