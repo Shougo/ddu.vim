@@ -50,24 +50,22 @@ export class GatherState<
   ) {
     const { signal: parentSignal } = options ?? {};
     this.sourceInfo = sourceInfo;
-    if (parentSignal) {
-      this.#chainAbortSignal(parentSignal);
-    }
+    this.#chainAbortSignal(parentSignal);
     this.itemsStream = this.#processItemsStream(itemsStream);
   }
 
   resetSignal(signal?: AbortSignal): void {
     // Do nothing if already aborted.
     if (!this.#aborter.signal.aborted) {
-      this.#resetParentSignal?.abort();
-      if (signal != null) {
-        this.#chainAbortSignal(signal);
-      }
+      this.#chainAbortSignal(signal);
     }
   }
 
-  #chainAbortSignal(parentSignal: AbortSignal): void {
-    this.#resetParentSignal = new AbortController();
+  #chainAbortSignal(parentSignal?: AbortSignal): void {
+    this.#resetParentSignal?.abort();
+    if (parentSignal == null) {
+      return;
+    }
 
     const abortIfTarget = () => {
       const reason = maybe(
@@ -85,6 +83,7 @@ export class GatherState<
     if (parentSignal.aborted) {
       abortIfTarget();
     } else {
+      this.#resetParentSignal = new AbortController();
       parentSignal.addEventListener("abort", () => abortIfTarget(), {
         signal: AbortSignal.any([
           this.#aborter.signal,
