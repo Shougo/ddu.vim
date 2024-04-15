@@ -149,7 +149,7 @@ export class GatherState<
   }
 }
 
-function isRefreshTarget(
+export function isRefreshTarget(
   sourceIndex: number,
   refreshIndexes: number[],
 ): boolean {

@@ -40,6 +40,7 @@ import {
   AvailableSourceInfo,
   GatherState,
   GatherStateAbortable,
+  isRefreshTarget,
 } from "./state.ts";
 import {
   callColumns,
@@ -884,10 +885,7 @@ export class Ddu {
     await Promise.all(
       [...this.#gatherStates]
         .map(([sourceIndex, state]) => {
-          if (
-            (refreshIndexes.length === 0 ||
-              refreshIndexes.includes(sourceIndex)) && state.signal.aborted
-          ) {
+          if (isRefreshTarget(sourceIndex, refreshIndexes)) {
             this.#gatherStates.delete(sourceIndex);
             return state.waitDone;
           }
