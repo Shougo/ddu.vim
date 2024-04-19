@@ -246,7 +246,6 @@ export class Ddu {
     this.#initialized = false;
     this.#resetQuitted();
     this.#startTime = Date.now();
-    const { signal } = this.#aborter;
 
     // Gather items asynchronously.
     const [availableSources, sourcesInitialized] = this
@@ -261,9 +260,11 @@ export class Ddu {
 
     // UI should load before refresh.
     // NOTE: If UI is blocked until refresh, user input will break UI.
-    await this.uiRedraw(denops, { signal });
+    await this.uiRedraw(denops, { signal: this.#aborter.signal });
 
-    await this.#refreshSources(denops, gatherStates, { signal });
+    await this.#refreshSources(denops, gatherStates, {
+      signal: this.#aborter.signal,
+    });
 
     this.#initialized = true;
   }
@@ -381,8 +382,6 @@ export class Ddu {
   #createGatherStateTransformer(
     denops: Denops,
   ): TransformStream<AvailableSourceInfo, GatherState> {
-    const { signal } = this.#aborter;
-
     return new TransformStream({
       transform: (sourceInfo, controller) => {
         const { sourceIndex, source, sourceOptions, sourceParams } = sourceInfo;
@@ -395,7 +394,7 @@ export class Ddu {
           sourceParams,
           this.#loader,
           0,
-          { signal },
+          { signal: this.#aborter.signal },
         );
         this.#gatherStates.set(sourceIndex, state);
 
@@ -909,8 +908,6 @@ export class Ddu {
     actionName: string,
     actionParams: BaseActionParams,
   ): Promise<void> {
-    const { signal } = this.#aborter;
-
     if (await fn.getcmdwintype(denops) !== "") {
       // Skip when Command line window
       return;
@@ -999,7 +996,7 @@ export class Ddu {
         ui,
         uiOptions,
         uiParams,
-        signal,
+        this.#aborter.signal,
       );
     }
   }
@@ -1012,8 +1009,6 @@ export class Ddu {
     clipboard: Clipboard,
     actionHistory: ActionHistory,
   ): Promise<void> {
-    const { signal } = this.#aborter;
-
     const itemAction = await getItemAction(
       denops,
       this.#loader,
@@ -1139,7 +1134,7 @@ export class Ddu {
           ui,
           uiOptions,
           uiParams,
-          signal,
+          this.#aborter.signal,
         );
       }
     }
