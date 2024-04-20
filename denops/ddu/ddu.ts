@@ -247,12 +247,15 @@ export class Ddu {
     this.#resetQuitted();
     this.#startTime = Date.now();
 
+    // NOTE: Get the signal after the aborter is reset.
+    const { signal } = this.#aborter;
+
     // Gather items asynchronously.
     const [availableSources, sourcesInitialized] = this
       .#createAvailableSourceStream(denops, { initialize: true })
       .tee();
     const [gatherStates] = availableSources
-      .pipeThrough(this.#createGatherStateTransformer(denops))
+      .pipeThrough(this.#createGatherStateTransformer(denops, signal))
       .tee();
 
     // Wait until initialized all sources. Source onInit() must be called before UI.
@@ -260,11 +263,9 @@ export class Ddu {
 
     // UI should load before refresh.
     // NOTE: If UI is blocked until refresh, user input will break UI.
-    await this.uiRedraw(denops, { signal: this.#aborter.signal });
+    await this.uiRedraw(denops, { signal });
 
-    await this.#refreshSources(denops, gatherStates, {
-      signal: this.#aborter.signal,
-    });
+    await this.#refreshSources(denops, gatherStates, { signal });
 
     this.#initialized = true;
   }
@@ -313,6 +314,9 @@ export class Ddu {
 
     await this.cancelToRefresh(refreshIndexes);
 
+    // NOTE: Get the signal after the aborter is reset.
+    const { signal } = this.#aborter;
+
     // Initialize UI window
     if (!this.#options.sync) {
       /* no await */ this.redraw(denops);
@@ -320,7 +324,7 @@ export class Ddu {
 
     const [gatherStates] = this
       .#createAvailableSourceStream(denops, { indexes: refreshIndexes })
-      .pipeThrough(this.#createGatherStateTransformer(denops))
+      .pipeThrough(this.#createGatherStateTransformer(denops, signal))
       .tee();
 
     await this.#refreshSources(denops, gatherStates);
@@ -381,6 +385,7 @@ export class Ddu {
 
   #createGatherStateTransformer(
     denops: Denops,
+    signal: AbortSignal,
   ): TransformStream<AvailableSourceInfo, GatherState> {
     return new TransformStream({
       transform: (sourceInfo, controller) => {
@@ -394,7 +399,7 @@ export class Ddu {
           sourceParams,
           this.#loader,
           0,
-          { signal: this.#aborter.signal },
+          { signal },
         );
         this.#gatherStates.set(sourceIndex, state);
 
@@ -983,6 +988,9 @@ export class Ddu {
       });
     }
 
+    // NOTE: Get the signal after the UI action finishes.
+    const { signal } = this.#aborter;
+
     const flags = typeof ret === "number" ? ret : ActionFlags.None;
 
     if (flags & ActionFlags.RefreshItems) {
@@ -996,7 +1004,7 @@ export class Ddu {
         ui,
         uiOptions,
         uiParams,
-        this.#aborter.signal,
+        signal,
       );
     }
   }
@@ -1125,6 +1133,9 @@ export class Ddu {
       // Restore quitted flag before refresh and redraw
       this.#resetQuitted();
 
+      // NOTE: Get the signal after the aborter is reset.
+      const { signal } = this.#aborter;
+
       if (ui) {
         await uiRedraw(
           denops,
@@ -1134,7 +1145,7 @@ export class Ddu {
           ui,
           uiOptions,
           uiParams,
-          this.#aborter.signal,
+          signal,
         );
       }
     }
