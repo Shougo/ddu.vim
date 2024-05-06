@@ -149,8 +149,7 @@ export type SourceOptions = {
 };
 
 export type FilterOptions = {
-  // TODO: Add options and remove placeholder
-  placeholder?: unknown;
+  minInputLength: number;
 };
 
 export type ColumnOptions = {

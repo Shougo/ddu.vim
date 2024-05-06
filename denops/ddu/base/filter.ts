@@ -55,6 +55,6 @@ export abstract class BaseFilter<Params extends BaseFilterParams> {
 
 export function defaultFilterOptions(): FilterOptions {
   return {
-    placeholder: undefined,
+    minInputLength: 0,
   };
 }

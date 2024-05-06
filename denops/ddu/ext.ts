@@ -521,7 +521,7 @@ export async function callFilters(
       options,
       userFilter,
     );
-    if (!filter) {
+    if (!filter || input.length < filterOptions.minInputLength) {
       continue;
     }
 
@@ -999,7 +999,7 @@ async function checkFilterOnInit(
 async function checkColumnOnInit(
   column: BaseColumn<BaseColumnParams>,
   denops: Denops,
-  columnOptions: FilterOptions,
+  columnOptions: ColumnOptions,
   columnParams: BaseColumnParams,
 ) {
   if (column.isInitialized) {
