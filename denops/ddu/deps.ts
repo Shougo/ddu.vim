@@ -17,7 +17,7 @@ export {
   is,
   maybe,
 } from "https://deno.land/x/unknownutil@v3.18.0/mod.ts";
-export { assertEquals, equal } from "jsr:@std/assert@0.224.0";
+export { assertEquals, equal } from "jsr:@std/assert@0.225.1";
 export {
   basename,
   dirname,
