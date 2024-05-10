@@ -324,7 +324,7 @@ export function main(denops: Denops) {
       if (mode === "collapse") {
         await ddu.collapseItems(denops, items.map((item) => item.item));
       } else if (mode === "expand") {
-        ddu.expandItems(denops, items);
+        await ddu.expandItems(denops, items);
       }
     },
     async updateOptions(arg1: unknown, arg2: unknown): Promise<void> {
