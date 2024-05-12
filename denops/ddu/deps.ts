@@ -28,4 +28,4 @@ export {
 export { deadline, DeadlineError } from "jsr:@std/async@0.224.0";
 
 export { TimeoutError } from "https://deno.land/x/msgpack_rpc@v4.0.1/response_waiter.ts";
-export { Lock } from "https://deno.land/x/async@v2.1.0/mod.ts";
+export { Lock } from "jsr:@lambdalisue/async@2.1.1";
