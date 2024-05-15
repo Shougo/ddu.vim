@@ -1,4 +1,4 @@
-import { Denops, ensure, is, Lock, toFileUrl } from "./deps.ts";
+import { Denops, ensure, Entrypoint, is, Lock, toFileUrl } from "./deps.ts";
 import {
   Action,
   ActionHistory,
@@ -36,7 +36,7 @@ import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 
-export function main(denops: Denops) {
+export const main: Entrypoint = (denops: Denops) => {
   type RedrawTreeMode = "collapse" | "expand";
   type RedrawOption = {
     check?: boolean;
@@ -507,4 +507,4 @@ export function main(denops: Denops) {
       return await ddu.uiWinids(denops);
     },
   };
-}
+};
