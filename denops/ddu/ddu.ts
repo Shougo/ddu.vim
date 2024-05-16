@@ -86,7 +86,7 @@ export class Ddu {
   readonly #expandedPaths = new Set<string[]>();
   #searchPath: TreePath = "";
   #items: DduItem[] = [];
-  readonly #expandedItems: Set<DduItem> = new Set();
+  readonly #expandedItems: Map<string, DduItem> = new Map();
 
   constructor(loader: Loader) {
     this.#loader = loader;
@@ -1205,7 +1205,8 @@ export class Ddu {
     } = options;
 
     if (
-      parent.__level < 0 || !parent.isTree || !parent.treePath || signal.aborted
+      parent.__level < 0 || !parent.isTree || !parent.treePath ||
+      signal.aborted
     ) {
       return;
     }
@@ -1231,7 +1232,7 @@ export class Ddu {
 
     this.#setExpanded(convertTreePath(parent.treePath));
     parent.__expanded = true;
-    this.#expandedItems.add(parent);
+    this.#expandedItems.set(item2Key(parent), parent);
 
     // Set path
     const savePath = this.#context.path;
@@ -1468,7 +1469,7 @@ export class Ddu {
 
       this.#setUnexpanded(convertTreePath(item.treePath));
       item.__expanded = false;
-      this.#expandedItems.delete(item);
+      this.#expandedItems.delete(item2Key(item));
 
       const columnItems = [item];
       await callColumns(
@@ -1549,7 +1550,7 @@ export class Ddu {
   ): Promise<void> {
     await this.expandItems(
       denops,
-      [...this.#expandedItems].map((item) => ({
+      [...this.#expandedItems.values()].map((item) => ({
         item,
       })),
     );
@@ -1850,6 +1851,15 @@ export class Ddu {
 
 function convertTreePath(treePath: TreePath) {
   return typeof treePath === "string" ? treePath.split(pathsep) : treePath;
+}
+
+function item2Key(item: DduItem) {
+  const treePath = typeof item.treePath === "string"
+    ? item.treePath
+    : item.treePath
+    ? item.treePath.join(pathsep)
+    : item.word;
+  return `${item.__sourceIndex}${item.__sourceName}:${treePath}`;
 }
 
 function isParentPath(checkPath: string[], searchPath: string[]) {
