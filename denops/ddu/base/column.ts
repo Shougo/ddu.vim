@@ -15,6 +15,15 @@ export type OnInitArguments<Params extends BaseColumnParams> = {
   columnParams: Params;
 };
 
+export type GetBaseTextArguments<Params extends BaseColumnParams> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  columnOptions: ColumnOptions;
+  columnParams: Params;
+  item: DduItem;
+};
+
 export type GetLengthArguments<Params extends BaseColumnParams> = {
   denops: Denops;
   context: Context;
@@ -33,6 +42,7 @@ export type GetTextArguments<Params extends BaseColumnParams> = {
   startCol: number;
   endCol: number;
   item: DduItem;
+  baseText?: string;
 };
 
 export type GetTextResult = {
@@ -48,6 +58,10 @@ export abstract class BaseColumn<Params extends BaseColumnParams> {
   isInitialized = false;
 
   onInit(_args: OnInitArguments<Params>): void | Promise<void> {}
+
+  abstract getBaseText(
+    {}: GetBaseTextArguments<Params>,
+  ): string | Promise<string>;
 
   abstract getLength({}: GetLengthArguments<Params>): number | Promise<number>;
 

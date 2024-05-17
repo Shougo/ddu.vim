@@ -1368,6 +1368,11 @@ NOTE: If you call Vim functions, it is not asynchronous.
 ------------------------------------------------------------------------------
 COLUMN ATTRIBUTES                                      *ddu-column-attributes*
 
+                                            *ddu-column-attribute-getBaseText*
+getBaseText		(function)			(Optional)
+		It is called to get column base text.
+		It is called once for the item.
+
                                               *ddu-column-attribute-getLength*
 getLength		(function)			(Required)
 		It is called to get column length.

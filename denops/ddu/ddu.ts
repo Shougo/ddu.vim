@@ -498,6 +498,7 @@ export class Ddu {
         item.treePath &&
           this.#isExpanded(convertTreePath(item.treePath)),
       ),
+      __columnTexts: {},
       __groupedPath: "",
     };
   }

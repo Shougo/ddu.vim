@@ -567,11 +567,6 @@ export async function callColumns(
     return items;
   }
 
-  for (const item of items) {
-    item.display = "";
-    item.highlights = [];
-  }
-
   type CachedColumn = {
     column: BaseColumn<BaseColumnParams>;
     columnOptions: ColumnOptions;
@@ -609,11 +604,27 @@ export async function callColumns(
   }
 
   for (const item of items) {
+    item.display = "";
+    item.highlights = [];
+  }
+
+  for (const item of items) {
     let startCol = 1;
     for (const index of userColumns.keys()) {
       const cachedColumn = cachedColumns[index];
       if (!cachedColumn) {
         continue;
+      }
+
+      if (!item.__columnTexts[index] && cachedColumn.column.getBaseText) {
+        item.__columnTexts[index] = await cachedColumn.column.getBaseText({
+          denops,
+          context,
+          options,
+          columnOptions: cachedColumn.columnOptions,
+          columnParams: cachedColumn.columnParams,
+          item,
+        });
       }
 
       const text = await cachedColumn.column.getText({
@@ -625,6 +636,7 @@ export async function callColumns(
         startCol,
         endCol: startCol + cachedColumn.length,
         item,
+        baseText: item.__columnTexts[index],
       });
 
       if (text.highlights && item.highlights) {
