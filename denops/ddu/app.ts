@@ -290,13 +290,12 @@ export const main: Entrypoint = (denops: Denops) => {
               denops,
               opt?.method === "refreshItems" ? [] : volatiles,
             );
-            await ddu.restoreTree(denops);
           } else if (opt?.method === "uiRedraw") {
             await ddu.uiRedraw(denops);
           } else {
             await ddu.redraw(denops);
-            await ddu.restoreTree(denops);
           }
+          await ddu.restoreTree(denops);
 
           if (opt?.searchItem) {
             await uiSearchItem(

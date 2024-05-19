@@ -327,6 +327,7 @@ export class Ddu {
       .tee();
 
     await this.#refreshSources(denops, gatherStates);
+    await this.restoreTree(denops);
   }
 
   #createAvailableSourceStream(
@@ -1542,17 +1543,6 @@ export class Ddu {
     }
   }
 
-  async restoreTree(
-    denops: Denops,
-  ): Promise<void> {
-    await this.expandItems(
-      denops,
-      [...this.#expandedItems.values()].map((item) => ({
-        item,
-      })),
-    );
-  }
-
   async uiVisible(
     denops: Denops,
     tabNr: number,
@@ -1755,6 +1745,17 @@ export class Ddu {
     }
 
     return false;
+  }
+
+  async restoreTree(
+    denops: Denops,
+  ): Promise<void> {
+    await this.expandItems(
+      denops,
+      [...this.#expandedItems.values()].map((item) => ({
+        item,
+      })),
+    );
   }
 
   async #filterItems(
