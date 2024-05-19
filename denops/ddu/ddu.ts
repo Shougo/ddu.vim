@@ -83,7 +83,6 @@ export class Ddu {
   #waitRedrawComplete?: Promise<void>;
   #scheduledRedrawOptions?: Required<RedrawOptions>;
   #startTime = 0;
-  readonly #expandedPaths = new Set<string[]>();
   #searchPath: TreePath = "";
   #items: DduItem[] = [];
   readonly #expandedItems: Map<string, DduItem> = new Map();
@@ -484,23 +483,24 @@ export class Ddu {
         sourceOptions.matcherKey
       ] as string
       : item.word;
-    if (item.isExpanded && item.treePath) {
-      this.#expandedPaths.add(convertTreePath(item.treePath));
-    }
-    return {
+
+    const dduItem = {
       ...item,
       kind: item.kind ?? source.kind,
       matcherKey,
       __sourceIndex: sourceIndex,
       __sourceName: source.name,
       __level: item.level ?? level ?? 0,
-      __expanded: Boolean(
-        item.treePath &&
-          this.#isExpanded(convertTreePath(item.treePath)),
-      ),
+      __expanded: false,
       __columnTexts: {},
       __groupedPath: "",
     };
+    if (item.isExpanded) {
+      this.#setExpanded(dduItem);
+      dduItem.__expanded = this.#isExpanded(dduItem);
+    }
+
+    return dduItem;
   }
 
   #gatherItems<
@@ -668,9 +668,7 @@ export class Ddu {
           if (restoreItemState) {
             for (const item of items) {
               if (item.treePath) {
-                item.__expanded = this.#isExpanded(
-                  convertTreePath(item.treePath),
-                );
+                item.__expanded = this.#isExpanded(item);
               }
             }
           }
@@ -1231,9 +1229,8 @@ export class Ddu {
       this.#options.sources[sourceIndex],
     );
 
-    this.#setExpanded(convertTreePath(parent.treePath));
+    this.#setExpanded(parent);
     parent.__expanded = true;
-    this.#expandedItems.set(item2Key(parent), parent);
 
     // Set path
     const savePath = this.#context.path;
@@ -1468,9 +1465,8 @@ export class Ddu {
         continue;
       }
 
-      this.#setUnexpanded(convertTreePath(item.treePath));
+      this.#setUnexpanded(item);
       item.__expanded = false;
-      this.#expandedItems.delete(item2Key(item));
 
       const columnItems = [item];
       await callColumns(
@@ -1828,30 +1824,52 @@ export class Ddu {
   }
 
   #isExpanded(
-    itemTreePath: string[],
+    item: DduItem,
   ): boolean {
     return Boolean(
-      this.#expandedPaths.has(itemTreePath),
+      item.treePath && this.#expandedItems.has(item2Key(item)),
     );
   }
+
   #setExpanded(
-    itemTreePath: string[],
+    item: DduItem,
   ): void {
-    this.#expandedPaths.add(itemTreePath);
+    if (item.treePath) {
+      this.#expandedItems.set(item2Key(item), item);
+    }
   }
+
   #setUnexpanded(
-    itemTreePath: string[],
+    item: DduItem,
   ): void {
-    [...this.#expandedPaths].forEach((v) => {
-      if (v === itemTreePath || isParentPath(itemTreePath, v)) {
-        this.#expandedPaths.delete(v);
+    if (!item.treePath) {
+      return;
+    }
+
+    const key = item2Key(item);
+    const itemTreePath = convertTreePath(item.treePath);
+    [...this.#expandedItems.values()].forEach((v) => {
+      const k = item2Key(v);
+      if (
+        key === k || isParentPath(itemTreePath, convertTreePath(v.treePath))
+      ) {
+        this.#expandedItems.delete(k);
       }
     });
   }
 }
 
-function convertTreePath(treePath: TreePath) {
-  return typeof treePath === "string" ? treePath.split(pathsep) : treePath;
+function convertTreePath(treePath?: TreePath): string[] {
+  return typeof treePath === "string"
+    ? treePath.split(pathsep)
+    : !treePath
+    ? []
+    : treePath;
+}
+
+function isParentPath(checkPath: string[], searchPath: string[]) {
+  return checkPath !== searchPath &&
+    searchPath.join(pathsep).startsWith(checkPath.join(pathsep) + pathsep);
 }
 
 function item2Key(item: DduItem) {
@@ -1861,11 +1879,6 @@ function item2Key(item: DduItem) {
     ? item.treePath.join(pathsep)
     : item.word;
   return `${item.__sourceIndex}${item.__sourceName}:${treePath}`;
-}
-
-function isParentPath(checkPath: string[], searchPath: string[]) {
-  return checkPath !== searchPath &&
-    searchPath.join(pathsep).startsWith(checkPath.join(pathsep) + pathsep);
 }
 
 Deno.test("isParentPath", () => {
