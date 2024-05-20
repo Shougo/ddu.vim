@@ -327,7 +327,6 @@ export class Ddu {
       .tee();
 
     await this.#refreshSources(denops, gatherStates);
-    await this.restoreTree(denops);
   }
 
   #createAvailableSourceStream(
@@ -1128,7 +1127,13 @@ export class Ddu {
     if (flags & ActionFlags.RefreshItems) {
       // Restore quitted flag before refresh and redraw
       this.#resetQuitted();
+
       await this.refresh(denops);
+
+      if (searchPath.length <= 0) {
+        // NOTE: If searchPath exists, expandItems() is executed.
+        await this.restoreTree(denops);
+      }
     } else if (uiOptions.persist || flags & ActionFlags.Persist) {
       // Restore quitted flag before refresh and redraw
       this.#resetQuitted();
