@@ -1096,7 +1096,12 @@ ddu.vim defines some |User| autocmds.
 Ddu:redraw
 		Called after |ddu-ui-attribute-redraw| is called.
 
-                                                      *ddu-autocmd-Ddu:uiReady*
+                                                      *ddu-autocmd-Ddu:uiDone*
+Ddu:uiDone
+		Called after all items are gathered in
+		|ddu-ui-attribute-redraw|.
+
+                                                     *ddu-autocmd-Ddu:uiReady*
 Ddu:uiReady
 		Called after UI window is created in
 		|ddu-ui-attribute-redraw|.

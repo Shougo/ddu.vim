@@ -973,6 +973,12 @@ export async function uiRedraw<
         // NOTE: UI window is generated.
         await denops.cmd("doautocmd <nomodeline> User Ddu:uiReady");
       }
+
+      if (!ui.prevDone && context.done) {
+        await denops.cmd("doautocmd <nomodeline> User Ddu:uiDone");
+      }
+
+      ui.prevDone = context.done;
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes(" E523: ")) {
         // NOTE: It may be called on invalid state

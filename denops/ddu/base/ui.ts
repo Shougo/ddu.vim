@@ -133,6 +133,7 @@ export abstract class BaseUi<
   name = "";
   path = "";
   isInitialized = false;
+  prevDone = false;
 
   onInit(_args: OnInitArguments<Params>): void | Promise<void> {}
   onBeforeAction(
