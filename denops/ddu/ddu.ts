@@ -1006,6 +1006,9 @@ export class Ddu {
         signal,
       );
     }
+
+    // NOTE: :redraw is needed for command line
+    await denops.cmd("redraw");
   }
 
   async itemAction(
