@@ -47,11 +47,10 @@ endfunction
 
 const s:root_dir = '<sfile>'->expand()->fnamemodify(':h:h:h')
 const s:sep = has('win32') ? '\' : '/'
+function ddu#denops#_mods() abort
+  return [s:root_dir, 'denops', 'ddu', '_mods.js']->join(s:sep)
+endfunction
 function s:register() abort
-  if !'g:ddu#_mods'->exists()
-    const g:ddu#_mods = [s:root_dir, 'denops', 'ddu', '_mods.js']->join(s:sep)
-  endif
-
   call ddu#denops#_load('ddu',
         \ [s:root_dir, 'denops', 'ddu', 'app.ts']->join(s:sep))
 

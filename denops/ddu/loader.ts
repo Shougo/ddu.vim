@@ -94,7 +94,7 @@ export class Loader {
     }
     staticLines.push("};");
     await Deno.writeTextFile(
-      await vars.g.get(denops, "ddu#_mods"),
+      await denops.call("ddu#denops#_mods") as string,
       staticLines.join("\n"),
     );
   }
