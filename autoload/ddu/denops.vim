@@ -11,7 +11,7 @@ function ddu#denops#_request(method, args) abort
 
   if !ddu#denops#_running()
     " Lazy call
-    execute printf('autocmd User DenopsPluginPost:ddu call '
+    execute printf('autocmd User DenopsPluginPost:ddu ++nested call '
           \ .. 's:notify("%s", %s)', a:method, a:args->string())
     return {}
   endif
@@ -28,7 +28,7 @@ function ddu#denops#_notify(method, args) abort
 
   if !ddu#denops#_running()
     " Lazy call
-    execute printf('autocmd User DenopsPluginPost:ddu call '
+    execute printf('autocmd User DenopsPluginPost:ddu ++nested call '
           \ .. 's:notify("%s", %s)', a:method, a:args->string())
     return {}
   endif
@@ -54,7 +54,7 @@ function s:register() abort
   call ddu#denops#_load('ddu',
         \ [s:root_dir, 'denops', 'ddu', 'app.ts']->join(s:sep))
 
-  autocmd ddu User DenopsClosed call s:stopped()
+  autocmd ddu User DenopsClosed ++nested call s:stopped()
 endfunction
 function s:stopped() abort
   unlet! g:ddu#_initialized
@@ -90,8 +90,9 @@ function s:init() abort
 
   augroup ddu
     autocmd!
-    autocmd User DenopsPluginPost:ddu let g:ddu#_initialized = v:true
-    autocmd User Ddu:redraw,Ddu:uiReady,Ddu:uiDone :
+    autocmd User DenopsPluginPost:ddu ++nested
+          \ let g:ddu#_initialized = v:true
+    autocmd User Ddu:redraw,Ddu:uiReady,Ddu:uiDone ++nested :
   augroup END
 
   let g:ddu#_started = reltime()
@@ -104,6 +105,6 @@ function s:init() abort
         \  denops#server#status() ==# 'running')
     call s:register()
   else
-    autocmd ddu User DenopsReady call s:register()
+    autocmd ddu User DenopsReady ++nested call s:register()
   endif
 endfunction
