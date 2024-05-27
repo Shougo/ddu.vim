@@ -17,15 +17,7 @@ import {
   SourceName,
   UiName,
 } from "./types.ts";
-import {
-  basename,
-  Denops,
-  fn,
-  Lock,
-  op,
-  parse,
-  toFileUrl,
-} from "./deps.ts";
+import { basename, Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
 import { mods } from "./_mods.js";
 
 type Mod = {
