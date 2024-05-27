@@ -1419,14 +1419,13 @@ export class Ddu {
       );
 
       if (!signal.aborted) {
-        await ui.searchItem({
+        await uiSearchItem(
           denops,
-          context: this.#context,
-          options: this.#options,
-          uiOptions,
-          uiParams,
-          item: searchedItem ?? parent,
-        });
+          this.#loader,
+          this.#context,
+          this.#options,
+          searchedItem ?? parent,
+        );
       }
     }
 
@@ -1539,14 +1538,13 @@ export class Ddu {
       const searchItem = items.at(-1);
 
       if (searchItem && !signal.aborted) {
-        await ui.searchItem({
+        await uiSearchItem(
           denops,
-          context: this.#context,
-          options: this.#options,
-          uiOptions,
-          uiParams,
-          item: searchItem,
-        });
+          this.#loader,
+          this.#context,
+          this.#options,
+          searchItem,
+        );
       }
     }
   }

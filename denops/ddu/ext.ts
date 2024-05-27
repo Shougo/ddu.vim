@@ -286,6 +286,7 @@ export async function uiSearchItem(
     return;
   }
 
+  console.log(searchItem);
   await ui.searchItem({
     denops,
     context,
