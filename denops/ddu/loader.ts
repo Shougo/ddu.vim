@@ -25,7 +25,6 @@ import {
   op,
   parse,
   toFileUrl,
-  vars,
 } from "./deps.ts";
 import { mods } from "./_mods.js";
 
