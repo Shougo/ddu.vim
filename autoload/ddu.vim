@@ -70,7 +70,7 @@ function ddu#set_static_import_path() abort
   call writefile([
         \   '// NOTE: It is dummy module.',
         \   'export const mods = {};',
-        \ ], ddu#denops#_mods)
+        \ ], ddu#denops#_mods())
 
   call ddu#denops#_notify('setStaticImportPath', [])
 endfunction
