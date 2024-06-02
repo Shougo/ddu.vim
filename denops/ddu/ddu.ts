@@ -1133,7 +1133,7 @@ export class Ddu {
 
       await this.refresh(denops);
 
-      if (searchPath.length > 0) {
+      if (searchPath.length <= 0) {
         // NOTE: If searchPath exists, expandItems() is executed.
         await this.restoreTree(denops);
       }
@@ -1756,16 +1756,21 @@ export class Ddu {
   async restoreTree(
     denops: Denops,
   ): Promise<void> {
-    if (this.#expandedItems.size === 0) {
+    // NOTE: Check expandedItems are exists in this.#items
+    const checkItems: Map<string, DduItem> = new Map();
+    for (const item of this.#items) {
+      checkItems.set(item2Key(item), item);
+    }
+
+    const restoreItems = [...this.#expandedItems.values()].filter((item) =>
+      checkItems.has(item2Key(item))
+    ).map((item) => ({ item }));
+
+    if (restoreItems.length === 0) {
       return;
     }
 
-    await this.expandItems(
-      denops,
-      [...this.#expandedItems.values()].map((item) => ({
-        item,
-      })),
-    );
+    await this.expandItems(denops, restoreItems);
   }
 
   async #filterItems(
