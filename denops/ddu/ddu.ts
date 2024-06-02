@@ -1133,7 +1133,7 @@ export class Ddu {
 
       await this.refresh(denops);
 
-      if (searchPath.length <= 0) {
+      if (searchPath.length > 0) {
         // NOTE: If searchPath exists, expandItems() is executed.
         await this.restoreTree(denops);
       }
@@ -1756,6 +1756,10 @@ export class Ddu {
   async restoreTree(
     denops: Denops,
   ): Promise<void> {
+    if (this.#expandedItems.size === 0) {
+      return;
+    }
+
     await this.expandItems(
       denops,
       [...this.#expandedItems.values()].map((item) => ({
