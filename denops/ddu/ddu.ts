@@ -449,10 +449,10 @@ export class Ddu {
       sourceOptions,
     );
 
-    // Get path option, or current directory instead if it is empty.
+    // Get path option or context path directory instead if it is empty.
     const path = sourceOptions.path.length > 0
       ? sourceOptions.path
-      : await fn.getcwd(denops);
+      : this.#context.path;
 
     for await (const newItems of itemsStream) {
       if (!equal(path, this.#context.path)) {

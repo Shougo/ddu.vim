@@ -337,13 +337,16 @@ export class ContextBuilder {
       );
     }
 
+    const cwd = await fn.getcwd(denops);
+
     return [
       {
         ...defaultContext(),
         bufName: await fn.bufname(denops, "%"),
         bufNr: await fn.bufnr(denops, "%"),
-        cwd: await fn.getcwd(denops),
+        cwd,
         mode: await fn.mode(denops),
+        path: cwd,
         winId: await fn.win_getid(denops) as number,
       },
       userOptions,
