@@ -100,11 +100,21 @@ function s:init() abort
   " NOTE: ddu.vim must be registered manually.
 
   " NOTE: denops load may be started
-  if 'g:loaded_denops'->exists() &&
-        \ ('<amatch>'->expand() ==# 'DenopsReady' ||
-        \  denops#server#status() ==# 'running')
-    call s:register()
-  else
-    autocmd ddu User DenopsReady ++nested call s:register()
+  if 'g:loaded_denops'->exists()
+    if denops#server#status() ==# 'running'
+      call s:register()
+      return
+    endif
+
+    try
+      if '<amatch>'->expand() ==# 'DenopsReady'
+        call s:register()
+        return
+      endif
+    catch /^Vim\%((\a\+)\)\=:E497:/
+      " NOTE: E497 is occured when it is not in autocmd.
+    endtry
   endif
+
+  autocmd ddu User DenopsReady ++nested call s:register()
 endfunction
