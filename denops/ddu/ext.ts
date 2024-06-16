@@ -975,10 +975,10 @@ export async function uiRedraw<
       }
 
       if (!ui.prevDone && context.done) {
+        // NOTE: Ddu:uiDone is called only once
+        ui.prevDone = true;
         await denops.cmd("doautocmd <nomodeline> User Ddu:uiDone");
       }
-
-      ui.prevDone = context.done;
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes(" E523: ")) {
         // NOTE: It may be called on invalid state
