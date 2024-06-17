@@ -36,22 +36,13 @@ function ddu#denops#_notify(method, args) abort
   return s:notify(a:method, a:args)
 endfunction
 
-function ddu#denops#_load(name, path) abort
-  try
-    call denops#plugin#load(a:name, a:path)
-  catch /^Vim\%((\a\+)\)\=:E117:/
-    " Fallback to `register` for backward compatibility
-    call denops#plugin#register(a:name, a:path, #{ mode: 'skip' })
-  endtry
-endfunction
-
 const s:root_dir = '<sfile>'->expand()->fnamemodify(':h:h:h')
 const s:sep = has('win32') ? '\' : '/'
 function ddu#denops#_mods() abort
   return [s:root_dir, 'denops', 'ddu', '_mods.js']->join(s:sep)
 endfunction
 function s:register() abort
-  call ddu#denops#_load('ddu',
+  call denops#plugin#load('ddu',
         \ [s:root_dir, 'denops', 'ddu', 'app.ts']->join(s:sep))
 
   autocmd ddu User DenopsClosed ++nested call s:stopped()
