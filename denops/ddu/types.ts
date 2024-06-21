@@ -143,6 +143,7 @@ export type SourceOptions = {
   matchers: UserFilter[];
   maxItems: number;
   path: TreePath;
+  preview: boolean;
   smartCase: boolean;
   sorters: UserFilter[];
   volatile: boolean;

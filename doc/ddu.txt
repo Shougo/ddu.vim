@@ -848,6 +848,12 @@ path			(string | string[])
 			["/", "aa", "bb", "cc"] (string[])
 		NOTE: It must be full path.
 
+                                                   *ddu-source-option-preview*
+preview		(boolean)
+		If it is False, ddu disables preview feature.
+
+		Default: v:true
+
                                                 *ddu-source-option-smartCase*
 smartCase		(boolean)
 		If it is True, |ddu-filters| don't ignore case when input
