@@ -349,7 +349,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const ddu = getDdu(name);
 
       if (event === "close" || event === "cancel") {
-        ddu.quit();
+        await ddu.quit(denops);
       }
 
       await ddu.onEvent(denops, event);
@@ -372,7 +372,7 @@ export const main: Entrypoint = (denops: Denops) => {
 
       if (dduLength <= 1 || opt?.quit) {
         // Quit current ddu
-        currentDdu.quit();
+        await currentDdu.quit(denops);
         await currentDdu.onEvent(denops, "cancel");
         return;
       }
