@@ -349,7 +349,8 @@ export const main: Entrypoint = (denops: Denops) => {
       const ddu = getDdu(name);
 
       if (event === "close" || event === "cancel") {
-        await ddu.quit(denops);
+        // NOTE: Cannot use await it will be freezed.
+        ddu.quit(denops);
       }
 
       await ddu.onEvent(denops, event);
