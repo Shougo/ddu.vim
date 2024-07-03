@@ -127,6 +127,7 @@ export class Ddu {
         uiOptions,
         uiParams,
       });
+      ui.prevDone = false;
       this.quit();
     }
 
@@ -172,6 +173,7 @@ export class Ddu {
           uiOptions,
           uiParams,
         });
+        ui.prevDone = false;
         this.quit();
         return;
       }
@@ -234,6 +236,7 @@ export class Ddu {
         uiOptions,
         uiParams,
       });
+      ui.prevDone = false;
       this.quit();
       return;
     }
@@ -289,6 +292,7 @@ export class Ddu {
       uiOptions,
       uiParams,
     });
+    ui.prevDone = false;
     this.quit();
 
     // Disable resume
@@ -1055,6 +1059,7 @@ export class Ddu {
           uiOptions,
           uiParams,
         });
+        ui.prevDone = false;
       }
     }
 
