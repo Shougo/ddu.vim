@@ -5,7 +5,7 @@ lint:
 	deno check ${TS}
 	deno fmt --check denops
 	deno test --no-run -A ${TS}
-	deno lint denops
+	deno lint denops --ignore=denops/ddu/_mod.js
 
 test:
 	deno test -A ${TSTEST}

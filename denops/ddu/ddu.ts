@@ -54,6 +54,7 @@ import {
   getUi,
   initSource,
   sourceArgs,
+  uiQuit,
   uiRedraw,
   uiSearchItem,
 } from "./ext.ts";
@@ -112,22 +113,12 @@ export class Ddu {
 
     if (uiChanged) {
       // Quit current UI
-      const [ui, uiOptions, uiParams] = await getUi(
+      await uiQuit(
         denops,
         this.#loader,
+        this.#context,
         this.#options,
       );
-      if (!ui) {
-        return;
-      }
-      await ui.quit({
-        denops,
-        context: this.#context,
-        options: this.#options,
-        uiOptions,
-        uiParams,
-      });
-      ui.prevDone = false;
       this.quit();
     }
 
@@ -277,22 +268,12 @@ export class Ddu {
     userOptions: UserOptions,
   ): Promise<void> {
     // Quit current UI
-    const [ui, uiOptions, uiParams] = await getUi(
+    await uiQuit(
       denops,
       this.#loader,
+      this.#context,
       this.#options,
     );
-    if (!ui) {
-      return;
-    }
-    await ui.quit({
-      denops,
-      context: this.#context,
-      options: this.#options,
-      uiOptions,
-      uiParams,
-    });
-    ui.prevDone = false;
     this.quit();
 
     // Disable resume
@@ -869,6 +850,16 @@ export class Ddu {
         sourceParams,
         event,
       });
+    }
+
+    if (event === "close" || event === "cancel") {
+      // Quit event
+      await uiQuit(
+        denops,
+        this.#loader,
+        this.#context,
+        this.#options,
+      );
     }
   }
 
