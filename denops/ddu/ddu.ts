@@ -54,7 +54,6 @@ import {
   getUi,
   initSource,
   sourceArgs,
-  uiQuit,
   uiRedraw,
   uiSearchItem,
 } from "./ext.ts";
@@ -113,7 +112,22 @@ export class Ddu {
 
     if (uiChanged) {
       // Quit current UI
-      await this.quit(denops);
+      const [ui, uiOptions, uiParams] = await getUi(
+        denops,
+        this.#loader,
+        this.#options,
+      );
+      if (!ui) {
+        return;
+      }
+      await ui.quit({
+        denops,
+        context: this.#context,
+        options: this.#options,
+        uiOptions,
+        uiParams,
+      });
+      this.quit();
     }
 
     const checkToggle = this.#initialized && !prevSignal.aborted &&
@@ -151,7 +165,14 @@ export class Ddu {
       }
 
       if (checkToggle && uiOptions.toggle) {
-        await this.quit(denops);
+        await ui.quit({
+          denops,
+          context: this.#context,
+          options: this.#options,
+          uiOptions,
+          uiParams,
+        });
+        this.quit();
         return;
       }
 
@@ -199,14 +220,21 @@ export class Ddu {
     }
 
     // NOTE: UI must be reset.
-    const [ui, uiOptions, _] = await getUi(
+    const [ui, uiOptions, uiParams] = await getUi(
       denops,
       this.#loader,
       this.#options,
     );
 
     if (checkToggle && ui && uiOptions.toggle) {
-      await this.quit(denops);
+      await ui.quit({
+        denops,
+        context: this.#context,
+        options: this.#options,
+        uiOptions,
+        uiParams,
+      });
+      this.quit();
       return;
     }
 
@@ -245,7 +273,23 @@ export class Ddu {
     denops: Denops,
     userOptions: UserOptions,
   ): Promise<void> {
-    await this.quit(denops);
+    // Quit current UI
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
+    if (!ui) {
+      return;
+    }
+    await ui.quit({
+      denops,
+      context: this.#context,
+      options: this.#options,
+      uiOptions,
+      uiParams,
+    });
+    this.quit();
 
     // Disable resume
     userOptions.resume = false;
@@ -824,14 +868,7 @@ export class Ddu {
     }
   }
 
-  async quit(denops: Denops) {
-    await uiQuit(
-      denops,
-      this.#loader,
-      this.#context,
-      this.#options,
-    );
-
+  quit() {
     // NOTE: quitted flag must be called after ui.quit().
     this.#quitted = true;
     this.#aborter.abort({ reason: "quit" });
@@ -1011,12 +1048,13 @@ export class Ddu {
 
       if (itemAction.actionOptions.quit && visible) {
         // Quit UI before action
-        await uiQuit(
+        await ui.quit({
           denops,
-          this.#loader,
-          this.#context,
-          this.#options,
-        );
+          context: this.#context,
+          options: this.#options,
+          uiOptions,
+          uiParams,
+        });
       }
     }
 

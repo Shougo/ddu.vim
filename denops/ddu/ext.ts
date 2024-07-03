@@ -901,33 +901,6 @@ async function checkUiOnInit(
   }
 }
 
-export async function uiQuit<
-  Params extends BaseUiParams,
->(
-  denops: Denops,
-  loader: Loader,
-  context: Context,
-  options: DduOptions,
-): Promise<void> {
-  // Quit current UI
-  const [ui, uiOptions, uiParams] = await getUi(
-    denops,
-    loader,
-    options,
-  );
-  if (!ui) {
-    return;
-  }
-  await ui.quit({
-    denops,
-    context,
-    options,
-    uiOptions,
-    uiParams,
-  });
-  ui.prevDone = false;
-}
-
 export async function uiRedraw<
   Params extends BaseUiParams,
 >(
@@ -956,7 +929,6 @@ export async function uiRedraw<
           uiOptions,
           uiParams,
         });
-        ui.prevDone = false;
         return;
       }
 
@@ -985,7 +957,6 @@ export async function uiRedraw<
           uiOptions,
           uiParams,
         });
-        ui.prevDone = false;
       }
 
       await denops.cmd("doautocmd <nomodeline> User Ddu:redraw");
