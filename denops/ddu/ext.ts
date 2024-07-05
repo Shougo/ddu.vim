@@ -1008,14 +1008,26 @@ export async function uiQuit<
   if (!ui) {
     return;
   }
-  await ui.quit({
+
+  const visible = await ui.visible({
     denops,
     context,
     options,
     uiOptions,
     uiParams,
+    tabNr: await fn.tabpagenr(denops),
   });
-  ui.prevDone = false;
+
+  if (visible) {
+    await ui.quit({
+      denops,
+      context,
+      options,
+      uiOptions,
+      uiParams,
+    });
+    ui.prevDone = false;
+  }
 }
 
 async function checkFilterOnInit(

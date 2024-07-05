@@ -157,14 +157,12 @@ export class Ddu {
       }
 
       if (checkToggle && uiOptions.toggle) {
-        await ui.quit({
+        await uiQuit(
           denops,
-          context: this.#context,
-          options: this.#options,
-          uiOptions,
-          uiParams,
-        });
-        ui.prevDone = false;
+          this.#loader,
+          this.#context,
+          this.#options,
+        );
         this.quit();
         return;
       }
@@ -213,21 +211,19 @@ export class Ddu {
     }
 
     // NOTE: UI must be reset.
-    const [ui, uiOptions, uiParams] = await getUi(
+    const [ui, uiOptions, _] = await getUi(
       denops,
       this.#loader,
       this.#options,
     );
 
     if (checkToggle && ui && uiOptions.toggle) {
-      await ui.quit({
+      await uiQuit(
         denops,
-        context: this.#context,
-        options: this.#options,
-        uiOptions,
-        uiParams,
-      });
-      ui.prevDone = false;
+        this.#loader,
+        this.#context,
+        this.#options,
+      );
       this.quit();
       return;
     }
@@ -1026,32 +1022,14 @@ export class Ddu {
       return;
     }
 
-    const [ui, uiOptions, uiParams] = await getUi(
-      denops,
-      this.#loader,
-      this.#options,
-    );
-    if (ui) {
-      const visible = await ui.visible({
+    if (itemAction.actionOptions.quit) {
+      // Quit UI before action
+      await uiQuit(
         denops,
-        context: this.#context,
-        options: this.#options,
-        uiOptions,
-        uiParams,
-        tabNr: await fn.tabpagenr(denops),
-      });
-
-      if (itemAction.actionOptions.quit && visible) {
-        // Quit UI before action
-        await ui.quit({
-          denops,
-          context: this.#context,
-          options: this.#options,
-          uiOptions,
-          uiParams,
-        });
-        ui.prevDone = false;
-      }
+        this.#loader,
+        this.#context,
+        this.#options,
+      );
     }
 
     const prevPath = itemAction.sourceOptions.path;
@@ -1122,6 +1100,12 @@ export class Ddu {
     }
 
     const winId = await fn.win_getid(denops);
+
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
 
     if (flags & ActionFlags.RefreshItems) {
       // Restore quitted flag before refresh and redraw
