@@ -147,7 +147,7 @@ export class Ddu {
       this.#context.path = prevContext.path;
       this.#context.maxItems = prevContext.maxItems;
 
-      const [ui, uiOptions, uiParams] = await getUi(
+      const [ui, uiOptions, _] = await getUi(
         denops,
         this.#loader,
         this.#options,
@@ -183,15 +183,9 @@ export class Ddu {
         // UI Redraw only
         // NOTE: Enable done to redraw UI properly
         this.#context.done = true;
-        await uiRedraw(
+        await this.uiRedraw(
           denops,
-          this.#uiRedrawLock,
-          this.#context,
-          this.#options,
-          ui,
-          uiOptions,
-          uiParams,
-          this.#aborter.signal,
+          { signal: this.#aborter.signal },
         );
         this.#context.doneUi = true;
         return;
