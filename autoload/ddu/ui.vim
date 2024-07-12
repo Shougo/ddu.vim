@@ -28,7 +28,7 @@ endfunction
 
 function ddu#ui#get_items(name=b:->get('ddu_ui_name', '')) abort
   call ddu#ui_sync_action(a:name, 'getItems', {})
-  return b:->get('ddu_ui_items', {})
+  return b:->get('ddu_ui_items', [])
 endfunction
 
 function ddu#ui#get_selected_items(name=b:->get('ddu_ui_name', '')) abort
