@@ -216,7 +216,7 @@ export type ExpandItem = {
   maxLevel?: number;
   search?: TreePath;
   isGrouped?: boolean;
-  isInDirectory?: boolean;
+  isInTree?: boolean;
 };
 
 export type DduFilterItems = DduItem[] | {
