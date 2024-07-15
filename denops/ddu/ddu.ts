@@ -1156,6 +1156,7 @@ export class Ddu {
           maxLevel,
           preventRedraw: true,
           isGrouped: item.isGrouped ?? false,
+          isInDirectory: item.isInDirectory ?? false,
           signal,
         },
       );
@@ -1176,6 +1177,7 @@ export class Ddu {
       maxLevel?: number;
       preventRedraw?: boolean;
       isGrouped?: boolean;
+      isInDirectory?: boolean;
       signal?: AbortSignal;
     },
   ): Promise<DduItem /* searchedItem */ | undefined> {
@@ -1401,6 +1403,15 @@ export class Ddu {
           searchedItem ?? parent,
         );
       }
+    }
+
+    if (options.isInDirectory && children.length > 0 && !isGrouped) {
+      // NOTE: To enter the expanded directory, execute "cursorNext" action
+      await this.uiAction(
+        denops,
+        "cursorNext",
+        {},
+      );
     }
 
     return searchedItem;
