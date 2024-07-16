@@ -1578,6 +1578,27 @@ export class Ddu {
     });
   }
 
+  async uiUpdateCursor(
+    denops: Denops,
+  ) {
+    const [ui, uiOptions, uiParams] = await getUi(
+      denops,
+      this.#loader,
+      this.#options,
+    );
+    if (!ui?.updateCursor || this.#quitted) {
+      return;
+    }
+
+    await ui.updateCursor({
+      denops,
+      context: this.#context,
+      options: this.#options,
+      uiOptions,
+      uiParams,
+    });
+  }
+
   async setInput(denops: Denops, input: string) {
     if (this.#options.expandInput) {
       input = await fn.expand(denops, input) as string;

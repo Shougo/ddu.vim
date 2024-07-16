@@ -505,5 +505,13 @@ export const main: Entrypoint = (denops: Denops) => {
       const ddu = getDdu(name);
       return await ddu.uiWinids(denops);
     },
+    async uiUpdateCursor(
+      arg1: unknown,
+    ): Promise<void> {
+      const name = ensure(arg1, is.String) as string;
+
+      const ddu = getDdu(name);
+      await ddu.uiUpdateCursor(denops);
+    },
   };
 };

@@ -109,6 +109,14 @@ export type WinidArguments<Params extends BaseUiParams> = {
   uiParams: Params;
 };
 
+export type UpdateCursorArguments<Params extends BaseUiParams> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+};
+
 export type UiActionArguments<Params extends BaseUiParams> = {
   denops: Denops;
   ddu: Ddu;
@@ -166,6 +174,8 @@ export abstract class BaseUi<
   winIds(_args: WinidArguments<Params>): number[] | Promise<number[]> {
     return [];
   }
+
+  updateCursor(_args: UpdateCursorArguments<Params>): void | Promise<void> {}
 
   actions: UiActions<Params> = {};
 

@@ -22,18 +22,17 @@ function ddu#ui#multi_actions(
 endfunction
 
 function ddu#ui#get_item(name=b:->get('ddu_ui_name', '')) abort
-  call ddu#ui_sync_action(a:name, 'getItem', {})
   return b:->get('ddu_ui_item', {})
 endfunction
 
 function ddu#ui#get_items(name=b:->get('ddu_ui_name', '')) abort
-  call ddu#ui_sync_action(a:name, 'getItems', {})
   return b:->get('ddu_ui_items', [])
 endfunction
 
 function ddu#ui#get_selected_items(name=b:->get('ddu_ui_name', '')) abort
-  call ddu#ui_sync_action(a:name, 'getSelectedItems', {})
-  return b:->get('ddu_ui_selected_items', [])
+  return b:->get('ddu_ui_selected_items', [])->empty()
+        \ ? [ddu#ui#get_items(a:name)]
+        \ : b:->get('ddu_ui_selected_items', [])
 endfunction
 
 function ddu#ui#visible(
@@ -45,4 +44,9 @@ endfunction
 function ddu#ui#winids(name=b:->get('ddu_ui_name', '')) abort
   return ddu#denops#_running() ?
         \ ddu#denops#_request('uiWinids', [a:name]) : []
+endfunction
+
+function ddu#ui#update_cursor(name=b:->get('ddu_ui_name', '')) abort
+  return ddu#denops#_running() ?
+        \ ddu#denops#_request('uiUpdateCursor', [a:name]) : []
 endfunction
