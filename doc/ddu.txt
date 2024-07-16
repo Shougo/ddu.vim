@@ -469,6 +469,7 @@ ddu#ui_sync_action({name}, {action}[, {params}])
 
 		{params} is action params.
 		NOTE: It does not work in |command-line-window|.
+		NOTE: You must not call it in |autocmd|.
 
 
 CUSTOM FUNCTIONS                                        *ddu-custom-functions*
@@ -578,24 +579,28 @@ ddu#ui#async_action({action-name}[, {params}[, {ui-name}]])
 ddu#ui#do_action({action-name}[, {params}[, {ui-name}]])
 		It is same with |ddu#ui#sync_action()|.
 		NOTE: It does not work in |command-line-window|.
+		NOTE: You must not call it in |autocmd|.
 
                                                            *ddu#ui#get_item()*
 ddu#ui#get_item()
 		Return the current cursor item as |Dictionary| from current
 		buffer UI.
 		NOTE: current UI must support "getItem" action.
+		NOTE: You must not call it in |autocmd|.
 
                                                           *ddu#ui#get_items()*
 ddu#ui#get_items()
 		Return the current items as |List| of |Dictionary| from
 		current buffer UI.
 		NOTE: current UI must support "getItems" action.
+		NOTE: You must not call it in |autocmd|.
 
                                                  *ddu#ui#get_selected_items()*
 ddu#ui#get_selected_items()
 		Return the selected items as |List| of |Dictionary| from
 		current buffer UI.
 		NOTE: current UI must support "getSelectedItems" action.
+		NOTE: You must not call it in |autocmd|.
 
                                                       *ddu#ui#multi_actions()*
 ddu#ui#multi_actions([{action-name1}[, {params1}], ...][, {ui-name}])
@@ -603,6 +608,7 @@ ddu#ui#multi_actions([{action-name1}[, {params1}], ...][, {ui-name}])
 		{params} behavior depends on {action-name}.
 		{ui-name} is specified ddu name(|ddu-option-name|).
 		If {ui-name} is not specified, current buffer UI name is used.
+		NOTE: You must not call it in |autocmd|.
 
 		Example: >
 
@@ -620,6 +626,7 @@ ddu#ui#sync_action({action-name}[, {params}[, {ui-name}]])
 		{ui-name} is specified ddu name(|ddu-option-name|).
 		If {ui-name} is not specified, current buffer UI name is used.
 		NOTE: It is slow than |ddu#ui#do_action()|.
+		NOTE: You must not call it in |autocmd|.
 
                                                             *ddu#ui#visible()*
 ddu#ui#visible({name}[, {tabnr}])
@@ -627,11 +634,13 @@ ddu#ui#visible({name}[, {tabnr}])
 		{name} is specified ddu name(|ddu-option-name|).
 		{tabnr} is tabpage number.  If it is omitted, current tabpage
 		is used.  If it is less than 1, it means search from all tabs.
+		NOTE: You must not call it in |autocmd|.
 
                                                              *ddu#ui#winids()*
 ddu#ui#winids({name})
 		Return UI window ID list.
 		{name} is specified ddu name(|ddu-option-name|).
+		NOTE: You must not call it in |autocmd|.
 
 ==============================================================================
 EXAMPLES                                                        *ddu-examples*
