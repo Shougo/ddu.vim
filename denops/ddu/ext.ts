@@ -991,9 +991,7 @@ export async function uiRedraw<
   });
 }
 
-export async function uiQuit<
-  Params extends BaseUiParams,
->(
+export async function uiQuit(
   denops: Denops,
   loader: Loader,
   context: Context,

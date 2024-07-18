@@ -1050,7 +1050,7 @@ ACTION OPTIONS                                            *ddu-action-options*
 
                                                       *ddu-action-option-quit*
 quit			(boolean)
-		Quit the UI before executing action.
+		Quit the UI "before" executing action.
 
 		Default: true
 
@@ -1089,6 +1089,8 @@ Redraw
                                                      *ddu-action-flag-Persist*
 Persist
 		Restore the UI window.
+		NOTE: If you don't want to quit the UI, you must set
+		|ddu-action-option-quit| to false.
 
 		Default: 4
 
