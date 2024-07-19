@@ -31,7 +31,7 @@ endfunction
 
 function ddu#ui#get_selected_items(name=b:->get('ddu_ui_name', '')) abort
   return b:->get('ddu_ui_selected_items', [])->empty()
-        \ ? [ddu#ui#get_items(a:name)]
+        \ ? [ddu#ui#get_item(a:name)]
         \ : b:->get('ddu_ui_selected_items', [])
 endfunction
 
