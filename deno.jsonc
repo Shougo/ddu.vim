@@ -12,9 +12,11 @@
     "./ui": "./denops/ddu/base/ui.ts",
     "./utils": "./denops/ddu/utils.ts"
   },
-  "include": [
-    "denops/ddu/**/*.ts"
-  ],
+  "publish": {
+    "include": [
+      "denops/ddu/**/*.ts"
+    ],
+  },
   "imports": {
   },
   "lock": false,
