@@ -1,4 +1,12 @@
 {
+  "name": "@shougo/ddu-vim",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./denops/ddu/deps.ts"
+  },
+  "exclude": [],
+  "imports": {
+  },
   "lock": false,
   "tasks": {
     "check": "deno check denops/**/*.ts",
