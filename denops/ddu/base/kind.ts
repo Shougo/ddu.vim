@@ -1,4 +1,4 @@
-import {
+import type {
   ActionOptions,
   Actions,
   DduItem,
@@ -7,7 +7,7 @@ import {
   PreviewContext,
   Previewer,
 } from "../types.ts";
-import { Denops } from "../deps.ts";
+import type { Denops } from "../deps.ts";
 
 export type BaseKindParams = Record<string, unknown>;
 

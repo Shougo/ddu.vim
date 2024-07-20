@@ -1,4 +1,4 @@
-import {
+import type {
   BaseActionParams,
   Context,
   Ddu,
@@ -10,7 +10,7 @@ import {
   UiActionCallback,
   UiOptions,
 } from "../types.ts";
-import { Denops } from "../deps.ts";
+import type { Denops } from "../deps.ts";
 
 export type BaseUiParams = Record<string, unknown>;
 

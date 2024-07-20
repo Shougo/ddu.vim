@@ -1,14 +1,6 @@
-import {
-  assertEquals,
-  basename,
-  Denops,
-  equal,
-  fn,
-  Lock,
-  pathsep,
-} from "./deps.ts";
-import {
-  ActionFlags,
+import type { Denops } from "./deps.ts";
+import { assertEquals, basename, equal, fn, Lock, pathsep } from "./deps.ts";
+import type {
   ActionHistory,
   BaseActionParams,
   BaseSource,
@@ -27,6 +19,7 @@ import {
   UserOptions,
   UserSource,
 } from "./types.ts";
+import { ActionFlags } from "./types.ts";
 import {
   defaultContext,
   defaultDduOptions,
@@ -34,14 +27,11 @@ import {
   mergeDduOptions,
 } from "./context.ts";
 import { defaultSourceOptions } from "./base/source.ts";
-import { Loader } from "./loader.ts";
+import type { Loader } from "./loader.ts";
 import { convertUserString, printError, treePath2Filename } from "./utils.ts";
-import {
-  AvailableSourceInfo,
-  GatherState,
-  GatherStateAbortable,
-  isRefreshTarget,
-} from "./state.ts";
+import type { AvailableSourceInfo, GatherStateAbortable } from "./state.ts";
+import { GatherState } from "./state.ts";
+import { isRefreshTarget } from "./state.ts";
 import {
   callColumns,
   callFilters,

@@ -1,4 +1,4 @@
-import {
+import type {
   Actions,
   Context,
   DduEvent,
@@ -7,8 +7,8 @@ import {
   Item,
   SourceOptions,
 } from "../types.ts";
-import { Denops } from "../deps.ts";
-import { Loader } from "../loader.ts";
+import type { Denops } from "../deps.ts";
+import type { Loader } from "../loader.ts";
 
 export type BaseSourceParams = Record<string, unknown>;
 
