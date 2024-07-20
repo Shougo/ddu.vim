@@ -56,7 +56,7 @@ export abstract class BaseSource<
   isInitialized = false;
 
   kind = "base";
-  prevMtime = new Date();
+  prevMtime: Date = new Date();
   actions: Actions<Params> = {};
 
   onInit(_args: OnInitArguments<Params>): void | Promise<void> {}

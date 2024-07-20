@@ -1597,15 +1597,15 @@ export class Ddu {
     this.#context.input = input;
   }
 
-  getContext() {
+  getContext(): Context {
     return this.#context;
   }
 
-  getOptions() {
+  getOptions(): DduOptions {
     return this.#options;
   }
 
-  getUserOptions() {
+  getUserOptions(): UserOptions {
     return this.#userOptions;
   }
 
@@ -1691,7 +1691,7 @@ export class Ddu {
     return ret;
   }
 
-  getSourceArgs() {
+  getSourceArgs(): [SourceOptions, BaseSourceParams][] {
     return this.#options.sources.map((userSource) =>
       sourceArgs(
         this.#loader.getSource(
@@ -1704,7 +1704,7 @@ export class Ddu {
     );
   }
 
-  getItems() {
+  getItems(): DduItem[] {
     return this.#items;
   }
 

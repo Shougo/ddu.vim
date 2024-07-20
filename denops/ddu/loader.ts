@@ -169,10 +169,10 @@ export class Loader {
   getAlias(type: DduAliasType, name: string): string | undefined {
     return this.#aliases[type][name];
   }
-  getAliasNames(type: DduAliasType) {
+  getAliasNames(type: DduAliasType): string[] {
     return Object.keys(this.#aliases[type]);
   }
-  getSourceNames() {
+  getSourceNames(): string[] {
     return Object.keys(this.#mods.source);
   }
 
