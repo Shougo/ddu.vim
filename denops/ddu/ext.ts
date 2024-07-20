@@ -1,5 +1,5 @@
 import type { Denops, Lock } from "./deps.ts";
-import { assertEquals, fn, is } from "./deps.ts";
+import { fn, is } from "./deps.ts";
 import type {
   Action,
   ActionName,
@@ -20,7 +20,6 @@ import type {
   DduItem,
   DduOptions,
   FilterOptions,
-  Item,
   ItemAction,
   KindOptions,
   PreviewContext,
@@ -32,7 +31,6 @@ import type {
   UserSource,
 } from "./types.ts";
 import {
-  defaultDduOptions,
   defaultDummy,
   foldMerge,
   mergeActionOptions,
@@ -49,7 +47,7 @@ import {
   mergeUiParams,
 } from "./context.ts";
 import { defaultUiOptions } from "./base/ui.ts";
-import { defaultSourceOptions, GatherArguments } from "./base/source.ts";
+import { defaultSourceOptions } from "./base/source.ts";
 import { defaultFilterOptions } from "./base/filter.ts";
 import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";

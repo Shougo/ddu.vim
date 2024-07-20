@@ -1,4 +1,4 @@
-import {
+import type {
   BaseColumn,
   BaseColumnParams,
   BaseFilter,
@@ -17,7 +17,9 @@ import {
   SourceName,
   UiName,
 } from "./types.ts";
-import { basename, Denops, fn, Lock, op, parse, toFileUrl } from "./deps.ts";
+import type { Denops } from "./deps.ts";
+import { Lock } from "./deps.ts";
+import { basename, fn, op, parse, toFileUrl } from "./deps.ts";
 import { mods } from "./_mods.js";
 
 type Mod = {

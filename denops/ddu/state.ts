@@ -1,5 +1,5 @@
 import { is, maybe } from "./deps.ts";
-import {
+import type {
   BaseSource,
   BaseSourceParams,
   DduItem,

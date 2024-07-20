@@ -3,7 +3,7 @@ import type { BaseSourceParams } from "./base/source.ts";
 import type { BaseFilterParams } from "./base/filter.ts";
 import type { BaseKindParams } from "./base/kind.ts";
 import type { BaseColumnParams } from "./base/column.ts";
-import { Denops } from "./deps.ts";
+import type { Denops } from "./deps.ts";
 
 export { BaseConfig } from "./base/config.ts";
 export { BaseUi } from "./base/ui.ts";
