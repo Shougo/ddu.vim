@@ -19,7 +19,8 @@ export type { BaseColumnParams } from "./base/column.ts";
 
 export { ContextBuilder } from "./context.ts";
 
-export { Ddu } from "./ddu.ts";
+export type { Ddu } from "./ddu.ts";
+export type { Denops } from "./deps.ts";
 
 export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
 
