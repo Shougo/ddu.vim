@@ -177,7 +177,7 @@ export abstract class BaseUi<
 
   updateCursor(_args: UpdateCursorArguments<Params>): void | Promise<void> {}
 
-  actions: UiActions<Params> = {};
+  abstract actions: UiActions<Params>;
 
   abstract params(): Params;
 }

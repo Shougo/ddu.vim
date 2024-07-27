@@ -28,7 +28,7 @@ export abstract class BaseKind<
   path = "";
   isInitialized = false;
 
-  actions: Actions<Params> = {};
+  abstract actions: Actions<Params>;
 
   abstract params(): Params;
 

@@ -1146,7 +1146,7 @@ NOTE: If you call Vim functions, it is not asynchronous.
 UI ATTRIBUTES                                              *ddu-ui-attributes*
 
                                                     *ddu-ui-attribute-actions*
-actions			(Record<string, function>)	(Optional)
+actions			(Record<string, function>)	(Required)
 		Defines UI actions.
 		The actions are called from |ddu#ui_sync_action()|.
 
