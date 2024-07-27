@@ -6,6 +6,7 @@
     "./action": "./denops/ddu/base/action.ts",
     "./column": "./denops/ddu/base/column.ts",
     "./config": "./denops/ddu/base/config.ts",
+    "./deps": "./denops/ddu/deps.ts",
     "./filter": "./denops/ddu/base/filter.ts",
     "./kind": "./denops/ddu/base/kind.ts",
     "./source": "./denops/ddu/base/source.ts",
