@@ -2,7 +2,6 @@
   "name": "@shougo/ddu-vim",
   "version": "0.0.0",
   "exports": {
-    ".": "./denops/ddu/deps.ts",
     "./action": "./denops/ddu/base/action.ts",
     "./column": "./denops/ddu/base/column.ts",
     "./config": "./denops/ddu/base/config.ts",
