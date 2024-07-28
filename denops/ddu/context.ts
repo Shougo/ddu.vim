@@ -1,5 +1,6 @@
-import { assertEquals, Denops, fn } from "./deps.ts";
-import {
+import type { Denops } from "./deps.ts";
+import { assertEquals, fn } from "./deps.ts";
+import type {
   ActionOptions,
   BaseActionParams,
   BaseColumnParams,

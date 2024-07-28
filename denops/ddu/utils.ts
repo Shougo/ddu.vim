@@ -1,7 +1,8 @@
-import { Denops, pathsep } from "./deps.ts";
-import { TreePath } from "./types.ts";
+import type { Denops } from "./deps.ts";
+import { pathsep } from "./deps.ts";
+import type { TreePath } from "./types.ts";
 
-export function treePath2Filename(treePath: TreePath) {
+export function treePath2Filename(treePath: TreePath): string {
   return typeof treePath === "string" ? treePath : treePath.join(pathsep);
 }
 
@@ -42,6 +43,8 @@ export async function safeStat(path: string): Promise<Deno.FileInfo | null> {
   return null;
 }
 
-export function convertUserString<T>(user: string | T) {
+export function convertUserString<T>(
+  user: string | T,
+): T | { name: string | (T & string) } {
   return typeof user === "string" ? { name: user } : user;
 }

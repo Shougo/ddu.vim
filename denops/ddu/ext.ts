@@ -1,5 +1,6 @@
-import { assertEquals, Denops, fn, is, Lock } from "./deps.ts";
-import {
+import type { Denops, Lock } from "./deps.ts";
+import { fn, is } from "./deps.ts";
+import type {
   Action,
   ActionName,
   ActionOptions,
@@ -19,7 +20,6 @@ import {
   DduItem,
   DduOptions,
   FilterOptions,
-  Item,
   ItemAction,
   KindOptions,
   PreviewContext,
@@ -31,7 +31,6 @@ import {
   UserSource,
 } from "./types.ts";
 import {
-  defaultDduOptions,
   defaultDummy,
   foldMerge,
   mergeActionOptions,
@@ -48,12 +47,12 @@ import {
   mergeUiParams,
 } from "./context.ts";
 import { defaultUiOptions } from "./base/ui.ts";
-import { defaultSourceOptions, GatherArguments } from "./base/source.ts";
+import { defaultSourceOptions } from "./base/source.ts";
 import { defaultFilterOptions } from "./base/filter.ts";
 import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
-import { Loader } from "./loader.ts";
+import type { Loader } from "./loader.ts";
 import { convertUserString, printError } from "./utils.ts";
 
 type ItemActions = {
@@ -1073,60 +1072,3 @@ async function checkColumnOnInit(
     await printError(denops, `column: ${column.name} "onInit()" failed`, e);
   }
 }
-
-Deno.test("sourceArgs", () => {
-  const userOptions: DduOptions = {
-    ...defaultDduOptions(),
-    sources: [],
-    sourceOptions: {
-      "_": {
-        matcherKey: "foo",
-        matchers: ["matcher_head"],
-      },
-      "strength": {
-        matcherKey: "bar",
-      },
-    },
-    sourceParams: {
-      "_": {
-        "by_": "bar",
-      },
-      "strength": {
-        min: 100,
-      },
-    },
-  };
-  class S extends BaseSource<{ min: number; max: number }> {
-    params() {
-      return {
-        "min": 0,
-        "max": 999,
-      };
-    }
-    gather(
-      _args: GatherArguments<{ min: number; max: number }> | Denops,
-    ): ReadableStream<Item<Record<string, never>>[]> {
-      return new ReadableStream({
-        start(controller) {
-          controller.close();
-        },
-      });
-    }
-  }
-  const source = new S();
-  source.name = "strength";
-  const [o, p] = sourceArgs(source, userOptions, null);
-  assertEquals(o, {
-    ...defaultSourceOptions(),
-    matcherKey: "bar",
-    matchers: ["matcher_head"],
-    converters: [],
-    sorters: [],
-  });
-  assertEquals(p, {
-    ...defaultDummy(),
-    by_: "bar",
-    min: 100,
-    max: 999,
-  });
-});

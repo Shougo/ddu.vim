@@ -1,4 +1,4 @@
-import {
+import type {
   BaseActionParams,
   Context,
   Ddu,
@@ -10,7 +10,7 @@ import {
   UiActionCallback,
   UiOptions,
 } from "../types.ts";
-import { Denops } from "../deps.ts";
+import type { Denops } from "../deps.ts";
 
 export type BaseUiParams = Record<string, unknown>;
 
@@ -177,7 +177,7 @@ export abstract class BaseUi<
 
   updateCursor(_args: UpdateCursorArguments<Params>): void | Promise<void> {}
 
-  actions: UiActions<Params> = {};
+  abstract actions: UiActions<Params>;
 
   abstract params(): Params;
 }

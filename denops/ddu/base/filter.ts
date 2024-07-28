@@ -1,4 +1,4 @@
-import {
+import type {
   Context,
   DduFilterItems,
   DduItem,
@@ -6,7 +6,7 @@ import {
   FilterOptions,
   SourceOptions,
 } from "../types.ts";
-import { Denops } from "../deps.ts";
+import type { Denops } from "../deps.ts";
 
 export type BaseFilterParams = Record<string, unknown>;
 

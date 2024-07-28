@@ -1,11 +1,11 @@
-import {
+import type {
   ColumnOptions,
   Context,
   DduItem,
   DduOptions,
   ItemHighlight,
 } from "../types.ts";
-import { Denops } from "../deps.ts";
+import type { Denops } from "../deps.ts";
 
 export type BaseColumnParams = Record<string, unknown>;
 

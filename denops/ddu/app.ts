@@ -1,5 +1,7 @@
-import { Denops, ensure, Entrypoint, is, Lock, toFileUrl } from "./deps.ts";
-import {
+import type { Denops, Entrypoint } from "./deps.ts";
+import { Lock } from "./deps.ts";
+import { ensure, is, toFileUrl } from "./deps.ts";
+import type {
   Action,
   ActionHistory,
   BaseActionParams,
