@@ -9,7 +9,7 @@ function ddu#denops#_request(method, args) abort
     return {}
   endif
 
-  if !ddu#denops#_running()
+  if denops#server#status() !=# 'running'
     " Lazy call
     execute printf('autocmd User DenopsPluginPost:ddu ++nested call '
           \ .. 's:notify("%s", %s)', a:method, a:args->string())
