@@ -2,10 +2,6 @@ import type { Denops } from "./deps.ts";
 import { pathsep } from "./deps.ts";
 import type { TreePath } from "./types.ts";
 
-export function treePath2Filename(treePath: TreePath): string {
-  return typeof treePath === "string" ? treePath : treePath.join(pathsep);
-}
-
 export async function printError(
   denops: Denops,
   ...messages: unknown[]
@@ -21,6 +17,22 @@ export async function printError(
     }
   }).join("\n");
   await denops.call("ddu#util#print_error", message);
+}
+
+// See https://github.com/vim-denops/denops.vim/issues/358 for details
+export function isDenoCacheIssueError(e: unknown): boolean {
+  const expects = [
+    "Could not find constraint in the list of versions: ", // Deno 1.40?
+    "Could not find version of ", // Deno 1.38
+  ] as const;
+  if (e instanceof TypeError) {
+    return expects.some((expect) => e.message.startsWith(expect));
+  }
+  return false;
+}
+
+export function treePath2Filename(treePath: TreePath): string {
+  return typeof treePath === "string" ? treePath : treePath.join(pathsep);
 }
 
 export async function safeStat(path: string): Promise<Deno.FileInfo | null> {

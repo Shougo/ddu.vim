@@ -31,6 +31,7 @@ import {
   getItemActions,
   uiSearchItem,
 } from "./ext.ts";
+import { isDenoCacheIssueError } from "./utils.ts";
 import { defaultUiOptions } from "./base/ui.ts";
 import { defaultSourceOptions } from "./base/source.ts";
 import { defaultFilterOptions } from "./base/filter.ts";
@@ -180,13 +181,28 @@ export const main: Entrypoint = (denops: Denops) => {
       // NOTE: Lock until load finished to prevent execute start() API.
       await lock.lock(async () => {
         const path = ensure(arg1, is.String) as string;
-        // NOTE: Import module with fragment so that reload works properly.
-        // https://github.com/vim-denops/denops.vim/issues/227
-        const mod = await import(
-          `${toFileUrl(path).href}#${performance.now()}`
-        );
-        const obj = new mod.Config();
-        await obj.config({ denops, contextBuilder, setAlias });
+
+        try {
+          // NOTE: Import module with fragment so that reload works properly.
+          // https://github.com/vim-denops/denops.vim/issues/227
+          const mod = await import(
+            `${toFileUrl(path).href}#${performance.now()}`
+          );
+          const obj = new mod.Config();
+          await obj.config({ denops, contextBuilder, setAlias });
+        } catch (e) {
+          if (isDenoCacheIssueError(e)) {
+            console.warn("*".repeat(80));
+            console.warn(`Deno module cache issue is detected.`);
+            console.warn(
+              `Execute '!deno cache --reload "${path}"' and restart Vim/Neovim.`,
+            );
+            console.warn("*".repeat(80));
+          }
+
+          console.error(`Failed to load file '${path}': ${e}`);
+          throw e;
+        }
       });
       //console.log(`${arg1}: ${Date.now() - startTime} ms`);
       return Promise.resolve();

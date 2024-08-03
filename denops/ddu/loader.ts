@@ -20,6 +20,7 @@ import type {
 import type { Denops } from "./deps.ts";
 import { Lock } from "./deps.ts";
 import { basename, fn, op, parse, toFileUrl } from "./deps.ts";
+import { isDenoCacheIssueError } from "./utils.ts";
 import { mods } from "./_mods.js";
 
 type Mod = {
@@ -121,7 +122,21 @@ export class Loader {
 
   async registerPath(type: DduExtType, path: string) {
     await this.#registerLock.lock(async () => {
-      await this.#register(type, path);
+      try {
+        await this.#register(type, path);
+      } catch (e) {
+        if (isDenoCacheIssueError(e)) {
+          console.warn("*".repeat(80));
+          console.warn(`Deno module cache issue is detected.`);
+          console.warn(
+            `Execute '!deno cache --reload "${path}"' and restart Vim/Neovim.`,
+          );
+          console.warn("*".repeat(80));
+        }
+
+        console.error(`Failed to load file '${path}': ${e}`);
+        throw e;
+      }
     });
   }
 
