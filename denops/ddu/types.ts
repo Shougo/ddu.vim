@@ -3,7 +3,7 @@ import type { BaseSourceParams } from "./base/source.ts";
 import type { BaseFilterParams } from "./base/filter.ts";
 import type { BaseKindParams } from "./base/kind.ts";
 import type { BaseColumnParams } from "./base/column.ts";
-import type { Denops } from "./deps.ts";
+import type { Denops } from "jsr:@denops/std@~7.0.3";
 
 export { BaseConfig } from "./base/config.ts";
 export { BaseUi } from "./base/ui.ts";
@@ -20,7 +20,6 @@ export type { BaseColumnParams } from "./base/column.ts";
 export { ContextBuilder } from "./context.ts";
 
 export type { Ddu } from "./ddu.ts";
-export type { Denops } from "./deps.ts";
 
 export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
 

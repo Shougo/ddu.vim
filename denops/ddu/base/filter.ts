@@ -6,7 +6,7 @@ import type {
   FilterOptions,
   SourceOptions,
 } from "../types.ts";
-import type { Denops } from "../deps.ts";
+import type { Denops } from "jsr:@denops/std@~7.0.3";
 
 export type BaseFilterParams = Record<string, unknown>;
 

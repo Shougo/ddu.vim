@@ -5,7 +5,7 @@ import type {
   DduOptions,
   ItemHighlight,
 } from "../types.ts";
-import type { Denops } from "../deps.ts";
+import type { Denops } from "jsr:@denops/std@~7.0.3";
 
 export type BaseColumnParams = Record<string, unknown>;
 

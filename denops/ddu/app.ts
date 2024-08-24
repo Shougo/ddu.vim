@@ -1,6 +1,8 @@
-import type { Denops, Entrypoint } from "./deps.ts";
-import { Lock } from "./deps.ts";
-import { ensure, is, toFileUrl } from "./deps.ts";
+import type { Denops, Entrypoint } from "jsr:@denops/std@~7.0.3";
+import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
+import { is } from "jsr:@core/unknownutil@~4.3.0/is";
+import { ensure } from "jsr:@core/unknownutil@~4.3.0/ensure";
+import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
 import type {
   Action,
   ActionHistory,

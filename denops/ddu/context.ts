@@ -1,5 +1,6 @@
-import type { Denops } from "./deps.ts";
-import { assertEquals, fn } from "./deps.ts";
+import type { Denops } from "jsr:@denops/std@~7.0.3";
+import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
+import * as fn from "jsr:@denops/std@~7.0.3/function";
 import type {
   ActionOptions,
   BaseActionParams,

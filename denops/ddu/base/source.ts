@@ -7,7 +7,7 @@ import type {
   Item,
   SourceOptions,
 } from "../types.ts";
-import type { Denops } from "../deps.ts";
+import type { Denops } from "jsr:@denops/std@~7.0.3";
 import type { Loader } from "../loader.ts";
 
 export type BaseSourceParams = Record<string, unknown>;

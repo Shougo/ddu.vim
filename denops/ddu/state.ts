@@ -1,4 +1,5 @@
-import { is, maybe } from "./deps.ts";
+import { is } from "jsr:@core/unknownutil@~4.3.0/is";
+import { maybe } from "jsr:@core/unknownutil@~4.3.0/maybe";
 import type {
   BaseSource,
   BaseSourceParams,

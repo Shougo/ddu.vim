@@ -1,5 +1,7 @@
-import type { Denops, Lock } from "./deps.ts";
-import { fn, is } from "./deps.ts";
+import type { Denops } from "jsr:@denops/std@~7.0.3";
+import type { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
+import * as fn from "jsr:@denops/std@~7.0.3/function";
+import { is } from "jsr:@core/unknownutil@~4.3.0/is";
 import type {
   Action,
   ActionName,

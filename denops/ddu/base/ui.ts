@@ -10,7 +10,7 @@ import type {
   UiActionCallback,
   UiOptions,
 } from "../types.ts";
-import type { Denops } from "../deps.ts";
+import type { Denops } from "jsr:@denops/std@~7.0.3";
 
 export type BaseUiParams = Record<string, unknown>;
 

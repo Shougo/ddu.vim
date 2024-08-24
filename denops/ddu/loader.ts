@@ -17,9 +17,13 @@ import type {
   SourceName,
   UiName,
 } from "./types.ts";
-import type { Denops } from "./deps.ts";
-import { Lock } from "./deps.ts";
-import { basename, fn, op, parse, toFileUrl } from "./deps.ts";
+import type { Denops } from "jsr:@denops/std@~7.0.3";
+import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
+import { basename } from "jsr:@std/path@~1.0.2/basename";
+import { parse } from "jsr:@std/path@~1.0.2/parse";
+import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
+import * as fn from "jsr:@denops/std@~7.0.3/function";
+import * as op from "jsr:@denops/std@~7.0.3/option";
 import { isDenoCacheIssueError } from "./utils.ts";
 import { mods } from "./_mods.js";
 
