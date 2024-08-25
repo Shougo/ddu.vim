@@ -6,7 +6,7 @@ import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
 import type {
   Action,
   ActionHistory,
-  BaseActionParams,
+  BaseParams,
   Clipboard,
   Context,
   DduAliasType,
@@ -18,7 +18,6 @@ import type {
   FilterOptions,
   UserOptions,
 } from "./types.ts";
-import type { BaseFilterParams } from "./base/filter.ts";
 import { Ddu } from "./ddu.ts";
 import {
   ContextBuilder,
@@ -419,7 +418,7 @@ export const main: Entrypoint = (denops: Denops) => {
     ): Promise<void> {
       const name = ensure(arg1, is.String) as string;
       const actionName = ensure(arg2, is.String) as string;
-      const params = ensure(arg3, is.Record) as BaseActionParams;
+      const params = ensure(arg3, is.Record) as BaseParams;
 
       const ddu = getDdu(name);
       if (ddu.getOptions().ui !== "") {
@@ -435,7 +434,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const name = ensure(arg1, is.String) as string;
       const actionName = ensure(arg2, is.String) as string;
       const items = ensure(arg3, is.Array) as DduItem[];
-      const params = ensure(arg4, is.Record) as BaseActionParams;
+      const params = ensure(arg4, is.Record) as BaseParams;
 
       const ddu = getDdu(name);
       await ddu.itemAction(
@@ -451,7 +450,7 @@ export const main: Entrypoint = (denops: Denops) => {
       arg1: unknown,
       arg2: unknown,
       arg3: unknown,
-    ): Promise<string | Action<BaseActionParams> | undefined> {
+    ): Promise<string | Action<BaseParams> | undefined> {
       const name = ensure(arg1, is.String) as string;
       const items = ensure(arg2, is.Array) as DduItem[];
       const action = ensure(arg3, is.String) as string;
@@ -493,7 +492,7 @@ export const main: Entrypoint = (denops: Denops) => {
       [
         string,
         FilterOptions,
-        BaseFilterParams,
+        BaseParams,
       ]
     > {
       const name = ensure(arg1, is.String) as string;

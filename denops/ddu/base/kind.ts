@@ -1,6 +1,7 @@
 import type {
   ActionOptions,
   Actions,
+  BaseParams,
   DduItem,
   DduOptions,
   KindOptions,
@@ -8,8 +9,6 @@ import type {
   Previewer,
 } from "../types.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
-
-export type BaseKindParams = Record<string, unknown>;
 
 export type GetPreviewerArguments = {
   denops: Denops;
@@ -19,9 +18,7 @@ export type GetPreviewerArguments = {
   item: DduItem;
 };
 
-export abstract class BaseKind<
-  Params extends BaseKindParams,
-> {
+export abstract class BaseKind<Params extends BaseParams> {
   apiVersion = 2;
 
   name = "";

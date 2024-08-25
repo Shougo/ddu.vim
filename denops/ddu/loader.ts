@@ -1,4 +1,5 @@
 import type {
+  BaseParams,
   ColumnName,
   DduAliasType,
   DduExtType,
@@ -7,11 +8,11 @@ import type {
   SourceName,
   UiName,
 } from "./types.ts";
-import type { BaseColumn, BaseColumnParams } from "./base/column.ts";
-import type { BaseFilter, BaseFilterParams } from "./base/filter.ts";
-import type { BaseKind, BaseKindParams } from "./base/kind.ts";
-import type { BaseSource, BaseSourceParams } from "./base/source.ts";
-import type { BaseUi, BaseUiParams } from "./base/ui.ts";
+import type { BaseColumn } from "./base/column.ts";
+import type { BaseFilter } from "./base/filter.ts";
+import type { BaseKind } from "./base/kind.ts";
+import type { BaseSource } from "./base/source.ts";
+import type { BaseUi } from "./base/ui.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
 import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
 import { basename } from "jsr:@std/path@~1.0.2/basename";
@@ -139,7 +140,7 @@ export class Loader {
     });
   }
 
-  getUi(index: string, name: string): BaseUi<BaseUiParams> | null {
+  getUi(index: string, name: string): BaseUi<BaseParams> | null {
     const mod = this.#mods.ui[name];
     if (!mod) {
       return null;
@@ -147,7 +148,7 @@ export class Loader {
 
     return this.#getExtension(index).getUi(mod, name);
   }
-  getSource(index: string, name: string): BaseSource<BaseSourceParams> | null {
+  getSource(index: string, name: string): BaseSource<BaseParams> | null {
     const mod = this.#mods.source[name];
     if (!mod) {
       return null;
@@ -155,7 +156,7 @@ export class Loader {
 
     return this.#getExtension(index).getSource(mod, name);
   }
-  getFilter(index: string, name: string): BaseFilter<BaseFilterParams> | null {
+  getFilter(index: string, name: string): BaseFilter<BaseParams> | null {
     const mod = this.#mods.filter[name];
     if (!mod) {
       return null;
@@ -163,7 +164,7 @@ export class Loader {
 
     return this.#getExtension(index).getFilter(mod, name);
   }
-  getKind(index: string, name: string): BaseKind<BaseKindParams> | null {
+  getKind(index: string, name: string): BaseKind<BaseParams> | null {
     const mod = this.#mods.kind[name];
     if (!mod) {
       return null;
@@ -171,7 +172,7 @@ export class Loader {
 
     return this.#getExtension(index).getKind(mod, name);
   }
-  getColumn(index: string, name: string): BaseColumn<BaseColumnParams> | null {
+  getColumn(index: string, name: string): BaseColumn<BaseParams> | null {
     const mod = this.#mods.column[name];
     if (!mod) {
       return null;
@@ -228,13 +229,13 @@ export class Loader {
 }
 
 class Extension {
-  #uis: Record<UiName, BaseUi<BaseUiParams>> = {};
-  #sources: Record<SourceName, BaseSource<BaseSourceParams>> = {};
-  #filters: Record<FilterName, BaseFilter<BaseFilterParams>> = {};
-  #kinds: Record<KindName, BaseKind<BaseKindParams>> = {};
-  #columns: Record<ColumnName, BaseColumn<BaseColumnParams>> = {};
+  #uis: Record<UiName, BaseUi<BaseParams>> = {};
+  #sources: Record<SourceName, BaseSource<BaseParams>> = {};
+  #filters: Record<FilterName, BaseFilter<BaseParams>> = {};
+  #kinds: Record<KindName, BaseKind<BaseParams>> = {};
+  #columns: Record<ColumnName, BaseColumn<BaseParams>> = {};
 
-  getUi(mod: Mod, name: string): BaseUi<BaseUiParams> {
+  getUi(mod: Mod, name: string): BaseUi<BaseParams> {
     if (!this.#uis[name]) {
       const obj = new mod.mod.Ui();
       obj.name = name;
@@ -243,7 +244,7 @@ class Extension {
     }
     return this.#uis[name];
   }
-  getSource(mod: Mod, name: string): BaseSource<BaseSourceParams> {
+  getSource(mod: Mod, name: string): BaseSource<BaseParams> {
     if (!this.#sources[name]) {
       const obj = new mod.mod.Source();
       obj.name = name;
@@ -252,7 +253,7 @@ class Extension {
     }
     return this.#sources[name];
   }
-  getFilter(mod: Mod, name: string): BaseFilter<BaseFilterParams> {
+  getFilter(mod: Mod, name: string): BaseFilter<BaseParams> {
     if (!this.#filters[name]) {
       const obj = new mod.mod.Filter();
       obj.name = name;
@@ -261,7 +262,7 @@ class Extension {
     }
     return this.#filters[name];
   }
-  getKind(mod: Mod, name: string): BaseKind<BaseKindParams> {
+  getKind(mod: Mod, name: string): BaseKind<BaseParams> {
     if (!this.#kinds[name]) {
       const obj = new mod.mod.Kind();
       obj.name = name;
@@ -270,7 +271,7 @@ class Extension {
     }
     return this.#kinds[name];
   }
-  getColumn(mod: Mod, name: string): BaseColumn<BaseColumnParams> {
+  getColumn(mod: Mod, name: string): BaseColumn<BaseParams> {
     if (!this.#columns[name]) {
       const obj = new mod.mod.Column();
       obj.name = name;

@@ -3,7 +3,7 @@ import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
 import * as fn from "jsr:@denops/std@~7.0.3/function";
 import type {
   ActionOptions,
-  BaseActionParams,
+  BaseParams,
   ColumnOptions,
   Context,
   DduOptions,
@@ -13,11 +13,6 @@ import type {
   UiOptions,
   UserOptions,
 } from "./types.ts";
-import type { BaseColumnParams } from "./base/column.ts";
-import type { BaseFilterParams } from "./base/filter.ts";
-import type { BaseKindParams } from "./base/kind.ts";
-import type { BaseSourceParams } from "./base/source.ts";
-import type { BaseUiParams } from "./base/ui.ts";
 import { defaultSourceOptions } from "./base/source.ts";
 import { printError } from "./utils.ts";
 
@@ -44,12 +39,12 @@ export const mergeColumnOptions: Merge<ColumnOptions> = overwrite;
 export const mergeKindOptions: Merge<KindOptions> = overwrite;
 export const mergeActionOptions: Merge<ActionOptions> = overwrite;
 
-export const mergeUiParams: Merge<BaseUiParams> = overwrite;
-export const mergeSourceParams: Merge<BaseSourceParams> = overwrite;
-export const mergeFilterParams: Merge<BaseFilterParams> = overwrite;
-export const mergeColumnParams: Merge<BaseColumnParams> = overwrite;
-export const mergeKindParams: Merge<BaseKindParams> = overwrite;
-export const mergeActionParams: Merge<BaseActionParams> = overwrite;
+export const mergeUiParams: Merge<BaseParams> = overwrite;
+export const mergeSourceParams: Merge<BaseParams> = overwrite;
+export const mergeFilterParams: Merge<BaseParams> = overwrite;
+export const mergeColumnParams: Merge<BaseParams> = overwrite;
+export const mergeKindParams: Merge<BaseParams> = overwrite;
+export const mergeActionParams: Merge<BaseParams> = overwrite;
 
 export function foldMerge<T>(
   merge: Merge<T>,

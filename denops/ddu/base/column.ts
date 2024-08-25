@@ -1,4 +1,5 @@
 import type {
+  BaseParams,
   ColumnOptions,
   Context,
   DduItem,
@@ -7,15 +8,13 @@ import type {
 } from "../types.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
 
-export type BaseColumnParams = Record<string, unknown>;
-
-export type OnInitArguments<Params extends BaseColumnParams> = {
+export type OnInitArguments<Params extends BaseParams> = {
   denops: Denops;
   columnOptions: ColumnOptions;
   columnParams: Params;
 };
 
-export type GetBaseTextArguments<Params extends BaseColumnParams> = {
+export type GetBaseTextArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -24,7 +23,7 @@ export type GetBaseTextArguments<Params extends BaseColumnParams> = {
   item: DduItem;
 };
 
-export type GetLengthArguments<Params extends BaseColumnParams> = {
+export type GetLengthArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -33,7 +32,7 @@ export type GetLengthArguments<Params extends BaseColumnParams> = {
   items: DduItem[];
 };
 
-export type GetTextArguments<Params extends BaseColumnParams> = {
+export type GetTextArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -50,7 +49,7 @@ export type GetTextResult = {
   highlights?: ItemHighlight[];
 };
 
-export abstract class BaseColumn<Params extends BaseColumnParams> {
+export abstract class BaseColumn<Params extends BaseParams> {
   apiVersion = 2;
 
   name = "";

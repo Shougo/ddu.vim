@@ -7,7 +7,7 @@ import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
 import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 import type {
   ActionHistory,
-  BaseActionParams,
+  BaseParams,
   Clipboard,
   Context,
   DduEvent,
@@ -30,7 +30,7 @@ import {
   mergeDduOptions,
 } from "./context.ts";
 import { defaultSourceOptions } from "./base/source.ts";
-import type { BaseSource, BaseSourceParams } from "./base/source.ts";
+import type { BaseSource } from "./base/source.ts";
 import type { Loader } from "./loader.ts";
 import { convertUserString, printError, treePath2Filename } from "./utils.ts";
 import type { AvailableSourceInfo, GatherStateAbortable } from "./state.ts";
@@ -438,7 +438,7 @@ export class Ddu {
   }
 
   #newDduItem<
-    Params extends BaseSourceParams,
+    Params extends BaseParams,
     UserData extends unknown,
   >(
     sourceIndex: number,
@@ -473,7 +473,7 @@ export class Ddu {
   }
 
   #gatherItems<
-    Params extends BaseSourceParams,
+    Params extends BaseParams,
     UserData extends unknown,
   >(
     denops: Denops,
@@ -889,7 +889,7 @@ export class Ddu {
   async uiAction(
     denops: Denops,
     actionName: string,
-    actionParams: BaseActionParams,
+    actionParams: BaseParams,
   ): Promise<void> {
     if (await fn.getcmdwintype(denops) !== "") {
       // Skip when Command line window
@@ -944,7 +944,7 @@ export class Ddu {
         getPreviewer: (
           denops: Denops,
           item: DduItem,
-          actionParams: BaseActionParams,
+          actionParams: BaseParams,
           previewContext: PreviewContext,
         ) =>
           getPreviewer(
@@ -994,7 +994,7 @@ export class Ddu {
     denops: Denops,
     actionName: string,
     items: DduItem[],
-    userActionParams: BaseActionParams,
+    userActionParams: BaseParams,
     clipboard: Clipboard,
     actionHistory: ActionHistory,
   ): Promise<void> {
@@ -1695,7 +1695,7 @@ export class Ddu {
     return ret;
   }
 
-  getSourceArgs(): [SourceOptions, BaseSourceParams][] {
+  getSourceArgs(): [SourceOptions, BaseParams][] {
     return this.#options.sources.map((userSource) =>
       sourceArgs(
         this.#loader.getSource(

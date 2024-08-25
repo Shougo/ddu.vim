@@ -1,8 +1,4 @@
-import type { BaseUiParams, UiActionArguments } from "./base/ui.ts";
-import type { BaseSourceParams } from "./base/source.ts";
-import type { BaseFilterParams } from "./base/filter.ts";
-import type { BaseKindParams } from "./base/kind.ts";
-import type { BaseColumnParams } from "./base/column.ts";
+import type { UiActionArguments } from "./base/ui.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
 
 export { ContextBuilder } from "./context.ts";
@@ -15,6 +11,8 @@ export type DduAliasType = DduExtType | "action";
 
 export type DduEvent = "close" | "cancel";
 
+export type BaseParams = Record<string, unknown>;
+
 export type UiName = string;
 export type SourceName = string;
 export type FilterName = string;
@@ -22,10 +20,10 @@ export type KindName = string;
 export type ColumnName = string;
 export type ActionName = string;
 
-export type UiActionCallback<Params extends BaseUiParams> = (
+export type UiActionCallback<Params extends BaseParams> = (
   args: UiActionArguments<Params>,
 ) => ActionFlags | Promise<ActionFlags>;
-export type ActionCallback<Params extends BaseUiParams> = (
+export type ActionCallback<Params extends BaseParams> = (
   args: ActionArguments<Params>,
 ) => ActionFlags | ActionResult | Promise<ActionFlags | ActionResult>;
 
@@ -38,25 +36,25 @@ export type TreePath = string | string[];
 export type UserUi = UiName | {
   name: UiName;
   options?: Partial<UiOptions>;
-  params?: Partial<BaseUiParams>;
+  params?: Partial<BaseParams>;
 };
 
 export type UserSource = SourceName | {
   name: SourceName;
   options?: Partial<SourceOptions>;
-  params?: Partial<BaseSourceParams>;
+  params?: Partial<BaseParams>;
 };
 
 export type UserFilter = FilterName | {
   name: FilterName;
   options?: Partial<FilterOptions>;
-  params?: Partial<BaseFilterParams>;
+  params?: Partial<BaseParams>;
 };
 
 export type UserColumn = ColumnName | {
   name: ColumnName;
   options?: Partial<ColumnOptions>;
-  params?: Partial<BaseColumnParams>;
+  params?: Partial<BaseParams>;
 };
 
 export type SourceInfo = {
@@ -82,16 +80,16 @@ export type Context = {
 
 export type DduOptions = {
   actionOptions: Record<ActionName, Partial<ActionOptions>>;
-  actionParams: Record<ActionName, Partial<BaseActionParams>>;
+  actionParams: Record<ActionName, Partial<BaseParams>>;
   actions: string[];
   columnOptions: Record<ColumnName, Partial<ColumnOptions>>;
-  columnParams: Record<ColumnName, Partial<BaseColumnParams>>;
+  columnParams: Record<ColumnName, Partial<BaseParams>>;
   expandInput: boolean;
   filterOptions: Record<FilterName, Partial<FilterOptions>>;
-  filterParams: Record<FilterName, Partial<BaseFilterParams>>;
+  filterParams: Record<FilterName, Partial<BaseParams>>;
   input: string;
   kindOptions: Record<KindName, Partial<KindOptions>>;
-  kindParams: Record<KindName, Partial<BaseKindParams>>;
+  kindParams: Record<KindName, Partial<BaseParams>>;
   name: string;
   postFilters: UserFilter[];
   profile: boolean;
@@ -100,19 +98,19 @@ export type DduOptions = {
   resume: boolean;
   searchPath: TreePath;
   sourceOptions: Record<SourceName, Partial<SourceOptions>>;
-  sourceParams: Record<SourceName, Partial<BaseSourceParams>>;
+  sourceParams: Record<SourceName, Partial<BaseParams>>;
   sources: UserSource[];
   sync: boolean;
   ui: UserUi;
   uiOptions: Record<UiName, Partial<UiOptions>>;
-  uiParams: Record<UiName, Partial<BaseUiParams>>;
+  uiParams: Record<UiName, Partial<BaseParams>>;
   unique: boolean;
 };
 
 export type UserOptions = Record<string, unknown>;
 
-export type UiAction = string | UiActionCallback<BaseUiParams>;
-export type ItemAction = string | ActionCallback<BaseActionParams>;
+export type UiAction = string | UiActionCallback<BaseParams>;
+export type ItemAction = string | ActionCallback<BaseParams>;
 
 export type UiOptions = {
   actions: Record<ActionName, UiAction>;
@@ -154,7 +152,6 @@ export type KindOptions = {
 export type ActionOptions = {
   quit: boolean;
 };
-export type BaseActionParams = Record<string, unknown>;
 
 export type ItemHighlight = {
   name: string;
@@ -213,7 +210,7 @@ export type DduFilterItems = DduItem[] | {
   postActionCommand?: string;
 };
 
-export type ActionArguments<Params extends BaseActionParams> = {
+export type ActionArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -227,12 +224,12 @@ export type ActionArguments<Params extends BaseActionParams> = {
   actionHistory: ActionHistory;
 };
 
-export type Actions<Params extends BaseActionParams> = Record<
+export type Actions<Params extends BaseParams> = Record<
   ActionName,
   Action<Params>
 >;
 
-export type Action<Params extends BaseActionParams> = {
+export type Action<Params extends BaseParams> = {
   description: string;
   callback: ActionCallback<Params>;
 } | ActionCallback<Params>;
