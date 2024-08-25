@@ -8,8 +8,6 @@ import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 import type {
   ActionHistory,
   BaseActionParams,
-  BaseSource,
-  BaseSourceParams,
   Clipboard,
   Context,
   DduEvent,
@@ -32,6 +30,7 @@ import {
   mergeDduOptions,
 } from "./context.ts";
 import { defaultSourceOptions } from "./base/source.ts";
+import type { BaseSource, BaseSourceParams } from "./base/source.ts";
 import type { Loader } from "./loader.ts";
 import { convertUserString, printError, treePath2Filename } from "./utils.ts";
 import type { AvailableSourceInfo, GatherStateAbortable } from "./state.ts";

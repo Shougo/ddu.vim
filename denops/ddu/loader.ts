@@ -1,14 +1,4 @@
 import type {
-  BaseColumn,
-  BaseColumnParams,
-  BaseFilter,
-  BaseFilterParams,
-  BaseKind,
-  BaseKindParams,
-  BaseSource,
-  BaseSourceParams,
-  BaseUi,
-  BaseUiParams,
   ColumnName,
   DduAliasType,
   DduExtType,
@@ -17,6 +7,11 @@ import type {
   SourceName,
   UiName,
 } from "./types.ts";
+import type { BaseColumn, BaseColumnParams } from "./base/column.ts";
+import type { BaseFilter, BaseFilterParams } from "./base/filter.ts";
+import type { BaseKind, BaseKindParams } from "./base/kind.ts";
+import type { BaseSource, BaseSourceParams } from "./base/source.ts";
+import type { BaseUi, BaseUiParams } from "./base/ui.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
 import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
 import { basename } from "jsr:@std/path@~1.0.2/basename";

@@ -7,7 +7,6 @@ import type {
   Action,
   ActionHistory,
   BaseActionParams,
-  BaseFilterParams,
   Clipboard,
   Context,
   DduAliasType,
@@ -19,6 +18,7 @@ import type {
   FilterOptions,
   UserOptions,
 } from "./types.ts";
+import type { BaseFilterParams } from "./base/filter.ts";
 import { Ddu } from "./ddu.ts";
 import {
   ContextBuilder,

@@ -1,11 +1,7 @@
 import { is } from "jsr:@core/unknownutil@~4.3.0/is";
 import { maybe } from "jsr:@core/unknownutil@~4.3.0/maybe";
-import type {
-  BaseSource,
-  BaseSourceParams,
-  DduItem,
-  SourceOptions,
-} from "./types.ts";
+import type { DduItem, SourceOptions } from "./types.ts";
+import type { BaseSource, BaseSourceParams } from "./base/source.ts";
 
 export type AvailableSourceInfo<
   Params extends BaseSourceParams = BaseSourceParams,

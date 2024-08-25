@@ -4,11 +4,6 @@ import * as fn from "jsr:@denops/std@~7.0.3/function";
 import type {
   ActionOptions,
   BaseActionParams,
-  BaseColumnParams,
-  BaseFilterParams,
-  BaseKindParams,
-  BaseSourceParams,
-  BaseUiParams,
   ColumnOptions,
   Context,
   DduOptions,
@@ -18,6 +13,11 @@ import type {
   UiOptions,
   UserOptions,
 } from "./types.ts";
+import type { BaseColumnParams } from "./base/column.ts";
+import type { BaseFilterParams } from "./base/filter.ts";
+import type { BaseKindParams } from "./base/kind.ts";
+import type { BaseSourceParams } from "./base/source.ts";
+import type { BaseUiParams } from "./base/ui.ts";
 import { defaultSourceOptions } from "./base/source.ts";
 import { printError } from "./utils.ts";
 

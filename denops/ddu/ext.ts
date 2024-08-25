@@ -7,16 +7,6 @@ import type {
   ActionName,
   ActionOptions,
   BaseActionParams,
-  BaseColumn,
-  BaseColumnParams,
-  BaseFilter,
-  BaseFilterParams,
-  BaseKind,
-  BaseKindParams,
-  BaseSource,
-  BaseSourceParams,
-  BaseUi,
-  BaseUiParams,
   ColumnOptions,
   Context,
   DduItem,
@@ -54,6 +44,11 @@ import { defaultFilterOptions } from "./base/filter.ts";
 import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
+import type { BaseColumn, BaseColumnParams } from "./base/column.ts";
+import type { BaseFilter, BaseFilterParams } from "./base/filter.ts";
+import type { BaseKind, BaseKindParams } from "./base/kind.ts";
+import type { BaseSource, BaseSourceParams } from "./base/source.ts";
+import type { BaseUi, BaseUiParams } from "./base/ui.ts";
 import type { Loader } from "./loader.ts";
 import { convertUserString, printError } from "./utils.ts";
 

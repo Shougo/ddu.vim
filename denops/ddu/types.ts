@@ -5,18 +5,6 @@ import type { BaseKindParams } from "./base/kind.ts";
 import type { BaseColumnParams } from "./base/column.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
 
-export { BaseConfig } from "./base/config.ts";
-export { BaseUi } from "./base/ui.ts";
-export type { BaseUiParams, UiActionArguments, UiActions } from "./base/ui.ts";
-export { BaseSource } from "./base/source.ts";
-export type { BaseSourceParams } from "./base/source.ts";
-export { BaseFilter } from "./base/filter.ts";
-export type { BaseFilterParams } from "./base/filter.ts";
-export { BaseKind } from "./base/kind.ts";
-export type { BaseKindParams } from "./base/kind.ts";
-export { BaseColumn } from "./base/column.ts";
-export type { BaseColumnParams } from "./base/column.ts";
-
 export { ContextBuilder } from "./context.ts";
 
 export type { Ddu } from "./ddu.ts";
