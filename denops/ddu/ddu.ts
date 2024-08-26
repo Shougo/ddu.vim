@@ -1,10 +1,3 @@
-import type { Denops } from "jsr:@denops/std@~7.0.3";
-import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
-import { equal } from "jsr:@std/assert@~1.0.2/equal";
-import { basename } from "jsr:@std/path@~1.0.2/basename";
-import * as fn from "jsr:@denops/std@~7.0.3/function";
-import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
-import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 import type {
   ActionHistory,
   BaseParams,
@@ -52,6 +45,15 @@ import {
   uiRedraw,
   uiSearchItem,
 } from "./ext.ts";
+
+import type { Denops } from "jsr:@denops/std@~7.0.3";
+import * as fn from "jsr:@denops/std@~7.0.3/function";
+
+import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
+import { equal } from "jsr:@std/assert@~1.0.2/equal";
+import { basename } from "jsr:@std/path@~1.0.2/basename";
+import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
+import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 
 type RedrawOptions = {
   /**

@@ -1,6 +1,3 @@
-import type { Denops } from "jsr:@denops/std@~7.0.3";
-import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
-import * as fn from "jsr:@denops/std@~7.0.3/function";
 import type {
   ActionOptions,
   BaseParams,
@@ -15,6 +12,11 @@ import type {
 } from "./types.ts";
 import { defaultSourceOptions } from "./base/source.ts";
 import { printError } from "./utils.ts";
+
+import type { Denops } from "jsr:@denops/std@~7.0.3";
+import * as fn from "jsr:@denops/std@~7.0.3/function";
+
+import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
 
 // where
 // T: Object

@@ -6,6 +6,7 @@ import type {
   DduOptions,
   ItemHighlight,
 } from "../types.ts";
+
 import type { Denops } from "jsr:@denops/std@~7.0.3";
 
 export type OnInitArguments<Params extends BaseParams> = {

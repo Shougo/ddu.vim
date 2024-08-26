@@ -1,8 +1,3 @@
-import type { Denops, Entrypoint } from "jsr:@denops/std@~7.0.3";
-import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
-import { is } from "jsr:@core/unknownutil@~4.3.0/is";
-import { ensure } from "jsr:@core/unknownutil@~4.3.0/ensure";
-import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
 import type {
   Action,
   ActionHistory,
@@ -39,6 +34,13 @@ import { defaultFilterOptions } from "./base/filter.ts";
 import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
+
+import type { Denops, Entrypoint } from "jsr:@denops/std@~7.0.3";
+
+import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
+import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
+import { is } from "jsr:@core/unknownutil@~4.3.0/is";
+import { ensure } from "jsr:@core/unknownutil@~4.3.0/ensure";
 
 export const main: Entrypoint = (denops: Denops) => {
   type RedrawTreeMode = "collapse" | "expand";

@@ -14,14 +14,16 @@ import type { BaseKind } from "./base/kind.ts";
 import type { BaseSource } from "./base/source.ts";
 import type { BaseUi } from "./base/ui.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
-import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
+import { isDenoCacheIssueError } from "./utils.ts";
+import { mods } from "./_mods.js";
+
+import * as fn from "jsr:@denops/std@~7.0.3/function";
+import * as op from "jsr:@denops/std@~7.0.3/option";
+
 import { basename } from "jsr:@std/path@~1.0.2/basename";
 import { parse } from "jsr:@std/path@~1.0.2/parse";
 import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
-import * as fn from "jsr:@denops/std@~7.0.3/function";
-import * as op from "jsr:@denops/std@~7.0.3/option";
-import { isDenoCacheIssueError } from "./utils.ts";
-import { mods } from "./_mods.js";
+import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
 
 type Mod = {
   // deno-lint-ignore no-explicit-any
