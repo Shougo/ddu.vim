@@ -1,4 +1,3 @@
-import type { UiActionArguments } from "./base/ui.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
 
 export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
@@ -204,6 +203,21 @@ export type DduFilterItems = DduItem[] | {
   items: DduItem[];
   input?: string;
   postActionCommand?: string;
+};
+
+export type UiActionArguments<Params extends BaseParams> = {
+  denops: Denops;
+  context: Context;
+  options: DduOptions;
+  uiOptions: UiOptions;
+  uiParams: Params;
+  actionParams: unknown;
+  getPreviewer?: (
+    denops: Denops,
+    item: DduItem,
+    actionParams: BaseParams,
+    previewContext: PreviewContext,
+  ) => Promise<Previewer | undefined>;
 };
 
 export type ActionArguments<Params extends BaseParams> = {
