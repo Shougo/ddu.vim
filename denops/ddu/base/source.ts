@@ -9,13 +9,11 @@ import type {
   SourceOptions,
 } from "../types.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
-import type { Loader } from "../loader.ts";
 
 export type OnInitArguments<Params extends BaseParams> = {
   denops: Denops;
   sourceOptions: SourceOptions;
   sourceParams: Params;
-  loader: Loader;
 };
 
 export type OnEventArguments<Params extends BaseParams> = {
@@ -33,7 +31,6 @@ export type GatherArguments<Params extends BaseParams> = {
   sourceParams: Params;
   input: string;
   parent?: DduItem;
-  loader: Loader;
 };
 
 export type CheckUpdatedArguments<Params extends BaseParams> = {

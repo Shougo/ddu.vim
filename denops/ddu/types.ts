@@ -1,10 +1,6 @@
 import type { UiActionArguments } from "./base/ui.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
 
-export { ContextBuilder } from "./context.ts";
-
-export type { Ddu } from "./ddu.ts";
-
 export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
 
 export type DduAliasType = DduExtType | "action";

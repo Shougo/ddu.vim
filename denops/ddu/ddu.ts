@@ -334,7 +334,6 @@ export class Ddu {
                   source,
                   sourceOptions,
                   sourceParams,
-                  this.#loader,
                 );
               }
 
@@ -365,7 +364,6 @@ export class Ddu {
           source,
           sourceOptions,
           sourceParams,
-          this.#loader,
           0,
           { signal },
         );
@@ -481,7 +479,6 @@ export class Ddu {
     source: BaseSource<Params, UserData>,
     sourceOptions: SourceOptions,
     sourceParams: Params,
-    loader: Loader,
     itemLevel: number,
     opts?: {
       parent?: DduItem;
@@ -528,7 +525,6 @@ export class Ddu {
           sourceParams,
           input: this.#input,
           parent,
-          loader,
         });
 
         // Wait until the stream closes.
@@ -1226,7 +1222,6 @@ export class Ddu {
         source,
         sourceOptions,
         sourceParams,
-        this.#loader,
         parent.__level + 1,
         { parent, signal },
       );

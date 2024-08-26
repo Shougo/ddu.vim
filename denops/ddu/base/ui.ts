@@ -1,7 +1,6 @@
 import type {
   BaseParams,
   Context,
-  Ddu,
   DduItem,
   DduOptions,
   PreviewContext,
@@ -11,6 +10,7 @@ import type {
   UiOptions,
 } from "../types.ts";
 import type { Denops } from "jsr:@denops/std@~7.0.3";
+import type { Ddu } from "../ddu.ts";
 
 export type UiActions<Params extends BaseParams> = Record<
   string,
