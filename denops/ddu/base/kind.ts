@@ -9,7 +9,7 @@ import type {
   Previewer,
 } from "../types.ts";
 
-import type { Denops } from "jsr:@denops/std@~7.0.3";
+import type { Denops } from "jsr:@denops/std@~7.1.0";
 
 export type GetPreviewerArguments = {
   denops: Denops;

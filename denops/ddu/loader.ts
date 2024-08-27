@@ -13,12 +13,12 @@ import type { BaseFilter } from "./base/filter.ts";
 import type { BaseKind } from "./base/kind.ts";
 import type { BaseSource } from "./base/source.ts";
 import type { BaseUi } from "./base/ui.ts";
-import type { Denops } from "jsr:@denops/std@~7.0.3";
+import type { Denops } from "jsr:@denops/std@~7.1.0";
 import { isDenoCacheIssueError } from "./utils.ts";
 import { mods } from "./_mods.js";
 
-import * as fn from "jsr:@denops/std@~7.0.3/function";
-import * as op from "jsr:@denops/std@~7.0.3/option";
+import * as fn from "jsr:@denops/std@~7.1.0/function";
+import * as op from "jsr:@denops/std@~7.1.0/option";
 
 import { basename } from "jsr:@std/path@~1.0.2/basename";
 import { parse } from "jsr:@std/path@~1.0.2/parse";

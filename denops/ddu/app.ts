@@ -35,7 +35,7 @@ import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
 
-import type { Denops, Entrypoint } from "jsr:@denops/std@~7.0.3";
+import type { Denops, Entrypoint } from "jsr:@denops/std@~7.1.0";
 
 import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
 import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";

@@ -48,8 +48,8 @@ import type { BaseUi } from "./base/ui.ts";
 import type { Loader } from "./loader.ts";
 import { convertUserString, printError } from "./utils.ts";
 
-import type { Denops } from "jsr:@denops/std@~7.0.3";
-import * as fn from "jsr:@denops/std@~7.0.3/function";
+import type { Denops } from "jsr:@denops/std@~7.1.0";
+import * as fn from "jsr:@denops/std@~7.1.0/function";
 
 import type { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
 import { is } from "jsr:@core/unknownutil@~4.3.0/is";

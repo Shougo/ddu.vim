@@ -1,4 +1,4 @@
-import type { Denops } from "jsr:@denops/std@~7.0.3";
+import type { Denops } from "jsr:@denops/std@~7.1.0";
 
 export type DduExtType = "ui" | "source" | "filter" | "kind" | "column";
 

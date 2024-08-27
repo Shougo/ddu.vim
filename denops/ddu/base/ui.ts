@@ -8,7 +8,7 @@ import type {
   UiOptions,
 } from "../types.ts";
 
-import type { Denops } from "jsr:@denops/std@~7.0.3";
+import type { Denops } from "jsr:@denops/std@~7.1.0";
 
 export type UiActions<Params extends BaseParams> = Record<
   string,
