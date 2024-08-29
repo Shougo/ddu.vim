@@ -1659,6 +1659,9 @@ A: The example is here. >
 ==============================================================================
 COMPATIBILITY                                              *ddu-compatibility*
 
+2024.08.29
+* Refactor types.ts.
+
 2024.04.07
 * Deno 1.40+ is required.
 
