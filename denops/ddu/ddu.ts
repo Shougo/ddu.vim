@@ -1,10 +1,6 @@
-import type { Denops } from "./deps.ts";
-import { assertEquals, basename, equal, fn, Lock, pathsep } from "./deps.ts";
 import type {
   ActionHistory,
-  BaseActionParams,
-  BaseSource,
-  BaseSourceParams,
+  BaseParams,
   Clipboard,
   Context,
   DduEvent,
@@ -27,6 +23,7 @@ import {
   mergeDduOptions,
 } from "./context.ts";
 import { defaultSourceOptions } from "./base/source.ts";
+import type { BaseSource } from "./base/source.ts";
 import type { Loader } from "./loader.ts";
 import { convertUserString, printError, treePath2Filename } from "./utils.ts";
 import type { AvailableSourceInfo, GatherStateAbortable } from "./state.ts";
@@ -48,6 +45,15 @@ import {
   uiRedraw,
   uiSearchItem,
 } from "./ext.ts";
+
+import type { Denops } from "jsr:@denops/std@~7.1.0";
+import * as fn from "jsr:@denops/std@~7.1.0/function";
+
+import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
+import { equal } from "jsr:@std/assert@~1.0.2/equal";
+import { basename } from "jsr:@std/path@~1.0.2/basename";
+import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
+import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 
 type RedrawOptions = {
   /**
@@ -330,7 +336,6 @@ export class Ddu {
                   source,
                   sourceOptions,
                   sourceParams,
-                  this.#loader,
                 );
               }
 
@@ -361,7 +366,6 @@ export class Ddu {
           source,
           sourceOptions,
           sourceParams,
-          this.#loader,
           0,
           { signal },
         );
@@ -434,7 +438,7 @@ export class Ddu {
   }
 
   #newDduItem<
-    Params extends BaseSourceParams,
+    Params extends BaseParams,
     UserData extends unknown,
   >(
     sourceIndex: number,
@@ -469,7 +473,7 @@ export class Ddu {
   }
 
   #gatherItems<
-    Params extends BaseSourceParams,
+    Params extends BaseParams,
     UserData extends unknown,
   >(
     denops: Denops,
@@ -477,7 +481,6 @@ export class Ddu {
     source: BaseSource<Params, UserData>,
     sourceOptions: SourceOptions,
     sourceParams: Params,
-    loader: Loader,
     itemLevel: number,
     opts?: {
       parent?: DduItem;
@@ -524,7 +527,6 @@ export class Ddu {
           sourceParams,
           input: this.#input,
           parent,
-          loader,
         });
 
         // Wait until the stream closes.
@@ -885,7 +887,7 @@ export class Ddu {
   async uiAction(
     denops: Denops,
     actionName: string,
-    actionParams: BaseActionParams,
+    actionParams: BaseParams,
   ): Promise<void> {
     if (await fn.getcmdwintype(denops) !== "") {
       // Skip when Command line window
@@ -931,7 +933,6 @@ export class Ddu {
     } else {
       ret = await action({
         denops,
-        ddu: this,
         context: this.#context,
         options: this.#options,
         uiOptions,
@@ -940,7 +941,7 @@ export class Ddu {
         getPreviewer: (
           denops: Denops,
           item: DduItem,
-          actionParams: BaseActionParams,
+          actionParams: BaseParams,
           previewContext: PreviewContext,
         ) =>
           getPreviewer(
@@ -990,7 +991,7 @@ export class Ddu {
     denops: Denops,
     actionName: string,
     items: DduItem[],
-    userActionParams: BaseActionParams,
+    userActionParams: BaseParams,
     clipboard: Clipboard,
     actionHistory: ActionHistory,
   ): Promise<void> {
@@ -1222,7 +1223,6 @@ export class Ddu {
         source,
         sourceOptions,
         sourceParams,
-        this.#loader,
         parent.__level + 1,
         { parent, signal },
       );
@@ -1691,7 +1691,7 @@ export class Ddu {
     return ret;
   }
 
-  getSourceArgs(): [SourceOptions, BaseSourceParams][] {
+  getSourceArgs(): [SourceOptions, BaseParams][] {
     return this.#options.sources.map((userSource) =>
       sourceArgs(
         this.#loader.getSource(

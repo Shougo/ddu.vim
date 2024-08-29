@@ -1,20 +1,8 @@
-import type { Denops, Lock } from "./deps.ts";
-import { fn, is } from "./deps.ts";
 import type {
   Action,
   ActionName,
   ActionOptions,
-  BaseActionParams,
-  BaseColumn,
-  BaseColumnParams,
-  BaseFilter,
-  BaseFilterParams,
-  BaseKind,
-  BaseKindParams,
-  BaseSource,
-  BaseSourceParams,
-  BaseUi,
-  BaseUiParams,
+  BaseParams,
   ColumnOptions,
   Context,
   DduItem,
@@ -52,12 +40,23 @@ import { defaultFilterOptions } from "./base/filter.ts";
 import { defaultColumnOptions } from "./base/column.ts";
 import { defaultKindOptions } from "./base/kind.ts";
 import { defaultActionOptions } from "./base/action.ts";
+import type { BaseColumn } from "./base/column.ts";
+import type { BaseFilter } from "./base/filter.ts";
+import type { BaseKind } from "./base/kind.ts";
+import type { BaseSource } from "./base/source.ts";
+import type { BaseUi } from "./base/ui.ts";
 import type { Loader } from "./loader.ts";
 import { convertUserString, printError } from "./utils.ts";
 
+import type { Denops } from "jsr:@denops/std@~7.1.0";
+import * as fn from "jsr:@denops/std@~7.1.0/function";
+
+import type { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
+import { is } from "jsr:@core/unknownutil@~4.3.0/is";
+
 type ItemActions = {
-  source: BaseSource<BaseSourceParams, unknown>;
-  kind: BaseKind<BaseKindParams>;
+  source: BaseSource<BaseParams, unknown>;
+  kind: BaseKind<BaseParams>;
   actions: Record<string, unknown>;
 };
 
@@ -65,12 +64,12 @@ type ItemActionInfo = {
   userSource: UserSource;
   sourceIndex: number;
   sourceOptions: SourceOptions;
-  sourceParams: BaseSourceParams;
+  sourceParams: BaseParams;
   kindOptions: KindOptions;
-  kindParams: BaseKindParams;
+  kindParams: BaseParams;
   actionOptions: ActionOptions;
-  actionParams: BaseActionParams;
-  action: string | Action<BaseActionParams>;
+  actionParams: BaseParams;
+  action: string | Action<BaseParams>;
 };
 
 export async function getItemActions(
@@ -168,7 +167,7 @@ export async function getItemAction(
   options: DduOptions,
   actionName: string,
   items: DduItem[],
-  userActionParams: BaseActionParams,
+  userActionParams: BaseParams,
 ): Promise<ItemActionInfo | undefined> {
   if (items.length === 0) {
     return;
@@ -224,7 +223,7 @@ export async function getItemAction(
 
   const action = actions[actionName] as
     | string
-    | Action<BaseActionParams>;
+    | Action<BaseParams>;
   if (!action) {
     await printError(denops, `Not found action: ${actionName}`);
     return;
@@ -301,9 +300,9 @@ export async function getUi(
   options: DduOptions,
 ): Promise<
   [
-    BaseUi<BaseUiParams> | undefined,
+    BaseUi<BaseParams> | undefined,
     UiOptions,
-    BaseUiParams,
+    BaseParams,
   ]
 > {
   const userUi = convertUserString(options.ui);
@@ -346,9 +345,9 @@ export async function getSource(
   userSource: UserSource,
 ): Promise<
   [
-    BaseSource<BaseSourceParams> | undefined,
+    BaseSource<BaseParams> | undefined,
     SourceOptions,
-    BaseSourceParams,
+    BaseParams,
   ]
 > {
   if (!loader.getSource(options.name, name)) {
@@ -387,9 +386,9 @@ export async function getFilter(
   userFilter: UserFilter,
 ): Promise<
   [
-    BaseFilter<BaseFilterParams> | undefined,
+    BaseFilter<BaseParams> | undefined,
     FilterOptions,
-    BaseFilterParams,
+    BaseParams,
   ]
 > {
   userFilter = convertUserString(userFilter);
@@ -433,7 +432,7 @@ async function getKind(
   options: DduOptions,
   name: string,
 ): Promise<
-  BaseKind<BaseKindParams> | undefined
+  BaseKind<BaseParams> | undefined
 > {
   if (!loader.getKind(options.name, name)) {
     const startTime = Date.now();
@@ -463,9 +462,9 @@ export async function getColumn(
   userColumn: UserColumn,
 ): Promise<
   [
-    BaseColumn<BaseColumnParams> | undefined,
+    BaseColumn<BaseParams> | undefined,
     ColumnOptions,
-    BaseColumnParams,
+    BaseParams,
   ]
 > {
   userColumn = convertUserString(userColumn);
@@ -567,9 +566,9 @@ export async function callColumns(
   }
 
   type CachedColumn = {
-    column: BaseColumn<BaseColumnParams>;
+    column: BaseColumn<BaseParams>;
     columnOptions: ColumnOptions;
-    columnParams: BaseColumnParams;
+    columnParams: BaseParams;
     length: number;
   };
   const userColumns = columns.map((column) => convertUserString(column));
@@ -668,7 +667,7 @@ export async function getPreviewer(
   loader: Loader,
   options: DduOptions,
   item: DduItem,
-  actionParams: BaseActionParams,
+  actionParams: BaseParams,
   previewContext: PreviewContext,
 ): Promise<Previewer | undefined> {
   const source = loader.getSource(
@@ -695,11 +694,11 @@ export async function getPreviewer(
 }
 
 function uiArgs<
-  Params extends BaseUiParams,
+  Params extends BaseParams,
 >(
   options: DduOptions,
   ui: BaseUi<Params>,
-): [UiOptions, BaseUiParams] {
+): [UiOptions, BaseParams] {
   const o = foldMerge(
     mergeUiOptions,
     defaultUiOptions,
@@ -717,13 +716,13 @@ function uiArgs<
 }
 
 export function sourceArgs<
-  Params extends BaseSourceParams,
+  Params extends BaseParams,
   UserData extends unknown,
 >(
   source: BaseSource<Params, UserData> | null,
   options: DduOptions,
   userSource: UserSource | null,
-): [SourceOptions, BaseSourceParams] {
+): [SourceOptions, BaseParams] {
   userSource = convertUserString(userSource);
 
   const o = foldMerge(
@@ -749,12 +748,12 @@ export function sourceArgs<
 }
 
 function filterArgs<
-  Params extends BaseFilterParams,
+  Params extends BaseParams,
 >(
   filter: BaseFilter<Params>,
   options: DduOptions,
   userFilter: UserFilter,
-): [FilterOptions, BaseFilterParams] {
+): [FilterOptions, BaseParams] {
   userFilter = convertUserString(userFilter);
 
   const o = foldMerge(
@@ -780,11 +779,11 @@ function filterArgs<
 }
 
 function kindArgs<
-  Params extends BaseKindParams,
+  Params extends BaseParams,
 >(
   kind: BaseKind<Params>,
   options: DduOptions,
-): [KindOptions, BaseKindParams] {
+): [KindOptions, BaseParams] {
   const o = foldMerge(
     mergeKindOptions,
     defaultKindOptions,
@@ -806,12 +805,12 @@ function kindArgs<
 }
 
 function columnArgs<
-  Params extends BaseColumnParams,
+  Params extends BaseParams,
 >(
   column: BaseColumn<Params>,
   options: DduOptions,
   userColumn: UserColumn,
-): [ColumnOptions, BaseColumnParams] {
+): [ColumnOptions, BaseParams] {
   userColumn = convertUserString(userColumn);
 
   const o = foldMerge(
@@ -839,8 +838,8 @@ function columnArgs<
 function actionArgs(
   actionName: string,
   options: DduOptions,
-  params: BaseActionParams,
-): [ActionOptions, BaseActionParams] {
+  params: BaseParams,
+): [ActionOptions, BaseParams] {
   const o = foldMerge(
     mergeActionOptions,
     defaultActionOptions,
@@ -858,30 +857,28 @@ function actionArgs(
 }
 
 export async function initSource<
-  Params extends BaseSourceParams,
+  Params extends BaseParams,
   UserData extends unknown,
 >(
   denops: Denops,
   source: BaseSource<Params, UserData>,
   sourceOptions: SourceOptions,
   sourceParams: Params,
-  loader: Loader,
 ): Promise<void> {
   source.isInitialized = false;
   await source.onInit({
     denops,
     sourceOptions,
     sourceParams,
-    loader,
   });
   source.isInitialized = true;
 }
 
 async function checkUiOnInit(
-  ui: BaseUi<BaseUiParams>,
+  ui: BaseUi<BaseParams>,
   denops: Denops,
   uiOptions: UiOptions,
-  uiParams: BaseUiParams,
+  uiParams: BaseParams,
 ) {
   if (ui.isInitialized) {
     return;
@@ -901,7 +898,7 @@ async function checkUiOnInit(
 }
 
 export async function uiRedraw<
-  Params extends BaseUiParams,
+  Params extends BaseParams,
 >(
   denops: Denops,
   lock: Lock<number>,
@@ -1028,10 +1025,10 @@ export async function uiQuit(
 }
 
 async function checkFilterOnInit(
-  filter: BaseFilter<BaseFilterParams>,
+  filter: BaseFilter<BaseParams>,
   denops: Denops,
   filterOptions: FilterOptions,
-  filterParams: BaseFilterParams,
+  filterParams: BaseParams,
 ) {
   if (filter.isInitialized) {
     return;
@@ -1051,10 +1048,10 @@ async function checkFilterOnInit(
 }
 
 async function checkColumnOnInit(
-  column: BaseColumn<BaseColumnParams>,
+  column: BaseColumn<BaseParams>,
   denops: Denops,
   columnOptions: ColumnOptions,
-  columnParams: BaseColumnParams,
+  columnParams: BaseParams,
 ) {
   if (column.isInitialized) {
     return;

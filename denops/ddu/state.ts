@@ -1,13 +1,11 @@
-import { is, maybe } from "./deps.ts";
-import type {
-  BaseSource,
-  BaseSourceParams,
-  DduItem,
-  SourceOptions,
-} from "./types.ts";
+import type { BaseParams, DduItem, SourceOptions } from "./types.ts";
+import type { BaseSource } from "./base/source.ts";
+
+import { is } from "jsr:@core/unknownutil@~4.3.0/is";
+import { maybe } from "jsr:@core/unknownutil@~4.3.0/maybe";
 
 export type AvailableSourceInfo<
-  Params extends BaseSourceParams = BaseSourceParams,
+  Params extends BaseParams = BaseParams,
   UserData extends unknown = unknown,
 > = {
   sourceIndex: number;
@@ -30,7 +28,7 @@ export type GatherStateAbortable = {
 };
 
 export class GatherState<
-  Params extends BaseSourceParams = BaseSourceParams,
+  Params extends BaseParams = BaseParams,
   UserData extends unknown = unknown,
 > {
   readonly sourceInfo: AvailableSourceInfo<Params, UserData>;

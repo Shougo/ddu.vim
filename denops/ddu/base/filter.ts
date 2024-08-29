@@ -1,4 +1,5 @@
 import type {
+  BaseParams,
   Context,
   DduFilterItems,
   DduItem,
@@ -6,23 +7,22 @@ import type {
   FilterOptions,
   SourceOptions,
 } from "../types.ts";
-import type { Denops } from "../deps.ts";
 
-export type BaseFilterParams = Record<string, unknown>;
+import type { Denops } from "jsr:@denops/std@~7.1.0";
 
-export type OnInitArguments<Params extends BaseFilterParams> = {
+export type OnInitArguments<Params extends BaseParams> = {
   denops: Denops;
   filterOptions: FilterOptions;
   filterParams: Params;
 };
 
-export type OnRefreshItemsArguments<Params extends BaseFilterParams> = {
+export type OnRefreshItemsArguments<Params extends BaseParams> = {
   denops: Denops;
   filterOptions: FilterOptions;
   filterParams: Params;
 };
 
-export type FilterArguments<Params extends BaseFilterParams> = {
+export type FilterArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -33,7 +33,7 @@ export type FilterArguments<Params extends BaseFilterParams> = {
   items: DduItem[];
 };
 
-export abstract class BaseFilter<Params extends BaseFilterParams> {
+export abstract class BaseFilter<Params extends BaseParams> {
   apiVersion = 3;
 
   name = "";

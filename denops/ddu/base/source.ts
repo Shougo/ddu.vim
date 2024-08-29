@@ -1,5 +1,6 @@
 import type {
   Actions,
+  BaseParams,
   Context,
   DduEvent,
   DduItem,
@@ -7,26 +8,23 @@ import type {
   Item,
   SourceOptions,
 } from "../types.ts";
-import type { Denops } from "../deps.ts";
-import type { Loader } from "../loader.ts";
 
-export type BaseSourceParams = Record<string, unknown>;
+import type { Denops } from "jsr:@denops/std@~7.1.0";
 
-export type OnInitArguments<Params extends BaseSourceParams> = {
+export type OnInitArguments<Params extends BaseParams> = {
   denops: Denops;
   sourceOptions: SourceOptions;
   sourceParams: Params;
-  loader: Loader;
 };
 
-export type OnEventArguments<Params extends BaseSourceParams> = {
+export type OnEventArguments<Params extends BaseParams> = {
   denops: Denops;
   sourceOptions: SourceOptions;
   sourceParams: Params;
   event: DduEvent;
 };
 
-export type GatherArguments<Params extends BaseSourceParams> = {
+export type GatherArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -34,10 +32,9 @@ export type GatherArguments<Params extends BaseSourceParams> = {
   sourceParams: Params;
   input: string;
   parent?: DduItem;
-  loader: Loader;
 };
 
-export type CheckUpdatedArguments<Params extends BaseSourceParams> = {
+export type CheckUpdatedArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -46,7 +43,7 @@ export type CheckUpdatedArguments<Params extends BaseSourceParams> = {
 };
 
 export abstract class BaseSource<
-  Params extends BaseSourceParams,
+  Params extends BaseParams,
   UserData extends unknown = unknown,
 > {
   apiVersion = 3;

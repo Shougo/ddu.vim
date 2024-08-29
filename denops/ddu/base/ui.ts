@@ -1,43 +1,39 @@
 import type {
-  BaseActionParams,
+  BaseParams,
   Context,
-  Ddu,
   DduItem,
   DduOptions,
-  PreviewContext,
-  Previewer,
   SourceInfo,
   UiActionCallback,
   UiOptions,
 } from "../types.ts";
-import type { Denops } from "../deps.ts";
 
-export type BaseUiParams = Record<string, unknown>;
+import type { Denops } from "jsr:@denops/std@~7.1.0";
 
-export type UiActions<Params extends BaseUiParams> = Record<
+export type UiActions<Params extends BaseParams> = Record<
   string,
   UiActionCallback<Params>
 >;
 
-export type OnInitArguments<Params extends BaseUiParams> = {
+export type OnInitArguments<Params extends BaseParams> = {
   denops: Denops;
   uiOptions: UiOptions;
   uiParams: Params;
 };
 
-export type OnBeforeActionArguments<Params extends BaseUiParams> = {
+export type OnBeforeActionArguments<Params extends BaseParams> = {
   denops: Denops;
   uiOptions: UiOptions;
   uiParams: Params;
 };
 
-export type OnAfterActionArguments<Params extends BaseUiParams> = {
+export type OnAfterActionArguments<Params extends BaseParams> = {
   denops: Denops;
   uiOptions: UiOptions;
   uiParams: Params;
 };
 
-export type RefreshItemsArguments<Params extends BaseUiParams> = {
+export type RefreshItemsArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -47,7 +43,7 @@ export type RefreshItemsArguments<Params extends BaseUiParams> = {
   items: DduItem[];
 };
 
-export type CollapseItemArguments<Params extends BaseUiParams> = {
+export type CollapseItemArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -56,7 +52,7 @@ export type CollapseItemArguments<Params extends BaseUiParams> = {
   item: DduItem;
 };
 
-export type ExpandItemArguments<Params extends BaseUiParams> = {
+export type ExpandItemArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -67,7 +63,7 @@ export type ExpandItemArguments<Params extends BaseUiParams> = {
   isGrouped: boolean;
 };
 
-export type SearchItemArguments<Params extends BaseUiParams> = {
+export type SearchItemArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -76,7 +72,7 @@ export type SearchItemArguments<Params extends BaseUiParams> = {
   item: DduItem;
 };
 
-export type RedrawArguments<Params extends BaseUiParams> = {
+export type RedrawArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -84,7 +80,7 @@ export type RedrawArguments<Params extends BaseUiParams> = {
   uiParams: Params;
 };
 
-export type QuitArguments<Params extends BaseUiParams> = {
+export type QuitArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -92,7 +88,7 @@ export type QuitArguments<Params extends BaseUiParams> = {
   uiParams: Params;
 };
 
-export type VisibleArguments<Params extends BaseUiParams> = {
+export type VisibleArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -101,7 +97,7 @@ export type VisibleArguments<Params extends BaseUiParams> = {
   tabNr: number;
 };
 
-export type WinidArguments<Params extends BaseUiParams> = {
+export type WinidArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -109,7 +105,7 @@ export type WinidArguments<Params extends BaseUiParams> = {
   uiParams: Params;
 };
 
-export type UpdateCursorArguments<Params extends BaseUiParams> = {
+export type UpdateCursorArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -117,25 +113,7 @@ export type UpdateCursorArguments<Params extends BaseUiParams> = {
   uiParams: Params;
 };
 
-export type UiActionArguments<Params extends BaseUiParams> = {
-  denops: Denops;
-  ddu: Ddu;
-  context: Context;
-  options: DduOptions;
-  uiOptions: UiOptions;
-  uiParams: Params;
-  actionParams: unknown;
-  getPreviewer?: (
-    denops: Denops,
-    item: DduItem,
-    actionParams: BaseActionParams,
-    previewContext: PreviewContext,
-  ) => Promise<Previewer | undefined>;
-};
-
-export abstract class BaseUi<
-  Params extends BaseUiParams,
-> {
+export abstract class BaseUi<Params extends BaseParams> {
   apiVersion = 2;
 
   name = "";
