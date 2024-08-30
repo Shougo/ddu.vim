@@ -14,7 +14,7 @@ import type { Denops } from "jsr:@denops/std@~7.1.0";
 export type GetPreviewerArguments = {
   denops: Denops;
   options: DduOptions;
-  actionParams: unknown;
+  actionParams: BaseParams;
   previewContext: PreviewContext;
   item: DduItem;
 };

@@ -211,7 +211,7 @@ export type UiActionArguments<Params extends BaseParams> = {
   options: DduOptions;
   uiOptions: UiOptions;
   uiParams: Params;
-  actionParams: unknown;
+  actionParams: BaseParams;
   getPreviewer?: (
     denops: Denops,
     item: DduItem,
@@ -228,7 +228,7 @@ export type ActionArguments<Params extends BaseParams> = {
   sourceParams: Params;
   kindOptions: KindOptions;
   kindParams: Params;
-  actionParams: unknown;
+  actionParams: BaseParams;
   items: DduItem[];
   clipboard: Clipboard;
   actionHistory: ActionHistory;
