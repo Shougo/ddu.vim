@@ -1115,7 +1115,7 @@ TYPES                                                              *ddu-types*
 
 Please see the TypeScript definition.
 
-https://jsr.io/@shougo/ddu-vim@5.0.0/doc
+https://jsr.io/@shougo/ddu-vim/doc
 
 
 ==============================================================================
