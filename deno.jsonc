@@ -16,7 +16,7 @@
     "include": [
       "denops/ddu/**/*.ts",
       "denops/ddu/**/*.js"
-    ],
+    ]
   },
   "imports": {
   },

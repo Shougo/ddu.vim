@@ -33,46 +33,7 @@ export type OnAfterActionArguments<Params extends BaseParams> = {
   uiParams: Params;
 };
 
-export type RefreshItemsArguments<Params extends BaseParams> = {
-  denops: Denops;
-  context: Context;
-  options: DduOptions;
-  uiOptions: UiOptions;
-  uiParams: Params;
-  sources: SourceInfo[];
-  items: DduItem[];
-};
-
-export type CollapseItemArguments<Params extends BaseParams> = {
-  denops: Denops;
-  context: Context;
-  options: DduOptions;
-  uiOptions: UiOptions;
-  uiParams: Params;
-  item: DduItem;
-};
-
-export type ExpandItemArguments<Params extends BaseParams> = {
-  denops: Denops;
-  context: Context;
-  options: DduOptions;
-  uiOptions: UiOptions;
-  uiParams: Params;
-  parent: DduItem;
-  children: DduItem[];
-  isGrouped: boolean;
-};
-
-export type SearchItemArguments<Params extends BaseParams> = {
-  denops: Denops;
-  context: Context;
-  options: DduOptions;
-  uiOptions: UiOptions;
-  uiParams: Params;
-  item: DduItem;
-};
-
-export type RedrawArguments<Params extends BaseParams> = {
+type BaseUiArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
@@ -80,38 +41,53 @@ export type RedrawArguments<Params extends BaseParams> = {
   uiParams: Params;
 };
 
-export type QuitArguments<Params extends BaseParams> = {
-  denops: Denops;
-  context: Context;
-  options: DduOptions;
-  uiOptions: UiOptions;
-  uiParams: Params;
-};
+export type RefreshItemsArguments<Params extends BaseParams> =
+  & BaseUiArguments<Params>
+  & {
+    sources: SourceInfo[];
+    items: DduItem[];
+  };
 
-export type VisibleArguments<Params extends BaseParams> = {
-  denops: Denops;
-  context: Context;
-  options: DduOptions;
-  uiOptions: UiOptions;
-  uiParams: Params;
-  tabNr: number;
-};
+export type CollapseItemArguments<Params extends BaseParams> =
+  & BaseUiArguments<Params>
+  & {
+    item: DduItem;
+  };
 
-export type WinidArguments<Params extends BaseParams> = {
-  denops: Denops;
-  context: Context;
-  options: DduOptions;
-  uiOptions: UiOptions;
-  uiParams: Params;
-};
+export type ExpandItemArguments<Params extends BaseParams> =
+  & BaseUiArguments<Params>
+  & {
+    parent: DduItem;
+    children: DduItem[];
+    isGrouped: boolean;
+  };
 
-export type UpdateCursorArguments<Params extends BaseParams> = {
-  denops: Denops;
-  context: Context;
-  options: DduOptions;
-  uiOptions: UiOptions;
-  uiParams: Params;
-};
+export type SearchItemArguments<Params extends BaseParams> =
+  & BaseUiArguments<Params>
+  & {
+    item: DduItem;
+  };
+
+export type RedrawArguments<Params extends BaseParams> = BaseUiArguments<
+  Params
+>;
+
+export type QuitArguments<Params extends BaseParams> = BaseUiArguments<Params>;
+
+export type VisibleArguments<Params extends BaseParams> =
+  & BaseUiArguments<Params>
+  & {
+    tabNr: number;
+  };
+
+export type WinidArguments<Params extends BaseParams> = BaseUiArguments<Params>;
+
+export type UpdateCursorArguments<Params extends BaseParams> = BaseUiArguments<
+  Params
+>;
+
+export type ClearSelectedItemsArguments<Params extends BaseParams> =
+  BaseUiArguments<Params>;
 
 export abstract class BaseUi<Params extends BaseParams> {
   apiVersion = 2;
@@ -154,6 +130,10 @@ export abstract class BaseUi<Params extends BaseParams> {
   }
 
   updateCursor(_args: UpdateCursorArguments<Params>): void | Promise<void> {}
+
+  clearSelectedItems(
+    _args: ClearSelectedItemsArguments<Params>,
+  ): void | Promise<void> {}
 
   abstract actions: UiActions<Params>;
 

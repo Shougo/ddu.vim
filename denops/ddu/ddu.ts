@@ -1110,6 +1110,16 @@ export class Ddu {
       const { signal } = this.#aborter;
 
       if (ui) {
+        if (ui.clearSelectedItems) {
+          await ui.clearSelectedItems({
+            denops,
+            context: this.#context,
+            options: this.#options,
+            uiOptions,
+            uiParams,
+          });
+        }
+
         await uiRedraw(
           denops,
           this.#uiRedrawLock,
