@@ -713,7 +713,7 @@ export class Ddu {
 
     await Promise.all(allItems.map(async (item: DduItem): Promise<void> => {
       if (searchPath) {
-        if (searchPath === item.treePath ?? item.word) {
+        if (searchPath === (item.treePath ?? item.word)) {
           searchTargetItem = item;
         }
         if (
@@ -1378,7 +1378,7 @@ export class Ddu {
       )
     ) {
       searchedItem = children.find((item) =>
-        search === item.treePath ?? item.word
+        search === (item.treePath ?? item.word)
       );
     }
 
