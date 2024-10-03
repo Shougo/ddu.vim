@@ -46,13 +46,13 @@ import {
   uiSearchItem,
 } from "./ext.ts";
 
-import type { Denops } from "jsr:@denops/std@~7.1.0";
-import * as fn from "jsr:@denops/std@~7.1.0/function";
+import type { Denops } from "jsr:@denops/std@~7.2.0";
+import * as fn from "jsr:@denops/std@~7.2.0/function";
 
 import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
 import { equal } from "jsr:@std/assert@~1.0.2/equal";
 import { basename } from "jsr:@std/path@~1.0.2/basename";
-import { Lock } from "jsr:@core/asyncutil@~1.1.1/lock";
+import { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
 import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 
 type RedrawOptions = {
