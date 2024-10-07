@@ -309,7 +309,7 @@ export async function getUi(
   if (!loader.getUi(options.name, userUi.name)) {
     const startTime = Date.now();
 
-    await loader.autoload(denops, "ui", userUi.name);
+    const exists = await loader.autoload(denops, "ui", userUi.name);
 
     if (options.profile) {
       await printError(
@@ -317,13 +317,14 @@ export async function getUi(
         `Load ${userUi.name}: ${Date.now() - startTime} ms`,
       );
     }
+
+    if (userUi.name !== "" && !exists) {
+      await printError(denops, `Not found ui: "${userUi.name}"`);
+    }
   }
 
   const ui = loader.getUi(options.name, userUi.name);
   if (!ui) {
-    if (userUi.name.length !== 0) {
-      await printError(denops, `Not found ui: "${userUi.name}"`);
-    }
     return [
       undefined,
       defaultUiOptions(),
@@ -353,16 +354,19 @@ export async function getSource(
   if (!loader.getSource(options.name, name)) {
     const startTime = Date.now();
 
-    await loader.autoload(denops, "source", name);
+    const exists = await loader.autoload(denops, "source", name);
 
     if (options.profile) {
       await printError(denops, `Load ${name}: ${Date.now() - startTime} ms`);
+    }
+
+    if (!exists) {
+      await printError(denops, `Not found source: ${name}`);
     }
   }
 
   const source = loader.getSource(options.name, name);
   if (!source) {
-    await printError(denops, `Not found source: ${name}`);
     return [
       undefined,
       defaultSourceOptions(),
@@ -396,7 +400,7 @@ export async function getFilter(
   if (!loader.getFilter(options.name, userFilter.name)) {
     const startTime = Date.now();
 
-    await loader.autoload(denops, "filter", userFilter.name);
+    const exists = await loader.autoload(denops, "filter", userFilter.name);
 
     if (options.profile) {
       await printError(
@@ -404,11 +408,14 @@ export async function getFilter(
         `Load ${userFilter.name}: ${Date.now() - startTime} ms`,
       );
     }
+
+    if (!exists) {
+      await printError(denops, `Not found filter: ${userFilter.name}`);
+    }
   }
 
   const filter = loader.getFilter(options.name, userFilter.name);
   if (!filter) {
-    await printError(denops, `Not found filter: ${userFilter.name}`);
     return [
       undefined,
       defaultFilterOptions(),
@@ -437,18 +444,19 @@ async function getKind(
   if (!loader.getKind(options.name, name)) {
     const startTime = Date.now();
 
-    await loader.autoload(denops, "kind", name);
+    const exists = await loader.autoload(denops, "kind", name);
 
     if (options.profile) {
       await printError(denops, `Load ${name}: ${Date.now() - startTime} ms`);
+    }
+
+    if (!exists) {
+      await printError(denops, `Not found kind: ${name}`);
     }
   }
 
   const kind = loader.getKind(options.name, name);
   if (!kind) {
-    if (name !== "base") {
-      await printError(denops, `Not found kind: ${name}`);
-    }
     return undefined;
   }
 
@@ -472,7 +480,7 @@ export async function getColumn(
   if (!loader.getColumn(options.name, userColumn.name)) {
     const startTime = Date.now();
 
-    await loader.autoload(denops, "column", userColumn.name);
+    const exists = await loader.autoload(denops, "column", userColumn.name);
 
     if (options.profile) {
       await printError(
@@ -480,11 +488,14 @@ export async function getColumn(
         `Load ${userColumn.name}: ${Date.now() - startTime} ms`,
       );
     }
+
+    if (!exists) {
+      await printError(denops, `Not found column: ${userColumn.name}`);
+    }
   }
 
   const column = loader.getColumn(options.name, userColumn.name);
   if (!column) {
-    await printError(denops, `Not found column: ${userColumn.name}`);
     return [
       undefined,
       defaultColumnOptions(),
