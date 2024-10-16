@@ -1,4 +1,4 @@
-*ddu.txt*	Dark deno-powered UI framework for neovim/Vim
+*ddu.txt*	Dark deno-powered UI framework for NeoVim/Vim
 
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
@@ -64,7 +64,7 @@ It does not work with zero configuration.  You can use other plugins.
 ==============================================================================
 INSTALL                                                          *ddu-install*
 
-NOTE: ddu.vim requires Neovim (0.8.0+) or Vim 9.0.1276+ (latest is
+NOTE: ddu.vim requires NeoVim (0.8.0+) or Vim 9.0.1276+ (latest is
 recommended).
 
 Please install both Deno 1.45+ and "denops.vim" v7.0+.
@@ -331,7 +331,7 @@ ddu#get_items([{options}])
 		Creates a new Ddu and get items without UI.
 		NOTE: You cannot call it in |vim_starting|.  Because
 		denops.vim is not initialized.
-		NOTE: It blocks Vim/neovim UI.
+		NOTE: It blocks Vim/NeoVim UI.
 
 		Refer to |ddu-options| about {options}.  If you skip a value,
 		it uses the default value.
@@ -1305,7 +1305,7 @@ highlights		(object[])			(Optional)
 
 		name			(string)
 		The highlight name. It is used for |prop_type_add()| in Vim.
-		It is not used in Neovim.
+		It is not used in NeoVim.
 		NOTE: Each name must be unique for the highlight group.
 		Because of possible interference with other plugins, a naming
 		convention like `ddu-{type}-{name}-{group}` is recommended.
@@ -1423,7 +1423,7 @@ getText			(function)			(Required)
 		The text length must be same with
 		|ddu-column-attribute-getLength|.
 		NOTE: The highlight length is not same with display width.
-		It is Vim/neovim highlight feature.
+		It is Vim/NeoVim highlight feature.
 
                                                  *ddu-column-attribute-onInit*
 onInit			(function)			(Optional)
@@ -1480,7 +1480,7 @@ NoFilePreviewer
 
                                              *ddu-previewer-TerminalPreviewer*
 TerminalPreviewer
-	Preview type which uses Vim/Neovim's |:terminal| feature.
+	Preview type which uses Vim/NeoVim's |:terminal| feature.
 
 
 ------------------------------------------------------------------------------
@@ -1577,7 +1577,7 @@ FAQ 7:                                                             |ddu-faq-7|
                                                                    *ddu-faq-1*
 Q: How to donate money to you?
 
-A: I have started github sponsorship to spend more time for Vim/neovim
+A: I have started github sponsorship to spend more time for Vim/NeoVim
 plugins.  You can donate money to help me!
 
    https://github.com/sponsors/Shougo
@@ -1684,13 +1684,13 @@ COMPATIBILITY                                              *ddu-compatibility*
 * item actions can close UI when all items are gathered.
 
 2023.07.07
-* Vim 9.0.1276+ or neovim 0.8+ is required to support the latest MacVim.
+* Vim 9.0.1276+ or NeoVim 0.8+ is required to support the latest MacVim.
 
 2023.07.07
-* Vim 9.0.1499+ or neovim 0.8+ is required.
+* Vim 9.0.1499+ or NeoVim 0.8+ is required.
 
 2023.06.30
-* Vim 9.0+ or neovim 0.8+ is required.
+* Vim 9.0+ or NeoVim 0.8+ is required.
 
 2023.06.19
 * Change path type to "string | string[]".
@@ -1715,7 +1715,7 @@ COMPATIBILITY                                              *ddu-compatibility*
 * Remove "searchPath" from UI interface.
 
 2022.11.18
-* neovim 0.8 is required.
+* NeoVim 0.8 is required.
 
 2022.03.27
 * Some ddu#util functions are not public.
@@ -1727,7 +1727,7 @@ COMPATIBILITY                                              *ddu-compatibility*
 * Replace ddu#quit() to ddu#event().
 
 2022.02.04
-* neovim 0.6 is required.
+* NeoVim 0.6 is required.
 * Users must set default kind.
 * Cannot mix multiple kinds/sources for item action.
 
