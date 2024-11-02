@@ -232,6 +232,7 @@ export type ActionArguments<Params extends BaseParams> = {
   items: DduItem[];
   clipboard: Clipboard;
   actionHistory: ActionHistory;
+  inputHistory: string[];
 };
 
 export type Actions<Params extends BaseParams> = Record<

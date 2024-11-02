@@ -68,6 +68,7 @@ export class Ddu {
   #loader: Loader;
   readonly #gatherStates = new Map<number, GatherState>();
   #input = "";
+  #inputHistory: string[] = [];
   #context: Context = defaultContext();
   #options: DduOptions = defaultDduOptions();
   #userOptions: UserOptions = {};
@@ -599,8 +600,8 @@ export class Ddu {
     }
 
     // Update current input
+    await this.setInput(denops, this.#input);
     this.#context.doneUi = false;
-    this.#context.input = this.#input;
     this.#context.maxItems = 0;
 
     const filterResults = (await Promise.all(
@@ -985,6 +986,9 @@ export class Ddu {
 
     // NOTE: :redraw is needed for command line
     await denops.cmd("redraw");
+
+    // NOTE: Update inputHistory when uiAction
+    this.#updateInputHistory();
   }
 
   async itemAction(
@@ -1047,6 +1051,7 @@ export class Ddu {
         items,
         clipboard,
         actionHistory,
+        inputHistory: this.#inputHistory,
       });
     }
 
@@ -1878,6 +1883,14 @@ export class Ddu {
         this.#expandedItems.delete(k);
       }
     });
+  }
+
+  #updateInputHistory() {
+    // NOTE: this.#inputHistory must be unique
+    this.#inputHistory.push(this.#input);
+    this.#inputHistory = Array.from(new Set(this.#inputHistory.reverse()))
+      .reverse();
+    console.log(this.#inputHistory);
   }
 }
 
