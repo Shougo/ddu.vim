@@ -953,6 +953,7 @@ export class Ddu {
             actionParams,
             previewContext,
           ),
+        inputHistory: this.#inputHistory,
       });
     }
 
@@ -1051,7 +1052,6 @@ export class Ddu {
         items,
         clipboard,
         actionHistory,
-        inputHistory: this.#inputHistory,
       });
     }
 
@@ -1890,7 +1890,6 @@ export class Ddu {
     this.#inputHistory.push(this.#input);
     this.#inputHistory = Array.from(new Set(this.#inputHistory.reverse()))
       .reverse();
-    console.log(this.#inputHistory);
   }
 }
 

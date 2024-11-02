@@ -218,6 +218,7 @@ export type UiActionArguments<Params extends BaseParams> = {
     actionParams: BaseParams,
     previewContext: PreviewContext,
   ) => Promise<Previewer | undefined>;
+  inputHistory: string[];
 };
 
 export type ActionArguments<Params extends BaseParams> = {
@@ -232,7 +233,6 @@ export type ActionArguments<Params extends BaseParams> = {
   items: DduItem[];
   clipboard: Clipboard;
   actionHistory: ActionHistory;
-  inputHistory: string[];
 };
 
 export type Actions<Params extends BaseParams> = Record<
