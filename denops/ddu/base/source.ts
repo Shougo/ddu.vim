@@ -24,23 +24,23 @@ export type OnEventArguments<Params extends BaseParams> = {
   event: DduEvent;
 };
 
-export type GatherArguments<Params extends BaseParams> = {
+type BaseSourceArguments<Params extends BaseParams> = {
   denops: Denops;
   context: Context;
   options: DduOptions;
   sourceOptions: SourceOptions;
   sourceParams: Params;
-  input: string;
-  parent?: DduItem;
 };
 
-export type CheckUpdatedArguments<Params extends BaseParams> = {
-  denops: Denops;
-  context: Context;
-  options: DduOptions;
-  sourceOptions: SourceOptions;
-  sourceParams: Params;
-};
+export type GatherArguments<Params extends BaseParams> =
+  & BaseSourceArguments<Params>
+  & {
+    input: string;
+    parent?: DduItem;
+  };
+
+export type CheckUpdatedArguments<Params extends BaseParams> =
+  BaseSourceArguments<Params>;
 
 export abstract class BaseSource<
   Params extends BaseParams,
