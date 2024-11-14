@@ -1100,9 +1100,12 @@ export class Ddu {
   async expandItems(
     denops: Denops,
     items: ExpandItem[],
-    opts?: { signal?: AbortSignal },
+    opts?: {
+      preventRedraw?: boolean;
+      signal?: AbortSignal;
+    },
   ): Promise<void> {
-    const { signal = this.#aborter.signal } = opts ?? {};
+    const { preventRedraw, signal = this.#aborter.signal } = opts ?? {};
     for (const item of items.sort((a, b) => a.item.__level - b.item.__level)) {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
@@ -1121,7 +1124,9 @@ export class Ddu {
       );
     }
 
-    await this.uiRedraw(denops, { signal });
+    if (!preventRedraw && !signal.aborted) {
+      await this.uiRedraw(denops, { signal });
+    }
   }
 
   async expandItem(
@@ -1719,6 +1724,10 @@ export class Ddu {
 
   async restoreTree(
     denops: Denops,
+    opts?: {
+      preventRedraw?: boolean;
+      signal?: AbortSignal;
+    },
   ): Promise<void> {
     // NOTE: Check expandedItems are exists in this.#items
     const checkItems: Map<string, DduItem> = new Map();
@@ -1734,7 +1743,7 @@ export class Ddu {
       return;
     }
 
-    await this.expandItems(denops, restoreItems);
+    await this.expandItems(denops, restoreItems, opts);
   }
 
   async #filterItems(
