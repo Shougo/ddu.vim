@@ -8,7 +8,6 @@ import type {
   DduOptions,
   ExpandItem,
   Item,
-  PreviewContext,
   SourceInfo,
   SourceOptions,
   TreePath,
@@ -36,11 +35,11 @@ import {
   getColumn,
   getFilter,
   getItemAction,
-  getPreviewer,
   getSource,
   getUi,
   initSource,
   sourceArgs,
+  uiAction,
   uiQuit,
   uiRedraw,
   uiSearchItem,
@@ -895,74 +894,17 @@ export class Ddu {
       return;
     }
 
-    const [ui, uiOptions, uiParams] = await getUi(
+    const [ui, uiOptions, uiParams, ret] = await uiAction(
       denops,
       this.#loader,
+      this.#context,
       this.#options,
+      actionName,
+      actionParams,
+      this.#inputHistory,
     );
     if (!ui) {
       return;
-    }
-
-    if (ui.onBeforeAction) {
-      await ui.onBeforeAction({
-        denops,
-        uiOptions,
-        uiParams,
-      });
-    }
-
-    const action = uiOptions.actions[actionName] ?? ui.actions[actionName];
-    if (!action) {
-      await printError(denops, `Not found UI action: ${actionName}`);
-      return;
-    }
-
-    let ret;
-    if (typeof action === "string") {
-      ret = await denops.call(
-        "denops#callback#call",
-        action,
-        {
-          context: this.#context,
-          options: this.#options,
-          uiOptions,
-          uiParams,
-          actionParams,
-        },
-      ) as ActionFlags;
-    } else {
-      ret = await action({
-        denops,
-        context: this.#context,
-        options: this.#options,
-        uiOptions,
-        uiParams,
-        actionParams,
-        getPreviewer: (
-          denops: Denops,
-          item: DduItem,
-          actionParams: BaseParams,
-          previewContext: PreviewContext,
-        ) =>
-          getPreviewer(
-            denops,
-            this.#loader,
-            this.#options,
-            item,
-            actionParams,
-            previewContext,
-          ),
-        inputHistory: this.#inputHistory,
-      });
-    }
-
-    if (ui.onAfterAction) {
-      await ui.onAfterAction({
-        denops,
-        uiOptions,
-        uiParams,
-      });
     }
 
     // NOTE: Get the signal after the UI action finishes.
