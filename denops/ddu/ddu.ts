@@ -536,7 +536,7 @@ export class Ddu {
         }
 
         // Add an event listener for the abort signal.
-        state.signal.addEventListener('abort', () => {
+        state.signal.addEventListener("abort", () => {
           itemsStream.cancel(state.signal.reason);
         });
 
