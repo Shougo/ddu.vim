@@ -1050,7 +1050,8 @@ export async function uiAction(
     UiOptions,
     BaseParams,
     ActionFlags,
-  ]> {
+  ]
+> {
   // Quit current UI
   const [ui, uiOptions, uiParams] = await getUi(
     denops,
