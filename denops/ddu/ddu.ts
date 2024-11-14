@@ -529,6 +529,17 @@ export class Ddu {
           parent,
         });
 
+        // Check if the signal is already aborted.
+        if (state.signal.aborted) {
+          itemsStream.cancel(state.signal.reason);
+          return;
+        }
+
+        // Add an event listener for the abort signal.
+        state.signal.addEventListener('abort', () => {
+          itemsStream.cancel(state.signal.reason);
+        });
+
         // Wait until the stream closes.
         await itemsStream.pipeTo(itemTransformer.writable);
       } catch (e: unknown) {
