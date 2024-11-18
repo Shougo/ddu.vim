@@ -14,14 +14,29 @@ export type AvailableSourceInfo<
   sourceParams: Params;
 };
 
-type GatherStateAbortReason =
-  | {
-    reason: "quit";
+export type BaseAbortReason = {
+  readonly type: string;
+};
+
+export class QuitAbortReason extends Error implements BaseAbortReason {
+  override name = "QuitAbortReason";
+  readonly type = "quit";
+}
+
+export class RefreshAbortReason extends Error implements BaseAbortReason {
+  override name = "RefreshAbortReason";
+  readonly type = "cancelToRefresh";
+  readonly refreshIndexes: readonly number[];
+
+  constructor(refreshIndexes: number[] = []) {
+    super();
+    this.refreshIndexes = refreshIndexes;
   }
-  | {
-    reason: "cancelToRefresh";
-    refreshIndexes: number[];
-  };
+}
+
+export type GatherStateAbortReason =
+  | QuitAbortReason
+  | RefreshAbortReason;
 
 export type GatherStateAbortable = {
   abort(reason: GatherStateAbortReason): void;

@@ -26,8 +26,12 @@ import type { BaseSource } from "./base/source.ts";
 import type { Loader } from "./loader.ts";
 import { convertUserString, printError, treePath2Filename } from "./utils.ts";
 import type { AvailableSourceInfo, GatherStateAbortable } from "./state.ts";
-import { GatherState } from "./state.ts";
-import { isRefreshTarget } from "./state.ts";
+import {
+  GatherState,
+  isRefreshTarget,
+  QuitAbortReason,
+  RefreshAbortReason,
+} from "./state.ts";
 import {
   callColumns,
   callFilters,
@@ -848,7 +852,8 @@ export class Ddu {
   quit() {
     // NOTE: quitted flag must be called after ui.quit().
     this.#quitted = true;
-    this.#aborter.abort({ reason: "quit" });
+    const reason = new QuitAbortReason();
+    this.#aborter.abort(reason);
     this.#context.done = true;
   }
 
@@ -860,7 +865,8 @@ export class Ddu {
   async cancelToRefresh(
     refreshIndexes: number[] = [],
   ): Promise<void> {
-    this.#aborter.abort({ reason: "cancelToRefresh", refreshIndexes });
+    const reason = new RefreshAbortReason(refreshIndexes);
+    this.#aborter.abort(reason);
 
     await Promise.all(
       [...this.#gatherStates]
