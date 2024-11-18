@@ -25,7 +25,11 @@ import { defaultSourceOptions } from "./base/source.ts";
 import type { BaseSource } from "./base/source.ts";
 import type { Loader } from "./loader.ts";
 import { convertUserString, printError, treePath2Filename } from "./utils.ts";
-import type { AvailableSourceInfo, GatherStateAbortable } from "./state.ts";
+import type {
+  AvailableSourceInfo,
+  GatherStateAbortable,
+  GatherStateAbortReason,
+} from "./state.ts";
 import {
   GatherState,
   isRefreshTarget,
@@ -81,6 +85,7 @@ export class Ddu {
     & Omit<AbortController, "abort">
     & GatherStateAbortable;
   readonly #uiRedrawLock = new Lock(0);
+  #waitCancelComplete = Promise.resolve();
   #waitRedrawComplete?: Promise<void>;
   #scheduledRedrawOptions?: Required<RedrawOptions>;
   #startTime = 0;
@@ -238,7 +243,7 @@ export class Ddu {
       .#createAvailableSourceStream(denops, { initialize: true })
       .tee();
     const [gatherStates] = availableSources
-      .pipeThrough(this.#createGatherStateTransformer(denops, signal))
+      .pipeThrough(this.#createGatherStateTransformer(denops))
       .tee();
 
     // Wait until initialized all sources. Source onInit() must be called before UI.
@@ -287,6 +292,7 @@ export class Ddu {
     this.#context.done = false;
 
     await this.cancelToRefresh(refreshIndexes);
+    this.#resetAborter();
 
     // NOTE: Get the signal after the aborter is reset.
     const { signal } = this.#aborter;
@@ -298,10 +304,10 @@ export class Ddu {
 
     const [gatherStates] = this
       .#createAvailableSourceStream(denops, { indexes: refreshIndexes })
-      .pipeThrough(this.#createGatherStateTransformer(denops, signal))
+      .pipeThrough(this.#createGatherStateTransformer(denops))
       .tee();
 
-    await this.#refreshSources(denops, gatherStates);
+    await this.#refreshSources(denops, gatherStates, { signal });
   }
 
   #createAvailableSourceStream(
@@ -358,7 +364,6 @@ export class Ddu {
 
   #createGatherStateTransformer(
     denops: Denops,
-    signal: AbortSignal,
   ): TransformStream<AvailableSourceInfo, GatherState> {
     return new TransformStream({
       transform: (sourceInfo, controller) => {
@@ -371,7 +376,6 @@ export class Ddu {
           sourceOptions,
           sourceParams,
           0,
-          { signal },
         );
         this.#gatherStates.set(sourceIndex, state);
 
@@ -393,7 +397,7 @@ export class Ddu {
       new WritableStream({
         write: (state) => {
           refreshedSources.push(
-            this.#refreshItems(denops, state).catch((e) => {
+            this.#refreshItems(denops, state, signal).catch((e) => {
               refreshErrorHandler.abort(e);
             }),
           );
@@ -412,8 +416,12 @@ export class Ddu {
     }
   }
 
-  async #refreshItems(denops: Denops, state: GatherState): Promise<void> {
-    const { sourceInfo: { sourceOptions }, itemsStream, signal } = state;
+  async #refreshItems(
+    denops: Denops,
+    state: GatherState,
+    signal: AbortSignal,
+  ): Promise<void> {
+    const { sourceInfo: { sourceOptions }, itemsStream } = state;
 
     await callOnRefreshItemsHooks(
       denops,
@@ -488,10 +496,9 @@ export class Ddu {
     itemLevel: number,
     opts?: {
       parent?: DduItem;
-      signal?: AbortSignal;
     },
   ): GatherState<Params, UserData> {
-    const { parent, signal = this.#aborter.signal } = opts ?? {};
+    const { parent } = opts ?? {};
 
     const itemTransformer = new TransformStream<Item[], DduItem[]>({
       transform: (chunk, controller) => {
@@ -516,7 +523,6 @@ export class Ddu {
         sourceParams,
       },
       itemTransformer.readable,
-      { signal },
     );
 
     // Process from stream generation to termination.
@@ -536,7 +542,7 @@ export class Ddu {
         // Wait until the stream closes.
         await itemsStream.pipeTo(itemTransformer.writable);
       } catch (e: unknown) {
-        if (state.signal.aborted && e === state.signal.reason) {
+        if (state.cancelled.aborted && e === state.cancelled.reason) {
           // Aborted by signal, so do nothing.
         } else {
           // Show error message
@@ -854,6 +860,7 @@ export class Ddu {
     this.#quitted = true;
     const reason = new QuitAbortReason();
     this.#aborter.abort(reason);
+    /* no await */ this.#cancelGatherStates([], reason);
     this.#context.done = true;
   }
 
@@ -867,26 +874,30 @@ export class Ddu {
   ): Promise<void> {
     const reason = new RefreshAbortReason(refreshIndexes);
     this.#aborter.abort(reason);
+    await this.#cancelGatherStates(refreshIndexes, reason);
+  }
 
-    await Promise.all(
-      [...this.#gatherStates]
-        .map(([sourceIndex, state]) => {
-          if (isRefreshTarget(sourceIndex, refreshIndexes)) {
-            this.#gatherStates.delete(sourceIndex);
-            return state.waitDone;
-          }
-        }),
-    );
-
-    this.#resetAborter();
+  #cancelGatherStates(
+    sourceIndexes: number[],
+    reason: GatherStateAbortReason,
+  ): Promise<void> {
+    const promises = [...this.#gatherStates]
+      .filter(([sourceIndex]) => isRefreshTarget(sourceIndex, sourceIndexes))
+      .map(([sourceIndex, state]) => {
+        this.#gatherStates.delete(sourceIndex);
+        state.cancel(reason);
+        return state.waitDone;
+      });
+    this.#waitCancelComplete = Promise.all([
+      this.#waitCancelComplete,
+      ...promises,
+    ]).then(() => {});
+    return this.#waitCancelComplete;
   }
 
   #resetAborter() {
     if (!this.#quitted && this.#aborter.signal.aborted) {
       this.#aborter = new AbortController();
-      for (const state of this.#gatherStates.values()) {
-        state.resetSignal(this.#aborter.signal);
-      }
     }
   }
 
@@ -1200,7 +1211,7 @@ export class Ddu {
         sourceOptions,
         sourceParams,
         parent.__level + 1,
-        { parent, signal },
+        { parent },
       );
 
       await state.readAll();
