@@ -1,6 +1,6 @@
 # ddu.vim
 
-> Dark deno-powered UI framework for Neovim/Vim
+> Dark deno-powered UI framework for Vim/Neovim
 
 If you don't want to configure plugins, you don't have to use the plugin. It
 does not work with zero configuration. You can use other plugins.
@@ -13,7 +13,7 @@ NOTE: I have created
 [Japanese article](https://zenn.dev/shougo/articles/ddu-vim-beta) for ddu.vim.
 
 Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible and
-asynchronous UI framework for Neovim/Vim.
+asynchronous UI framework for Vim/Neovim.
 
 The development is supported by
 [github sponsors](https://github.com/sponsors/Shougo/). Thank you!
@@ -34,7 +34,7 @@ better than Neovim Python interface.
 - Easy to setup
 - Minimal dependency
 - Stability
-- Neovim/Vim compatibility
+- Vim/Neovim compatibility
 - Speed
 - Library
 - Easy to hack
