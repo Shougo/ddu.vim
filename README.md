@@ -47,9 +47,8 @@ Please see: https://github.com/Shougo/ddu.vim/issues/10
 
 ## Install
 
-**NOTE:** Ddu.vim requires Neovim (0.8.0+ and of course, **latest** is
-recommended) or Vim 9.0.1276+. See [requirements](#requirements) if you aren't
-sure whether you have this.
+**NOTE:** Ddu.vim requires Vim 9.0.1276+ or Neovim 0.10.0+. See
+[requirements](#requirements) if you aren't sure whether you have this.
 
 ### Requirements
 
