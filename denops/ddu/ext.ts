@@ -94,19 +94,13 @@ export async function getItemActions(
   const indexes = [
     ...new Set(items.map((item) => item.__sourceIndex)),
   ];
-  if (sources.length === 0 || sources.length !== 1 && indexes.length !== 1) {
-    if (sources.length > 0) {
-      await printError(
-        denops,
-        `You must not mix multiple sources items: "${
-          sources.map((source) => source?.name)
-        }"`,
-      );
-    }
-    return null;
-  }
-  const source = sources[0];
-  if (!source) {
+  if (sources.length > 1) {
+    await printError(
+      denops,
+      `You must not mix multiple sources items: "${
+        sources.map((source) => source?.name)
+      }"`,
+    );
     return null;
   }
 
@@ -118,7 +112,9 @@ export async function getItemActions(
     ),
   ] as string[];
   if (kinds.length !== 1) {
-    await printError(denops, `You must not mix multiple kinds: "${kinds}"`);
+    if (kinds.length >= 1) {
+      await printError(denops, `You must not mix multiple kinds: "${kinds}"`);
+    }
     return null;
   }
 
@@ -127,6 +123,8 @@ export async function getItemActions(
   if (!kind) {
     return null;
   }
+
+  const source = sources.length > 0 ? sources[0] : null;
 
   const [kindOptions, _1] = kindArgs(kind, options);
   const [sourceOptions, _2] = sourceArgs(
@@ -138,7 +136,7 @@ export async function getItemActions(
   const actions = Object.assign(
     kind.actions,
     kindOptions.actions,
-    source.actions,
+    source?.actions,
     sourceOptions.actions,
   );
 
