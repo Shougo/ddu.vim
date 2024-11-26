@@ -548,7 +548,7 @@ export async function callFilters(
       if (is.Array(ret)) {
         items = ret;
       } else {
-        if (ret.input) {
+        if (ret.input || ret.input === "") {
           // Overwrite current input
           input = ret.input;
         }
