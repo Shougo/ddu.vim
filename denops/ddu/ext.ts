@@ -56,7 +56,7 @@ import type { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
 import { is } from "jsr:@core/unknownutil@~4.3.0/is";
 
 type ItemActions = {
-  source: BaseSource<BaseParams, unknown>;
+  source: BaseSource<BaseParams, unknown> | null;
   kind: BaseKind<BaseParams>;
   actions: Record<string, unknown>;
 };
