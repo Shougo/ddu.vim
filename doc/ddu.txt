@@ -923,14 +923,14 @@ FILTERS                                                          *ddu-filters*
 
 The filters are used to filter items from the sources.
 
-	"matchers": Filter items based on user input and process the input as 
-		needed.  If matchers return an object with an "input" field,
-		the value of this field is passed to subsequent filters as
-		user input
+	"matchers": Filter items based on user input.
 	
 	"sorters": Sort items.
 	
 	"filters": Convert item's attributes.
+
+If filters return an object with an "input" field, the value of this field is
+passed to subsequent filters as user input.
 
 The filters are applyed the following order.
 
