@@ -28,11 +28,11 @@ import {
   uiSearchItem,
 } from "./ext.ts";
 import { isDenoCacheIssueError } from "./utils.ts";
-import { BaseUi, defaultUiOptions } from "./base/ui.ts";
-import { BaseSource, defaultSourceOptions } from "./base/source.ts";
-import { BaseFilter, defaultFilterOptions } from "./base/filter.ts";
-import { BaseKind, defaultKindOptions } from "./base/kind.ts";
-import { BaseColumn, defaultColumnOptions } from "./base/column.ts";
+import { type BaseUi, defaultUiOptions } from "./base/ui.ts";
+import { type BaseSource, defaultSourceOptions } from "./base/source.ts";
+import { type BaseFilter, defaultFilterOptions } from "./base/filter.ts";
+import { type BaseKind, defaultKindOptions } from "./base/kind.ts";
+import { type BaseColumn, defaultColumnOptions } from "./base/column.ts";
 import { defaultActionOptions } from "./base/action.ts";
 
 import type { Denops, Entrypoint } from "jsr:@denops/std@~7.4.0";
