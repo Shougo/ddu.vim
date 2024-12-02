@@ -1,6 +1,6 @@
 import type { ContextBuilder } from "../context.ts";
 import type { DduAliasType } from "../types.ts";
-import type { Denops } from "jsr:@denops/std@~7.3.0";
+import type { Denops } from "jsr:@denops/std@~7.4.0";
 
 export type ConfigArguments = {
   denops: Denops;

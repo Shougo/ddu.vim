@@ -45,8 +45,8 @@ import {
   uiSearchItem,
 } from "./ext.ts";
 
-import type { Denops } from "jsr:@denops/std@~7.3.0";
-import * as fn from "jsr:@denops/std@~7.3.0/function";
+import type { Denops } from "jsr:@denops/std@~7.4.0";
+import * as fn from "jsr:@denops/std@~7.4.0/function";
 
 import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
 import { equal } from "jsr:@std/assert@~1.0.2/equal";
@@ -1145,7 +1145,6 @@ export class Ddu {
 
     const sourceIndex = parent.__sourceIndex;
     const source = this.#loader.getSource(
-      this.#options.name,
       parent.__sourceName,
     );
     if (source == null) {
@@ -1389,7 +1388,6 @@ export class Ddu {
       }
       const sourceIndex = item.__sourceIndex;
       const source = this.#loader.getSource(
-        this.#options.name,
         item.__sourceName,
       );
       if (source == null) {
@@ -1652,7 +1650,6 @@ export class Ddu {
     return this.#options.sources.map((userSource) =>
       sourceArgs(
         this.#loader.getSource(
-          this.#options.name,
           convertUserString(userSource).name,
         ),
         this.#options,

@@ -49,8 +49,8 @@ import type { BaseUi } from "./base/ui.ts";
 import type { Loader } from "./loader.ts";
 import { convertUserString, printError } from "./utils.ts";
 
-import type { Denops } from "jsr:@denops/std@~7.3.0";
-import * as fn from "jsr:@denops/std@~7.3.0/function";
+import type { Denops } from "jsr:@denops/std@~7.4.0";
+import * as fn from "jsr:@denops/std@~7.4.0/function";
 
 import type { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
 import { is } from "jsr:@core/unknownutil@~4.3.0/is";
@@ -82,10 +82,9 @@ export async function getItemActions(
   const sources = [
     ...new Set(
       items.length > 0
-        ? items.map((item) => loader.getSource(options.name, item.__sourceName))
+        ? items.map((item) => loader.getSource(item.__sourceName))
         : options.sources.map((userSource) =>
           loader.getSource(
-            options.name,
             convertUserString(userSource).name,
           )
         ),
@@ -305,7 +304,7 @@ export async function getUi(
   ]
 > {
   const userUi = convertUserString(options.ui);
-  if (!loader.getUi(options.name, userUi.name)) {
+  if (!loader.getUi(userUi.name)) {
     const startTime = Date.now();
 
     const exists = await loader.autoload(denops, "ui", userUi.name);
@@ -322,7 +321,7 @@ export async function getUi(
     }
   }
 
-  const ui = loader.getUi(options.name, userUi.name);
+  const ui = loader.getUi(userUi.name);
   if (!ui) {
     return [
       undefined,
@@ -350,7 +349,7 @@ export async function getSource(
     BaseParams,
   ]
 > {
-  if (!loader.getSource(options.name, name)) {
+  if (!loader.getSource(name)) {
     const startTime = Date.now();
 
     const exists = await loader.autoload(denops, "source", name);
@@ -364,7 +363,7 @@ export async function getSource(
     }
   }
 
-  const source = loader.getSource(options.name, name);
+  const source = loader.getSource(name);
   if (!source) {
     return [
       undefined,
@@ -396,7 +395,7 @@ export async function getFilter(
 > {
   userFilter = convertUserString(userFilter);
 
-  if (!loader.getFilter(options.name, userFilter.name)) {
+  if (!loader.getFilter(userFilter.name)) {
     const startTime = Date.now();
 
     const exists = await loader.autoload(denops, "filter", userFilter.name);
@@ -413,7 +412,7 @@ export async function getFilter(
     }
   }
 
-  const filter = loader.getFilter(options.name, userFilter.name);
+  const filter = loader.getFilter(userFilter.name);
   if (!filter) {
     return [
       undefined,
@@ -440,7 +439,7 @@ async function getKind(
 ): Promise<
   BaseKind<BaseParams> | undefined
 > {
-  if (!loader.getKind(options.name, name)) {
+  if (!loader.getKind(name)) {
     const startTime = Date.now();
 
     const exists = await loader.autoload(denops, "kind", name);
@@ -454,7 +453,7 @@ async function getKind(
     }
   }
 
-  const kind = loader.getKind(options.name, name);
+  const kind = loader.getKind(name);
   if (!kind) {
     return undefined;
   }
@@ -476,7 +475,7 @@ export async function getColumn(
 > {
   userColumn = convertUserString(userColumn);
 
-  if (!loader.getColumn(options.name, userColumn.name)) {
+  if (!loader.getColumn(userColumn.name)) {
     const startTime = Date.now();
 
     const exists = await loader.autoload(denops, "column", userColumn.name);
@@ -493,7 +492,7 @@ export async function getColumn(
     }
   }
 
-  const column = loader.getColumn(options.name, userColumn.name);
+  const column = loader.getColumn(userColumn.name);
   if (!column) {
     return [
       undefined,
@@ -681,7 +680,6 @@ export async function getPreviewer(
   previewContext: PreviewContext,
 ): Promise<Previewer | undefined> {
   const source = loader.getSource(
-    options.name,
     item.__sourceName,
   );
   if (!source) {

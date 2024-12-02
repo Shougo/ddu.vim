@@ -1,24 +1,15 @@
-import type {
-  BaseParams,
-  ColumnName,
-  DduAliasType,
-  DduExtType,
-  FilterName,
-  KindName,
-  SourceName,
-  UiName,
-} from "./types.ts";
+import type { BaseParams, DduAliasType, DduExtType } from "./types.ts";
 import type { BaseColumn } from "./base/column.ts";
 import type { BaseFilter } from "./base/filter.ts";
 import type { BaseKind } from "./base/kind.ts";
 import type { BaseSource } from "./base/source.ts";
 import type { BaseUi } from "./base/ui.ts";
-import type { Denops } from "jsr:@denops/std@~7.3.0";
+import type { Denops } from "jsr:@denops/std@~7.4.0";
 import { isDenoCacheIssueError } from "./utils.ts";
 import { mods } from "./_mods.js";
 
-import * as fn from "jsr:@denops/std@~7.3.0/function";
-import * as op from "jsr:@denops/std@~7.3.0/option";
+import * as fn from "jsr:@denops/std@~7.4.0/function";
+import * as op from "jsr:@denops/std@~7.4.0/option";
 
 import { basename } from "jsr:@std/path@~1.0.2/basename";
 import { parse } from "jsr:@std/path@~1.0.2/parse";
@@ -31,9 +22,16 @@ type Mod = {
   path: string;
 };
 
+type Ext = {
+  ui: Record<string, BaseUi<BaseParams>>;
+  source: Record<string, BaseSource<BaseParams>>;
+  filter: Record<string, BaseFilter<BaseParams>>;
+  kind: Record<string, BaseKind<BaseParams>>;
+  column: Record<string, BaseColumn<BaseParams>>;
+};
+
 export class Loader {
-  #extensions: Record<string, Extension> = {};
-  #mods: Record<DduExtType, Record<string, Mod>> = {
+  #exts: Ext = {
     ui: {},
     source: {},
     filter: {},
@@ -150,45 +148,55 @@ export class Loader {
     });
   }
 
-  getUi(index: string, name: string): BaseUi<BaseParams> | null {
-    const mod = this.#mods.ui[name];
-    if (!mod) {
-      return null;
-    }
-
-    return this.#getExtension(index).getUi(mod, name);
+  registerExtension(type: "ui", name: string, ext: BaseUi<BaseParams>): void;
+  registerExtension(
+    type: "source",
+    name: string,
+    ext: BaseSource<BaseParams>,
+  ): void;
+  registerExtension(
+    type: "filter",
+    name: string,
+    ext: BaseFilter<BaseParams>,
+  ): void;
+  registerExtension(
+    type: "kind",
+    name: string,
+    ext: BaseKind<BaseParams>,
+  ): void;
+  registerExtension(
+    type: "column",
+    name: string,
+    ext: BaseColumn<BaseParams>,
+  ): void;
+  registerExtension(
+    type: DduExtType,
+    name: string,
+    ext:
+      | BaseUi<BaseParams>
+      | BaseSource<BaseParams>
+      | BaseFilter<BaseParams>
+      | BaseKind<BaseParams>
+      | BaseColumn<BaseParams>,
+  ) {
+    ext.name = name;
+    this.#exts[type][name] = ext;
   }
-  getSource(index: string, name: string): BaseSource<BaseParams> | null {
-    const mod = this.#mods.source[name];
-    if (!mod) {
-      return null;
-    }
 
-    return this.#getExtension(index).getSource(mod, name);
+  getUi(name: string): BaseUi<BaseParams> | null {
+    return this.#exts.ui[name];
   }
-  getFilter(index: string, name: string): BaseFilter<BaseParams> | null {
-    const mod = this.#mods.filter[name];
-    if (!mod) {
-      return null;
-    }
-
-    return this.#getExtension(index).getFilter(mod, name);
+  getSource(name: string): BaseSource<BaseParams> | null {
+    return this.#exts.source[name];
   }
-  getKind(index: string, name: string): BaseKind<BaseParams> | null {
-    const mod = this.#mods.kind[name];
-    if (!mod) {
-      return null;
-    }
-
-    return this.#getExtension(index).getKind(mod, name);
+  getFilter(name: string): BaseFilter<BaseParams> | null {
+    return this.#exts.filter[name];
   }
-  getColumn(index: string, name: string): BaseColumn<BaseParams> | null {
-    const mod = this.#mods.column[name];
-    if (!mod) {
-      return null;
-    }
-
-    return this.#getExtension(index).getColumn(mod, name);
+  getKind(name: string): BaseKind<BaseParams> | null {
+    return this.#exts.kind[name];
+  }
+  getColumn(name: string): BaseColumn<BaseParams> | null {
+    return this.#exts.column[name];
   }
 
   getAlias(type: DduAliasType, name: string): string | undefined {
@@ -198,23 +206,13 @@ export class Loader {
     return Object.keys(this.#aliases[type]);
   }
   getSourceNames(): string[] {
-    return Object.keys(this.#mods.source);
-  }
-
-  #getExtension(index: string): Extension {
-    if (!this.#extensions[index]) {
-      this.#extensions[index] = new Extension();
-    }
-
-    return this.#extensions[index];
+    return Object.keys(this.#exts.source);
   }
 
   async #register(type: DduExtType, path: string) {
     if (path in this.#checkPaths) {
       return;
     }
-
-    const typeMods = this.#mods[type];
 
     const name = parse(path).name;
 
@@ -224,71 +222,43 @@ export class Loader {
       path,
     };
 
-    typeMods[name] = mod;
+    const typeExt = this.#exts[type];
+    if (type === "ui") {
+      const obj = new mod.mod.Ui();
+      obj.name = name;
+      obj.path = mod.path;
+      typeExt[name] = obj;
+    } else if (type === "source") {
+      const obj = new mod.mod.Source();
+      obj.name = name;
+      obj.path = mod.path;
+      typeExt[name] = obj;
+    } else if (type === "filter") {
+      const obj = new mod.mod.Filter();
+      obj.name = name;
+      obj.path = mod.path;
+      typeExt[name] = obj;
+    } else if (type === "kind") {
+      const obj = new mod.mod.Kind();
+      obj.name = name;
+      obj.path = mod.path;
+      typeExt[name] = obj;
+    } else if (type === "column") {
+      const obj = new mod.mod.Column();
+      obj.name = name;
+      obj.path = mod.path;
+      typeExt[name] = obj;
+    }
 
     // Check alias
     const aliases = this.getAliasNames(type).filter(
       (k) => this.getAlias(type, k) === name,
     );
     for (const alias of aliases) {
-      typeMods[alias] = mod;
+      typeExt[alias] = typeExt[name];
     }
 
     this.#checkPaths[path] = true;
-  }
-}
-
-class Extension {
-  #uis: Record<UiName, BaseUi<BaseParams>> = {};
-  #sources: Record<SourceName, BaseSource<BaseParams>> = {};
-  #filters: Record<FilterName, BaseFilter<BaseParams>> = {};
-  #kinds: Record<KindName, BaseKind<BaseParams>> = {};
-  #columns: Record<ColumnName, BaseColumn<BaseParams>> = {};
-
-  getUi(mod: Mod, name: string): BaseUi<BaseParams> {
-    if (!this.#uis[name]) {
-      const obj = new mod.mod.Ui();
-      obj.name = name;
-      obj.path = mod.path;
-      this.#uis[obj.name] = obj;
-    }
-    return this.#uis[name];
-  }
-  getSource(mod: Mod, name: string): BaseSource<BaseParams> {
-    if (!this.#sources[name]) {
-      const obj = new mod.mod.Source();
-      obj.name = name;
-      obj.path = mod.path;
-      this.#sources[obj.name] = obj;
-    }
-    return this.#sources[name];
-  }
-  getFilter(mod: Mod, name: string): BaseFilter<BaseParams> {
-    if (!this.#filters[name]) {
-      const obj = new mod.mod.Filter();
-      obj.name = name;
-      obj.path = mod.path;
-      this.#filters[obj.name] = obj;
-    }
-    return this.#filters[name];
-  }
-  getKind(mod: Mod, name: string): BaseKind<BaseParams> {
-    if (!this.#kinds[name]) {
-      const obj = new mod.mod.Kind();
-      obj.name = name;
-      obj.path = mod.path;
-      this.#kinds[obj.name] = obj;
-    }
-    return this.#kinds[name];
-  }
-  getColumn(mod: Mod, name: string): BaseColumn<BaseParams> {
-    if (!this.#columns[name]) {
-      const obj = new mod.mod.Column();
-      obj.name = name;
-      obj.path = mod.path;
-      this.#columns[obj.name] = obj;
-    }
-    return this.#columns[name];
   }
 }
 
