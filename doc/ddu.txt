@@ -427,7 +427,7 @@ ddu#redraw_tree({name}, {mode}, {items})
 
                                                               *ddu#register()*
 ddu#register({type}, {path})
-		Register ddu extension.
+		Register ddu extension from {path}.
 		{type} is "ui" or "source" or "filter" or "kind" or "column".
 		{path} is ddc extension path.
 		NOTE: {path} must be full path.

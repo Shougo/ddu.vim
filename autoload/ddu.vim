@@ -59,7 +59,7 @@ function ddu#get_context(name) abort
   return ddu#denops#_request('getContext', [a:name])
 endfunction
 function ddu#register(type, path) abort
-  call ddu#denops#_notify('register', [a:type, a:path])
+  call ddu#denops#_notify('registerPath', [a:type, a:path])
 endfunction
 function ddu#load(type, names) abort
   call ddu#denops#_notify('loadExtensions', [a:type, a:names])
