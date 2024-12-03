@@ -350,11 +350,12 @@ ddu#item_action({name}, {action}, {items}, {params})
 		NOTE: It is for creating UI interface.
 
                                                                   *ddu#load()*
-ddu#load({type}, {names})
+ddu#load({type}, {ext_names})
 		Load ddu extensions in background.
 		It is useful to optimize ddu loading time.
+		{name} is specified ddu name(|ddu-option-name|).
 		{type} is "ui" or "source" or "filter" or "kind" or "column".
-		{names} is array of extension name.
+		{ext_names} is array of extension name.
 		NOTE: It does not work if you use
 		|ddu#set_static_import_path()|.
 
@@ -426,8 +427,9 @@ ddu#redraw_tree({name}, {mode}, {items})
 		{items} is target tree items.
 
                                                               *ddu#register()*
-ddu#register({type}, {path})
-		Register ddu extension from {path}.
+ddu#register({name}, {type}, {path})
+		Register ddu extension from {path} for {name} ddu.
+		{name} is specified ddu name(|ddu-option-name|).
 		{type} is "ui" or "source" or "filter" or "kind" or "column".
 		{path} is ddc extension path.
 		NOTE: {path} must be full path.
@@ -493,21 +495,22 @@ ddu#custom#action({type}, {name}, {action-name}, {func})
 		    \ { args -> execute('let g:foo = 1') })
 <
                                                           *ddu#custom#alias()*
-ddu#custom#alias({type}, {alias-name}, {base-name})
-		Define {alias-name} alias based on {base-name}.
+ddu#custom#alias({name}, {type}, {alias-name}, {base-name})
+		Define {alias-name} alias based on {base-name} for {name} ddu.
 		{type} must be "ui" or "source" or "filter" or "kind" or
 		"column" or "action".
 		NOTE: It must be called before sources/filters initialization.
 >
-		call ddu#custom#alias('source', 'foo', 'file')
+		call ddu#custom#alias('default', 'source', 'foo', 'file')
 		call ddu#custom#patch_global('sourceOptions', #{
 		      \   file: #{ mark: 'A' },
 		      \   foo: #{ mark: 'foo' },
 		      \ })
 <
                                                 *ddu#custom#get_alias_names()*
-ddu#custom#get_alias_names({alias-type})
+ddu#custom#get_alias_names({name}, {alias-type})
 		Get names of {alias-type} aliases as |List|.
+		{name} is specified by |ddu-option-name|.
 		NOTE: It must be called after |DenopsReady|.
 
                                                     *ddu#custom#get_current()*
@@ -538,8 +541,9 @@ ddu#custom#get_names()
 		NOTE: It must be called after |DenopsReady|.
 
                                                *ddu#custom#get_source_names()*
-ddu#custom#get_source_names()
+ddu#custom#get_source_names({name})
 		Get loaded source names as |List|.
+		{name} is specified by |ddu-option-name|.
 		NOTE: It must be called after |DenopsReady|.
 
                                                     *ddu#custom#load_config()*
@@ -574,14 +578,16 @@ ddu#ui#async_action({action-name}[, {params}[, {ui-name}]])
 		execution.  If so, you should use |ddu#ui#sync_action()|
 		instead.
 		NOTE: It does not work in |command-line-window|.
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
                                                           *ddu#ui#do_action()*
 ddu#ui#do_action({action-name}[, {params}[, {ui-name}]])
 		It is same with |ddu#ui#sync_action()|.
 		NOTE: It does not work in |command-line-window|.
 		NOTE: You must not call it in |autocmd|.
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
                                                            *ddu#ui#get_item()*
 ddu#ui#get_item()
@@ -589,14 +595,16 @@ ddu#ui#get_item()
 		buffer UI.
 		NOTE: current UI must update "b:ddu_ui_item" when current
 		cursor is changed.
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
                                                           *ddu#ui#get_items()*
 ddu#ui#get_items()
 		Return the current items as |List| of |Dictionary| from
 		current buffer UI.
 		NOTE: current UI must update "b:ddu_ui_items" when redraw.
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
                                                  *ddu#ui#get_selected_items()*
 ddu#ui#get_selected_items()
@@ -604,7 +612,8 @@ ddu#ui#get_selected_items()
 		current buffer UI.
 		NOTE: current UI must update "b:ddu_ui_selected_items" when
 		select items.
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
                                                       *ddu#ui#multi_actions()*
 ddu#ui#multi_actions([{action-name1}[, {params1}], ...][, {ui-name}])
@@ -613,7 +622,8 @@ ddu#ui#multi_actions([{action-name1}[, {params1}], ...][, {ui-name}])
 		{ui-name} is specified ddu name(|ddu-option-name|).
 		If {ui-name} is not specified, current buffer UI name is used.
 		NOTE: You must not call it in |autocmd|.
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
 		Example: >
 
@@ -632,13 +642,15 @@ ddu#ui#sync_action({action-name}[, {params}[, {ui-name}]])
 		If {ui-name} is not specified, current buffer UI name is used.
 		NOTE: It is slow than |ddu#ui#do_action()|.
 		NOTE: You must not call it in |autocmd|.
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
                                                       *ddu#ui#update_cursor()*
 ddu#ui#update_cursor({name})
 		Update UI cursor.
 		{name} is specified ddu name(|ddu-option-name|).
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
                                                             *ddu#ui#visible()*
 ddu#ui#visible({name}[, {tabnr}])
@@ -647,14 +659,16 @@ ddu#ui#visible({name}[, {tabnr}])
 		{tabnr} is tabpage number.  If it is omitted, current tabpage
 		is used.  If it is less than 1, it means search from all tabs.
 		NOTE: You must not call it in |autocmd|.
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
                                                              *ddu#ui#winids()*
 ddu#ui#winids({name})
 		Return UI window ID list.
 		{name} is specified ddu name(|ddu-option-name|).
 		NOTE: You must not call it in |autocmd|.
-		NOTE: It does not work before |Ddu:uiReady| autocmd.
+		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
+		autocmd.
 
 ==============================================================================
 EXAMPLES                                                        *ddu-examples*
@@ -1661,6 +1675,11 @@ A: The example is here. >
 
 ==============================================================================
 COMPATIBILITY                                              *ddu-compatibility*
+
+2024.12.03
+* "ddu#register()", "ddu#load()", "ddu#custom#alias()",
+  "ddu#custom#get_source_names()" and "ddu#custom#get_alias_names()" require
+  "name" argument.
 
 2024.11.25
 * Vim 9.1.0448+ or Neovim 0.10.0+ is required.

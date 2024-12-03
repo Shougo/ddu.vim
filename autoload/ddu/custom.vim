@@ -31,13 +31,13 @@ let s:aliases = #{
       \   column: {},
       \   action: {},
       \ }
-function ddu#custom#alias(type, alias, base) abort
+function ddu#custom#alias(name, type, alias, base) abort
   if !s:aliases->has_key(a:type)
     call ddu#util#print_error('Invalid alias type: ' .. a:type)
     return
   endif
 
-  call s:notify('alias', [a:type, a:alias, a:base])
+  call s:notify('alias', [a:name, a:type, a:alias, a:base])
 endfunction
 
 let s:custom_actions = #{
@@ -79,11 +79,11 @@ endfunction
 function ddu#custom#get_names() abort
   return ddu#denops#_request('getNames', [])
 endfunction
-function ddu#custom#get_source_names() abort
-  return ddu#denops#_request('getSourceNames', [])
+function ddu#custom#get_source_names(name) abort
+  return ddu#denops#_request('getSourceNames', [a:name])
 endfunction
-function ddu#custom#get_alias_names(type) abort
-  return ddu#denops#_request('getAliasNames', [a:type])
+function ddu#custom#get_alias_names(name, type) abort
+  return ddu#denops#_request('getAliasNames', [a:name, a:type])
 endfunction
 
 function s:normalize_key_or_dict(key_or_dict, value) abort
