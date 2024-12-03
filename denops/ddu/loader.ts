@@ -51,48 +51,6 @@ export class Loader {
   #cachedPaths: Record<string, string> = {};
   #prevRuntimepath = "";
 
-  async initStaticImportPath(denops: Denops) {
-    // Generate _mods.ts
-    let mods: string[] = [];
-    const runtimepath = await op.runtimepath.getGlobal(denops);
-    for (
-      const glob of [
-        "denops/@ddu-columns/*.ts",
-        "denops/@ddu-filters/*.ts",
-        "denops/@ddu-kinds/*.ts",
-        "denops/@ddu-sources/*.ts",
-        "denops/@ddu-uis/*.ts",
-      ]
-    ) {
-      mods = mods.concat(
-        await fn.globpath(
-          denops,
-          runtimepath,
-          glob,
-          1,
-          1,
-        ),
-      );
-    }
-
-    const staticLines = [];
-    for (const [index, path] of mods.entries()) {
-      staticLines.push(
-        `import * as mod${index} from "${toFileUrl(path).href}"`,
-      );
-    }
-    staticLines.push("export const mods = {");
-    for (const [index, path] of mods.entries()) {
-      staticLines.push(`  "${toFileUrl(path).href}":`);
-      staticLines.push(`    mod${index},`);
-    }
-    staticLines.push("};");
-    await Deno.writeTextFile(
-      await denops.call("ddu#denops#_mods") as string,
-      staticLines.join("\n"),
-    );
-  }
-
   async autoload(
     denops: Denops,
     type: DduExtType,
@@ -223,43 +181,104 @@ export class Loader {
     };
 
     const typeExt = this.#exts[type];
-    if (type === "ui") {
-      const obj = new mod.mod.Ui();
-      obj.name = name;
-      obj.path = mod.path;
-      typeExt[name] = obj;
-    } else if (type === "source") {
-      const obj = new mod.mod.Source();
-      obj.name = name;
-      obj.path = mod.path;
-      typeExt[name] = obj;
-    } else if (type === "filter") {
-      const obj = new mod.mod.Filter();
-      obj.name = name;
-      obj.path = mod.path;
-      typeExt[name] = obj;
-    } else if (type === "kind") {
-      const obj = new mod.mod.Kind();
-      obj.name = name;
-      obj.path = mod.path;
-      typeExt[name] = obj;
-    } else if (type === "column") {
-      const obj = new mod.mod.Column();
-      obj.name = name;
-      obj.path = mod.path;
-      typeExt[name] = obj;
+    let add;
+    switch (type) {
+      case "ui":
+        add = (name: string) => {
+          const ext = new mod.mod.Ui();
+          ext.name = name;
+          ext.path = mod.path;
+          typeExt[name] = ext;
+        };
+        break;
+      case "source":
+        add = (name: string) => {
+          const ext = new mod.mod.Source();
+          ext.name = name;
+          ext.path = mod.path;
+          typeExt[name] = ext;
+        };
+        break;
+      case "filter":
+        add = (name: string) => {
+          const ext = new mod.mod.Filter();
+          ext.name = name;
+          ext.path = mod.path;
+          typeExt[name] = ext;
+        };
+        break;
+      case "kind":
+        add = (name: string) => {
+          const ext = new mod.mod.Kind();
+          ext.name = name;
+          ext.path = mod.path;
+          typeExt[name] = ext;
+        };
+        break;
+      case "column":
+        add = (name: string) => {
+          const ext = new mod.mod.Column();
+          ext.name = name;
+          ext.path = mod.path;
+          typeExt[name] = ext;
+        };
+        break;
     }
+
+    add(name);
 
     // Check alias
     const aliases = this.getAliasNames(type).filter(
       (k) => this.getAlias(type, k) === name,
     );
     for (const alias of aliases) {
-      typeExt[alias] = typeExt[name];
+      add(alias);
     }
 
     this.#checkPaths[path] = true;
   }
+}
+
+export async function initStaticImportPath(denops: Denops) {
+  // Generate _mods.ts
+  let mods: string[] = [];
+  const runtimepath = await op.runtimepath.getGlobal(denops);
+  for (
+    const glob of [
+      "denops/@ddu-columns/*.ts",
+      "denops/@ddu-filters/*.ts",
+      "denops/@ddu-kinds/*.ts",
+      "denops/@ddu-sources/*.ts",
+      "denops/@ddu-uis/*.ts",
+    ]
+  ) {
+    mods = mods.concat(
+      await fn.globpath(
+        denops,
+        runtimepath,
+        glob,
+        1,
+        1,
+      ),
+    );
+  }
+
+  const staticLines = [];
+  for (const [index, path] of mods.entries()) {
+    staticLines.push(
+      `import * as mod${index} from "${toFileUrl(path).href}"`,
+    );
+  }
+  staticLines.push("export const mods = {");
+  for (const [index, path] of mods.entries()) {
+    staticLines.push(`  "${toFileUrl(path).href}":`);
+    staticLines.push(`    mod${index},`);
+  }
+  staticLines.push("};");
+  await Deno.writeTextFile(
+    await denops.call("ddu#denops#_mods") as string,
+    staticLines.join("\n"),
+  );
 }
 
 async function globpath(

@@ -20,7 +20,7 @@ import {
   foldMerge,
   mergeDduOptions,
 } from "./context.ts";
-import { Loader } from "./loader.ts";
+import { initStaticImportPath, Loader } from "./loader.ts";
 import {
   getFilter,
   getItemAction,
@@ -104,55 +104,70 @@ export const main: Entrypoint = (denops: Denops) => {
   };
 
   denops.dispatcher = {
-    alias(arg1: unknown, arg2: unknown, arg3: unknown) {
+    alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void>  {
       setAlias(
         ensure(arg1, is.String) as DduAliasType,
         ensure(arg2, is.String) as string,
         ensure(arg3, is.String) as string,
       );
+      return Promise.resolve();
     },
-    async registerPath(arg1: unknown, arg2: unknown) {
+    async registerPath(arg1: unknown, arg2: unknown): Promise<void>  {
       await loader.registerPath(
         ensure(arg1, is.String) as DduExtType,
         ensure(arg2, is.String) as string,
       );
+      return Promise.resolve();
     },
     registerExtension(
       arg1: unknown,
       arg2: unknown,
       arg3: unknown,
-    ) {
+    ): Promise<void>  {
       const type = ensure(arg1, is.String);
       const name = ensure(arg2, is.String);
-      if (type === "ui") {
-        loader.registerExtension(type, name, arg3 as BaseUi<BaseParams>);
-      } else if (type === "source") {
-        loader.registerExtension(type, name, arg3 as BaseSource<BaseParams>);
-      } else if (type === "filter") {
-        loader.registerExtension(type, name, arg3 as BaseFilter<BaseParams>);
-      } else if (type === "kind") {
-        loader.registerExtension(type, name, arg3 as BaseKind<BaseParams>);
-      } else if (type === "column") {
-        loader.registerExtension(type, name, arg3 as BaseColumn<BaseParams>);
+
+      switch (type) {
+        case "ui":
+          loader.registerExtension(type, name, arg3 as BaseUi<BaseParams>);
+          break;
+        case "source":
+          loader.registerExtension(type, name, arg3 as BaseSource<BaseParams>);
+          break;
+        case "filter":
+          loader.registerExtension(type, name, arg3 as BaseFilter<BaseParams>);
+          break;
+        case "kind":
+          loader.registerExtension(type, name, arg3 as BaseKind<BaseParams>);
+          break;
+        case "column":
+          loader.registerExtension(type, name, arg3 as BaseColumn<BaseParams>);
+          break;
       }
+
+      return Promise.resolve();
     },
-    setGlobal(arg1: unknown) {
+    setGlobal(arg1: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       contextBuilder.setGlobal(options);
+      return Promise.resolve();
     },
-    setLocal(arg1: unknown, arg2: unknown) {
+    setLocal(arg1: unknown, arg2: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       const name = ensure(arg2, is.String) as string;
       contextBuilder.setLocal(name, options);
+      return Promise.resolve();
     },
-    patchGlobal(arg1: unknown) {
+    patchGlobal(arg1: unknown): Promise<void>  {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       contextBuilder.patchGlobal(options);
+      return Promise.resolve();
     },
-    patchLocal(arg1: unknown, arg2: unknown) {
+    patchLocal(arg1: unknown, arg2: unknown): Promise<void>  {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       const name = ensure(arg2, is.String) as string;
       contextBuilder.patchLocal(name, options);
+      return Promise.resolve();
     },
     getGlobal(): Promise<Partial<DduOptions>> {
       return Promise.resolve(contextBuilder.getGlobal());
@@ -234,7 +249,7 @@ export const main: Entrypoint = (denops: Denops) => {
       return Promise.resolve();
     },
     async setStaticImportPath(): Promise<void> {
-      await loader.initStaticImportPath(denops);
+      await initStaticImportPath(denops);
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {
