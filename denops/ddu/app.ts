@@ -51,7 +51,7 @@ export const main: Entrypoint = (denops: Denops) => {
     searchItem?: DduItem;
   };
 
-  const loader = new Loader();
+  const loaders: Record<string, Loader> = {};
   const ddus: Record<string, Ddu[]> = {};
   const contextBuilder = new ContextBuilder();
   const clipboard: Clipboard = {
@@ -73,9 +73,16 @@ export const main: Entrypoint = (denops: Denops) => {
 
     return ddus[name].length !== 0;
   };
+  const getLoader = (name: string) => {
+    if (!loaders[name]) {
+      loaders[name] = new Loader();
+    }
+
+    return loaders[name];
+  };
   const getDdu = (name: string) => {
     if (!checkDdu(name)) {
-      ddus[name].push(new Ddu(loader));
+      ddus[name].push(new Ddu(getLoader(name)));
     }
 
     return ddus[name].slice(-1)[0];
@@ -83,7 +90,7 @@ export const main: Entrypoint = (denops: Denops) => {
   const pushDdu = (name: string) => {
     checkDdu(name);
 
-    ddus[name].push(new Ddu(loader));
+    ddus[name].push(new Ddu(getLoader(name)));
 
     return ddus[name].slice(-1)[0];
   };
@@ -99,23 +106,40 @@ export const main: Entrypoint = (denops: Denops) => {
 
     return lastDdu;
   };
-  const setAlias = (type: DduAliasType, alias: string, base: string) => {
+  const setAlias = (
+    name: string,
+    type: DduAliasType,
+    alias: string,
+    base: string,
+  ) => {
+    const loader = getLoader(name);
     loader.registerAlias(type, alias, base);
   };
 
   denops.dispatcher = {
-    alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void>  {
+    alias(
+      arg1: unknown,
+      arg2: unknown,
+      arg3: unknown,
+      arg4: unknown,
+    ): Promise<void> {
       setAlias(
-        ensure(arg1, is.String) as DduAliasType,
-        ensure(arg2, is.String) as string,
+        ensure(arg1, is.String) as string,
+        ensure(arg2, is.String) as DduAliasType,
         ensure(arg3, is.String) as string,
+        ensure(arg4, is.String) as string,
       );
       return Promise.resolve();
     },
-    async registerPath(arg1: unknown, arg2: unknown): Promise<void>  {
+    async registerPath(
+      arg1: unknown,
+      arg2: unknown,
+      arg3: unknown,
+    ): Promise<void> {
+      const loader = getLoader(ensure(arg1, is.String) as string);
       await loader.registerPath(
-        ensure(arg1, is.String) as DduExtType,
-        ensure(arg2, is.String) as string,
+        ensure(arg2, is.String) as DduExtType,
+        ensure(arg3, is.String) as string,
       );
       return Promise.resolve();
     },
@@ -123,25 +147,40 @@ export const main: Entrypoint = (denops: Denops) => {
       arg1: unknown,
       arg2: unknown,
       arg3: unknown,
-    ): Promise<void>  {
-      const type = ensure(arg1, is.String);
-      const name = ensure(arg2, is.String);
+      arg4: unknown,
+    ): Promise<void> {
+      const name = ensure(arg1, is.String);
+      const type = ensure(arg2, is.String);
+      const extName = ensure(arg3, is.String);
 
+      const loader = getLoader(name);
       switch (type) {
         case "ui":
-          loader.registerExtension(type, name, arg3 as BaseUi<BaseParams>);
+          loader.registerExtension(type, extName, arg4 as BaseUi<BaseParams>);
           break;
         case "source":
-          loader.registerExtension(type, name, arg3 as BaseSource<BaseParams>);
+          loader.registerExtension(
+            type,
+            extName,
+            arg4 as BaseSource<BaseParams>,
+          );
           break;
         case "filter":
-          loader.registerExtension(type, name, arg3 as BaseFilter<BaseParams>);
+          loader.registerExtension(
+            type,
+            extName,
+            arg4 as BaseFilter<BaseParams>,
+          );
           break;
         case "kind":
-          loader.registerExtension(type, name, arg3 as BaseKind<BaseParams>);
+          loader.registerExtension(type, extName, arg4 as BaseKind<BaseParams>);
           break;
         case "column":
-          loader.registerExtension(type, name, arg3 as BaseColumn<BaseParams>);
+          loader.registerExtension(
+            type,
+            extName,
+            arg4 as BaseColumn<BaseParams>,
+          );
           break;
       }
 
@@ -158,12 +197,12 @@ export const main: Entrypoint = (denops: Denops) => {
       contextBuilder.setLocal(name, options);
       return Promise.resolve();
     },
-    patchGlobal(arg1: unknown): Promise<void>  {
+    patchGlobal(arg1: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       contextBuilder.patchGlobal(options);
       return Promise.resolve();
     },
-    patchLocal(arg1: unknown, arg2: unknown): Promise<void>  {
+    patchLocal(arg1: unknown, arg2: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       const name = ensure(arg2, is.String) as string;
       contextBuilder.patchLocal(name, options);
@@ -201,11 +240,13 @@ export const main: Entrypoint = (denops: Denops) => {
       );
       return Promise.resolve(Array.from(names));
     },
-    getSourceNames(): Promise<string[]> {
+    getSourceNames(arg1: unknown): Promise<string[]> {
+      const loader = getLoader(arg1 as string);
       return Promise.resolve(loader.getSourceNames());
     },
-    getAliasNames(arg1: unknown): Promise<string[]> {
-      return Promise.resolve(loader.getAliasNames(arg1 as DduAliasType));
+    getAliasNames(arg1: unknown, arg2: unknown): Promise<string[]> {
+      const loader = getLoader(arg1 as string);
+      return Promise.resolve(loader.getAliasNames(arg2 as DduAliasType));
     },
     async loadConfig(arg1: unknown): Promise<void> {
       //const startTime = Date.now();
@@ -238,11 +279,18 @@ export const main: Entrypoint = (denops: Denops) => {
       //console.log(`${arg1}: ${Date.now() - startTime} ms`);
       return Promise.resolve();
     },
-    async loadExtensions(arg1: unknown, arg2: unknown): Promise<void> {
+    async loadExtensions(
+      arg1: unknown,
+      arg2: unknown,
+      arg3: unknown,
+    ): Promise<void> {
       //const startTime = Date.now();
-      const type = ensure(arg1, is.String) as DduExtType;
-      const names = ensure(arg2, is.ArrayOf(is.String)) as string[];
-      for (const name of names) {
+      const name = ensure(arg1, is.String) as string;
+      const type = ensure(arg2, is.String) as DduExtType;
+      const extNames = ensure(arg3, is.ArrayOf(is.String)) as string[];
+
+      const loader = getLoader(name);
+      for (const name of extNames) {
         await loader.autoload(denops, type, name);
       }
       //console.log(`${type} ${names}: ${Date.now() - startTime} ms`);
@@ -319,6 +367,7 @@ export const main: Entrypoint = (denops: Denops) => {
           queuedRedrawOption = null;
 
           const ddu = getDdu(name);
+          const loader = getLoader(name);
 
           if (opt?.check && !(await ddu.checkUpdated(denops))) {
             // Mtime check failed
@@ -486,6 +535,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const action = ensure(arg3, is.String) as string;
 
       const ddu = getDdu(name);
+      const loader = getLoader(name);
       const itemsAction = await getItemAction(
         denops,
         loader,
@@ -504,6 +554,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const items = ensure(arg2, is.Array) as DduItem[];
 
       const ddu = getDdu(name);
+      const loader = getLoader(name);
       const ret = await getItemActions(denops, loader, ddu.getOptions(), items);
       const actions = ret && ret.actions ? Object.keys(ret.actions) : [];
       const useActions = ddu.getOptions().actions;
@@ -528,6 +579,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const name = ensure(arg1, is.String) as string;
       const filterName = ensure(arg2, is.String) as string;
       const ddu = getDdu(name);
+      const loader = getLoader(name);
       const [filter, filterOptions, filterParams] = await getFilter(
         denops,
         loader,

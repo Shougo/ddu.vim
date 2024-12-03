@@ -58,11 +58,11 @@ function ddu#get_context(name) abort
   endif
   return ddu#denops#_request('getContext', [a:name])
 endfunction
-function ddu#register(type, path) abort
-  call ddu#denops#_notify('registerPath', [a:type, a:path])
+function ddu#register(name, type, path) abort
+  call ddu#denops#_notify('registerPath', [a:name, a:type, a:path])
 endfunction
-function ddu#load(type, names) abort
-  call ddu#denops#_notify('loadExtensions', [a:type, a:names])
+function ddu#load(name, type, ext_names) abort
+  call ddu#denops#_notify('loadExtensions', [a:name, a:type, a:ext_names])
 endfunction
 
 function ddu#set_static_import_path() abort
