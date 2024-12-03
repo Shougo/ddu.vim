@@ -28,14 +28,14 @@ import {
   uiSearchItem,
 } from "./ext.ts";
 import { isDenoCacheIssueError } from "./utils.ts";
-import { defaultUiOptions } from "./base/ui.ts";
-import { defaultSourceOptions } from "./base/source.ts";
-import { defaultFilterOptions } from "./base/filter.ts";
-import { defaultColumnOptions } from "./base/column.ts";
-import { defaultKindOptions } from "./base/kind.ts";
+import { type BaseUi, defaultUiOptions } from "./base/ui.ts";
+import { type BaseSource, defaultSourceOptions } from "./base/source.ts";
+import { type BaseFilter, defaultFilterOptions } from "./base/filter.ts";
+import { type BaseKind, defaultKindOptions } from "./base/kind.ts";
+import { type BaseColumn, defaultColumnOptions } from "./base/column.ts";
 import { defaultActionOptions } from "./base/action.ts";
 
-import type { Denops, Entrypoint } from "jsr:@denops/std@~7.3.0";
+import type { Denops, Entrypoint } from "jsr:@denops/std@~7.4.0";
 
 import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
 import { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
@@ -104,42 +104,55 @@ export const main: Entrypoint = (denops: Denops) => {
   };
 
   denops.dispatcher = {
-    alias(arg1: unknown, arg2: unknown, arg3: unknown): Promise<void> {
+    alias(arg1: unknown, arg2: unknown, arg3: unknown) {
       setAlias(
         ensure(arg1, is.String) as DduAliasType,
         ensure(arg2, is.String) as string,
         ensure(arg3, is.String) as string,
       );
-      return Promise.resolve();
     },
-    async register(arg1: unknown, arg2: unknown): Promise<void> {
+    async registerPath(arg1: unknown, arg2: unknown) {
       await loader.registerPath(
         ensure(arg1, is.String) as DduExtType,
         ensure(arg2, is.String) as string,
       );
-      return Promise.resolve();
     },
-    setGlobal(arg1: unknown): Promise<void> {
+    registerExtension(
+      arg1: unknown,
+      arg2: unknown,
+      arg3: unknown,
+    ) {
+      const type = ensure(arg1, is.String);
+      const name = ensure(arg2, is.String);
+      if (type === "ui") {
+        loader.registerExtension(type, name, arg3 as BaseUi<BaseParams>);
+      } else if (type === "source") {
+        loader.registerExtension(type, name, arg3 as BaseSource<BaseParams>);
+      } else if (type === "filter") {
+        loader.registerExtension(type, name, arg3 as BaseFilter<BaseParams>);
+      } else if (type === "kind") {
+        loader.registerExtension(type, name, arg3 as BaseKind<BaseParams>);
+      } else if (type === "column") {
+        loader.registerExtension(type, name, arg3 as BaseColumn<BaseParams>);
+      }
+    },
+    setGlobal(arg1: unknown) {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       contextBuilder.setGlobal(options);
-      return Promise.resolve();
     },
-    setLocal(arg1: unknown, arg2: unknown): Promise<void> {
+    setLocal(arg1: unknown, arg2: unknown) {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       const name = ensure(arg2, is.String) as string;
       contextBuilder.setLocal(name, options);
-      return Promise.resolve();
     },
-    patchGlobal(arg1: unknown): Promise<void> {
+    patchGlobal(arg1: unknown) {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       contextBuilder.patchGlobal(options);
-      return Promise.resolve();
     },
-    patchLocal(arg1: unknown, arg2: unknown): Promise<void> {
+    patchLocal(arg1: unknown, arg2: unknown) {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       const name = ensure(arg2, is.String) as string;
       contextBuilder.patchLocal(name, options);
-      return Promise.resolve();
     },
     getGlobal(): Promise<Partial<DduOptions>> {
       return Promise.resolve(contextBuilder.getGlobal());
