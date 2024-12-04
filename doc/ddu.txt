@@ -350,7 +350,7 @@ ddu#item_action({name}, {action}, {items}, {params})
 		NOTE: It is for creating UI interface.
 
                                                                   *ddu#load()*
-ddu#load({type}, {ext_names})
+ddu#load({name}, {type}, {ext_names})
 		Load ddu extensions in background.
 		It is useful to optimize ddu loading time.
 		{name} is specified ddu name(|ddu-option-name|).
