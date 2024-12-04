@@ -5,7 +5,7 @@ import type { Denops } from "jsr:@denops/std@~7.4.0";
 export type ConfigArguments = {
   denops: Denops;
   contextBuilder: ContextBuilder;
-  setAlias: (type: DduAliasType, alias: string, base: string) => void;
+  setAlias: (name: string, type: DduAliasType, alias: string, base: string) => void;
 };
 
 export abstract class BaseConfig {
