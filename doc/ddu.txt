@@ -265,8 +265,23 @@ sources			(string[] | dictionary[])
 sync			(boolean)
 		Redraw the UI when all sources are finished.
 		It is useful for multiple sources.
+		NOTE: It blocks Vim/Neovim.
 
 		Default: v:false
+
+                                                        *ddu-option-syncLimit*
+syncLimit		(number)
+		|ddu-option-sync| limit.  If all items number exceeds the
+		limit, |ddu-option-sync| is disabled.
+
+		Default: 0
+
+                                                      *ddu-option-syncTimeout*
+syncTimeout		(number)
+		|ddu-option-sync| timeout.  If exceeds the timeout,
+		|ddu-option-sync| is disabled.
+
+		Default: 0
 
                                                                *ddu-option-ui*
 ui			(string | dictionary)

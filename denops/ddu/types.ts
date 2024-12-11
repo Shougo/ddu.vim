@@ -96,6 +96,8 @@ export type DduOptions = {
   sourceParams: Record<SourceName, Partial<BaseParams>>;
   sources: UserSource[];
   sync: boolean;
+  syncLimit: number;
+  syncTimeout: number;
   ui: UserUi;
   uiOptions: Record<UiName, Partial<UiOptions>>;
   uiParams: Record<UiName, Partial<BaseParams>>;

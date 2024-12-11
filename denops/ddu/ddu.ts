@@ -288,7 +288,7 @@ export class Ddu {
     const { signal } = this.#aborter;
 
     // Initialize UI window
-    if (!this.#options.sync) {
+    if (this.#checkSync()) {
       /* no await */ this.redraw(denops);
     }
 
@@ -431,7 +431,7 @@ export class Ddu {
         this.#context.path = path;
       }
 
-      if (!this.#options.sync && newItems.length > 0) {
+      if (this.#checkSync() && newItems.length > 0) {
         /* no await */ this.redraw(denops, { signal });
       }
     }
@@ -1829,6 +1829,14 @@ export class Ddu {
     this.#inputHistory.push(this.#input);
     this.#inputHistory = Array.from(new Set(this.#inputHistory.reverse()))
       .reverse();
+  }
+
+  #checkSync() {
+    return !this.#options.sync ||
+      (this.#options.syncLimit > 0 &&
+        this.#items.length >= this.#options.syncLimit) ||
+      (this.#options.syncTimeout > 0 &&
+        (Date.now() - this.#startTime) >= this.#options.syncTimeout);
   }
 }
 
