@@ -6,7 +6,11 @@ function ddu#start(options = {}) abort
     return
   endif
 
-  call ddu#denops#_notify('start', [a:options])
+  if a:options->get('sync', v:false)
+    call ddu#denops#_request('start', [a:options])
+  else
+    call ddu#denops#_notify('start', [a:options])
+  endif
 endfunction
 function ddu#redraw(name, options = {}) abort
   if a:name ==# ''
