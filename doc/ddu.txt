@@ -501,7 +501,7 @@ ddu#custom#action({type}, {name}, {action-name}, {func})
 		|ddu-source-option-actions| or |ddu-kind-option-actions|.
 		Note: The function must return |ddu-action-flags| as |Number|.
 		|String| is ignored.
->
+>vim
 		call ddu#custom#action('ui', 'ff', 'test3',
 		    \ { args -> execute('let g:baz = 1') })
 		call ddu#custom#action('source', 'file_old', 'test2',
@@ -515,7 +515,7 @@ ddu#custom#alias({name}, {type}, {alias-name}, {base-name})
 		{type} must be "ui" or "source" or "filter" or "kind" or
 		"column" or "action".
 		NOTE: It must be called before sources/filters initialization.
->
+>vim
 		call ddu#custom#alias('default', 'source', 'foo', 'file')
 		call ddu#custom#patch_global('sourceOptions', #{
 		      \   file: #{ mark: 'A' },
@@ -640,12 +640,12 @@ ddu#ui#multi_actions([{action-name1}[, {params1}], ...][, {ui-name}])
 		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
 		autocmd.
 
-		Example: >
+		Example: >vim
 
 		nnoremap <buffer> c
 		\ <Cmd>call ddu#ui#multi_actions([
-		\ ['itemAction', {'name': 'copy'}],
-		\ ['clearSelectAllItems'],
+		\   ['itemAction', {'name': 'copy'}],
+		\   ['clearSelectAllItems'],
 		\ ])<CR>
 <
                                                         *ddu#ui#sync_action()*
@@ -687,7 +687,7 @@ ddu#ui#winids({name})
 
 ==============================================================================
 EXAMPLES                                                        *ddu-examples*
->
+>vim
 	" You must set the default ui.
 	" NOTE: ff ui
 	" https://github.com/Shougo/ddu-ui-ff
@@ -1648,7 +1648,7 @@ https://github.com/vim-denops/denops.vim#shared-server
 Or you can create static import file by |ddu#set_static_import_path()|.
 
 Or you can use |ddu#load()| for it.
->
+>vim
 	call timer_start(10, { _ -> ddu#load('ui', ['ff']) })
 <
 Or ignore deno cache directory "%LOCALAPPDATA%\deno" from anti virus scan.
@@ -1661,7 +1661,7 @@ A: Nothing.  You can send items to |quickfix| by "quickfix" action instead.
                                                                    *ddu-faq-7*
 Q: I want to execute grep action from items.
 
-A: The example is here. >
+A: The example is here. >vim
 
 	" Use ddu-source-rg
 	" https://github.com/shun/ddu-source-rg
