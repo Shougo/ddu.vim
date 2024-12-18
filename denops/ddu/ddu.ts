@@ -912,6 +912,9 @@ export class Ddu {
 
     const flags = typeof ret === "number" ? ret : ActionFlags.None;
 
+    // Update current input
+    await this.setInput(denops, this.#context.input);
+
     if (flags & ActionFlags.RefreshItems) {
       await this.refresh(denops);
     } else if (flags & ActionFlags.Redraw) {
