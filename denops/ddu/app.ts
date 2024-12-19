@@ -324,6 +324,8 @@ export const main: Entrypoint = (denops: Denops) => {
           ]);
 
           [context, options] = await contextBuilder.get(denops, userOptions);
+
+          // NOTE: Ensure winId is carried over to the pushed context.
           context.winId = prevDdu.getContext().winId;
         } else {
           ddu = getDdu(options.name);
