@@ -283,7 +283,7 @@ export type TerminalPreviewer = {
   kind: "terminal";
 
   /**
-   * Commands passed to `termopen()` or `term_start()` to render the preview
+   * Commands passed to terminal API to render the preview
    */
   cmds: string[];
 
