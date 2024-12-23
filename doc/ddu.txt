@@ -1327,7 +1327,8 @@ isTree			(boolean)			(Optional)
 info			(object[])			(Optional)
 
 		The list of additional information.
-		Some UI support the feature.
+		Some UI supports the feature.
+		It is useful to display multilines information.
 
 		text			(string)
 		The additional text.
