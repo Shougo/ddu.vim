@@ -162,6 +162,11 @@ export type ItemStatus = {
   time?: number;
 };
 
+export type ItemInfo = {
+  text: string;
+  hl_group?: string;
+};
+
 export type Item<
   ActionData extends unknown = unknown,
 > = {
@@ -176,6 +181,7 @@ export type Item<
   treePath?: TreePath;
   isExpanded?: boolean;
   isTree?: boolean;
+  info?: ItemInfo[];
 };
 
 // For internal type

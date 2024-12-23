@@ -1323,6 +1323,18 @@ isTree			(boolean)			(Optional)
 		The item is tree.
 		NOTE: The attribute must be set to support tree feature.
 
+                                                     *ddu-item-attribute-info*
+info			(object[])			(Optional)
+
+		The list of additional information.
+		Some UI support the feature.
+
+		text			(string)
+		The additional text.
+
+		hl_group		(string)
+		|:highlight| group.  Please see |highlight-groups|.
+
                                                      *ddu-item-attribute-kind*
 kind			(string)			(Optional)
 		The kind name.
