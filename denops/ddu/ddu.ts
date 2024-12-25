@@ -1010,13 +1010,24 @@ export class Ddu {
     }
 
     // Check path is changed by action
-    if (itemAction.sourceOptions.path !== prevPath) {
+    const limitPath = itemAction.sourceOptions.limitPath;
+    const newPath = itemAction.sourceOptions.path;
+    if (
+      newPath !== prevPath && (
+        limitPath.length === 0 ||
+        treePath2Filename(newPath) === treePath2Filename(limitPath) ||
+        isParentPath(
+          convertTreePath(limitPath),
+          convertTreePath(newPath),
+        )
+      )
+    ) {
       itemAction.userSource = convertUserString(itemAction.userSource);
       // Overwrite current path
       if (!itemAction.userSource.options) {
         itemAction.userSource.options = {};
       }
-      itemAction.userSource.options.path = itemAction.sourceOptions.path;
+      itemAction.userSource.options.path = newPath;
       if (this.#context.path.length > 0) {
         this.#context.pathHistories.push(this.#context.path);
       }
@@ -1024,7 +1035,7 @@ export class Ddu {
       // Overwrite userSource
       this.#options.sources[itemAction.sourceIndex] = itemAction.userSource;
 
-      this.#context.path = itemAction.sourceOptions.path;
+      this.#context.path = newPath;
 
       // Clear input when path is changed
       await this.setInput(denops, "");

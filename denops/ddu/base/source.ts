@@ -80,6 +80,7 @@ export function defaultSourceOptions(): SourceOptions {
     converters: [],
     defaultAction: "",
     ignoreCase: false,
+    limitPath: "",
     matcherKey: "word",
     matchers: [],
     maxItems: 10000,

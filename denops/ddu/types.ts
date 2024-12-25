@@ -122,6 +122,7 @@ export type SourceOptions = {
   converters: UserFilter[];
   defaultAction: string;
   ignoreCase: boolean;
+  limitPath: TreePath;
   matcherKey: string;
   matchers: UserFilter[];
   maxItems: number;
