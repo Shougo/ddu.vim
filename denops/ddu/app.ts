@@ -63,8 +63,7 @@ export const main: Entrypoint = (denops: Denops) => {
     actions: [],
   };
   const lock = new Lock(0);
-  let queuedName: string | null = null;
-  let queuedRedrawOption: RedrawOption | null = null;
+  const uiRedrawLock = new Lock(0);
 
   const checkDdu = (name: string) => {
     if (!ddus[name]) {
@@ -82,7 +81,7 @@ export const main: Entrypoint = (denops: Denops) => {
   };
   const getDdu = (name: string) => {
     if (!checkDdu(name)) {
-      ddus[name].push(new Ddu(getLoader(name)));
+      ddus[name].push(new Ddu(getLoader(name), uiRedrawLock));
     }
 
     return ddus[name].slice(-1)[0];
@@ -90,7 +89,7 @@ export const main: Entrypoint = (denops: Denops) => {
   const pushDdu = (name: string) => {
     checkDdu(name);
 
-    ddus[name].push(new Ddu(getLoader(name)));
+    ddus[name].push(new Ddu(getLoader(name), uiRedrawLock));
 
     return ddus[name].slice(-1)[0];
   };
@@ -358,57 +357,49 @@ export const main: Entrypoint = (denops: Denops) => {
       return items;
     },
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
-      queuedName = ensure(arg1, is.String) as string;
-      queuedRedrawOption = ensure(arg2, is.Record) as RedrawOption;
+      const name = ensure(arg1, is.String) as string;
+      const opt = ensure(arg2, is.Record) as RedrawOption;
 
-      // NOTE: must be locked
-      await lock.lock(async () => {
-        while (queuedName !== null) {
-          const name = queuedName;
-          const opt = queuedRedrawOption;
-          queuedName = null;
-          queuedRedrawOption = null;
+      const ddu = getDdu(name);
+      const loader = getLoader(name);
+      let signal = ddu.cancelled;
 
-          const ddu = getDdu(name);
-          const loader = getLoader(name);
+      if (opt?.check && !(await ddu.checkUpdated(denops))) {
+        // Mtime check failed
+        return;
+      }
 
-          if (opt?.check && !(await ddu.checkUpdated(denops))) {
-            // Mtime check failed
-            continue;
-          }
+      if (opt?.input !== undefined) {
+        await ddu.setInput(denops, opt.input);
+      }
 
-          if (opt?.input !== undefined) {
-            await ddu.setInput(denops, opt.input);
-          }
+      if (opt?.method === "refreshItems") {
+        signal = await ddu.refresh(denops, [], { restoreTree: true });
+      } else {
+        // Check volatile sources
+        const volatiles = ddu.getSourceArgs().map(
+          (sourceArgs, index) => sourceArgs[0].volatile ? index : -1,
+        ).filter((index) => index >= 0);
 
-          // Check volatile sources
-          const volatiles = ddu.getSourceArgs().map(
-            (sourceArgs, index) => sourceArgs[0].volatile ? index : -1,
-          ).filter((index) => index >= 0);
-
-          if (volatiles.length > 0 || opt?.method === "refreshItems") {
-            await ddu.refresh(
-              denops,
-              opt?.method === "refreshItems" ? [] : volatiles,
-            );
-          } else if (opt?.method === "uiRedraw") {
-            await ddu.uiRedraw(denops);
-          } else {
-            await ddu.redraw(denops);
-          }
-          await ddu.restoreTree(denops);
-
-          if (opt?.searchItem) {
-            await uiSearchItem(
-              denops,
-              loader,
-              ddu.getContext(),
-              ddu.getOptions(),
-              opt.searchItem,
-            );
-          }
+        if (volatiles.length > 0) {
+          signal = await ddu.refresh(denops, volatiles, { restoreTree: true });
+        } else if (opt?.method === "uiRedraw") {
+          await ddu.restoreTree(denops, { preventRedraw: true, signal });
+          await ddu.uiRedraw(denops, { signal });
+        } else {
+          await ddu.redraw(denops, { restoreTree: true, signal });
         }
-      });
+      }
+
+      if (opt?.searchItem && !signal.aborted) {
+        await uiSearchItem(
+          denops,
+          loader,
+          ddu.getContext(),
+          ddu.getOptions(),
+          opt.searchItem,
+        );
+      }
     },
     async redrawTree(
       arg1: unknown,

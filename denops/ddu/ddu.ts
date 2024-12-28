@@ -59,7 +59,7 @@ import * as fn from "jsr:@denops/std@~7.4.0/function";
 import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
 import { equal } from "jsr:@std/assert@~1.0.2/equal";
 import { basename } from "jsr:@std/path@~1.0.2/basename";
-import { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
+import type { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
 import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 
 type RedrawOptions = {
@@ -68,8 +68,11 @@ type RedrawOptions = {
    * item's states reset to gathered.
    */
   restoreItemState?: boolean;
+  restoreTree?: boolean;
   signal?: AbortSignal;
 };
+
+type RefreshOptions = Omit<RedrawOptions, "signal">;
 
 export class Ddu {
   #loader: Loader;
@@ -84,7 +87,7 @@ export class Ddu {
   #aborter = new AbortController() as
     & Omit<AbortController, "abort">
     & GatherStateAbortable;
-  readonly #uiRedrawLock = new Lock(0);
+  readonly #uiRedrawLock: Lock<number>;
   #waitCancelComplete = Promise.resolve();
   #waitRedrawComplete?: Promise<void>;
   #scheduledRedrawOptions?: Required<RedrawOptions>;
@@ -93,8 +96,13 @@ export class Ddu {
   #items: DduItem[] = [];
   readonly #expandedItems: Map<string, DduItem> = new Map();
 
-  constructor(loader: Loader) {
+  constructor(loader: Loader, uiRedrawLock: Lock<number>) {
     this.#loader = loader;
+    this.#uiRedrawLock = uiRedrawLock;
+  }
+
+  get cancelled(): AbortSignal {
+    return this.#aborter.signal;
   }
 
   async start(
@@ -102,7 +110,7 @@ export class Ddu {
     context: Context,
     options: DduOptions,
     userOptions: UserOptions,
-  ): Promise<unknown> {
+  ): Promise<void> {
     const prevContext = { ...this.#context };
     const { signal: prevSignal } = this.#aborter;
 
@@ -188,10 +196,7 @@ export class Ddu {
         // UI Redraw only
         // NOTE: Enable done to redraw UI properly
         this.#context.done = true;
-        await this.uiRedraw(
-          denops,
-          { signal: this.#aborter.signal },
-        );
+        await this.uiRedraw(denops);
         this.#context.doneUi = true;
         return;
       }
@@ -287,7 +292,8 @@ export class Ddu {
   async refresh(
     denops: Denops,
     refreshIndexes: number[] = [],
-  ): Promise<void> {
+    opts?: RefreshOptions,
+  ): Promise<AbortSignal> {
     this.#startTime = Date.now();
     this.#context.done = false;
 
@@ -299,7 +305,7 @@ export class Ddu {
 
     // Initialize UI window
     if (this.#checkSync()) {
-      /* no await */ this.redraw(denops);
+      /* no await */ this.redraw(denops, { ...opts, signal });
     }
 
     const [gatherStates] = this
@@ -307,7 +313,9 @@ export class Ddu {
       .pipeThrough(this.#createGatherStateTransformer(denops))
       .tee();
 
-    await this.#refreshSources(denops, gatherStates, { signal });
+    await this.#refreshSources(denops, gatherStates, { ...opts, signal });
+
+    return signal;
   }
 
   #createAvailableSourceStream(
@@ -387,9 +395,9 @@ export class Ddu {
   async #refreshSources(
     denops: Denops,
     gatherStates: ReadableStream<GatherState>,
-    opts?: { signal?: AbortSignal },
+    opts?: RedrawOptions,
   ): Promise<void> {
-    const { signal = this.#aborter.signal } = opts ?? {};
+    const redrawOpts = { signal: this.#aborter.signal, ...opts };
     const refreshErrorHandler = new AbortController();
     const refreshedSources: Promise<void>[] = [];
 
@@ -397,7 +405,7 @@ export class Ddu {
       new WritableStream({
         write: (state) => {
           refreshedSources.push(
-            this.#refreshItems(denops, state, signal).catch((e) => {
+            this.#refreshItems(denops, state, redrawOpts).catch((e) => {
               refreshErrorHandler.abort(e);
             }),
           );
@@ -409,8 +417,10 @@ export class Ddu {
       { signal: refreshErrorHandler.signal },
     );
 
-    if (!this.#context.done) {
-      await this.redraw(denops, { signal });
+    if (redrawOpts.signal.aborted) {
+      // Redraw is aborted, so do nothing
+    } else if (!this.#context.done) {
+      await this.redraw(denops, redrawOpts);
     } else {
       await this.#waitRedrawComplete;
     }
@@ -419,7 +429,7 @@ export class Ddu {
   async #refreshItems(
     denops: Denops,
     state: GatherState,
-    signal: AbortSignal,
+    opts?: { signal?: AbortSignal },
   ): Promise<void> {
     const { sourceInfo: { sourceOptions }, itemsStream } = state;
 
@@ -444,7 +454,7 @@ export class Ddu {
       }
 
       if (this.#checkSync() && newItems.length > 0) {
-        /* no await */ this.redraw(denops, { signal });
+        /* no await */ this.redraw(denops, opts);
       }
     }
   }
@@ -557,9 +567,10 @@ export class Ddu {
   redraw(
     denops: Denops,
     opts?: RedrawOptions,
-  ): Promise<unknown> {
+  ): Promise<void> {
     const newOpts = {
       restoreItemState: false,
+      restoreTree: false,
       signal: this.#aborter.signal,
       ...opts,
     };
@@ -568,12 +579,10 @@ export class Ddu {
       // Already redrawing, so adding to schedule
       const prevOpts: RedrawOptions = this.#scheduledRedrawOptions ?? {};
       this.#scheduledRedrawOptions = {
+        ...newOpts,
         // Override with true
         restoreItemState: prevOpts.restoreItemState || newOpts.restoreItemState,
-        // Merge all signals
-        signal: prevOpts.signal && newOpts.signal !== prevOpts.signal
-          ? AbortSignal.any([newOpts.signal, prevOpts.signal])
-          : prevOpts.signal ?? newOpts.signal,
+        restoreTree: prevOpts.restoreTree || newOpts.restoreTree,
       };
     } else {
       // Start redraw
@@ -602,14 +611,13 @@ export class Ddu {
 
   async #redrawInternal(
     denops: Denops,
-    { restoreItemState, signal }: Required<RedrawOptions>,
+    { restoreItemState, restoreTree, signal }: Required<RedrawOptions>,
   ): Promise<void> {
     if (signal.aborted) {
       return;
     }
 
-    // Update current input
-    await this.setInput(denops, this.#input);
+    // Update current context
     this.#context.doneUi = false;
     this.#context.maxItems = 0;
 
@@ -762,6 +770,10 @@ export class Ddu {
         );
       }
     }));
+
+    if (restoreTree) {
+      this.restoreTree(denops, { preventRedraw: true, signal });
+    }
 
     if (this.#context.done && this.#options.profile) {
       await printError(
@@ -1074,12 +1086,10 @@ export class Ddu {
       // Restore quitted flag before refresh and redraw
       this.#resetQuitted();
 
-      await this.refresh(denops);
-
-      if (searchPath.length <= 0) {
+      await this.refresh(denops, [], {
         // NOTE: If searchPath exists, expandItems() is executed.
-        await this.restoreTree(denops);
-      }
+        restoreTree: searchPath.length <= 0,
+      });
     } else if (uiOptions.persist || flags & ActionFlags.Persist) {
       // Restore quitted flag before refresh and redraw
       this.#resetQuitted();
@@ -1120,9 +1130,12 @@ export class Ddu {
   async expandItems(
     denops: Denops,
     items: ExpandItem[],
-    opts?: { signal?: AbortSignal },
+    opts?: {
+      preventRedraw?: boolean;
+      signal?: AbortSignal;
+    },
   ): Promise<void> {
-    const { signal = this.#aborter.signal } = opts ?? {};
+    const { preventRedraw, signal = this.#aborter.signal } = opts ?? {};
     for (const item of items.sort((a, b) => a.item.__level - b.item.__level)) {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
@@ -1141,7 +1154,9 @@ export class Ddu {
       );
     }
 
-    await this.uiRedraw(denops, { signal });
+    if (!preventRedraw && !signal.aborted) {
+      await this.uiRedraw(denops, { signal });
+    }
   }
 
   async expandItem(
@@ -1736,6 +1751,10 @@ export class Ddu {
 
   async restoreTree(
     denops: Denops,
+    opts?: {
+      preventRedraw?: boolean;
+      signal?: AbortSignal;
+    },
   ): Promise<void> {
     // NOTE: Check expandedItems are exists in this.#items
     const checkItems: Map<string, DduItem> = new Map();
@@ -1751,7 +1770,7 @@ export class Ddu {
       return;
     }
 
-    await this.expandItems(denops, restoreItems);
+    await this.expandItems(denops, restoreItems, opts);
   }
 
   async #filterItems(
