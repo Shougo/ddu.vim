@@ -1,9 +1,6 @@
 import type { BaseParams, DduItem, SourceOptions } from "./types.ts";
 import type { BaseSource } from "./base/source.ts";
 
-import { is } from "jsr:@core/unknownutil@~4.3.0/is";
-import { maybe } from "jsr:@core/unknownutil@~4.3.0/maybe";
-
 export type AvailableSourceInfo<
   Params extends BaseParams = BaseParams,
   UserData extends unknown = unknown,
@@ -14,14 +11,29 @@ export type AvailableSourceInfo<
   sourceParams: Params;
 };
 
-type GatherStateAbortReason =
-  | {
-    reason: "quit";
+export type BaseAbortReason = {
+  readonly type: string;
+};
+
+export class QuitAbortReason extends Error implements BaseAbortReason {
+  override name = "QuitAbortReason";
+  readonly type = "quit";
+}
+
+export class RefreshAbortReason extends Error implements BaseAbortReason {
+  override name = "RefreshAbortReason";
+  readonly type = "cancelToRefresh";
+  readonly refreshIndexes: readonly number[];
+
+  constructor(refreshIndexes: number[] = []) {
+    super();
+    this.refreshIndexes = refreshIndexes;
   }
-  | {
-    reason: "cancelToRefresh";
-    refreshIndexes: number[];
-  };
+}
+
+export type GatherStateAbortReason =
+  | QuitAbortReason
+  | RefreshAbortReason;
 
 export type GatherStateAbortable = {
   abort(reason: GatherStateAbortReason): void;
@@ -37,58 +49,13 @@ export class GatherState<
   #isDone = false;
   readonly #waitDone = Promise.withResolvers<void>();
   readonly #aborter = new AbortController();
-  #resetParentSignal?: AbortController;
 
   constructor(
     sourceInfo: AvailableSourceInfo<Params, UserData>,
     itemsStream: ReadableStream<DduItem[]>,
-    options?: {
-      signal?: AbortSignal;
-    },
   ) {
-    const { signal: parentSignal } = options ?? {};
     this.sourceInfo = sourceInfo;
-    this.#chainAbortSignal(parentSignal);
     this.itemsStream = this.#processItemsStream(itemsStream);
-  }
-
-  resetSignal(signal?: AbortSignal): void {
-    // Do nothing if already aborted.
-    if (!this.#aborter.signal.aborted) {
-      this.#chainAbortSignal(signal);
-    }
-  }
-
-  #chainAbortSignal(parentSignal?: AbortSignal): void {
-    this.#resetParentSignal?.abort();
-    if (parentSignal == null) {
-      return;
-    }
-
-    const abortIfTarget = () => {
-      const reason = maybe(
-        parentSignal.reason,
-        is.ObjectOf({ reason: is.String }),
-      ) as GatherStateAbortReason | undefined;
-      if (
-        reason?.reason !== "cancelToRefresh" ||
-        isRefreshTarget(this.sourceInfo.sourceIndex, reason.refreshIndexes)
-      ) {
-        this.#aborter.abort(parentSignal.reason);
-      }
-    };
-
-    if (parentSignal.aborted) {
-      abortIfTarget();
-    } else {
-      this.#resetParentSignal = new AbortController();
-      parentSignal.addEventListener("abort", () => abortIfTarget(), {
-        signal: AbortSignal.any([
-          this.#aborter.signal,
-          this.#resetParentSignal.signal,
-        ]),
-      });
-    }
   }
 
   #processItemsStream(
@@ -135,8 +102,12 @@ export class GatherState<
     return this.#waitDone.promise;
   }
 
-  get signal(): AbortSignal {
+  get cancelled(): AbortSignal {
     return this.#aborter.signal;
+  }
+
+  cancel(reason?: unknown): void {
+    this.#aborter.abort(reason);
   }
 
   async readAll(): Promise<void> {

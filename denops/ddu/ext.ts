@@ -47,6 +47,7 @@ import type { BaseKind } from "./base/kind.ts";
 import type { BaseSource } from "./base/source.ts";
 import type { BaseUi } from "./base/ui.ts";
 import type { Loader } from "./loader.ts";
+import type { BaseAbortReason } from "./state.ts";
 import { convertUserString, printError } from "./utils.ts";
 
 import type { Denops } from "jsr:@denops/std@~7.4.0";
@@ -925,7 +926,7 @@ export async function uiRedraw<
     }
 
     try {
-      if (signal.aborted) {
+      if ((signal.reason as BaseAbortReason)?.type === "quit") {
         await ui.quit({
           denops,
           context,
@@ -953,7 +954,7 @@ export async function uiRedraw<
       });
 
       // NOTE: ddu may be quitted after redraw
-      if (signal.aborted) {
+      if ((signal.reason as BaseAbortReason)?.type === "quit") {
         await ui.quit({
           denops,
           context,
