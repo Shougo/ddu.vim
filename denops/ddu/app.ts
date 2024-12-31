@@ -15,7 +15,7 @@ import type {
 } from "./types.ts";
 import { Ddu } from "./ddu.ts";
 import {
-  ContextBuilder,
+  ContextBuilderImpl,
   defaultDduOptions,
   foldMerge,
   mergeDduOptions,
@@ -53,7 +53,7 @@ export const main: Entrypoint = (denops: Denops) => {
 
   const loaders: Record<string, Loader> = {};
   const ddus: Record<string, Ddu[]> = {};
-  const contextBuilder = new ContextBuilder();
+  const contextBuilder = new ContextBuilderImpl();
   const clipboard: Clipboard = {
     action: "none",
     items: [],

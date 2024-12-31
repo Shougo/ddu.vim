@@ -73,6 +73,16 @@ export type Context = {
   winId: number;
 };
 
+export interface ContextBuilder {
+  get(denops: Denops): Promise<[Context, DduOptions]>;
+  getGlobal(): Partial<DduOptions>;
+  getLocal(): Record<string, Partial<DduOptions>>;
+  setGlobal(options: Partial<DduOptions>): void;
+  setLocal(name: string, options: Partial<DduOptions>): void;
+  patchGlobal(options: Partial<DduOptions>): void;
+  patchLocal(name: string, options: Partial<DduOptions>): void;
+}
+
 export type DduOptions = {
   actionOptions: Record<ActionName, Partial<ActionOptions>>;
   actionParams: Record<ActionName, Partial<BaseParams>>;

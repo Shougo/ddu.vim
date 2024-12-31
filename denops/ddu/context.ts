@@ -3,6 +3,7 @@ import type {
   BaseParams,
   ColumnOptions,
   Context,
+  ContextBuilder,
   DduOptions,
   FilterOptions,
   KindOptions,
@@ -319,7 +320,7 @@ class Custom {
   }
 }
 
-export class ContextBuilder {
+export class ContextBuilderImpl implements ContextBuilder {
   #custom: Custom = new Custom();
 
   async get(
