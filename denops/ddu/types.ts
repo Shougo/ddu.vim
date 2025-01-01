@@ -74,7 +74,7 @@ export type Context = {
 };
 
 export interface ContextBuilder {
-  get(denops: Denops): Promise<[Context, DduOptions]>;
+  get(denops: Denops, options: UserOptions): Promise<[Context, DduOptions]>;
   getGlobal(): Partial<DduOptions>;
   getLocal(): Record<string, Partial<DduOptions>>;
   setGlobal(options: Partial<DduOptions>): void;
