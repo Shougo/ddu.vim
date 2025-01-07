@@ -895,8 +895,7 @@ export class Ddu {
   ): Promise<void> {
     const promises = [...this.#gatherStates]
       .filter(([sourceIndex]) => isRefreshTarget(sourceIndex, sourceIndexes))
-      .map(([sourceIndex, state]) => {
-        this.#gatherStates.delete(sourceIndex);
+      .map(([_, state]) => {
         state.cancel(reason);
         return state.waitDone;
       });
