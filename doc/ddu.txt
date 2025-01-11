@@ -580,6 +580,17 @@ ddu#custom#patch_local({ddu-name}, {dict})
 		Set local options for specific |ddu-option-name|.
 		The arguments are the same as for |ddu#custom#patch_global()|.
 
+                                                     *ddu#custom#set_global()*
+ddu#custom#set_global({dict})
+		Overwrites all options to {dict}.
+		The key is {option-name} and the value is {value}. See
+		|ddu-options| for available {option-name}.
+
+                                                      *ddu#custom#set_local()*
+ddu#custom#set_local({ddu-name}, {dict})
+		Set local options for specific |ddu-option-name|.
+		The arguments are the same as for |ddu#custom#set_global()|.
+
 UI FUNCTIONS                                                *ddu-ui-functions*
 
                                                        *ddu#ui#async_action()*
