@@ -1041,7 +1041,8 @@ export class Ddu {
     const limitPath = chompTreePath(itemAction.sourceOptions.limitPath);
     const newPath = chompTreePath(itemAction.sourceOptions.path);
     if (
-      newPath !== prevPath && (
+      newPath.length > 0 &&
+      !equal(newPath, prevPath) && (
         limitPath.length === 0 ||
         treePath2Filename(newPath) === treePath2Filename(limitPath) ||
         isParentPath(
