@@ -1038,8 +1038,8 @@ export class Ddu {
     }
 
     // Check path is changed by action
-    const limitPath = itemAction.sourceOptions.limitPath;
-    const newPath = itemAction.sourceOptions.path;
+    const limitPath = chompTreePath(itemAction.sourceOptions.limitPath);
+    const newPath = chompTreePath(itemAction.sourceOptions.path);
     if (
       newPath !== prevPath && (
         limitPath.length === 0 ||
@@ -1889,6 +1889,27 @@ export class Ddu {
   }
 }
 
+function chompTreePath(treePath?: TreePath): TreePath {
+  if (!treePath) {
+    return [];
+  }
+
+  if (typeof treePath === "string") {
+    return treePath.endsWith(pathsep) ? treePath.slice(0, -1) : treePath;
+  }
+
+  treePath = treePath.map((path) =>
+    path.endsWith(pathsep) ? path.slice(0, -1) : path
+  );
+
+  // Remove empty strings from the end of the array
+  while (treePath.length > 0 && treePath[treePath.length - 1] === "") {
+    treePath.pop();
+  }
+
+  return treePath;
+}
+
 function convertTreePath(treePath?: TreePath): string[] {
   return typeof treePath === "string"
     ? treePath.split(pathsep)
@@ -1924,4 +1945,6 @@ Deno.test("isParentPath", () => {
     ),
   );
   assertEquals(false, isParentPath("hoge".split("/"), "/home".split("/")));
+  assertEquals([], chompTreePath(undefined));
+  assertEquals(["hoge"], chompTreePath("hoge/".split("/")));
 });
