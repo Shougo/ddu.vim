@@ -958,6 +958,18 @@ export class Ddu {
       );
     }
 
+    const visible = await ui.visible({
+      denops,
+      context: this.#context,
+      options: this.#options,
+      uiOptions,
+      uiParams,
+      tabNr: await fn.tabpagenr(denops),
+    });
+    if (!visible) {
+      ui.prevDone = false;
+    }
+
     // NOTE: :redraw is needed for command line
     await denops.cmd("redraw");
 
