@@ -234,6 +234,7 @@ export class Ddu {
 
     if (ui) {
       ui.isInitialized = false;
+      ui.prevDone = false;
     }
 
     this.#initialized = false;
@@ -956,18 +957,6 @@ export class Ddu {
         uiParams,
         signal,
       );
-    }
-
-    const visible = await ui.visible({
-      denops,
-      context: this.#context,
-      options: this.#options,
-      uiOptions,
-      uiParams,
-      tabNr: await fn.tabpagenr(denops),
-    });
-    if (!visible) {
-      ui.prevDone = false;
     }
 
     // NOTE: :redraw is needed for command line
