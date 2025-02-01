@@ -1,4 +1,4 @@
-import { type ActionArguments, ActionFlags } from "../ddu/types.ts";
+import type { ActionArguments, ActionFlags } from "../ddu/types.ts";
 import { BaseKind } from "../ddu/base/kind.ts";
 
 type Params = Record<string, never>;
