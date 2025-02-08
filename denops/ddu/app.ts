@@ -301,37 +301,39 @@ export const main: Entrypoint = (denops: Denops) => {
     },
     async start(arg1: unknown): Promise<void> {
       //const startTime = Date.now();
-      await lock.lock(async () => {
-        let userOptions = ensure(arg1, is.Record) as UserOptions;
-        let [context, options] = await contextBuilder.get(denops, userOptions);
+      let userOptions = ensure(arg1, is.Record) as UserOptions;
+      let [context, options] = await contextBuilder.get(denops, userOptions);
 
-        let ddu: Ddu;
+      let ddu: Ddu;
 
-        // NOTE: Check if previous ddu exists
-        if (options.push && checkDdu(options.name)) {
-          const prevDdu = getDdu(options.name);
-          ddu = pushDdu(options.name);
+      // NOTE: Check if previous ddu exists
+      if (options.push && checkDdu(options.name)) {
+        const prevDdu = getDdu(options.name);
 
-          // Extends previous options
-          const prevOptions = {
-            ...prevDdu.getOptions(),
-            input: "",
-          };
-          userOptions = foldMerge(mergeDduOptions, defaultDduOptions, [
-            prevOptions,
-            userOptions,
-          ]);
+        // Cancel previous state
+        await prevDdu.cancelToRefresh();
 
-          [context, options] = await contextBuilder.get(denops, userOptions);
+        ddu = pushDdu(options.name);
 
-          // NOTE: Ensure winId is carried over to the pushed context.
-          context.winId = prevDdu.getContext().winId;
-        } else {
-          ddu = getDdu(options.name);
-        }
+        // Extends previous options
+        const prevOptions = {
+          ...prevDdu.getOptions(),
+          input: "",
+        };
+        userOptions = foldMerge(mergeDduOptions, defaultDduOptions, [
+          prevOptions,
+          userOptions,
+        ]);
 
-        await ddu.start(denops, context, options, userOptions);
-      });
+        [context, options] = await contextBuilder.get(denops, userOptions);
+
+        // NOTE: Ensure winId is carried over to the pushed context.
+        context.winId = prevDdu.getContext().winId;
+      } else {
+        ddu = getDdu(options.name);
+      }
+
+      await ddu.start(denops, context, options, userOptions);
       //console.log(`${Date.now() - startTime} ms`);
     },
     async getItems(arg1: unknown): Promise<DduItem[]> {
