@@ -257,7 +257,6 @@ export const main: Entrypoint = (denops: Denops) => {
     },
     async loadConfig(arg1: unknown): Promise<void> {
       //const startTime = Date.now();
-      // NOTE: Lock until load finished to prevent execute start() API.
       await lock.lock(async () => {
         const path = ensure(arg1, is.String) as string;
 
