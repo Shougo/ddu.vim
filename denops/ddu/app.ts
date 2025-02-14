@@ -187,24 +187,32 @@ export const main: Entrypoint = (denops: Denops) => {
     },
     setGlobal(arg1: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
-      contextBuilder.setGlobal(options);
+      lock.lock(() => {
+        contextBuilder.setGlobal(options);
+      });
       return Promise.resolve();
     },
     setLocal(arg1: unknown, arg2: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       const name = ensure(arg2, is.String) as string;
-      contextBuilder.setLocal(name, options);
+      lock.lock(() => {
+        contextBuilder.setLocal(name, options);
+      });
       return Promise.resolve();
     },
     patchGlobal(arg1: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
-      contextBuilder.patchGlobal(options);
+      lock.lock(() => {
+        contextBuilder.patchGlobal(options);
+      });
       return Promise.resolve();
     },
     patchLocal(arg1: unknown, arg2: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       const name = ensure(arg2, is.String) as string;
-      contextBuilder.patchLocal(name, options);
+      lock.lock(() => {
+        contextBuilder.patchLocal(name, options);
+      });
       return Promise.resolve();
     },
     getGlobal(): Promise<Partial<DduOptions>> {
@@ -301,6 +309,15 @@ export const main: Entrypoint = (denops: Denops) => {
     },
     async start(arg1: unknown): Promise<void> {
       //const startTime = Date.now();
+      function sleep(ms: number): Promise<void> {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      // Waiting for lock to be released...
+      while (lock.locked) {
+        await sleep(100);
+      }
+
       let userOptions = ensure(arg1, is.Record) as UserOptions;
       let [context, options] = await contextBuilder.get(denops, userOptions);
 
