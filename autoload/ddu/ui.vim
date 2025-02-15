@@ -50,3 +50,85 @@ function ddu#ui#update_cursor(name=b:->get('ddu_ui_name', '')) abort
   return ddu#denops#_running() ?
         \ ddu#denops#_request('uiUpdateCursor', [a:name]) : []
 endfunction
+
+function ddu#ui#_open_filter_window(
+      \ options, input, name, length, history) abort
+  if !'s:filter_prev_input'->exists()
+    let s:filter_prev_input = a:input
+  endif
+  let s:filter_init_input = a:input
+  let s:filter_history = a:history
+  let s:filter_update_callback = a:options.filterUpdateCallback
+
+  let b:ddu_ui_name = a:name
+
+  augroup ddu-filter
+    autocmd!
+    autocmd User Ddu:uiOpenFilterWindow :
+    autocmd User Ddu:uiCloseFilterWindow :
+  augroup END
+
+  if a:options.filterUpdateMax <= 0 || a:length <= a:options.filterUpdateMax
+    autocmd ddu-filter CmdlineChanged *
+          \ ++nested call s:update_input(
+          \   getcmdline(), s:filter_update_callback)
+  endif
+
+  doautocmd User Ddu:uiOpenFilterWindow
+
+  " NOTE: redraw is needed
+  redraw
+
+  let opts = #{
+        \   prompt: a:options.filterPrompt,
+        \   default:  a:input,
+        \   completion:  'custom,ddu#ui#_complete_input',
+        \   cancelreturn:  a:input,
+        \ }
+
+  let new_input = a:options.filterInputOptsFunc ==# ''
+        \ ? a:options.filterInputFunc->call(
+        \    [opts.prompt, opts.default, opts.completion])
+        \ : a:options.filterInputOptsFunc->call([opts])
+
+  doautocmd User Ddu:uiCloseFilterWindow
+
+  augroup ddu-filter
+    autocmd!
+  augroup END
+
+  let new_input = s:update_input(new_input, a:options.filterUpdateCallback)
+
+  return new_input
+endfunction
+
+function ddu#ui#_complete_input(arglead, cmdline, cursorpos) abort
+  return s:filter_history->join("\n")
+endfunction
+
+function s:update_input(input, callback) abort
+  let input = a:input
+  if a:callback !=# ''
+    let input = a:callback->call([input])
+  endif
+
+  if exists('s:filter_init_input')
+    " Check s:filter_init_input
+    " Because CmdlineChanged is called when default input
+    if s:filter_init_input !=# '' && input !=# s:filter_init_input
+      return input
+    endif
+
+    unlet s:filter_init_input
+  endif
+
+  if input ==# s:filter_prev_input || !'b:ddu_ui_name'->exists()
+    return input
+  endif
+
+  let s:filter_prev_input = input
+
+  call ddu#redraw(b:ddu_ui_name, #{ input: input })
+
+  return input
+endfunction
