@@ -83,10 +83,10 @@ function ddu#ui#_open_filter_window(
         \   cancelreturn:  a:input,
         \ }
 
-  let new_input = a:options.filterInputOptsFunc ==# ''
-        \ ? a:options.filterInputFunc->call(
+  let new_input = has('nvim') && a:options.filterInputOptsFunc !=# ''
+        \ ? a:options.filterInputOptsFunc->call([opts])
+        \ : a:options.filterInputFunc->call(
         \    [opts.prompt, opts.default, opts.completion])
-        \ : a:options.filterInputOptsFunc->call([opts])
 
   doautocmd User Ddu:uiCloseFilterWindow
 
