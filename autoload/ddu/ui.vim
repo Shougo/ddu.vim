@@ -53,9 +53,7 @@ endfunction
 
 function ddu#ui#_open_filter_window(
       \ options, input, name, length, history) abort
-  if !'s:filter_prev_input'->exists()
-    let s:filter_prev_input = a:input
-  endif
+  let s:filter_prev_input = a:input
   let s:filter_init_input = a:input
   let s:filter_history = a:history
   let s:filter_update_callback = a:options.filterUpdateCallback
@@ -69,9 +67,8 @@ function ddu#ui#_open_filter_window(
   augroup END
 
   if a:options.filterUpdateMax <= 0 || a:length <= a:options.filterUpdateMax
-    autocmd ddu-filter CmdlineChanged *
-          \ ++nested call s:update_input(
-          \   getcmdline(), s:filter_update_callback)
+    autocmd ddu-filter CmdlineChanged * ++nested
+          \ call s:update_input(getcmdline(), s:filter_update_callback)
   endif
 
   doautocmd User Ddu:uiOpenFilterWindow
@@ -110,16 +107,6 @@ function s:update_input(input, callback) abort
   let input = a:input
   if a:callback !=# ''
     let input = a:callback->call([input])
-  endif
-
-  if exists('s:filter_init_input')
-    " Check s:filter_init_input
-    " Because CmdlineChanged is called when default input
-    if s:filter_init_input !=# '' && input !=# s:filter_init_input
-      return input
-    endif
-
-    unlet s:filter_init_input
   endif
 
   if input ==# s:filter_prev_input || !'b:ddu_ui_name'->exists()
