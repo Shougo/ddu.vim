@@ -1796,6 +1796,17 @@ export class Ddu {
     let items = structuredClone(state.items) as DduItem[];
     const allItems = items.length;
 
+    // NOTE: Call columns before filters
+    await callColumns(
+      denops,
+      this.#loader,
+      this.#context,
+      this.#options,
+      sourceOptions.columns,
+      items,
+      items,
+    );
+
     items = await callFilters(
       denops,
       this.#loader,
@@ -1811,17 +1822,6 @@ export class Ddu {
     if (items.length > sourceOptions.maxItems) {
       items = items.slice(0, sourceOptions.maxItems);
     }
-
-    // NOTE: Call columns before converters after matchers and sorters
-    await callColumns(
-      denops,
-      this.#loader,
-      this.#context,
-      this.#options,
-      sourceOptions.columns,
-      items,
-      items,
-    );
 
     items = await callFilters(
       denops,

@@ -897,6 +897,7 @@ columns			(string[] | dictionary[])
 		Items will be processed in the order you specify here.
 		NOTE: The spaces are not added between each columns.
 		NOTE: The columns overwrites source items highlights.
+		NOTE: It is called before filters.  It will be slower.
 
 		Default: []
 
