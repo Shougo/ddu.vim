@@ -265,7 +265,7 @@ sources			(string[] | dictionary[])
 sync			(boolean)
 		Redraw the UI when all sources are finished.
 		It is useful for multiple sources.
-		NOTE: It blocks Vim/Neovim.
+		NOTE: It blocks Vim/Neovim UI.
 
 		Default: v:false
 
@@ -786,6 +786,65 @@ defaultAction		(string)
 
 		Default: "default"
 
+                                               *ddu-ui-option-filterInputFunc*
+filterInputFunc	(string)
+		Specify the input function name when filter window is opened.
+		For example: |cmdline#input()|
+		NOTE: The function must have the same interface as |input()|.
+
+		Default: "input"
+
+                                           *ddu-ui-option-filterInputOptsFunc*
+filterInputOptsFunc	(string)
+		Specify the input({opts}) function name when filter window is
+		opened.
+		For example: |cmdline#input_opts()|
+		NOTE: The function must have the same interface as |input()|
+		with {opts} argument.
+		NOTE: It is Neovim only.
+
+		Default: ""
+
+                                                  *ddu-ui-option-filterPrompt*
+filterPrompt		(string)
+		Specify the prompt in the filter window.
+		NOTE: It must be one or two width characters.
+
+		Default: ""
+
+                                          *ddu-ui-option-filterUpdateCallback*
+filterUpdateCallback (string)
+		Specify the callback when update in the filter window.
+		The function argument is {input} and it returns the new input
+		string.
+>vim
+	function! DduFilterCallback(input)
+	  if a:input->stridx('@') != 0
+	    return a:input
+	  endif
+	
+	  " Use file source instead.
+	  call ddu#ui#do_action('updateOptions', #{
+	        \   sources: [
+	        \     #{ name: 'file' },
+	        \   ],
+	        \ })
+	  call ddu#ui#do_action('redraw', #{ method: 'refreshItems' })
+	
+	  return a:input[1:]
+	endfunction
+<
+
+		Default: ""
+
+                                               *ddu-ui-option-filterUpdateMax*
+filterUpdateMax	(number)
+		Specify the maximum item number to update in the filter
+		window.
+		If it is less than equal 0, the feature will be disabled.
+
+		Default: 0
+
                                                        *ddu-ui-option-persist*
 persist			(boolean)
 		Redraw the UI after fire actions.
@@ -838,6 +897,7 @@ columns			(string[] | dictionary[])
 		Items will be processed in the order you specify here.
 		NOTE: The spaces are not added between each columns.
 		NOTE: The columns overwrites source items highlights.
+		NOTE: It is called before filters.  It will be slower.
 
 		Default: []
 
@@ -1179,10 +1239,18 @@ ddu.vim defines some |User| autocmds.
 Ddu:redraw
 		Called after |ddu-ui-attribute-redraw| is called.
 
+                                         *ddu-autocmd-Ddu:uiCloseFilterWindow*
+Ddu:uiCloseFilterWindow
+		Called after filter window is closed.
+
                                                       *ddu-autocmd-Ddu:uiDone*
 Ddu:uiDone
 		Called after all items are gathered in
 		|ddu-ui-attribute-redraw|.
+
+                                          *ddu-autocmd-Ddu:uiOpenFilterWindow*
+Ddu:uiOpenFilterWindow
+		Called after filter window is opened.
 
                                                      *ddu-autocmd-Ddu:uiReady*
 Ddu:uiReady

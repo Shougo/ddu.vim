@@ -144,6 +144,11 @@ export function defaultUiOptions(): UiOptions {
   return {
     actions: {},
     defaultAction: "default",
+    filterInputFunc: "input",
+    filterInputOptsFunc: "",
+    filterUpdateCallback: "",
+    filterUpdateMax: 0,
+    filterPrompt: "",
     persist: false,
     toggle: false,
   };

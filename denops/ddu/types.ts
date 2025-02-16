@@ -122,6 +122,11 @@ export type ItemAction = string | ActionCallback<BaseParams>;
 export type UiOptions = {
   actions: Record<ActionName, UiAction>;
   defaultAction: string;
+  filterInputFunc: string;
+  filterInputOptsFunc: string;
+  filterPrompt: string;
+  filterUpdateCallback: string;
+  filterUpdateMax: number;
   persist: boolean;
   toggle: boolean;
 };

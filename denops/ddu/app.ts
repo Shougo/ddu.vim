@@ -377,6 +377,7 @@ export const main: Entrypoint = (denops: Denops) => {
     async redraw(arg1: unknown, arg2: unknown): Promise<void> {
       const name = ensure(arg1, is.String) as string;
       const opt = ensure(arg2, is.Record) as RedrawOption;
+      //denops.cmd(`let &titlestring = "${opt?.input}"`);
 
       const ddu = getDdu(name);
       const loader = getLoader(name);
@@ -418,6 +419,8 @@ export const main: Entrypoint = (denops: Denops) => {
           opt.searchItem,
         );
       }
+
+      denops.cmd("redraw");
     },
     async redrawTree(
       arg1: unknown,
