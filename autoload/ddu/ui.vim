@@ -120,7 +120,8 @@ function s:update_input(input, callback) abort
 
   let s:filter_prev_input = input
 
-  call ddu#redraw(b:ddu_ui_name, #{ input: input })
+  " NOTE: Use timer to redraw
+  call timer_start(0, { _ -> ddu#redraw(b:ddu_ui_name, #{ input: input }) })
 
   return input
 endfunction
