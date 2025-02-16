@@ -945,7 +945,7 @@ export class Ddu {
     await this.setInput(denops, this.#context.input);
 
     if (flags & ActionFlags.RefreshItems) {
-      await this.refresh(denops);
+      await this.refresh(denops, [], { restoreTree: true });
     } else if (flags & ActionFlags.Redraw) {
       await uiRedraw(
         denops,
@@ -1087,10 +1087,7 @@ export class Ddu {
       // Restore quitted flag before refresh and redraw
       this.#resetQuitted();
 
-      await this.refresh(denops, [], {
-        // NOTE: If searchPath exists, expandItems() is executed.
-        restoreTree: searchPath.length <= 0,
-      });
+      await this.refresh(denops, [], { restoreTree: true });
     } else if (uiOptions.persist || flags & ActionFlags.Persist) {
       // Restore quitted flag before refresh and redraw
       this.#resetQuitted();
