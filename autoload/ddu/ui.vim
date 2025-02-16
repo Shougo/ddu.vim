@@ -103,6 +103,38 @@ function ddu#ui#_complete_input(arglead, cmdline, cursorpos) abort
   return s:filter_history->join("\n")
 endfunction
 
+function ddu#ui#save_cmaps(keys) abort
+  let s:save_maps = {}
+  for key in a:keys
+    let s:save_maps[key] = key->maparg('c', v:false, v:true)
+  endfor
+endfunction
+
+function ddu#ui#restore_cmaps() abort
+  if !'s:save_maps'->exists()
+    return
+  endif
+
+  for [key, map] in s:save_maps->items()
+    " Remove current map
+    let ff_map = key->maparg('c', v:false, v:true)
+    if !ff_map->empty()
+      if ff_map.buffer
+        execute 'cunmap' '<buffer>' key
+      else
+        execute 'cunmap' key
+      endif
+    endif
+
+    if !map->empty()
+      " Restore old map
+      call mapset('c', 0, map)
+    endif
+  endfor
+
+  let s:save_maps = {}
+endfunction
+
 function s:update_input(input, callback) abort
   let input = a:input
   if a:callback !=# ''

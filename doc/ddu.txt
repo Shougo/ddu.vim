@@ -671,6 +671,17 @@ ddu#ui#sync_action({action-name}[, {params}[, {ui-name}]])
 		NOTE: It does not work before |ddu-autocmd-Ddu:uiReady|
 		autocmd.
 
+                                                      *ddu#ui#restore_cmaps()*
+ddu#ui#restore_cmaps()
+		Restore command line maps saved by |ddu#ui#save_cmaps()|.
+		It is useful to use in |ddu-autocmd-Ddu:uiCloseFilterWindow|
+		autocmd.
+                                                         *ddu#ui#save_cmaps()*
+ddu#ui#save_cmaps({keys})
+		Save command line maps for {keys}.
+		It is useful to use in |ddu-autocmd-Ddu:uiOpenFilterWindow|
+		autocmd.
+
                                                       *ddu#ui#update_cursor()*
 ddu#ui#update_cursor({name})
 		Update UI cursor.
