@@ -265,7 +265,7 @@ sources			(string[] | dictionary[])
 sync			(boolean)
 		Redraw the UI when all sources are finished.
 		It is useful for multiple sources.
-		NOTE: It blocks Vim/Neovim.
+		NOTE: It blocks Vim/Neovim UI.
 
 		Default: v:false
 
@@ -844,6 +844,15 @@ filterUpdateMax	(number)
 		If it is less than equal 0, the feature will be disabled.
 
 		Default: 0
+
+                                             *ddu-ui-option-filterUpdateSleep*
+filterUpdateSleep (number)
+		Specify |:sleep| milliseconds time to update in the filter
+		window.
+		It is needed to update items properly.
+		NOTE: It is Neovim only.
+
+		Default: 10
 
                                                        *ddu-ui-option-persist*
 persist			(boolean)

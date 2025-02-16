@@ -127,6 +127,7 @@ export type UiOptions = {
   filterPrompt: string;
   filterUpdateCallback: string;
   filterUpdateMax: number;
+  filterUpdateSleep: number;
   persist: boolean;
   toggle: boolean;
 };

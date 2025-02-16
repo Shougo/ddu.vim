@@ -69,6 +69,11 @@ function ddu#ui#_open_filter_window(
   if a:options.filterUpdateMax <= 0 || a:length <= a:options.filterUpdateMax
     autocmd ddu-filter CmdlineChanged * ++nested
           \ call s:update_input(getcmdline(), s:filter_update_callback)
+    if has('nvim')
+      " NOTE: sleep is needed to process "denops#notify()" calls
+      execute 'autocmd ddu-filter CursorMovedC * ++nested'
+            \ 'sleep' a:options.filterUpdateSleep .. 'm'
+    endif
   endif
 
   doautocmd User Ddu:uiOpenFilterWindow
