@@ -845,15 +845,6 @@ filterUpdateMax	(number)
 
 		Default: 0
 
-                                             *ddu-ui-option-filterUpdateSleep*
-filterUpdateSleep (number)
-		Specify |:sleep| milliseconds time to update in the filter
-		window.
-		It is needed to update items properly.
-		NOTE: It is Neovim only.
-
-		Default: 10
-
                                                        *ddu-ui-option-persist*
 persist			(boolean)
 		Redraw the UI after fire actions.

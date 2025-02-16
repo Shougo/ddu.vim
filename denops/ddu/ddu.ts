@@ -812,6 +812,7 @@ export class Ddu {
       return;
     }
 
+    //denops.cmd(`let &titlestring = "${this.#input}"`);
     await uiRedraw(
       denops,
       this.#uiRedrawLock,

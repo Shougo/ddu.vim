@@ -148,7 +148,6 @@ export function defaultUiOptions(): UiOptions {
     filterInputOptsFunc: "",
     filterUpdateCallback: "",
     filterUpdateMax: 0,
-    filterUpdateSleep: 10,
     filterPrompt: "",
     persist: false,
     toggle: false,
