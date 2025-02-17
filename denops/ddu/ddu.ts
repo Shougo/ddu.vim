@@ -731,9 +731,11 @@ export class Ddu {
     await Promise.all(allItems.map(async (item: DduItem): Promise<void> => {
       if (searchPath) {
         const itemTreePath = convertTreePath(item.treePath ?? item.word);
+
         if (equal(searchTreePath, itemTreePath)) {
           searchTargetItem = item;
         }
+
         if (
           !searchTargetItem && item.treePath &&
           isParentPath(itemTreePath, searchTreePath)
@@ -782,6 +784,9 @@ export class Ddu {
 
     await this.uiRedraw(denops, { signal });
     if (searchTargetItem && !signal.aborted) {
+      // Prevent infinite loop
+      this.#searchPath = "";
+
       await uiSearchItem(
         denops,
         this.#loader,
