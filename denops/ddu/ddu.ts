@@ -725,22 +725,18 @@ export class Ddu {
 
     const searchPath = this.#searchPath;
 
-    // Prevent infinite loop
-    this.#searchPath = "";
-
     let searchTargetItem: DduItem | undefined;
 
+    const searchTreePath = convertTreePath(searchPath);
     await Promise.all(allItems.map(async (item: DduItem): Promise<void> => {
       if (searchPath) {
-        if (searchPath === (item.treePath ?? item.word)) {
+        const itemTreePath = convertTreePath(item.treePath ?? item.word);
+        if (equal(searchTreePath, itemTreePath)) {
           searchTargetItem = item;
         }
         if (
           !searchTargetItem && item.treePath &&
-          isParentPath(
-            convertTreePath(item.treePath),
-            convertTreePath(searchPath),
-          )
+          isParentPath(itemTreePath, searchTreePath)
         ) {
           searchTargetItem = await this.expandItem(
             denops,
@@ -753,6 +749,7 @@ export class Ddu {
               signal,
             },
           );
+
           return;
         }
       }
