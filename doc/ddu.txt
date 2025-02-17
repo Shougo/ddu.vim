@@ -859,6 +859,7 @@ filterUpdateMax	(number)
                                                        *ddu-ui-option-persist*
 persist			(boolean)
 		Redraw the UI after fire actions.
+		It is useful if you don't want to quit UI after fire actions.
 		Default: v:false
 
                                                         *ddu-ui-option-toggle*
@@ -1184,6 +1185,7 @@ ACTION OPTIONS                                            *ddu-action-options*
                                                       *ddu-action-option-quit*
 quit			(boolean)
 		Quit the UI "before" executing action.
+		NOTE: If it is false, the action execution may be failed.
 
 		Default: true
 
