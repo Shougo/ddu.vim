@@ -1390,6 +1390,7 @@ onInit			(function)			(Optional)
                                                  *ddu-source-attribute-gather*
 gather			(function)			(Required)
 		It is called to gather items.
+		NOTE: All items must be unique.
 
                                                  *ddu-source-attribute-params*
 params			(function)			(Required)
