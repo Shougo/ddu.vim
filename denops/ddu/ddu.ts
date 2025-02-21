@@ -1085,6 +1085,19 @@ export class Ddu {
       this.#loader,
       this.#options,
     );
+    if (!ui) {
+      return;
+    }
+
+    if (ui?.clearSelectedItems) {
+      await ui.clearSelectedItems({
+        denops,
+        context: this.#context,
+        options: this.#options,
+        uiOptions,
+        uiParams,
+      });
+    }
 
     if (flags & ActionFlags.RefreshItems) {
       // Restore quitted flag before refresh and redraw
@@ -1098,28 +1111,16 @@ export class Ddu {
       // NOTE: Get the signal after the aborter is reset.
       const { signal } = this.#aborter;
 
-      if (ui) {
-        if (ui.clearSelectedItems) {
-          await ui.clearSelectedItems({
-            denops,
-            context: this.#context,
-            options: this.#options,
-            uiOptions,
-            uiParams,
-          });
-        }
-
-        await uiRedraw(
-          denops,
-          this.#uiRedrawLock,
-          this.#context,
-          this.#options,
-          ui,
-          uiOptions,
-          uiParams,
-          signal,
-        );
-      }
+      await uiRedraw(
+        denops,
+        this.#uiRedrawLock,
+        this.#context,
+        this.#options,
+        ui,
+        uiOptions,
+        uiParams,
+        signal,
+      );
     }
 
     if (flags & ActionFlags.RestoreCursor) {
