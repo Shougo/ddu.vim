@@ -1248,10 +1248,6 @@ AUTOCMDS                                                        *ddu-autocmds*
 
 ddu.vim defines some |User| autocmds.
 
-                                                      *ddu-autocmd-Ddu:redraw*
-Ddu:redraw
-		Called after |ddu-ui-attribute-redraw| is called.
-
                                          *ddu-autocmd-Ddu:uiCloseFilterWindow*
 Ddu:uiCloseFilterWindow
 		Called after filter window is closed.
@@ -1265,10 +1261,19 @@ Ddu:uiDone
 Ddu:uiOpenFilterWindow
 		Called after filter window is opened.
 
+                                                      *ddu-autocmd-Ddu:uiQuit*
+Ddu:uiQuit
+		Called after UI window is closed in
+		|ddu-ui-attribute-quit|.
+
                                                      *ddu-autocmd-Ddu:uiReady*
 Ddu:uiReady
 		Called after UI window is created in
 		|ddu-ui-attribute-redraw|.
+
+                                                    *ddu-autocmd-Ddu:uiRedraw*
+Ddu:uiRedraw
+		Called after |ddu-ui-attribute-redraw| is called.
 
 
 ==============================================================================
@@ -1805,6 +1810,9 @@ A: The example is here. >vim
 
 ==============================================================================
 COMPATIBILITY                                              *ddu-compatibility*
+
+2025.02.24
+* Rename "Ddu:redraw" to "Ddu:uiRedraw".
 
 2024.12.03
 * "ddu#register()", "ddu#load()", "ddu#custom#alias()",

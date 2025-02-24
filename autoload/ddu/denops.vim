@@ -83,7 +83,12 @@ function s:init() abort
     autocmd!
     autocmd User DenopsPluginPost:ddu ++nested
           \ let g:ddu#_initialized = v:true
-    autocmd User Ddu:redraw,Ddu:uiReady,Ddu:uiDone ++nested :
+    autocmd User
+          \ Ddu:uiCloseFilterWindow,Ddu:uiDone,Ddu:uiOpenFilterWindow
+          \ ++nested :
+    autocmd User
+          \ Ddu:uiQuit,Ddu:uiReady,Ddu:uiRedraw
+          \ ++nested :
   augroup END
 
   let g:ddu#_started = reltime()

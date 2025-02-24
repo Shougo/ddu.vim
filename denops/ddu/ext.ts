@@ -911,6 +911,7 @@ export async function uiRedraw<
 >(
   denops: Denops,
   lock: Lock<number>,
+  loader: Loader,
   context: Context,
   options: DduOptions,
   ui: BaseUi<Params>,
@@ -955,16 +956,15 @@ export async function uiRedraw<
 
       // NOTE: ddu may be quitted after redraw
       if ((signal.reason as BaseAbortReason)?.type === "quit") {
-        await ui.quit({
+        await uiQuit(
           denops,
+          loader,
           context,
           options,
-          uiOptions,
-          uiParams,
-        });
+        );
       }
 
-      await denops.cmd("doautocmd <nomodeline> User Ddu:redraw");
+      await denops.cmd("doautocmd <nomodeline> User Ddu:uiRedraw");
 
       const winIds = await ui.winIds({
         denops,
@@ -1030,6 +1030,8 @@ export async function uiQuit(
       uiParams,
     });
     ui.prevDone = false;
+
+    await denops.cmd("doautocmd <nomodeline> User Ddu:uiQuit");
   }
 }
 

@@ -818,6 +818,7 @@ export class Ddu {
     await uiRedraw(
       denops,
       this.#uiRedrawLock,
+      this.#loader,
       this.#context,
       this.#options,
       ui,
@@ -953,6 +954,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this.#uiRedrawLock,
+        this.#loader,
         this.#context,
         this.#options,
         ui,
@@ -1114,6 +1116,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this.#uiRedrawLock,
+        this.#loader,
         this.#context,
         this.#options,
         ui,
@@ -1380,6 +1383,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this.#uiRedrawLock,
+        this.#loader,
         this.#context,
         this.#options,
         ui,
@@ -1505,6 +1509,7 @@ export class Ddu {
       await uiRedraw(
         denops,
         this.#uiRedrawLock,
+        this.#loader,
         this.#context,
         this.#options,
         ui,

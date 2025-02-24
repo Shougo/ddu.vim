@@ -62,8 +62,6 @@ function ddu#ui#_open_filter_window(
 
   augroup ddu-filter
     autocmd!
-    autocmd User Ddu:uiOpenFilterWindow :
-    autocmd User Ddu:uiCloseFilterWindow :
   augroup END
 
   if a:options.filterUpdateMax <= 0 || a:length <= a:options.filterUpdateMax
