@@ -20,7 +20,7 @@ import {
   foldMerge,
   mergeDduOptions,
 } from "./context.ts";
-import { initStaticImportPath, Loader } from "./loader.ts";
+import { Loader } from "./loader.ts";
 import {
   getFilter,
   getItemAction,
@@ -35,7 +35,7 @@ import { type BaseKind, defaultKindOptions } from "./base/kind.ts";
 import { type BaseColumn, defaultColumnOptions } from "./base/column.ts";
 import { defaultActionOptions } from "./base/action.ts";
 
-import type { Denops, Entrypoint } from "jsr:@denops/std@~7.4.0";
+import type { Denops, Entrypoint } from "jsr:@denops/std@~7.5.0";
 
 import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
 import { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
@@ -282,7 +282,7 @@ export const main: Entrypoint = (denops: Denops) => {
           throw e;
         }
       });
-      //console.log(`${arg1}: ${Date.now() - startTime} ms`);
+      //console.log(`${Date.now() - startTime} ms`);
       return Promise.resolve();
     },
     async loadExtensions(
@@ -300,10 +300,6 @@ export const main: Entrypoint = (denops: Denops) => {
         await loader.autoload(denops, type, name);
       }
       //console.log(`${type} ${names}: ${Date.now() - startTime} ms`);
-      return Promise.resolve();
-    },
-    async setStaticImportPath(): Promise<void> {
-      await initStaticImportPath(denops);
       return Promise.resolve();
     },
     async start(arg1: unknown): Promise<void> {

@@ -69,15 +69,6 @@ function ddu#load(name, type, ext_names) abort
   call ddu#denops#_notify('loadExtensions', [a:name, a:type, a:ext_names])
 endfunction
 
-function ddu#set_static_import_path() abort
-  " Clear current import path.
-  call writefile([
-        \   '// NOTE: It is dummy module.',
-        \   'export const mods = {};',
-        \ ], ddu#denops#_mods())
-
-  call ddu#denops#_notify('setStaticImportPath', [])
-endfunction
 function ddu#get_items(options = {}) abort
   return ddu#denops#_request('getItems', [a:options])
 endfunction
