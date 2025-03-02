@@ -140,19 +140,48 @@ export class Loader {
     this.#exts[type][name] = ext;
   }
 
-  getUi(name: string): BaseUi<BaseParams> | null {
+  async getUi(
+    denops: Denops,
+    name: string,
+  ): Promise<BaseUi<BaseParams> | null> {
+    if (!this.#exts.ui[name]) {
+      await this.autoload(denops, "ui", name);
+    }
+
     return this.#exts.ui[name];
   }
-  getSource(name: string): BaseSource<BaseParams> | null {
+  // NOTE: It must not async
+  getSource(name: string): BaseSource<BaseParams> {
     return this.#exts.source[name];
   }
-  getFilter(name: string): BaseFilter<BaseParams> | null {
+  async getFilter(
+    denops: Denops,
+    name: string,
+  ): Promise<BaseFilter<BaseParams> | null> {
+    if (!this.#exts.filter[name]) {
+      await this.autoload(denops, "filter", name);
+    }
+
     return this.#exts.filter[name];
   }
-  getKind(name: string): BaseKind<BaseParams> | null {
+  async getKind(
+    denops: Denops,
+    name: string,
+  ): Promise<BaseKind<BaseParams> | null> {
+    if (!this.#exts.kind[name]) {
+      await this.autoload(denops, "kind", name);
+    }
+
     return this.#exts.kind[name];
   }
-  getColumn(name: string): BaseColumn<BaseParams> | null {
+  async getColumn(
+    denops: Denops,
+    name: string,
+  ): Promise<BaseColumn<BaseParams> | null> {
+    if (!this.#exts.column[name]) {
+      await this.autoload(denops, "column", name);
+    }
+
     return this.#exts.column[name];
   }
 

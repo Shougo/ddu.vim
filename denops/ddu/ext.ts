@@ -119,7 +119,7 @@ export async function getItemActions(
   }
 
   const kindName = kinds[0];
-  const kind = await getKind(denops, loader, options, kindName);
+  const kind = await getKind(denops, loader, kindName);
   if (!kind) {
     return null;
   }
@@ -304,26 +304,20 @@ export async function getUi(
     BaseParams,
   ]
 > {
-  const userUi = convertUserString(options.ui);
-  if (!loader.getUi(userUi.name)) {
-    const startTime = Date.now();
+  const name = convertUserString(options.ui).name;
 
-    const exists = await loader.autoload(denops, "ui", userUi.name);
-
-    if (options.profile) {
-      await printError(
-        denops,
-        `Load ${userUi.name}: ${Date.now() - startTime} ms`,
-      );
-    }
-
-    if (userUi.name !== "" && !exists) {
-      await printError(denops, `Not found ui: "${userUi.name}"`);
-    }
+  if (name.length === 0) {
+    return [
+      undefined,
+      defaultUiOptions(),
+      defaultDummy(),
+    ];
   }
 
-  const ui = loader.getUi(userUi.name);
+  const ui = await loader.getUi(denops, name);
   if (!ui) {
+    await printError(denops, `Not found ui: "${name}"`);
+
     return [
       undefined,
       defaultUiOptions(),
@@ -332,6 +326,7 @@ export async function getUi(
   }
 
   const [uiOptions, uiParams] = uiArgs(options, ui);
+
   await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
   return [ui, uiOptions, uiParams];
@@ -394,27 +389,12 @@ export async function getFilter(
     BaseParams,
   ]
 > {
-  userFilter = convertUserString(userFilter);
+  const name = convertUserString(userFilter).name;
 
-  if (!loader.getFilter(userFilter.name)) {
-    const startTime = Date.now();
-
-    const exists = await loader.autoload(denops, "filter", userFilter.name);
-
-    if (options.profile) {
-      await printError(
-        denops,
-        `Load ${userFilter.name}: ${Date.now() - startTime} ms`,
-      );
-    }
-
-    if (!exists) {
-      await printError(denops, `Not found filter: ${userFilter.name}`);
-    }
-  }
-
-  const filter = loader.getFilter(userFilter.name);
+  const filter = await loader.getFilter(denops, name);
   if (!filter) {
+    await printError(denops, `Not found filter: ${name}`);
+
     return [
       undefined,
       defaultFilterOptions(),
@@ -427,6 +407,7 @@ export async function getFilter(
     options,
     userFilter,
   );
+
   await checkFilterOnInit(filter, denops, filterOptions, filterParams);
 
   return [filter, filterOptions, filterParams];
@@ -435,27 +416,14 @@ export async function getFilter(
 async function getKind(
   denops: Denops,
   loader: Loader,
-  options: DduOptions,
   name: string,
 ): Promise<
   BaseKind<BaseParams> | undefined
 > {
-  if (!loader.getKind(name)) {
-    const startTime = Date.now();
-
-    const exists = await loader.autoload(denops, "kind", name);
-
-    if (options.profile) {
-      await printError(denops, `Load ${name}: ${Date.now() - startTime} ms`);
-    }
-
-    if (!exists) {
-      await printError(denops, `Not found kind: ${name}`);
-    }
-  }
-
-  const kind = loader.getKind(name);
+  const kind = await loader.getKind(denops, name);
   if (!kind) {
+    await printError(denops, `Not found kind: ${name}`);
+
     return undefined;
   }
 
@@ -474,27 +442,12 @@ export async function getColumn(
     BaseParams,
   ]
 > {
-  userColumn = convertUserString(userColumn);
+  const name = convertUserString(userColumn).name;
 
-  if (!loader.getColumn(userColumn.name)) {
-    const startTime = Date.now();
-
-    const exists = await loader.autoload(denops, "column", userColumn.name);
-
-    if (options.profile) {
-      await printError(
-        denops,
-        `Load ${userColumn.name}: ${Date.now() - startTime} ms`,
-      );
-    }
-
-    if (!exists) {
-      await printError(denops, `Not found column: ${userColumn.name}`);
-    }
-  }
-
-  const column = loader.getColumn(userColumn.name);
+  const column = await loader.getColumn(denops, name);
   if (!column) {
+    await printError(denops, `Not found column: ${name}`);
+
     return [
       undefined,
       defaultColumnOptions(),
@@ -507,6 +460,7 @@ export async function getColumn(
     options,
     userColumn,
   );
+
   await checkColumnOnInit(column, denops, columnOptions, columnParams);
 
   return [column, columnOptions, columnParams];
@@ -688,7 +642,7 @@ export async function getPreviewer(
   }
   const kindName = item.kind ?? source.kind;
 
-  const kind = await getKind(denops, loader, options, kindName);
+  const kind = await getKind(denops, loader, kindName);
   if (!kind || !kind.getPreviewer) {
     return;
   }
