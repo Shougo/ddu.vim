@@ -108,6 +108,8 @@ export class GatherState<
 
   cancel(reason?: unknown): void {
     this.#aborter.abort(reason);
+    this.#items = [];
+    this.#isDone = true;
   }
 
   async readAll(): Promise<void> {
