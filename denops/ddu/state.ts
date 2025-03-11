@@ -108,7 +108,12 @@ export class GatherState<
 
   cancel(reason?: unknown): void {
     this.#aborter.abort(reason);
-    this.#items = [];
+
+    // Don't clear items when QuitAbortReason to resume items
+    if (reason instanceof Error && reason.name === "RefreshAbortReason") {
+      this.#items = [];
+    }
+
     this.#isDone = true;
   }
 

@@ -1780,6 +1780,15 @@ export class Ddu {
     await this.expandItems(denops, restoreItems, opts);
   }
 
+  // For debug.
+  checkState() {
+    for (const sourceIndex of this.#gatherStates.keys()) {
+      const state = this.#gatherStates.get(sourceIndex);
+      const allItems = state ? state.items.length : 0;
+      console.log(`state index=${sourceIndex}, items=${allItems}`);
+    }
+  }
+
   async #filterItems(
     denops: Denops,
     userSource: UserSource,
