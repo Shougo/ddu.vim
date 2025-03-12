@@ -299,7 +299,7 @@ export class Ddu {
     this.#context.done = false;
 
     await this.cancelToRefresh(refreshIndexes);
-    this.#resetAborter();
+    this.resetAborter();
 
     // NOTE: Get the signal after the aborter is reset.
     const { signal } = this.#aborter;
@@ -814,7 +814,6 @@ export class Ddu {
       return;
     }
 
-    //denops.cmd(`let &titlestring = "${this.#input}"`);
     await uiRedraw(
       denops,
       this.#uiRedrawLock,
@@ -883,7 +882,7 @@ export class Ddu {
 
   #resetQuitted() {
     this.#quitted = false;
-    this.#resetAborter();
+    this.resetAborter();
   }
 
   async cancelToRefresh(
@@ -911,7 +910,7 @@ export class Ddu {
     return this.#waitCancelComplete;
   }
 
-  #resetAborter() {
+  resetAborter() {
     if (!this.#quitted && this.#aborter.signal.aborted) {
       this.#aborter = new AbortController();
     }

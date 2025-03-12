@@ -450,6 +450,10 @@ export const main: Entrypoint = (denops: Denops) => {
       } else {
         ddu.updateOptions(updateOptions);
       }
+
+      // NOTE: Reset aborter, because if it is not reseted, UI redraw is
+      // failed.
+      ddu.resetAborter();
     },
     async event(arg1: unknown, arg2: unknown): Promise<void> {
       const name = ensure(arg1, is.String) as string;
