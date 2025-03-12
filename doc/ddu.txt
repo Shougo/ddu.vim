@@ -16,6 +16,7 @@ Examples		|ddu-examples|
 UIs			|ddu-uis|
   UI option	          |ddu-ui-options|
   UI params	          |ddu-ui-params|
+  UI variables	          |ddu-ui-variables|
 Sources			|ddu-sources|
   Source option	          |ddu-source-options|
   Source params	          |ddu-source-params|
@@ -862,6 +863,27 @@ UI PARAMS                                                      *ddu-ui-params*
 These are the parameters that each UI can have.  Please read the UI
 documentation.
 
+
+------------------------------------------------------------------------------
+UI VARIABLES                                                *ddu-ui-variables*
+
+You can get UI information from variables.
+
+                                               *ddu-ui-variable-b:ddu_ui_item*
+b:ddu_ui_item		(DduItem)
+		The item on cursor in current UI.
+
+                                              *ddu-ui-variable-b:ddu_ui_items*
+b:ddu_ui_items		(DduItem[])
+		The all items in current UI.
+
+                                               *ddu-ui-variable-b:ddu_ui_name*
+b:ddu_ui_name		(string)
+		|ddu-option-name| in current UI.
+
+                                     *ddu-ui-variable-b:ddu_ui_selected_items*
+b:ddu_ui_selected_items	(DduItem[])
+		Selected items in current UI.
 
 ==============================================================================
 SOURCES                                                          *ddu-sources*
