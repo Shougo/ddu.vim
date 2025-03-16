@@ -885,6 +885,10 @@ b:ddu_ui_name		(string)
 b:ddu_ui_selected_items	(DduItem[])
 		Selected items in current UI.
 
+                                               *ddu-ui-variable-t:ddu_ui_name*
+t:ddu_ui_name		(string)
+		|ddu-option-name| in current UI.
+
 ==============================================================================
 SOURCES                                                          *ddu-sources*
 

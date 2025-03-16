@@ -139,13 +139,14 @@ function s:update_input(input, callback) abort
     let input = a:callback->call([input])
   endif
 
-  if input ==# s:filter_prev_input || !'b:ddu_ui_name'->exists()
+  const ui_name = b:->get('ddu_ui_name', t:->get('ddu_ui_name', ''))
+  if input ==# s:filter_prev_input || ui_name ==# ''
     return input
   endif
 
   let s:filter_prev_input = input
 
-  call ddu#redraw(b:ddu_ui_name, #{ input: input })
+  call ddu#redraw(ui_name, #{ input: input })
 
   return input
 endfunction
