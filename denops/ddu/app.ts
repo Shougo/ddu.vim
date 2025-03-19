@@ -559,6 +559,7 @@ export const main: Entrypoint = (denops: Denops) => {
         items,
         {},
       );
+
       return itemsAction ? itemsAction.action : undefined;
     },
     async getItemActionNames(
@@ -582,7 +583,33 @@ export const main: Entrypoint = (denops: Denops) => {
           actions.push(aliasAction);
         }
       }
+
       return actions.sort();
+    },
+    async getItemActions(
+      arg1: unknown,
+      arg2: unknown,
+    ): Promise<Record<string, unknown>> {
+      const name = ensure(arg1, is.String) as string;
+      const items = ensure(arg2, is.Array) as DduItem[];
+
+      const ddu = getDdu(name);
+      const loader = getLoader(name);
+      const ret = await getItemActions(denops, loader, ddu.getOptions(), items);
+      const actions = ret && ret.actions ? ret.actions : {};
+      const actionNames = Object.keys(actions);
+      const useActions = ddu.getOptions().actions;
+      for (const aliasAction of loader.getAliasNames("action")) {
+        const alias = loader.getAlias("action", aliasAction);
+        if (
+          alias && actionNames.indexOf(alias) >= 0 &&
+          (useActions.length === 0 || useActions.includes(aliasAction))
+        ) {
+          actions[alias] = aliasAction;
+        }
+      }
+
+      return actions;
     },
     async getFilter(arg1: unknown, arg2: unknown): Promise<
       [

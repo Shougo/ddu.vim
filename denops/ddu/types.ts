@@ -117,7 +117,7 @@ export type DduOptions = {
 export type UserOptions = Record<string, unknown>;
 
 export type UiAction = string | UiActionCallback<BaseParams>;
-export type ItemAction = string | ActionCallback<BaseParams>;
+export type ItemAction = string | Action<BaseParams>;
 
 export type UiOptions = {
   actions: Record<ActionName, UiAction>;
