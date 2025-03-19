@@ -35,6 +35,14 @@ export function treePath2Filename(treePath: TreePath): string {
   return typeof treePath === "string" ? treePath : treePath.join(pathsep);
 }
 
+export function convertTreePath(treePath?: TreePath): string[] {
+  return typeof treePath === "string"
+    ? treePath.split(pathsep)
+    : !treePath
+    ? []
+    : treePath;
+}
+
 export async function safeStat(path: string): Promise<Deno.FileInfo | null> {
   // NOTE: Deno.stat() may be failed
   try {

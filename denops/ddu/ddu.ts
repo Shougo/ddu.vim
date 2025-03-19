@@ -24,7 +24,7 @@ import {
 import { defaultSourceOptions } from "./base/source.ts";
 import type { BaseSource } from "./base/source.ts";
 import type { Loader } from "./loader.ts";
-import { convertUserString, printError, treePath2Filename } from "./utils.ts";
+import { convertTreePath, convertUserString, printError, treePath2Filename } from "./utils.ts";
 import type {
   AvailableSourceInfo,
   GatherStateAbortable,
@@ -723,6 +723,10 @@ export class Ddu {
       items: allItems,
     });
 
+    if (restoreTree) {
+      await this.restoreTree(denops, { preventRedraw: true, signal });
+    }
+
     const searchPath = this.#searchPath;
 
     let searchTargetItem: DduItem | undefined;
@@ -770,10 +774,6 @@ export class Ddu {
         );
       }
     }));
-
-    if (restoreTree) {
-      this.restoreTree(denops, { preventRedraw: true, signal });
-    }
 
     if (this.#context.done && this.#options.profile) {
       await printError(
@@ -1924,14 +1924,6 @@ function chompTreePath(treePath?: TreePath): TreePath {
   }
 
   return treePath;
-}
-
-function convertTreePath(treePath?: TreePath): string[] {
-  return typeof treePath === "string"
-    ? treePath.split(pathsep)
-    : !treePath
-    ? []
-    : treePath;
 }
 
 function isParentPath(checkPath: string[], searchPath: string[]) {
