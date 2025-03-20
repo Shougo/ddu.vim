@@ -64,6 +64,7 @@ import * as fn from "jsr:@denops/std@~7.5.0/function";
 import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
 import { equal } from "jsr:@std/assert@~1.0.2/equal";
 import { basename } from "jsr:@std/path@~1.0.2/basename";
+import { dirname } from "jsr:@std/path@~1.0.2/dirname";
 import type { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
 import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 
@@ -308,11 +309,6 @@ export class Ddu {
 
     // NOTE: Get the signal after the aborter is reset.
     const { signal } = this.#aborter;
-
-    // Initialize UI window
-    if (this.#checkSync()) {
-      /* no await */ this.redraw(denops, { ...opts, signal });
-    }
 
     const [gatherStates] = this
       .#createAvailableSourceStream(denops, { indexes: refreshIndexes })
@@ -788,6 +784,7 @@ export class Ddu {
     }
 
     await this.uiRedraw(denops, { signal });
+
     if (searchTargetItem && !signal.aborted) {
       // Prevent infinite loop
       this.#searchPath = "";
@@ -1773,9 +1770,20 @@ export class Ddu {
       checkItems.set(item2Key(item), item);
     }
 
-    const restoreItems = [...this.#expandedItems.values()].filter((item) =>
-      checkItems.has(item2Key(item))
-    ).map((item) => ({ item }));
+    const restoreItems = [...this.#expandedItems.values()].filter((item) => {
+      let k = item2Key(item);
+
+      // Check all parent paths.
+      while (k.length !== 0) {
+        if (checkItems.has(k)) {
+          return true;
+        }
+
+        k = dirname(k);
+      }
+
+      return false;
+    }).map((item) => ({ item }));
 
     if (restoreItems.length === 0) {
       return;
