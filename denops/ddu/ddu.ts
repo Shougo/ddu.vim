@@ -24,7 +24,12 @@ import {
 import { defaultSourceOptions } from "./base/source.ts";
 import type { BaseSource } from "./base/source.ts";
 import type { Loader } from "./loader.ts";
-import { convertTreePath, convertUserString, printError, treePath2Filename } from "./utils.ts";
+import {
+  convertTreePath,
+  convertUserString,
+  printError,
+  treePath2Filename,
+} from "./utils.ts";
 import type {
   AvailableSourceInfo,
   GatherStateAbortable,
