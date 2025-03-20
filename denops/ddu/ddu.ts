@@ -1779,7 +1779,12 @@ export class Ddu {
           return true;
         }
 
-        k = dirname(k);
+        const parent = dirname(k);
+        if (k === parent) {
+          break;
+        }
+
+        k = parent;
       }
 
       return false;

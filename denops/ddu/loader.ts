@@ -61,11 +61,12 @@ export class Loader {
         denops,
         "denops/@ddu-*s",
       );
+
       // NOTE: glob may be invalid.
       if (Object.keys(cached).length > 0) {
         this.#cachedPaths = cached;
+        this.#prevRuntimepath = runtimepath;
       }
-      this.#prevRuntimepath = runtimepath;
     }
 
     const key = `@ddu-${type}s/${this.getAlias(type, name) ?? name}`;
@@ -77,7 +78,7 @@ export class Loader {
     await this.registerPath(type, this.#cachedPaths[key]);
 
     // NOTE: this.#prevRuntimepath may be true if initialized.
-    // NOTE: If not found, it returns false, .
+    // NOTE: If not found, it returns false.
     return this.#prevRuntimepath === "" || this.#cachedPaths[key] !== undefined;
   }
 
