@@ -59,6 +59,8 @@ function ddu#ui#_open_filter_window(
   let s:filter_update_callback = a:options.filterUpdateCallback
 
   let b:ddu_ui_name = a:name
+  " Reset saved item when filtering.
+  let b:ddu_ui_item = {}
 
   augroup ddu-filter
     autocmd!
