@@ -36,7 +36,7 @@ function ddu#denops#_notify(method, args) abort
   return s:notify(a:method, a:args)
 endfunction
 
-const s:root_dir = '<sfile>'->expand()->fnamemodify(':h:h:h')
+const s:root_dir = '<sfile>:h:h:h'->expand()
 const s:sep = has('win32') ? '\' : '/'
 function ddu#denops#_mods() abort
   return [s:root_dir, 'denops', 'ddu', '_mods.js']->join(s:sep)
