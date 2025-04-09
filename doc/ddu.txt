@@ -503,6 +503,7 @@ ddu#custom#alias({name}, {type}, {alias-name}, {base-name})
 		Define {alias-name} alias based on {base-name} for {name} ddu.
 		{type} must be "ui" or "source" or "filter" or "kind" or
 		"column" or "action".
+		If {name} is "_", it means global alias.
 		NOTE: It must be called before sources/filters initialization.
 >vim
 		call ddu#custom#alias('default', 'source', 'foo', 'file')

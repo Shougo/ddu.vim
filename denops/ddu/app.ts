@@ -64,6 +64,14 @@ export const main: Entrypoint = (denops: Denops) => {
   };
   const lock = new Lock(0);
   const uiRedrawLock = new Lock(0);
+  const globalAliases: Record<DduAliasType, Record<string, string>> = {
+    ui: {},
+    source: {},
+    filter: {},
+    kind: {},
+    column: {},
+    action: {},
+  };
 
   const checkDdu = (name: string) => {
     if (!ddus[name]) {
@@ -75,6 +83,13 @@ export const main: Entrypoint = (denops: Denops) => {
   const getLoader = (name: string) => {
     if (!loaders[name]) {
       loaders[name] = new Loader();
+
+      // Set global aliases
+      for (const [type, val] of Object.entries(globalAliases)) {
+        for (const [alias, base] of Object.entries(val)) {
+          loaders[name].registerAlias(type as DduAliasType, alias, base);
+        }
+      }
     }
 
     return loaders[name];
@@ -111,8 +126,12 @@ export const main: Entrypoint = (denops: Denops) => {
     alias: string,
     base: string,
   ) => {
-    const loader = getLoader(name);
-    loader.registerAlias(type, alias, base);
+    if (name === "_") {
+      globalAliases[type][alias] = base;
+    } else {
+      const loader = getLoader(name);
+      loader.registerAlias(type, alias, base);
+    }
   };
 
   denops.dispatcher = {
