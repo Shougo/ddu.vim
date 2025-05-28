@@ -37,7 +37,7 @@ import { defaultActionOptions } from "./base/action.ts";
 
 import type { Denops, Entrypoint } from "jsr:@denops/std@~7.5.0";
 
-import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
+import { toFileUrl } from "jsr:@std/path@~1.1.0/to-file-url";
 import { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
 import { is } from "jsr:@core/unknownutil@~4.3.0/is";
 import { ensure } from "jsr:@core/unknownutil@~4.3.0/ensure";

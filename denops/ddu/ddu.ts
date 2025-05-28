@@ -63,10 +63,10 @@ import * as fn from "jsr:@denops/std@~7.5.0/function";
 
 import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
 import { equal } from "jsr:@std/assert@~1.0.2/equal";
-import { basename } from "jsr:@std/path@~1.0.2/basename";
-import { dirname } from "jsr:@std/path@~1.0.2/dirname";
+import { basename } from "jsr:@std/path@~1.1.0/basename";
+import { dirname } from "jsr:@std/path@~1.1.0/dirname";
 import type { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
-import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
+import { SEPARATOR as pathsep } from "jsr:@std/path@~1.1.0/constants";
 
 type RedrawOptions = {
   /**

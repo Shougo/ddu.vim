@@ -10,9 +10,9 @@ import { isDenoCacheIssueError } from "./utils.ts";
 import * as fn from "jsr:@denops/std@~7.5.0/function";
 import * as op from "jsr:@denops/std@~7.5.0/option";
 
-import { basename } from "jsr:@std/path@~1.0.2/basename";
-import { parse } from "jsr:@std/path@~1.0.2/parse";
-import { toFileUrl } from "jsr:@std/path@~1.0.2/to-file-url";
+import { basename } from "jsr:@std/path@~1.1.0/basename";
+import { parse } from "jsr:@std/path@~1.1.0/parse";
+import { toFileUrl } from "jsr:@std/path@~1.1.0/to-file-url";
 import { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
 
 type Mod = {
