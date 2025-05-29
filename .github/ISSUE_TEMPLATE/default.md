@@ -1,3 +1,7 @@
+---
+name: Default
+about: "You must prepare the minimal init.vim and the reproduction instructions"
+---
 **Warning: I will close the issue without the minimal init.vim and the
 reproduction instructions.**
 
