@@ -1,3 +1,11 @@
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: bug
+assignees: ''
+---
+
 **Warning: I will close the issue without the minimal init.vim and the
 reproduction instructions.**
 
@@ -15,7 +23,7 @@ reproduction instructions.**
 
 - OS:
 
-- neovim/Vim `:version` output:
+- Neovim/Vim `:version` output:
 
 ## Provide a minimal init.vim/vimrc without plugin managers (Required!)
 
@@ -24,7 +32,7 @@ reproduction instructions.**
 set runtimepath+=~/path/to/ddu.vim/
 ```
 
-## How to reproduce the problem from neovim/Vim startup (Required!)
+## How to reproduce the problem from Neovim/Vim startup (Required!)
 
 1. foo
 2. bar
