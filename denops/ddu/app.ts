@@ -167,9 +167,9 @@ export const main: Entrypoint = (denops: Denops) => {
       arg3: unknown,
       arg4: unknown,
     ): Promise<void> {
-      const name = ensure(arg1, is.String);
-      const type = ensure(arg2, is.String);
-      const extName = ensure(arg3, is.String);
+      const name = ensure(arg1, is.String) as string;
+      const type = ensure(arg2, is.String) as string;
+      const extName = ensure(arg3, is.String) as string;
 
       const loader = getLoader(name);
       switch (type) {
