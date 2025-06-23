@@ -1,4 +1,4 @@
-import type { Denops } from "jsr:@denops/std@~7.5.0";
+import type { Denops } from "jsr:@denops/std@~7.6.0";
 import { SEPARATOR as pathsep } from "jsr:@std/path@~1.1.0/constants";
 import type { TreePath } from "./types.ts";
 
