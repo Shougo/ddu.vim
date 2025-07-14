@@ -1599,7 +1599,8 @@ export class Ddu {
   }
 
   async setInput(denops: Denops, input: string) {
-    if (this.#options.expandInput) {
+    if (this.#options.expandInput && !input.startsWith("<")) {
+      // NOTE: expand() result will be broken if "input" starts "<".
       input = await fn.expand(denops, input) as string;
     }
     this.#input = input;
