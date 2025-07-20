@@ -35,12 +35,12 @@ import { type BaseKind, defaultKindOptions } from "./base/kind.ts";
 import { type BaseColumn, defaultColumnOptions } from "./base/column.ts";
 import { defaultActionOptions } from "./base/action.ts";
 
-import type { Denops, Entrypoint } from "jsr:@denops/std@~7.6.0";
+import type { Denops, Entrypoint } from "@denops/std";
 
-import { toFileUrl } from "jsr:@std/path@~1.1.0/to-file-url";
-import { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
-import { is } from "jsr:@core/unknownutil@~4.3.0/is";
-import { ensure } from "jsr:@core/unknownutil@~4.3.0/ensure";
+import { toFileUrl } from "@std/path/to-file-url";
+import { Lock } from "@core/asyncutil/lock";
+import { is } from "@core/unknownutil/is";
+import { ensure } from "@core/unknownutil/ensure";
 
 export const main: Entrypoint = (denops: Denops) => {
   type RedrawTreeMode = "collapse" | "expand";
