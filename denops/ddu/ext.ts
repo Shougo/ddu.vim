@@ -50,11 +50,11 @@ import type { Loader } from "./loader.ts";
 import type { BaseAbortReason } from "./state.ts";
 import { convertUserString, printError } from "./utils.ts";
 
-import type { Denops } from "jsr:@denops/std@~7.6.0";
-import * as fn from "jsr:@denops/std@~7.6.0/function";
+import type { Denops } from "@denops/std";
+import * as fn from "@denops/std/function";
 
-import type { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
-import { is } from "jsr:@core/unknownutil@~4.3.0/is";
+import type { Lock } from "@core/asyncutil/lock";
+import { is } from "@core/unknownutil/is";
 
 type ItemActions = {
   source: BaseSource<BaseParams, unknown> | null;
