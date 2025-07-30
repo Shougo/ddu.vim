@@ -1063,7 +1063,7 @@ The filters are used to filter items from the sources.
 	
 	"sorters": Sort items.
 	
-	"filters": Convert item's attributes.
+	"converters": Convert item's attributes.
 
 If filters return an object with an "input" field, the value of this field is
 passed to subsequent filters as user input.
