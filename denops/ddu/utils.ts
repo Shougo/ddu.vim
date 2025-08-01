@@ -1,6 +1,6 @@
-import type { Denops } from "@denops/std";
-import { SEPARATOR as pathsep } from "@std/path/constants";
 import type { TreePath } from "./types.ts";
+
+import { SEPARATOR as pathsep } from "@std/path/constants";
 import {
   type ImportMap,
   ImportMapImporter,
@@ -10,6 +10,8 @@ import { toFileUrl } from "@std/path/to-file-url";
 import { fromFileUrl } from "@std/path/from-file-url";
 import { join } from "@std/path/join";
 import { dirname } from "@std/path/dirname";
+
+import type { Denops } from "@denops/std";
 
 export async function printError(
   denops: Denops,
