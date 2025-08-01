@@ -27,7 +27,7 @@ import {
   getItemActions,
   uiSearchItem,
 } from "./ext.ts";
-import { isDenoCacheIssueError, importPlugin } from "./utils.ts";
+import { importPlugin, isDenoCacheIssueError } from "./utils.ts";
 import { type BaseUi, defaultUiOptions } from "./base/ui.ts";
 import { type BaseSource, defaultSourceOptions } from "./base/source.ts";
 import { type BaseFilter, defaultFilterOptions } from "./base/filter.ts";
