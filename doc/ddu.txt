@@ -1298,14 +1298,19 @@ CREATE UI                                                      *ddu-create-ui*
 
 To create UI, you should read other UIs implementation.
 
-The UIs must put under "denops/@ddu-uis/*.ts".
+The UIs must be placed in one of the following structures, where {name} is
+the UI name:
+
+	denops/@ddu-uis/{name}.ts
+	denops/@ddu-uis/{name}/main.ts
+
+NOTE: If both structures exist, "{name}.ts" is preferred.
 
 UI class must extend the BaseUi class.
 
 NOTE: It must be written in TypeScript language.
 
 NOTE: If you call Vim functions, it is not asynchronous.
-
 
 ------------------------------------------------------------------------------
 UI ATTRIBUTES                                              *ddu-ui-attributes*
@@ -1373,7 +1378,13 @@ CREATE SOURCE                                              *ddu-create-source*
 
 To create source, you should read other sources implementation.
 
-The sources must put under "denops/@ddu-sources/*.ts".
+The sources must be placed in one of the following structures, where {name} is
+the source name:
+
+	denops/@ddu-sources/{name}.ts
+	denops/@ddu-sources/{name}/main.ts
+
+NOTE: If both structures exist, "{name}.ts" is preferred.
 
 The source class must extend the BaseSource class.
 
@@ -1517,7 +1528,13 @@ CREATE FILTER                                              *ddu-create-filter*
 
 To create filter, you should read other filters implementation.
 
-The filters must put under "denops/@ddu-filters/*.ts".
+The filters must be placed in one of the following structures, where {name} is
+the filter name:
+
+	denops/@ddu-filters/{name}.ts
+	denops/@ddu-filters/{name}/main.ts
+
+NOTE: If both structures exist, "{name}.ts" is preferred.
 
 The filter class must extend the BaseFilter class.
 
@@ -1565,7 +1582,13 @@ CREATE COLUMN                                              *ddu-create-column*
 
 To create column, you should read other columns implementation.
 
-The column must put under "denops/@ddu-columns/*.ts".
+The column must be placed in one of the following structures, where {name} is
+the column name:
+
+	denops/@ddu-columns/{name}.ts
+	denops/@ddu-columns/{name}/main.ts
+
+NOTE: If both structures exist, "{name}.ts" is preferred.
 
 The column class must extend the "BaseColumn" class.
 
@@ -1607,7 +1630,13 @@ CREATE KIND                                                  *ddu-create-kind*
 
 To create kind, you should read other kinds implementation.
 
-The kinds must put under "denops/@ddu-kinds/*.ts".
+The kinds must be placed in one of the following structures, where {name} is
+the kind name:
+
+	denops/@ddu-kinds/{name}.ts
+	denops/@ddu-kinds/{name}/main.ts
+
+NOTE: If both structures exist, "{name}.ts" is preferred.
 
 The kind class must extend the BaseKind class.
 
