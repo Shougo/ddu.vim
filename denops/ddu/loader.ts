@@ -210,7 +210,10 @@ export class Loader {
       path,
     };
 
+    // NOTE: We intentionally use Deno.stat instead of safeStat here.
+    // We expect errors to be thrown when paths don't exist or are inaccessible.
     const fileInfo = await Deno.stat(path);
+
     if (fileInfo.isDirectory) {
       // Load structured extension module
       const entryPoint = join(path, EXT_ENTRY_POINT_FILE);
