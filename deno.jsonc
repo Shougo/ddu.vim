@@ -1,6 +1,7 @@
 {
   "name": "@shougo/ddu-vim",
   "version": "0.0.0",
+  "lock": false,
   "exports": {
     "./action": "./denops/ddu/base/action.ts",
     "./column": "./denops/ddu/base/column.ts",
@@ -13,7 +14,6 @@
     "./ui": "./denops/ddu/base/ui.ts",
     "./utils": "./denops/ddu/utils.ts"
   },
-  "lock": false,
   "publish": {
     "include": [
       "denops/ddu/**/*.ts",
