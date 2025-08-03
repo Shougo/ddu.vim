@@ -1333,7 +1333,7 @@ refer to existing extensions for best practices and implementation patterns.
 FILE STRUCTURE                           *ddu-create-extension-file-structure*
 
 Extensions must be placed in specific paths under directories in your Vim
-|'runtimepath'|.  The structure follows this pattern:
+'runtimepath'.  The structure follows this pattern:
 
 	denops/@ddu-{type}s/{name}.ts
 	denops/@ddu-{type}s/{name}/main.ts
@@ -1348,7 +1348,8 @@ Examples:
 	denops/@ddu-filters/matcher_substring/main.ts
 					(Filter named "matcher_substring")
 
-NOTE: If both "{name}.ts" and "{name}/main.ts" exist, "{name}.ts" is preferred.
+NOTE: If both "{name}.ts" and "{name}/main.ts" exist, "{name}.ts" is
+preferred.
 
 ------------------------------------------------------------------------------
 BASE CLASS                                   *ddu-create-extension-base-class*
@@ -1419,7 +1420,7 @@ The UI extension must be placed in "denops/@ddu-uis" directory.
 
 The UI class must be extended from the `BaseUi` class and exported as `Ui`
 identifier.  The `BaseUi` class has abstract members, so you must implement
-them.  |ddu-ui-attributes|
+them in |ddu-ui-attributes|.
 
 
 ------------------------------------------------------------------------------
@@ -1492,7 +1493,7 @@ The Source extension must be placed in "denops/@ddu-sources" directory.
 
 The Source class must be extended from the `BaseSource` class and exported as
 `Source` identifier.  The `BaseSource` class has abstract members, so you must
-implement them.  |ddu-source-attributes|
+implement them in |ddu-source-attributes|.
 
 
 ------------------------------------------------------------------------------
@@ -1634,7 +1635,7 @@ The Filter extension must be placed in "denops/@ddu-filters" directory.
 
 The Filter class must be extended from the `BaseFilter` class and exported as
 `Filter` identifier.  The `BaseFilter` class has abstract members, so you must
-implement them.  |ddu-filter-attributes|
+implement them in |ddu-filter-attributes|.
 
 NOTE: "matchers" must not sort items.  Because later "sorters" overwrites the
 sort.
@@ -1680,7 +1681,7 @@ The Column extension must be placed in "denops/@ddu-columns" directory.
 
 The Column class must be extended from the `BaseColumn` class and exported as
 `Column` identifier.  The `BaseColumn` class has abstract members, so you must
-implement them.  |ddu-column-attributes|
+implement them in |ddu-column-attributes|.
 
 
 ------------------------------------------------------------------------------
@@ -1720,7 +1721,7 @@ The Kind extension must be placed in "denops/@ddu-kinds" directory.
 
 The Kind class must be extended from the `BaseKind` class and exported as
 `Kind` identifier.  The `BaseKind` class has abstract members, so you must
-implement them.  |ddu-kind-attributes|
+implement them in |ddu-kind-attributes|.
 
 
 ------------------------------------------------------------------------------
