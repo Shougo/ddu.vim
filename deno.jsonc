@@ -13,6 +13,7 @@
     "./ui": "./denops/ddu/base/ui.ts",
     "./utils": "./denops/ddu/utils.ts"
   },
+  "lock": false,
   "publish": {
     "include": [
       "denops/ddu/**/*.ts",
