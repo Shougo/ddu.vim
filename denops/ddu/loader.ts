@@ -30,8 +30,10 @@ type Ext = {
   column: Record<string, BaseColumn<BaseParams>>;
 };
 
+const PLUGIN_PREFIX = "@ddu";
+
 // Pattern for directories where auto-loadable extensions are placed by type
-const TYPE_DIR_PATTERN = "denops/@ddu-*s";
+const TYPE_DIR_PATTERN = `denops/${PLUGIN_PREFIX}-*s`;
 
 // Structured extension module entry point file.
 const EXT_ENTRY_POINT_FILE = "main.ts";
@@ -73,7 +75,9 @@ export class Loader {
       }
     }
 
-    const key = `@ddu-${type}s/${this.getAlias(type, name) ?? name}`;
+    const key = `${PLUGIN_PREFIX}-${type}s/${
+      this.getAlias(type, name) ?? name
+    }`;
     const path = this.#cachedPaths.get(key);
 
     if (!path) {
@@ -300,14 +304,14 @@ async function createPathCache(
   // Create key paths for both single-file and directory entry points.
   // Prioritize the first occurrence key in keyPaths.
   const keyPaths: Readonly<[key: string, path: string]>[] = [
-    //   1. `@ddu-{type}s/{name}.ts`
+    //   1. `{name}.ts`
     ...extFileGlob.map((extFile) => {
       const { name, dir: typeDir } = parse(extFile);
       const typeDirName = basename(typeDir);
       const key = `${typeDirName}/${name}`;
       return [key, extFile] as const;
     }),
-    //   2. `@ddu-{type}s/{name}/main.ts`
+    //   2. `{name}/main.ts`
     ...extDirEntryPointGlob.map((entryPoint) => {
       const extDir = dirname(entryPoint);
       const { base: name, dir: typeDir } = parse(extDir);
