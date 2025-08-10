@@ -467,7 +467,7 @@ export const main: Entrypoint = (denops: Denops) => {
         // UI is changed
         await ddu.restart(denops, updateOptions);
       } else {
-        ddu.updateOptions(updateOptions);
+        await ddu.updateOptions(denops, updateOptions);
       }
 
       // NOTE: Reset aborter, because if it is not reseted, UI redraw is

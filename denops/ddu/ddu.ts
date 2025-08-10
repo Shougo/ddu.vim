@@ -153,7 +153,7 @@ export class Ddu {
       // NOTE: sources must not overwrite
       userOptions.sources = this.#options.sources;
 
-      this.updateOptions(userOptions);
+      await this.updateOptions(denops, userOptions);
 
       // Set input
       if (userOptions?.input !== undefined) {
@@ -287,7 +287,8 @@ export class Ddu {
     userOptions.resume = false;
 
     // Restart
-    this.updateOptions(userOptions);
+    await this.updateOptions(denops, userOptions);
+
     await this.start(
       denops,
       this.#context,
@@ -1717,11 +1718,15 @@ export class Ddu {
     return this.#items;
   }
 
-  updateOptions(userOptions: UserOptions) {
+  async updateOptions(denops: Denops, userOptions: UserOptions) {
     this.#options = foldMerge(mergeDduOptions, defaultDduOptions, [
       this.#options,
       userOptions,
     ]);
+
+    if (userOptions.input) {
+      await this.setInput(denops, this.#options.input);
+    }
   }
 
   async checkUpdated(denops: Denops): Promise<boolean> {
