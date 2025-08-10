@@ -8,6 +8,7 @@
     "./filter": "./denops/ddu/base/filter.ts",
     "./kind": "./denops/ddu/base/kind.ts",
     "./source": "./denops/ddu/base/source.ts",
+    "./state": "./denops/ddu/state.ts",
     "./types": "./denops/ddu/types.ts",
     "./ui": "./denops/ddu/base/ui.ts",
     "./utils": "./denops/ddu/utils.ts"
