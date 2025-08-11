@@ -58,15 +58,15 @@ import {
   uiSearchItem,
 } from "./ext.ts";
 
-import type { Denops } from "jsr:@denops/std@~7.6.0";
-import * as fn from "jsr:@denops/std@~7.6.0/function";
+import type { Denops } from "@denops/std";
+import * as fn from "@denops/std/function";
 
-import { assertEquals } from "jsr:@std/assert@~1.0.2/equals";
-import { equal } from "jsr:@std/assert@~1.0.2/equal";
-import { basename } from "jsr:@std/path@~1.1.0/basename";
-import { dirname } from "jsr:@std/path@~1.1.0/dirname";
-import type { Lock } from "jsr:@core/asyncutil@~1.2.0/lock";
-import { SEPARATOR as pathsep } from "jsr:@std/path@~1.1.0/constants";
+import { assertEquals } from "@std/assert/equals";
+import { equal } from "@std/assert/equal";
+import { basename } from "@std/path/basename";
+import { dirname } from "@std/path/dirname";
+import type { Lock } from "@core/asyncutil/lock";
+import { SEPARATOR as pathsep } from "@std/path/constants";
 
 type RedrawOptions = {
   /**
