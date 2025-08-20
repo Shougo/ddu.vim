@@ -16,8 +16,7 @@
   },
   "publish": {
     "include": [
-      "denops/ddu/**/*.ts",
-      "denops/ddu/**/*.js"
+      "denops/ddu/**/*.ts"
     ]
   },
   "tasks": {
