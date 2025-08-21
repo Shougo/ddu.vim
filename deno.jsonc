@@ -1,7 +1,7 @@
 {
   "lock": false,
   "tasks": {
-    "cache": "deno cache --reload denops/**/*.ts",
+    "cache": "deno install --reload",
     "check": "deno check denops/**/*.ts",
     "fmt": "deno fmt denops",
     "lint": "deno lint denops",
