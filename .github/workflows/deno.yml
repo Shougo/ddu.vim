@@ -1,7 +1,7 @@
 name: deno
 
 env:
-  DENO_VERSION: 1.x
+  DENO_VERSION: 2.x
   DENOPS_PATH: "./"
 
 on:
@@ -43,3 +43,14 @@ jobs:
       - name: Test
         run: deno task test
         timeout-minutes: 5
+
+  deno-test-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@main
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Test Publish
+        run: deno task test:publish
