@@ -73,9 +73,9 @@ function s:init() abort
     return
   endif
 
-  if !has('patch-9.1.0448') && !has('nvim-0.10')
+  if !has('patch-9.1.1646') && !has('nvim-0.11')
     call ddu#util#print_error(
-          \ 'ddu requires Vim 9.1.0448+ or neovim 0.10.0+.')
+          \ 'ddu requires Vim 9.1.1646+ or neovim 0.11.0+.')
     return 1
   endif
 
