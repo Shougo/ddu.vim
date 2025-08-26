@@ -36,7 +36,7 @@ function ddu#denops#_notify(method, args) abort
   return s:notify(a:method, a:args)
 endfunction
 
-const s:root_dir = '<sfile>:h:h:h'->expand()
+const s:root_dir = '<script>:h:h:h'->expand()
 const s:sep = has('win32') ? '\' : '/'
 function ddu#denops#_mods() abort
   return [s:root_dir, 'denops', 'ddu', '_mods.js']->join(s:sep)
@@ -73,9 +73,9 @@ function s:init() abort
     return
   endif
 
-  if !has('patch-9.1.0448') && !has('nvim-0.10')
+  if !has('patch-9.1.1646') && !has('nvim-0.11')
     call ddu#util#print_error(
-          \ 'ddu requires Vim 9.1.0448+ or neovim 0.10.0+.')
+          \ 'ddu requires Vim 9.1.1646+ or neovim 0.11.0+.')
     return 1
   endif
 

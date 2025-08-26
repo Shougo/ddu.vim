@@ -1,33 +1,17 @@
 {
-  "name": "@shougo/ddu-vim",
-  "version": "0.0.0",
-  "exports": {
-    "./action": "./denops/ddu/base/action.ts",
-    "./column": "./denops/ddu/base/column.ts",
-    "./config": "./denops/ddu/base/config.ts",
-    "./filter": "./denops/ddu/base/filter.ts",
-    "./kind": "./denops/ddu/base/kind.ts",
-    "./source": "./denops/ddu/base/source.ts",
-    "./state": "./denops/ddu/state.ts",
-    "./types": "./denops/ddu/types.ts",
-    "./ui": "./denops/ddu/base/ui.ts",
-    "./utils": "./denops/ddu/utils.ts"
-  },
-  "publish": {
-    "include": [
-      "denops/ddu/**/*.ts",
-      "denops/ddu/**/*.js"
-    ]
-  },
-  "imports": {
-  },
   "lock": false,
   "tasks": {
+    "cache": "deno install --reload",
     "check": "deno check denops/**/*.ts",
+    "fmt": "deno fmt denops",
     "lint": "deno lint denops",
     "lint-fix": "deno lint --fix denops",
-    "fmt": "deno fmt denops",
     "test": "deno test -A --doc --parallel --shuffle denops/**/*.ts",
-    "upgrade": "deno run -A jsr:@molt/cli **/*.ts --write"
-  }
+    "test:publish": "deno publish --dry-run --allow-dirty --set-version 0.0.0",
+    "update": "deno outdated --recursive",
+    "upgrade": "deno outdated --recursive --update"
+  },
+  "workspace": [
+    "./denops/ddu"
+  ]
 }

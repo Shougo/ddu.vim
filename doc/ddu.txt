@@ -35,6 +35,11 @@ Actions			|ddu-actions|
   Action flags		  |ddu-action-flags|
 Types			|ddu-types|
 Autocmds		|ddu-autocmds|
+Create extension	|ddu-create-extension|
+  File Structure	  |ddu-create-extension-file-structure|
+  Base class		  |ddu-create-extension-base-class|
+  Import map support	  |ddu-create-extension-import-map-support|
+  Development notes	  |ddu-create-extension-development-notes|
 Create UI		|ddu-create-ui|
   UI attributes		  |ddu-ui-attributes|
 Create source		|ddu-create-source|
@@ -65,10 +70,9 @@ It does not work with zero configuration.  You can use other plugins.
 ==============================================================================
 INSTALL                                                          *ddu-install*
 
-NOTE: ddu.vim requires Vim 9.1.0448+ or Neovim 0.10.0+ (latest is
-recommended).
+NOTE: It requires Vim 9.1.1646+ or Neovim (0.11.0+).
 
-Please install both Deno 1.45+ and "denops.vim" v7.0+.
+Please install both Deno 2.3.0+ and "denops.vim" v8.0+.
 
 https://deno.land/
 https://github.com/vim-denops/denops.vim
@@ -443,10 +447,20 @@ ddu#redraw_tree({name}, {mode}, {items})
                                                               *ddu#register()*
 ddu#register({name}, {type}, {path})
 		Register ddu extension from {path} for {name} ddu.
+
 		{name} is specified ddu name(|ddu-option-name|).
-		{type} is "ui" or "source" or "filter" or "kind" or "column".
-		{path} is ddc extension path.
+
+		{type} is "ui", "source", "filter", "kind" or "column".
+
+		{path} is ddu extension path like below:
+
+			"/path/to/ext.ts"
+			"/path/to/ext_dir" (directory must contain `main.ts`)
+
 		NOTE: {path} must be full path.
+		NOTE: Import maps from "deno.json[c]" or "import_map.json[c]"
+		file in the same directory as "ext.ts" or in "ext_dir" will
+		also be loaded.
 
                                                                  *ddu#start()*
 ddu#start([{options}])
@@ -556,6 +570,8 @@ ddu#custom#load_config({path})
 		Load TypeScript configuration from {path} file.
 		NOTE: {path} must be full path.
 		NOTE: The loading is asynchronous.
+		NOTE: Import maps from "deno.json[c]" or "import_map.json[c]"
+		file in the same directory will also be loaded.
 
                                                    *ddu#custom#patch_global()*
 ddu#custom#patch_global({option-name}, {value})
@@ -1292,17 +1308,118 @@ Ddu:uiRedraw
 
 
 ==============================================================================
+CREATE EXTENSION                                        *ddu-create-extension*
+
+This section describes how to create ddu extensions.
+
+ddu extensions are written in TypeScript and run on Deno through |denops.vim|.
+Extensions extend the functionality of ddu by providing custom UIs, data
+sources, filters, display columns, or item kinds.
+
+Extension types:
+
+	UI:      User interfaces for displaying and interacting with items
+	Source:  Data providers that gather items for display and actions
+	Filter:  Item processors (matchers, sorters, converters)
+	Column:  Custom display formats for item information
+	Kind:    Action definitions for different item types
+
+Many extensions have been created by the community.  It is recommended to
+refer to existing extensions for best practices and implementation patterns.
+
+
+------------------------------------------------------------------------------
+FILE STRUCTURE                           *ddu-create-extension-file-structure*
+
+Extensions must be placed in specific paths under directories in your Vim
+'runtimepath'.  The structure follows this pattern:
+
+	denops/@ddu-{type}s/{name}.ts
+	denops/@ddu-{type}s/{name}/main.ts
+
+Where:
+	{type} is the extension type: ui, source, filter, column, kind
+	{name} is your extension name
+
+Examples:
+	denops/@ddu-uis/ff.ts		(UI named "ff")
+	denops/@ddu-sources/file.ts	(Source named "file")
+	denops/@ddu-filters/matcher_substring/main.ts
+					(Filter named "matcher_substring")
+
+NOTE: If both "{name}.ts" and "{name}/main.ts" exist, "{name}.ts" is
+preferred.
+
+------------------------------------------------------------------------------
+BASE CLASS                                   *ddu-create-extension-base-class*
+
+All extensions must extend a base class and export it with a specific
+identifier.  The base classes are published to JSR (the JavaScript Registry)
+at https://jsr.io/@shougo/ddu-vim
+
+Import the base classes:
+>typescript
+	import { BaseUi } from "jsr:@shougo/ddu-vim/ui";
+	import { BaseSource } from "jsr:@shougo/ddu-vim/source";
+	import { BaseFilter } from "jsr:@shougo/ddu-vim/filter";
+	import { BaseColumn } from "jsr:@shougo/ddu-vim/column";
+	import { BaseKind } from "jsr:@shougo/ddu-vim/kind";
+<
+Extend the base class and export your extension with the specific identifier:
+>typescript
+	/** UI extension */
+	export class Ui extends BaseUi { ... }
+
+	/** Source extension */
+	export class Source extends BaseSource { ... }
+
+	/** Filter extension */
+	export class Filter extends BaseFilter { ... }
+
+	/** Column extension */
+	export class Column extends BaseColumn { ... }
+
+	/** Kind extension */
+	export class Kind extends BaseKind { ... }
+<
+NOTE: The export name must be exactly as shown above.  This is required for
+ddu to load your extension correctly.
+
+NOTE: The base classes are abstract, and your extension must implement the
+abstract methods and properties defined in them.
+
+------------------------------------------------------------------------------
+IMPORT MAP SUPPORT                   *ddu-create-extension-import-map-support*
+
+When using the "{name}/main.ts" structure, you can include import map JSON
+(or JSONC) files in the same directory.  The following files are searched
+and the first one found is loaded:
+
+	deno.json[c]
+	import_map.json[c]
+
+NOTE: Avoid placing import map files in the same directory as "{name}.ts"
+to prevent conflicts when directories are merged by plugin managers.
+
+------------------------------------------------------------------------------
+DEVELOPMENT NOTES                     *ddu-create-extension-development-notes*
+
+Important guidelines for extension development:
+
+- Follow the TypeScript types defined in `jsr:@shougo/ddu-vim`
+- Do not call Vim functions in asynchronous contexts
+
+
+==============================================================================
 CREATE UI                                                      *ddu-create-ui*
 
-To create UI, you should read other UIs implementation.
+To create UI, please refer to |ddu-create-extension|.
 
-The UIs must put under "denops/@ddu-uis/*.ts".
+The UI extension must be placed in "denops/@ddu-uis" directory.
 
-UI class must extend the BaseUi class.
-
-NOTE: It must be written in TypeScript language.
-
-NOTE: If you call Vim functions, it is not asynchronous.
+The UI class must be extended from the `BaseUi` class and exported as `Ui`
+identifier.  The `BaseUi` class has abstract members, so you must implement
+them in |ddu-ui-attributes|.
 
 
 ------------------------------------------------------------------------------
@@ -1369,15 +1486,13 @@ winIds			(function)			(Optional)
 ==============================================================================
 CREATE SOURCE                                              *ddu-create-source*
 
-To create source, you should read other sources implementation.
+To create source, please refer to |ddu-create-extension|.
 
-The sources must put under "denops/@ddu-sources/*.ts".
+The Source extension must be placed in "denops/@ddu-sources" directory.
 
-The source class must extend the BaseSource class.
-
-NOTE: It must be written in TypeScript language.
-
-NOTE: If you call Vim functions, it is not asynchronous.
+The Source class must be extended from the `BaseSource` class and exported as
+`Source` identifier.  The `BaseSource` class has abstract members, so you must
+implement them in |ddu-source-attributes|.
 
 
 ------------------------------------------------------------------------------
@@ -1513,15 +1628,13 @@ word			(string)			(Required)
 ==============================================================================
 CREATE FILTER                                              *ddu-create-filter*
 
-To create filter, you should read other filters implementation.
+To create filter, please refer to |ddu-create-extension|.
 
-The filters must put under "denops/@ddu-filters/*.ts".
+The Filter extension must be placed in "denops/@ddu-filters" directory.
 
-The filter class must extend the BaseFilter class.
-
-NOTE: It must be written in TypeScript language.
-
-NOTE: If you call Vim functions, it is not asynchronous.
+The Filter class must be extended from the `BaseFilter` class and exported as
+`Filter` identifier.  The `BaseFilter` class has abstract members, so you must
+implement them in |ddu-filter-attributes|.
 
 NOTE: "matchers" must not sort items.  Because later "sorters" overwrites the
 sort.
@@ -1561,22 +1674,20 @@ params			(function)			(Required)
 ==============================================================================
 CREATE COLUMN                                              *ddu-create-column*
 
-To create column, you should read other columns implementation.
+To create column, please refer to |ddu-create-extension|.
 
-The column must put under "denops/@ddu-columns/*.ts".
+The Column extension must be placed in "denops/@ddu-columns" directory.
 
-The column class must extend the "BaseColumn" class.
-
-NOTE: It must be written in TypeScript language.
-
-NOTE: If you call Vim functions, it is not asynchronous.
+The Column class must be extended from the `BaseColumn` class and exported as
+`Column` identifier.  The `BaseColumn` class has abstract members, so you must
+implement them in |ddu-column-attributes|.
 
 
 ------------------------------------------------------------------------------
 COLUMN ATTRIBUTES                                      *ddu-column-attributes*
 
                                             *ddu-column-attribute-getBaseText*
-getBaseText		(function)			(Optional)
+getBaseText		(function)			(Required)
 		It is called to get column base text.
 		It is called once for the item.
 
@@ -1603,15 +1714,13 @@ params			(function)			(Required)
 ==============================================================================
 CREATE KIND                                                  *ddu-create-kind*
 
-To create kind, you should read other kinds implementation.
+To create kind, please refer to |ddu-create-extension|.
 
-The kinds must put under "denops/@ddu-kinds/*.ts".
+The Kind extension must be placed in "denops/@ddu-kinds" directory.
 
-The kind class must extend the BaseKind class.
-
-NOTE: It must be written in TypeScript language.
-
-NOTE: If you call Vim functions, it is not asynchronous.
+The Kind class must be extended from the `BaseKind` class and exported as
+`Kind` identifier.  The `BaseKind` class has abstract members, so you must
+implement them in |ddu-kind-attributes|.
 
 
 ------------------------------------------------------------------------------
