@@ -52,12 +52,22 @@ export type UserColumn = ColumnName | {
   params?: Partial<BaseParams>;
 };
 
+export type Filters = {
+  matchers: UserFilter[];
+  sorters: UserFilter[];
+  converters: UserFilter[];
+};
+
 export type SourceInfo = {
   name: SourceName;
   index: number;
   path: TreePath;
   kind: string;
 };
+
+export type Callback =
+  | string
+  | ((denops: Denops, args: Record<string, unknown>) => Promise<unknown>);
 
 export type Context = {
   bufName: string;
@@ -136,6 +146,7 @@ export type SourceOptions = {
   columns: UserColumn[];
   converters: UserFilter[];
   defaultAction: string;
+  dynamicFilters: Callback;
   ignoreCase: boolean;
   limitPath: TreePath;
   matcherKey: string;

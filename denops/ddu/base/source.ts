@@ -79,6 +79,7 @@ export function defaultSourceOptions(): SourceOptions {
     columns: [],
     converters: [],
     defaultAction: "",
+    dynamicFilters: "",
     ignoreCase: false,
     limitPath: "",
     matcherKey: "word",

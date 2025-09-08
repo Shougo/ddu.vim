@@ -968,6 +968,14 @@ defaultAction		(string)
 		NOTE: It overwrites kind default actions.
 
 		Default: ""
+                                            *ddu-source-option-dynamicFilters*
+dynamicFilters
+		It is the function which overwrites
+		|ddu-source-option-matchers| and |ddu-source-option-sorters|
+		and |ddu-source-option-converters| after gather items.
+		The function returns new |ddu-source-options| or |v:null|.
+
+		Default: ""
 
                                                 *ddu-source-option-ignoreCase*
 ignoreCase		(boolean)

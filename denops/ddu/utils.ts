@@ -1,4 +1,12 @@
-import type { TreePath } from "./types.ts";
+import type {
+  Callback,
+  Context,
+  DduItem,
+  DduOptions,
+  Filters,
+  SourceOptions,
+  TreePath,
+} from "./types.ts";
 
 import type { Denops } from "@denops/std";
 
@@ -8,6 +16,7 @@ import {
   ImportMapImporter,
   loadImportMap,
 } from "@lambdalisue/import-map-importer";
+import { is } from "@core/unknownutil/is";
 import { toFileUrl } from "@std/path/to-file-url";
 import { fromFileUrl } from "@std/path/from-file-url";
 import { join } from "@std/path/join";
@@ -125,4 +134,68 @@ export async function importPlugin(path: string): Promise<unknown> {
   } else {
     return await import(`${url}#${suffix}`);
   }
+}
+
+export async function callCallback(
+  denops: Denops | null,
+  callback: Callback,
+  args: Record<string, unknown>,
+): Promise<unknown | null> {
+  if (!denops || !callback) {
+    return null;
+  }
+
+  if (is.String(callback)) {
+    if (callback === "") {
+      return null;
+    }
+
+    return await denops.call(
+      "denops#callback#call",
+      callback,
+      args,
+    );
+  } else {
+    return await callback(denops, args);
+  }
+}
+
+export async function getFilters(
+  denops: Denops,
+  context: Context,
+  options: DduOptions,
+  sourceOptions: SourceOptions,
+  input: string,
+  items: DduItem[],
+): Promise<Filters> {
+  const filters: Filters = {
+    matchers: sourceOptions.matchers,
+    sorters: sourceOptions.sorters,
+    converters: sourceOptions.converters,
+  };
+
+  const dynamicFilters = await callCallback(
+    denops,
+    sourceOptions.dynamicFilters,
+    {
+      context,
+      options,
+      sourceOptions,
+      input,
+      items,
+    },
+  ) as Filters | null;
+  if (dynamicFilters) {
+    if (dynamicFilters.matchers) {
+      filters.matchers = dynamicFilters.matchers;
+    }
+    if (dynamicFilters.sorters) {
+      filters.sorters = dynamicFilters.sorters;
+    }
+    if (dynamicFilters.converters) {
+      filters.converters = dynamicFilters.converters;
+    }
+  }
+
+  return filters;
 }

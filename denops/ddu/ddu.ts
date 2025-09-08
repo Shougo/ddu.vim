@@ -27,6 +27,7 @@ import type { Loader } from "./loader.ts";
 import {
   convertTreePath,
   convertUserString,
+  getFilters,
   printError,
   treePath2Filename,
 } from "./utils.ts";
@@ -1262,9 +1263,14 @@ export class Ddu {
         state.items.concat(columnItems),
       );
 
-      const filters = sourceOptions.matchers.concat(
-        sourceOptions.sorters,
-      ).concat(sourceOptions.converters);
+      const parentFilters = await getFilters(
+        denops,
+        this.#context,
+        this.#options,
+        sourceOptions,
+        this.#input,
+        [parent],
+      );
 
       // NOTE: Apply filter for parent item to update highlights and "display".
       const items = await callFilters(
@@ -1273,7 +1279,9 @@ export class Ddu {
         this.#context,
         this.#options,
         sourceOptions,
-        filters,
+        parentFilters.matchers.concat(
+          parentFilters.sorters,
+        ).concat(parentFilters.converters),
         this.#input,
         [parent],
       );
@@ -1281,13 +1289,24 @@ export class Ddu {
         parent.display = items[0].display;
       }
 
+      const childrenFilters = await getFilters(
+        denops,
+        this.#context,
+        this.#options,
+        sourceOptions,
+        this.#input,
+        children,
+      );
+
       children = await callFilters(
         denops,
         this.#loader,
         this.#context,
         this.#options,
         sourceOptions,
-        filters,
+        childrenFilters.matchers.concat(
+          childrenFilters.sorters,
+        ).concat(childrenFilters.converters),
         this.#input,
         children,
       );
@@ -1472,16 +1491,23 @@ export class Ddu {
       );
 
       // NOTE: Apply filter for parent item to update highlights and "display".
-      const filters = sourceOptions.matchers.concat(
-        sourceOptions.sorters,
-      ).concat(sourceOptions.converters);
+      const filters = await getFilters(
+        denops,
+        this.#context,
+        this.#options,
+        sourceOptions,
+        this.#input,
+        [item],
+      );
       const items = await callFilters(
         denops,
         this.#loader,
         this.#context,
         this.#options,
         sourceOptions,
-        filters,
+        filters.matchers.concat(
+          filters.sorters,
+        ).concat(filters.converters),
         this.#input,
         [item],
       );
@@ -1848,13 +1874,21 @@ export class Ddu {
       items,
     );
 
+    const filters = await getFilters(
+      denops,
+      this.#context,
+      this.#options,
+      sourceOptions,
+      input,
+      items,
+    );
     items = await callFilters(
       denops,
       this.#loader,
       this.#context,
       this.#options,
       sourceOptions,
-      sourceOptions.matchers.concat(sourceOptions.sorters),
+      filters.matchers.concat(filters.sorters),
       input,
       items,
     );
@@ -1870,7 +1904,7 @@ export class Ddu {
       this.#context,
       this.#options,
       sourceOptions,
-      sourceOptions.converters,
+      filters.converters,
       input,
       items,
     );
