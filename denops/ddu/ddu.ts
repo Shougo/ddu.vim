@@ -1252,7 +1252,7 @@ export class Ddu {
       }
 
       // NOTE: parent must be applied columns.
-      const columnItems = [parent].concat(children);
+      const columnItems = [parent, ...children];
       await callColumns(
         denops,
         this.#loader,
@@ -1260,7 +1260,7 @@ export class Ddu {
         this.#options,
         sourceOptions.columns,
         columnItems,
-        state.items.concat(columnItems),
+        [...state.items, ...columnItems],
       );
 
       const parentFilters = await getFilters(
@@ -1279,9 +1279,11 @@ export class Ddu {
         this.#context,
         this.#options,
         sourceOptions,
-        parentFilters.matchers.concat(
-          parentFilters.sorters,
-        ).concat(parentFilters.converters),
+        [
+          ...parentFilters.matchers,
+          ...parentFilters.sorters,
+          ...parentFilters.converters,
+        ],
         this.#input,
         [parent],
       );
@@ -1304,9 +1306,11 @@ export class Ddu {
         this.#context,
         this.#options,
         sourceOptions,
-        childrenFilters.matchers.concat(
-          childrenFilters.sorters,
-        ).concat(childrenFilters.converters),
+        [
+          ...childrenFilters.matchers,
+          ...childrenFilters.sorters,
+          ...childrenFilters.converters,
+        ],
         this.#input,
         children,
       );
@@ -1487,7 +1491,7 @@ export class Ddu {
         this.#options,
         sourceOptions.columns,
         columnItems,
-        state.items.concat(columnItems),
+        [...state.items, ...columnItems],
       );
 
       // NOTE: Apply filter for parent item to update highlights and "display".
@@ -1505,9 +1509,11 @@ export class Ddu {
         this.#context,
         this.#options,
         sourceOptions,
-        filters.matchers.concat(
-          filters.sorters,
-        ).concat(filters.converters),
+        [
+          ...filters.matchers,
+          ...filters.sorters,
+          ...filters.converters,
+        ],
         this.#input,
         [item],
       );
@@ -1684,9 +1690,11 @@ export class Ddu {
       ret.sourceParams[source.name] = sourceParams;
 
       // Merge filter options
-      const filters = sourceOptions.matchers.concat(
-        sourceOptions.sorters,
-      ).concat(sourceOptions.converters);
+      const filters = [
+        ...sourceOptions.matchers,
+        ...sourceOptions.sorters,
+        ...sourceOptions.converters
+      ];
       for (
         const userFilter of filters.map((filter) => convertUserString(filter))
       ) {
@@ -1888,7 +1896,7 @@ export class Ddu {
       this.#context,
       this.#options,
       sourceOptions,
-      filters.matchers.concat(filters.sorters),
+      [...filters.matchers, ...filters.sorters],
       input,
       items,
     );

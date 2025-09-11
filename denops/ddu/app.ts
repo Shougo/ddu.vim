@@ -260,9 +260,10 @@ export const main: Entrypoint = (denops: Denops) => {
       return Promise.resolve(ddu.getContext());
     },
     getNames(): Promise<string[]> {
-      const names = new Set(
-        Object.keys(contextBuilder.getLocal()).concat(Object.keys(ddus)),
-      );
+      const names = new Set([
+        ...Object.keys(contextBuilder.getLocal()),
+        ...Object.keys(ddus)
+      ]);
       return Promise.resolve(Array.from(names));
     },
     getSourceNames(arg1: unknown): Promise<string[]> {

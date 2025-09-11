@@ -602,7 +602,7 @@ export async function callColumns(
       });
 
       if (text.highlights && item.highlights) {
-        item.highlights = item.highlights.concat(text.highlights);
+        item.highlights = [...item.highlights, ...text.highlights];
       }
 
       item.display += text.text;

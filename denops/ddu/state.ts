@@ -63,7 +63,7 @@ export class GatherState<
   ): ReadableStream<DduItem[]> {
     const appendStream = new TransformStream<DduItem[], DduItem[]>({
       transform: (newItems, controller) => {
-        this.#items = this.#items.concat(newItems);
+        this.#items = [...this.#items, ...newItems];
         controller.enqueue(newItems);
       },
       flush: () => {
