@@ -23,17 +23,12 @@ import {
   defaultDummy,
   foldMerge,
   mergeActionOptions,
-  mergeActionParams,
   mergeColumnOptions,
-  mergeColumnParams,
   mergeFilterOptions,
-  mergeFilterParams,
   mergeKindOptions,
-  mergeKindParams,
   mergeSourceOptions,
-  mergeSourceParams,
   mergeUiOptions,
-  mergeUiParams,
+  mergeParams,
 } from "./context.ts";
 import { defaultUiOptions } from "./base/ui.ts";
 import { defaultSourceOptions } from "./base/source.ts";
@@ -670,7 +665,7 @@ function uiArgs<
       options.uiOptions[ui.name],
     ],
   );
-  const p = foldMerge(mergeUiParams, defaultDummy, [
+  const p = foldMerge(mergeParams, defaultDummy, [
     ui.params(),
     options.uiParams["_"],
     options.uiParams[ui.name],
@@ -698,7 +693,7 @@ export function sourceArgs<
     ],
   );
   const p = foldMerge(
-    mergeSourceParams,
+    mergeParams,
     defaultDummy,
     [
       source?.params(),
@@ -729,7 +724,7 @@ function filterArgs<
     ],
   );
   const p = foldMerge(
-    mergeFilterParams,
+    mergeParams,
     defaultDummy,
     [
       filter?.params(),
@@ -756,7 +751,7 @@ function kindArgs<
     ],
   );
   const p = foldMerge(
-    mergeKindParams,
+    mergeParams,
     defaultDummy,
     [
       kind?.params(),
@@ -786,7 +781,7 @@ function columnArgs<
     ],
   );
   const p = foldMerge(
-    mergeColumnParams,
+    mergeParams,
     defaultDummy,
     [
       column?.params(),
@@ -811,7 +806,7 @@ function actionArgs(
       options.actionOptions[actionName],
     ],
   );
-  const p = foldMerge(mergeActionParams, defaultDummy, [
+  const p = foldMerge(mergeParams, defaultDummy, [
     options.actionParams["_"],
     options.actionParams[actionName],
     params,

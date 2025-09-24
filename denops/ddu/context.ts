@@ -42,12 +42,7 @@ export const mergeColumnOptions: Merge<ColumnOptions> = overwrite;
 export const mergeKindOptions: Merge<KindOptions> = overwrite;
 export const mergeActionOptions: Merge<ActionOptions> = overwrite;
 
-export const mergeUiParams: Merge<BaseParams> = overwrite;
-export const mergeSourceParams: Merge<BaseParams> = overwrite;
-export const mergeFilterParams: Merge<BaseParams> = overwrite;
-export const mergeColumnParams: Merge<BaseParams> = overwrite;
-export const mergeKindParams: Merge<BaseParams> = overwrite;
-export const mergeActionParams: Merge<BaseParams> = overwrite;
+export const mergeParams: Merge<BaseParams> = overwrite;
 
 export function foldMerge<T>(
   merge: Merge<T>,
