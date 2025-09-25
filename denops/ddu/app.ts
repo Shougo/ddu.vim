@@ -262,7 +262,7 @@ export const main: Entrypoint = (denops: Denops) => {
     getNames(): Promise<string[]> {
       const names = new Set([
         ...Object.keys(contextBuilder.getLocal()),
-        ...Object.keys(ddus)
+        ...Object.keys(ddus),
       ]);
       return Promise.resolve(Array.from(names));
     },

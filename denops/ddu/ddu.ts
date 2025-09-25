@@ -1693,7 +1693,7 @@ export class Ddu {
       const filters = [
         ...sourceOptions.matchers,
         ...sourceOptions.sorters,
-        ...sourceOptions.converters
+        ...sourceOptions.converters,
       ];
       for (
         const userFilter of filters.map((filter) => convertUserString(filter))

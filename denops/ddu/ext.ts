@@ -26,9 +26,9 @@ import {
   mergeColumnOptions,
   mergeFilterOptions,
   mergeKindOptions,
+  mergeParams,
   mergeSourceOptions,
   mergeUiOptions,
-  mergeParams,
 } from "./context.ts";
 import { defaultUiOptions } from "./base/ui.ts";
 import { defaultSourceOptions } from "./base/source.ts";
