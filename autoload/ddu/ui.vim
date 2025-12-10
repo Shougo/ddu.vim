@@ -78,9 +78,9 @@ function ddu#ui#_open_filter_window(
 
   let opts = #{
         \   prompt: a:options.filterPrompt,
-        \   default:  a:input,
-        \   completion:  'custom,ddu#ui#_complete_input',
-        \   cancelreturn:  a:input,
+        \   default: a:input,
+        \   completion: 'custom,ddu#ui#_complete_input',
+        \   cancelreturn: a:input,
         \ }
 
   let new_input = has('nvim') && a:options.filterInputOptsFunc !=# ''
