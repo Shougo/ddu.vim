@@ -1314,7 +1314,18 @@ export class Ddu {
         this.#input,
         children,
       );
-      this.#context.maxItems += children.length;
+
+      // Check if any children matched the filter
+      const hasMatchedChildren = children.length > 0;
+
+      // Only keep parent expanded if children matched the filter
+      if (hasMatchedChildren) {
+        this.#context.maxItems += children.length;
+      } else {
+        // If no children matched, unmark the parent as expanded
+        parent.__expanded = false;
+        this.#setUnexpanded(parent);
+      }
     } finally {
       // Restore path
       this.#context.path = savePath;
