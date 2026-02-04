@@ -1851,6 +1851,11 @@ export class Ddu {
     filteredItems: DduItem[],
     originalItems: DduItem[],
   ): DduItem[] {
+    // Early return if no items have tree paths
+    if (!filteredItems.some((item) => item.treePath)) {
+      return filteredItems;
+    }
+
     // Create a set of matched item keys for quick lookup
     const matchedKeys = new Set(filteredItems.map((item) => item2Key(item)));
 
@@ -1929,7 +1934,6 @@ export class Ddu {
     // NOTE: Use deepcopy.  Because of filters may break original items.
     let items = structuredClone(state.items) as DduItem[];
     const allItems = items.length;
-    const originalItems = structuredClone(state.items) as DduItem[];
 
     // NOTE: Call columns before filters
     await callColumns(
@@ -1941,6 +1945,13 @@ export class Ddu {
       items,
       items,
     );
+
+    // Save original items before filtering for parent preservation
+    // Only clone if we have tree items that might need parent preservation
+    const hasTreeItems = items.some((item) => item.treePath);
+    const originalItems = hasTreeItems
+      ? structuredClone(items) as DduItem[]
+      : items;
 
     const filters = await getFilters(
       denops,
@@ -1962,7 +1973,9 @@ export class Ddu {
     );
 
     // Preserve parent items with matching children
-    items = this.#preserveParentItems(items, originalItems);
+    if (hasTreeItems) {
+      items = this.#preserveParentItems(items, originalItems);
+    }
 
     // Truncate before converters
     if (items.length > sourceOptions.maxItems) {
