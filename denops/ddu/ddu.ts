@@ -1316,6 +1316,7 @@ export class Ddu {
       );
 
       // Check if any children matched the filter
+      // NOTE: At this point, children contains only items that passed the filters
       const hasMatchedChildren = children.length > 0;
 
       // Only keep parent expanded if children matched the filter
