@@ -658,6 +658,7 @@ export class Ddu {
             for (const item of items) {
               if (item.treePath) {
                 item.__expanded = this.#isExpanded(item);
+                item.isExpanded = item.__expanded;
               }
             }
           }
@@ -1846,6 +1847,86 @@ export class Ddu {
     }
   }
 
+  #hasMatchedChildren(
+    item: DduItem,
+    matchedItems: Set<string>,
+  ): boolean {
+    if (!item.treePath) {
+      return false;
+    }
+
+    const itemTreePath = convertTreePath(item.treePath);
+    for (const matchedKey of matchedItems) {
+      const [, matchedTreePath] = matchedKey.split(":");
+      if (!matchedTreePath) continue;
+
+      const matchedPath = matchedTreePath.split(pathsep);
+      if (isParentPath(itemTreePath, matchedPath)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  #preserveParentItems(
+    filteredItems: DduItem[],
+    originalItems: DduItem[],
+  ): DduItem[] {
+    // Create a set of matched item keys for quick lookup
+    const matchedKeys = new Set(filteredItems.map((item) => item2Key(item)));
+
+    // Build a map of all items by their key
+    const itemsByKey = new Map<string, DduItem>();
+    for (const item of originalItems) {
+      itemsByKey.set(item2Key(item), item);
+    }
+
+    // Find all parent items that need to be preserved
+    const parentsToAdd = new Map<string, DduItem>();
+
+    for (const item of filteredItems) {
+      if (!item.treePath) continue;
+
+      const itemTreePath = convertTreePath(item.treePath);
+      
+      // Check all potential parent paths
+      for (const [key, candidate] of itemsByKey) {
+        if (matchedKeys.has(key)) continue; // Already matched
+        if (!candidate.treePath) continue;
+
+        const candidateTreePath = convertTreePath(candidate.treePath);
+        
+        // If this candidate is a parent of our matched item
+        if (isParentPath(candidateTreePath, itemTreePath)) {
+          parentsToAdd.set(key, candidate);
+          // Mark parent as expanded
+          candidate.__expanded = true;
+          candidate.isExpanded = true;
+          this.#setExpanded(candidate);
+        }
+      }
+    }
+
+    // Combine filtered items with their parents
+    const result = [...filteredItems];
+    for (const parent of parentsToAdd.values()) {
+      result.push(parent);
+    }
+
+    // Sort by level to maintain tree structure (parents before children)
+    return result.sort((a, b) => {
+      // First sort by level
+      if (a.__level !== b.__level) {
+        return a.__level - b.__level;
+      }
+      // Then by tree path for consistent ordering
+      const aPath = convertTreePath(a.treePath ?? a.word);
+      const bPath = convertTreePath(b.treePath ?? b.word);
+      return aPath.join(pathsep).localeCompare(bPath.join(pathsep));
+    });
+  }
+
   async #filterItems(
     denops: Denops,
     userSource: UserSource,
@@ -1870,6 +1951,7 @@ export class Ddu {
     // NOTE: Use deepcopy.  Because of filters may break original items.
     let items = structuredClone(state.items) as DduItem[];
     const allItems = items.length;
+    const originalItems = structuredClone(state.items) as DduItem[];
 
     // NOTE: Call columns before filters
     await callColumns(
@@ -1900,6 +1982,9 @@ export class Ddu {
       input,
       items,
     );
+
+    // Preserve parent items with matching children
+    items = this.#preserveParentItems(items, originalItems);
 
     // Truncate before converters
     if (items.length > sourceOptions.maxItems) {
@@ -2021,4 +2106,127 @@ Deno.test("isParentPath", () => {
   assertEquals(false, isParentPath("hoge".split("/"), "/home".split("/")));
   assertEquals([], chompTreePath(undefined));
   assertEquals(["hoge"], chompTreePath("hoge/".split("/")));
+});
+
+Deno.test("preserveParentItems", () => {
+  // Mock Ddu instance for testing
+  const mockLoader = {} as Loader;
+  const mockLock = {} as Lock<number>;
+  const ddu = new Ddu(mockLoader, mockLock);
+
+  // Create test items with tree structure
+  const parent1: DduItem = {
+    word: "parent1",
+    treePath: "/parent1",
+    isTree: true,
+    matcherKey: "parent1",
+    __sourceIndex: 0,
+    __sourceName: "test",
+    __level: 0,
+    __expanded: false,
+    __columnTexts: {},
+    __groupedPath: "",
+  };
+
+  const child1: DduItem = {
+    word: "child1",
+    treePath: "/parent1/child1",
+    matcherKey: "child1",
+    __sourceIndex: 0,
+    __sourceName: "test",
+    __level: 1,
+    __expanded: false,
+    __columnTexts: {},
+    __groupedPath: "",
+  };
+
+  const child2: DduItem = {
+    word: "child2",
+    treePath: "/parent1/child2",
+    matcherKey: "child2",
+    __sourceIndex: 0,
+    __sourceName: "test",
+    __level: 1,
+    __expanded: false,
+    __columnTexts: {},
+    __groupedPath: "",
+  };
+
+  const parent2: DduItem = {
+    word: "parent2",
+    treePath: "/parent2",
+    isTree: true,
+    matcherKey: "parent2",
+    __sourceIndex: 0,
+    __sourceName: "test",
+    __level: 0,
+    __expanded: false,
+    __columnTexts: {},
+    __groupedPath: "",
+  };
+
+  const child3: DduItem = {
+    word: "child3",
+    treePath: "/parent2/child3",
+    matcherKey: "child3",
+    __sourceIndex: 0,
+    __sourceName: "test",
+    __level: 1,
+    __expanded: false,
+    __columnTexts: {},
+    __groupedPath: "",
+  };
+
+  const originalItems = [parent1, child1, child2, parent2, child3];
+
+  // Test case 1: Filter matches only child1
+  // Expected: parent1 and child1 should be in result
+  const filtered1 = [child1];
+  const result1 = ddu["#preserveParentItems"](filtered1, originalItems);
+  
+  assertEquals(result1.length, 2, "Should have parent1 and child1");
+  assertEquals(
+    result1.some((item) => item.word === "parent1"),
+    true,
+    "Should include parent1",
+  );
+  assertEquals(
+    result1.some((item) => item.word === "child1"),
+    true,
+    "Should include child1",
+  );
+  assertEquals(
+    result1.find((item) => item.word === "parent1")?.isExpanded,
+    true,
+    "parent1 should be expanded",
+  );
+
+  // Test case 2: Filter matches only child3
+  // Expected: parent2 and child3 should be in result
+  const filtered2 = [child3];
+  const result2 = ddu["#preserveParentItems"](filtered2, originalItems);
+  
+  assertEquals(result2.length, 2, "Should have parent2 and child3");
+  assertEquals(
+    result2.some((item) => item.word === "parent2"),
+    true,
+    "Should include parent2",
+  );
+  assertEquals(
+    result2.some((item) => item.word === "child3"),
+    true,
+    "Should include child3",
+  );
+
+  // Test case 3: Filter matches multiple children from same parent
+  // Expected: parent1, child1, and child2 should be in result
+  const filtered3 = [child1, child2];
+  const result3 = ddu["#preserveParentItems"](filtered3, originalItems);
+  
+  assertEquals(result3.length, 3, "Should have parent1, child1, and child2");
+  assertEquals(
+    result3.some((item) => item.word === "parent1"),
+    true,
+    "Should include parent1",
+  );
 });
