@@ -1872,14 +1872,14 @@ export class Ddu {
       if (!item.treePath) continue;
 
       const itemTreePath = convertTreePath(item.treePath);
-      
+
       // Check all potential parent paths
       for (const [key, candidate] of itemsByKey) {
         if (matchedKeys.has(key)) continue; // Already matched
         if (!candidate.treePath) continue;
 
         const candidateTreePath = convertTreePath(candidate.treePath);
-        
+
         // If this candidate is a parent of our matched item
         if (isParentPath(candidateTreePath, itemTreePath)) {
           parentsToAdd.set(key, candidate);
