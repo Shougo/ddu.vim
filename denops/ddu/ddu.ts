@@ -658,6 +658,7 @@ export class Ddu {
             for (const item of items) {
               if (item.treePath) {
                 item.__expanded = this.#isExpanded(item);
+                item.isExpanded = item.__expanded;
               }
             }
           }
@@ -1846,6 +1847,69 @@ export class Ddu {
     }
   }
 
+  #preserveParentItems(
+    filteredItems: DduItem[],
+    originalItems: DduItem[],
+  ): DduItem[] {
+    // Early return if no items have tree paths
+    if (!filteredItems.some((item) => item.treePath)) {
+      return filteredItems;
+    }
+
+    // Create a set of matched item keys for quick lookup
+    const matchedKeys = new Set(filteredItems.map((item) => item2Key(item)));
+
+    // Build a map of all items by their key
+    const itemsByKey = new Map<string, DduItem>();
+    for (const item of originalItems) {
+      itemsByKey.set(item2Key(item), item);
+    }
+
+    // Find all parent items that need to be preserved
+    const parentsToAdd = new Map<string, DduItem>();
+
+    for (const item of filteredItems) {
+      if (!item.treePath) continue;
+
+      const itemTreePath = convertTreePath(item.treePath);
+
+      // Check all potential parent paths
+      for (const [key, candidate] of itemsByKey) {
+        if (matchedKeys.has(key)) continue; // Already matched
+        if (!candidate.treePath) continue;
+
+        const candidateTreePath = convertTreePath(candidate.treePath);
+
+        // If this candidate is a parent of our matched item
+        if (isParentPath(candidateTreePath, itemTreePath)) {
+          parentsToAdd.set(key, candidate);
+          // Mark parent as expanded
+          candidate.__expanded = true;
+          candidate.isExpanded = true;
+          this.#setExpanded(candidate);
+        }
+      }
+    }
+
+    // Combine filtered items with their parents
+    const result = [...filteredItems];
+    for (const parent of parentsToAdd.values()) {
+      result.push(parent);
+    }
+
+    // Sort by level to maintain tree structure (parents before children)
+    return result.sort((a, b) => {
+      // First sort by level
+      if (a.__level !== b.__level) {
+        return a.__level - b.__level;
+      }
+      // Then by tree path for consistent ordering
+      const aPath = convertTreePath(a.treePath ?? a.word);
+      const bPath = convertTreePath(b.treePath ?? b.word);
+      return aPath.join(pathsep).localeCompare(bPath.join(pathsep));
+    });
+  }
+
   async #filterItems(
     denops: Denops,
     userSource: UserSource,
@@ -1882,6 +1946,13 @@ export class Ddu {
       items,
     );
 
+    // Save original items before filtering for parent preservation
+    // Only clone if we have tree items that might need parent preservation
+    const hasTreeItems = items.some((item) => item.treePath);
+    const originalItems = hasTreeItems
+      ? structuredClone(items) as DduItem[]
+      : items;
+
     const filters = await getFilters(
       denops,
       this.#context,
@@ -1900,6 +1971,11 @@ export class Ddu {
       input,
       items,
     );
+
+    // Preserve parent items with matching children
+    if (hasTreeItems) {
+      items = this.#preserveParentItems(items, originalItems);
+    }
 
     // Truncate before converters
     if (items.length > sourceOptions.maxItems) {
