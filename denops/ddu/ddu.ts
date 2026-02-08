@@ -1581,7 +1581,7 @@ export class Ddu {
     // Find all items that should be initially expanded
     const itemsToExpand: ExpandItem[] = [];
 
-    for (const [_, state] of this.#gatherStates) {
+    for (const state of this.#gatherStates.values()) {
       for (const item of state.items) {
         if (item.isExpanded && item.isTree && item.treePath && !item.__expanded) {
           itemsToExpand.push({ item });

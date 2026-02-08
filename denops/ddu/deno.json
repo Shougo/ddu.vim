@@ -1,5 +1,6 @@
 {
   "name": "@shougo/ddu-vim",
+  "version": "0.0.0",
   "exports": {
     "./action": "./base/action.ts",
     "./column": "./base/column.ts",
