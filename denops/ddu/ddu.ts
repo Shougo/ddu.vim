@@ -427,6 +427,11 @@ export class Ddu {
       await this.redraw(denops, redrawOpts);
     } else {
       await this.#waitRedrawComplete;
+
+      // Auto-expand items marked as isExpanded by sources
+      if (!redrawOpts.signal.aborted) {
+        await this.#autoExpandInitialItems(denops, { signal: redrawOpts.signal });
+      }
     }
   }
 
@@ -1567,6 +1572,28 @@ export class Ddu {
     }
   }
 
+  async #autoExpandInitialItems(
+    denops: Denops,
+    opts?: { signal?: AbortSignal },
+  ): Promise<void> {
+    const { signal = this.#aborter.signal } = opts ?? {};
+
+    // Find all items that should be initially expanded
+    const itemsToExpand: ExpandItem[] = [];
+
+    for (const [_, state] of this.#gatherStates) {
+      for (const item of state.items) {
+        if (item.isExpanded && item.isTree && item.treePath && !item.__expanded) {
+          itemsToExpand.push({ item });
+        }
+      }
+    }
+
+    if (itemsToExpand.length > 0 && !signal.aborted) {
+      await this.expandItems(denops, itemsToExpand, { preventRedraw: false, signal });
+    }
+  }
+
   async uiVisible(
     denops: Denops,
     tabNr: number,
@@ -1949,7 +1976,7 @@ export class Ddu {
     // Save original items before filtering for parent preservation
     // Only clone if we have tree items that might need parent preservation
     const hasTreeItems = items.some(
-      (item) => item.treePath && item.isTree && item.isExpanded,
+      (item) => item.treePath,
     );
     const originalItems = hasTreeItems
       ? structuredClone(items) as DduItem[]
