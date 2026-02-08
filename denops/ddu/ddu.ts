@@ -1982,7 +1982,7 @@ export class Ddu {
     // Save original items before filtering for parent preservation
     // Only clone if we have tree items that might need parent preservation
     const hasTreeItems = items.some(
-      (item) => item.treePath,
+      (item) => item.treePath && item.isTree && item.isExpanded,
     );
     const originalItems = hasTreeItems
       ? structuredClone(items) as DduItem[]
