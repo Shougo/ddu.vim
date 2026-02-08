@@ -1327,6 +1327,12 @@ export class Ddu {
       this.#options,
     );
     if (ui && !signal.aborted) {
+      // Filter out children that are already added by the source
+      const newChildren = children.filter(child => {
+        const childKey = item2Key(child);
+        return !this.#items.some(item => item2Key(item) === childKey);
+      });
+
       await ui.expandItem({
         denops,
         context: this.#context,
@@ -1334,7 +1340,7 @@ export class Ddu {
         uiOptions,
         uiParams,
         parent,
-        children,
+        children: newChildren,
         isGrouped,
       });
     }
