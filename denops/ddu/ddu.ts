@@ -427,6 +427,13 @@ export class Ddu {
       await this.redraw(denops, redrawOpts);
     } else {
       await this.#waitRedrawComplete;
+
+      // Auto-expand items marked as isExpanded by sources
+      if (!redrawOpts.signal.aborted) {
+        await this.#autoExpandInitialItems(denops, {
+          signal: redrawOpts.signal,
+        });
+      }
     }
   }
 
@@ -1328,9 +1335,9 @@ export class Ddu {
     );
     if (ui && !signal.aborted) {
       // Filter out children that are already added by the source
-      const newChildren = children.filter(child => {
+      const newChildren = children.filter((child) => {
         const childKey = item2Key(child);
-        return !this.#items.some(item => item2Key(item) === childKey);
+        return !this.#items.some((item) => item2Key(item) === childKey);
       });
 
       await ui.expandItem({
@@ -1570,6 +1577,33 @@ export class Ddu {
           searchItem,
         );
       }
+    }
+  }
+
+  async #autoExpandInitialItems(
+    denops: Denops,
+    opts?: { signal?: AbortSignal },
+  ): Promise<void> {
+    const { signal = this.#aborter.signal } = opts ?? {};
+
+    // Find all items that should be initially expanded
+    const itemsToExpand: ExpandItem[] = [];
+
+    for (const state of this.#gatherStates.values()) {
+      for (const item of state.items) {
+        if (
+          item.isExpanded && item.isTree && item.treePath && !item.__expanded
+        ) {
+          itemsToExpand.push({ item });
+        }
+      }
+    }
+
+    if (itemsToExpand.length > 0 && !signal.aborted) {
+      await this.expandItems(denops, itemsToExpand, {
+        preventRedraw: false,
+        signal,
+      });
     }
   }
 
