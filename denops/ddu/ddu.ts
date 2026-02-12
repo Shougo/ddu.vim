@@ -1586,24 +1586,39 @@ export class Ddu {
   ): Promise<void> {
     const { signal = this.#aborter.signal } = opts ?? {};
 
-    // Find all items that should be initially expanded
-    const itemsToExpand: ExpandItem[] = [];
+    // Use this.#items instead of gatherStates to get actually displayed items
+    const itemsToExpand: DduItem[] = [];
 
-    for (const state of this.#gatherStates.values()) {
-      for (const item of state.items) {
-        if (
-          item.isExpanded && item.isTree && item.treePath && !item.__expanded
-        ) {
-          itemsToExpand.push({ item });
-        }
+    for (const item of this.#items) {
+      if (
+        item.isExpanded && item.isTree && item.treePath && !item.__expanded
+      ) {
+        itemsToExpand.push(item);
       }
     }
 
-    if (itemsToExpand.length > 0 && !signal.aborted) {
-      await this.expandItems(denops, itemsToExpand, {
-        preventRedraw: false,
+    if (itemsToExpand.length === 0 || signal.aborted) {
+      return;
+    }
+
+    // Sort by level to ensure parents are expanded first
+    itemsToExpand.sort((a, b) => a.__level - b.__level);
+
+    // Expand items level by level to maintain tree structure
+    for (const item of itemsToExpand) {
+      if (signal.aborted) break;
+
+      await this.expandItem(denops, item, {
+        maxLevel: item.__level + 1, // Only expand one level
+        preventRedraw: true,
+        isGrouped: false,
         signal,
       });
+    }
+
+    // Redraw once at the end
+    if (!signal.aborted) {
+      await this.uiRedraw(denops, { signal });
     }
   }
 
