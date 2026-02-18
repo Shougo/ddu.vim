@@ -1010,6 +1010,12 @@ export class Ddu {
         this.#context,
         this.#options,
       );
+
+      // Check UI is really quit
+      if ((await this.uiWinids(denops)).length > 0) {
+        await printError(denops, `ui: "quit()" failed`, e);
+        return;
+      }
     }
 
     const prevPath = itemAction.sourceOptions.path;
