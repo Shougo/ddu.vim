@@ -1013,7 +1013,7 @@ export class Ddu {
 
       // Check UI is really quit
       if ((await this.uiWinids(denops)).length > 0) {
-        await printError(denops, `ui: "quit()" failed`, e);
+        await printError(denops, `ui: "quit()" failed`);
         return;
       }
     }
