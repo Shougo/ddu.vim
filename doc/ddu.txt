@@ -321,7 +321,8 @@ uiParams		(dictionary)
 
                                                            *ddu-option-unique*
 unique			(boolean)
-		Unique the items by |ddu-item-attribute-word| attribute.
+		Unique the items by item path or |ddu-item-attribute-word|
+		attribute.
 
 		Default: v:false
 

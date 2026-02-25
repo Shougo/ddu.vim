@@ -703,9 +703,11 @@ export class Ddu {
       // Unique all items
 
       const words = new Set<string>();
+      type ActionPath = { path: string };
       allItems = allItems.reduce((items: DduItem[], item) => {
-        if (!words.has(item.word)) {
-          words.add(item.word);
+        const word = (item.action as ActionPath)?.path ?? item.word;
+        if (!words.has(word)) {
+          words.add(word);
           items.push(item);
         }
         return items;
