@@ -47,7 +47,7 @@ Please see: https://github.com/Shougo/ddu.vim/issues/10
 
 ## Install
 
-**NOTE:** It requires Vim 9.1.0448+ or Neovim 0.10.0+. See
+**NOTE:** It requires Vim 9.1.1646+ or Neovim (0.11.0+). See
 [requirements](#requirements) if you aren't sure whether you have this.
 
 ### Requirements
