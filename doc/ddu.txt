@@ -77,9 +77,9 @@ Please install both Deno 2.3.0+ and "denops.vim" v8.0+.
 https://deno.land/
 https://github.com/vim-denops/denops.vim
 
-NOTE: ddu.vim does not include any UIs, sources, filters and kinds.
-You must install them you want manually.
-You can search ddu.vim plugins from https://github.com/topics/ddu-vim.
+NOTE: ddu.vim does not include any UIs, sources, filters, or kinds.
+You must install the ones you want manually.
+You can search for ddu.vim plugins at: https://github.com/topics/ddu-vim.
 
 
 ==============================================================================
@@ -227,10 +227,10 @@ resume			(boolean)
 searchPath		(string | string[])
 		Search the path.  This only works when specified |ddu#start()|
 		or |ddu#redraw()|.
-		NOTE: You can represents a path by two way like below.
+		NOTE: You can represent a path in two ways:
 			"/aa/bb/cc" (string)
 			["/", "aa", "bb", "cc"] (string[])
-		NOTE: The path must be absolute path.
+		NOTE: The path must be an absolute path.
 
 		Default: ""
 
@@ -988,10 +988,10 @@ ignoreCase		(boolean)
 limitPath		(string | string[])
 		Specify limit path when current path is changed by actions.
 		The path must be under the limit path.
-		NOTE: You can represents a path by two way like below.
+		NOTE: You can represent a path in two ways:
 			"/aa/bb/cc" (string)
 			["/", "aa", "bb", "cc"] (string[])
-		NOTE: It must be full path.
+		NOTE: It must be a full path.
 
                                                 *ddu-source-option-matcherKey*
 matcherKey		(string)
@@ -1027,14 +1027,14 @@ maxItems		(number)
                                                       *ddu-source-option-path*
 path			(string | string[])
 		Specify an initial narrowing path.
-		NOTE: You can represents a path by two way like below.
+		NOTE: You can represent a path in two ways:
 			"/aa/bb/cc" (string)
 			["/", "aa", "bb", "cc"] (string[])
-		NOTE: It must be full path.
+		NOTE: It must be a full path.
 
                                                    *ddu-source-option-preview*
 preview		(boolean)
-		If it is False, ddu disables preview feature.
+		If set to |v:false|, ddu disables the preview feature.
 
 		Default: v:true
 
@@ -1625,7 +1625,7 @@ status			(object)			(Optional)
                                                  *ddu-item-attribute-treePath*
 treePath		(string | string[])		(Optional)
 		The item tree path.
-		NOTE: You can represents a path by two way like below.
+		NOTE: You can represent a path in two ways:
 			"/aa/bb/cc" (string)
 			["/", "aa", "bb", "cc"] (string[])
 		NOTE: The attribute must be set to support tree feature.
@@ -1849,7 +1849,7 @@ FAQ 4:                                                             |ddu-faq-4|
 	I want to use ":Ddu" command like ":Denite" in denite.nvim.
 
 FAQ 5:                                                             |ddu-faq-5|
-	ddu.vim starting is slow.
+	Why is ddu.vim starting slowly?
 
 FAQ 6:                                                             |ddu-faq-6|
 	|:cnext| / |:cprevious| like commands are available?
@@ -1891,7 +1891,7 @@ https://github.com/Shougo/ddu-commands.vim
 It is not all users needed plugin and users can define the original commands.
 
                                                                    *ddu-faq-5*
-Q: ddu.vim starting is slow.
+Q: Why is ddu.vim starting slowly?
 
 A: It may be slow in Windows environment.  You can use denops shared server
 feature.
@@ -1903,6 +1903,18 @@ Or you can use |ddu#load()| for it.
 	call timer_start(10, { _ -> ddu#load('ui', ['ff']) })
 <
 Or ignore deno cache directory "%LOCALAPPDATA%\deno" from anti virus scan.
+
+Quick troubleshooting checklist:
+- Verify you have the recommended Deno and denops versions as listed in
+  COMPATIBILITY.
+- If you installed many extensions (UIs, sources, filters), try disabling
+  some to identify heavy ones.
+- Use lazy-loading for extensions where possible so they do not load at
+  startup.
+- Some plugin managers may run build steps on install; the first startup
+  after install or update can be slower.
+- If the startup is still slow, collect |:messages| output and your plugin
+  list and open an issue with reproduction steps.
 
                                                                    *ddu-faq-6*
 Q: |:cnext| / |:cprevious| like commands are available?
