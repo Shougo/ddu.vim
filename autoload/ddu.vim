@@ -75,10 +75,11 @@ endfunction
 
 let s:lazy_redraw_timers = {}
 function s:_lazy_redraw_callback(name, args, timer) abort
-  if has_key(s:lazy_redraw_timers, a:name)
-        \ && s:lazy_redraw_timers[a:name] == a:timer
+  const timer = s:lazy_redraw_timers->get(a:name, -1)
+  if timer ==# a:timer
     call remove(s:lazy_redraw_timers, a:name)
   endif
+
   call ddu#redraw(a:name, a:args)
 endfunction
 function ddu#_lazy_redraw(name, args = {}) abort
@@ -86,8 +87,9 @@ function ddu#_lazy_redraw(name, args = {}) abort
     return
   endif
 
-  if s:lazy_redraw_timers->has_key(a:name)
-    call timer_stop(s:lazy_redraw_timers[a:name])
+  const redraw_timer = s:lazy_redraw_timers->get(a:name, -1)
+  if redraw_timer > 0
+    call timer_stop(redraw_timer)
   endif
 
   " 20ms delay coalesces rapid successive calls into a single redraw
