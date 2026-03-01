@@ -65,6 +65,10 @@ function ddu#util#input_list(message, list) abort
 endfunction
 
 function ddu#util#benchmark(msg = '') abort
+  if !'g:ddu#_started'->exists()
+    return
+  endif
+
   let msg = a:msg
   if msg !=# ''
     let msg ..= ' '
