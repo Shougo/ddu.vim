@@ -471,6 +471,16 @@ export async function callFilters(
   input: string,
   items: DduItem[],
 ) {
+  type FilterProfile = {
+    name: string;
+    elapsedMs: number;
+    itemsBefore: number;
+    itemsAfter: number;
+    inputChanged: boolean;
+    retType: "array" | "object";
+  };
+  const profiles: FilterProfile[] = [];
+
   for (const userFilter of filters) {
     const [filter, filterOptions, filterParams] = await getFilter(
       denops,
@@ -483,6 +493,10 @@ export async function callFilters(
     }
 
     try {
+      const itemsBefore = items.length;
+      const prevInput = input;
+      const startTime = Date.now();
+
       const ret = await filter.filter({
         denops,
         context: context,
@@ -494,18 +508,48 @@ export async function callFilters(
         items,
       });
 
+      const elapsedMs = Date.now() - startTime;
+      let retType: "array" | "object";
+      let inputChanged = false;
+
       if (is.Array(ret)) {
+        retType = "array";
         items = ret;
       } else {
+        retType = "object";
         if (ret.input || ret.input === "") {
           // Overwrite current input
+          inputChanged = ret.input !== prevInput;
           input = ret.input;
         }
         items = ret.items;
       }
+
+      if (options.profile) {
+        profiles.push({
+          name: filter.name,
+          elapsedMs,
+          itemsBefore,
+          itemsAfter: items.length,
+          inputChanged,
+          retType,
+        });
+      }
     } catch (e: unknown) {
       await printError(denops, `filter: ${filter.name} "filter()" failed`, e);
     }
+  }
+
+  if (options.profile && profiles.length > 0) {
+    const lines = profiles.map((p) =>
+      `  ${p.name}: ${p.elapsedMs} ms` +
+      ` items: ${p.itemsBefore} -> ${p.itemsAfter}` +
+      ` inputChanged: ${p.inputChanged} retType: ${p.retType}`
+    );
+    await printError(
+      denops,
+      `ddu: filter profiling results:\n${lines.join("\n")}`,
+    );
   }
 
   return items;
