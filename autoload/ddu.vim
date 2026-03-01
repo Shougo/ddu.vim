@@ -73,6 +73,26 @@ function ddu#get_items(options = {}) abort
   return ddu#denops#_request('getItems', [a:options])
 endfunction
 
+let s:lazy_redraw_timers = {}
+
+function s:_lazy_redraw_callback(name, args, timer) abort
+  if has_key(s:lazy_redraw_timers, a:name)
+        \ && s:lazy_redraw_timers[a:name] == a:timer
+    call remove(s:lazy_redraw_timers, a:name)
+  endif
+  call ddu#redraw(a:name, a:args)
+endfunction
+
 function ddu#_lazy_redraw(name, args = {}) abort
-  call timer_start(0, { -> ddu#redraw(a:name, a:args) })
+  if a:name ==# ''
+    return
+  endif
+
+  if has_key(s:lazy_redraw_timers, a:name)
+    call timer_stop(s:lazy_redraw_timers[a:name])
+  endif
+
+  " 20ms delay coalesces rapid successive calls into a single redraw
+  let s:lazy_redraw_timers[a:name] =
+        \ timer_start(20, {timer -> s:_lazy_redraw_callback(a:name, a:args, timer)})
 endfunction
