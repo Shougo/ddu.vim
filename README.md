@@ -47,16 +47,45 @@ Please see: https://github.com/Shougo/ddu.vim/issues/10
 
 ## Install
 
-**NOTE:** It requires Vim 9.1.1646+ or Neovim (0.11.0+). See
-[requirements](#requirements) if you aren't sure whether you have this.
+**NOTE:** For the exact compatibility and requirements, see the COMPATIBILITY section in the documentation: `doc/ddu.txt`.
 
 ### Requirements
 
-Please install both Deno 2.3.0+ and "denops.vim" v8.0+.
+Please install both Deno 2.3.0+ and denops.vim v8.0+ (see `doc/ddu.txt` for the latest requirements).
 
-- <https://deno.land/>
-- <https://github.com/vim-denops/denops.vim>
+- https://deno.land/
+- https://github.com/vim-denops/denops.vim
 
-**NOTE:** Ddu.vim does not include any extra plugins. You must install them you
-want manually. You can search ddu plugins from
-[here](https://github.com/topics/ddu-vim).
+**NOTE:** ddu.vim does not include any UI, source, filter, column or kind
+plugins. Install the extensions you need separately (search for the `ddu-vim`
+topic on GitHub).
+
+### Quick Start
+
+A minimal runtime configuration example (no plugin-manager-specific instructions):
+
+```vim
+" Example: minimal settings to configure and start ddu.
+" Ensure ddu.vim and at least one UI and one source are installed beforehand.
+
+" Set a default UI and basic kind option.
+call ddu#custom#patch_global(#{
+    \   ui: 'ff',
+    \ })
+
+call ddu#custom#patch_global(#{
+    \   kindOptions: #{
+    \     file: #{
+    \       defaultAction: 'open',
+    \     },
+    \   }
+    \ })
+
+" Start ddu with a simple source list and optional input.
+" Replace 'file' with any installed source name.
+:call ddu#start({'name': 'list', 'sources': ['file']})
+```
+
+Notes:
+- For full documentation, read `:help ddu` or open `doc/ddu.txt`.
+- If you are unsure which UI or source to install first, see the community topic: https://github.com/topics/ddu-vim
