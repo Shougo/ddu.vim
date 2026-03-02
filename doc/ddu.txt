@@ -227,7 +227,7 @@ resume			(boolean)
 searchPath		(string | string[])
 		Search the path.  This only works when specified |ddu#start()|
 		or |ddu#redraw()|.
-		NOTE: You can represents a path by two way like below.
+		NOTE: You can represent a path in two ways:
 			"/aa/bb/cc" (string)
 			["/", "aa", "bb", "cc"] (string[])
 		NOTE: The path must be absolute path.
@@ -980,7 +980,7 @@ dynamicFilters
 
                                                 *ddu-source-option-ignoreCase*
 ignoreCase		(boolean)
-		If it is True, |ddu-filters| ignores case when input match.
+		If set to |v:true|, |ddu-filters| ignores case when input match.
 
 		Default: v:false
 
@@ -988,7 +988,7 @@ ignoreCase		(boolean)
 limitPath		(string | string[])
 		Specify limit path when current path is changed by actions.
 		The path must be under the limit path.
-		NOTE: You can represents a path by two way like below.
+		NOTE: You can represent a path in two ways:
 			"/aa/bb/cc" (string)
 			["/", "aa", "bb", "cc"] (string[])
 		NOTE: It must be full path.
@@ -1039,10 +1039,10 @@ preview		(boolean)
 
                                                 *ddu-source-option-smartCase*
 smartCase		(boolean)
-		If it is True, |ddu-filters| don't ignore case when input
+		If set to |v:true|, |ddu-filters| don't ignore case when input
 		contains upper case characters.
 		NOTE: It works only when |ddu-source-option-ignoreCase| is
-		True.
+		|v:true|.
 
 		Default: v:false
 
@@ -1624,7 +1624,7 @@ status			(object)			(Optional)
                                                  *ddu-item-attribute-treePath*
 treePath		(string | string[])		(Optional)
 		The item tree path.
-		NOTE: You can represents a path by two way like below.
+		NOTE: You can represent a path in two ways:
 			"/aa/bb/cc" (string)
 			["/", "aa", "bb", "cc"] (string[])
 		NOTE: The attribute must be set to support tree feature.
@@ -1658,7 +1658,7 @@ filter			(function)			(Required)
 
 		input			(string)	(Optional)
 		Overwrite current input.
-		NOTE: The overwrite is avaiable for current filters list only.
+		NOTE: The overwrite is available for current filters list only.
 
 		items			(DduItem[])	(Required)
 		Filtered items.
@@ -1773,25 +1773,25 @@ PREVIEWER ATTRIBUTES                                *ddu-previewer-attributes*
                                                 *ddu-previewer-attribute-cmds*
 cmds			(string[])			(Required)
 		Commands passed to terminal API to render the preview.
-		NOTE: It is only avaiable in
+		NOTE: It is only available in
 		|ddu-previewer-TerminalPreviewer|.
 
                                             *ddu-previewer-attribute-contents*
 contents		(string[])			(Required)
 		Contents to be shown in the preview buffer.
-		NOTE: It is only avaiable in |ddu-previewer-NoFilePreviewer|.
+		NOTE: It is only available in |ddu-previewer-NoFilePreviewer|.
 
                                                  *ddu-previewer-attribute-cwd*
 cwd			(string)			(Optional)
 		Current working directory.
-		NOTE: It is only avaiable in
+		NOTE: It is only available in
 		|ddu-previewer-TerminalPreviewer|.
 
                                                 *ddu-previewer-attribute-expr*
 expr			(number | string)		(Optional)
 		Buffer expression, which is the same as the arguments of
 		|bufname()|.
-		NOTE: It is only avaiable in |ddu-previewer-BufferPreviewer|.
+		NOTE: It is only available in |ddu-previewer-BufferPreviewer|.
 
                                             *ddu-previewer-attribute-filetype*
 filetype		(string)			(Optional)
@@ -1821,7 +1821,7 @@ lineNr			(number)			(Optional)
                                                 *ddu-previewer-attribute-path*
 path			(string)			(Optional)
 		Path of file to preview.
-		NOTE: It is only avaiable in |ddu-previewer-BufferPreviewer|.
+		NOTE: It is only available in |ddu-previewer-BufferPreviewer|.
 
                                              *ddu-previewer-attribute-pattern*
 pattern			(string)			(Optional)
@@ -1893,16 +1893,15 @@ It is not all users needed plugin and users can define the original commands.
 Q: Why is ddu.vim starting slowly?
 
 A:
-- Verify you have the recommended Deno and denops versions as listed in
-  COMPATIBILITY.
-- If you installed many extensions (UIs, sources, filters), try disabling some
-  to identify heavy ones.
-- Use lazy-loading for extensions where possible so they do not load at
-  startup.
-- Some plugin managers may run build steps on install; the first startup after
-  install or update can be slower.
-- If the startup is still slow, collect `:messages` output and your plugin
-  list and open an issue with reproduction steps.
+
+- Make sure you are using Deno 2.3.0+ and denops.vim v8.0+.  Older versions
+  may be significantly slower.
+- Heavy extensions (e.g. sources that spawn external processes) can be
+  lazy-loaded with |ddu#load()| to avoid blocking startup.
+- On the first run, Deno compiles TypeScript files; subsequent runs will be
+  faster once the cache is built.
+- Consider using the denops shared server to share a single Deno process
+  across multiple Vim/Neovim instances.
 
                                                                    *ddu-faq-6*
 Q: |:cnext| / |:cprevious| like commands are available?

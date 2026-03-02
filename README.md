@@ -9,29 +9,30 @@ does not work with zero configuration. You can use other plugins.
 
 Please read [help](doc/ddu.txt) for details.
 
-NOTE: I have created
+**NOTE:** I have created a
 [Japanese article](https://zenn.dev/shougo/articles/ddu-vim-beta) for ddu.vim.
 
-Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible and
-asynchronous UI framework for Vim/Neovim.
+Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible
+and asynchronous UI framework for Vim/Neovim.
 
 The development is supported by
-[github sponsors](https://github.com/sponsors/Shougo/). Thank you!
+[GitHub Sponsors](https://github.com/sponsors/Shougo/). Thank you!
 
 <!-- vim-markdown-toc GFM -->
 
 - [Introduction](#introduction)
 - [Screenshots](#screenshots)
 - [Install](#install)
+- [Quick Start](#quick-start)
 
 <!-- vim-markdown-toc -->
 
 ## Introduction
 
-I have chosen denops.vim framework to create new plugin. Because denops.vim is
-better than Neovim Python interface.
+I have chosen the denops.vim framework to create this plugin because denops.vim
+is better than the Neovim Python interface.
 
-- Easy to setup
+- Easy to set up
 - Minimal dependency
 - Stability
 - Vim/Neovim compatibility
@@ -47,18 +48,20 @@ Please see: https://github.com/Shougo/ddu.vim/issues/10
 
 ## Install
 
-**NOTE:** For the exact compatibility and requirements, see the COMPATIBILITY section in the documentation: `doc/ddu.txt`.
+**NOTE:** For the current version requirements, see the `COMPATIBILITY` section
+in `doc/ddu.txt` (`:h ddu-compatibility`).
 
-### Requirements
+## Quick Start
 
-Please install both Deno 2.3.0+ and denops.vim v8.0+ (see `doc/ddu.txt` for the latest requirements).
+Below is a minimal configuration to get started with ddu.vim.
+For detailed documentation, see [doc/ddu.txt](doc/ddu.txt).
 
-- https://deno.land/
-- https://github.com/vim-denops/denops.vim
-
-**NOTE:** ddu.vim does not include any UI, source, filter, column or kind
-plugins. Install the extensions you need separately (search for the `ddu-vim`
-topic on GitHub).
+You will need a UI, at least one source, and a kind plugin. The example below
+uses the popular combination of
+[ddu-ui-ff](https://github.com/Shougo/ddu-ui-ff),
+[ddu-source-file](https://github.com/Shougo/ddu-source-file),
+[ddu-kind-file](https://github.com/Shougo/ddu-kind-file), and
+[ddu-filter-matcher_substring](https://github.com/Shougo/ddu-filter-matcher_substring).
 
 ### Quick Start
 
@@ -73,12 +76,27 @@ call ddu#custom#patch_global(#{
     \   ui: 'ff',
     \ })
 
+" Set the default action for file kind
 call ddu#custom#patch_global(#{
     \   kindOptions: #{
     \     file: #{
     \       defaultAction: 'open',
     \     },
-    \   }
+    \   },
+    \ })
+
+" Use substring matcher
+call ddu#custom#patch_global(#{
+    \   sourceOptions: #{
+    \     _: #{
+    \       matchers: ['matcher_substring'],
+    \     },
+    \   },
+    \ })
+
+" Open ddu with the file source in the current directory
+call ddu#start(#{
+    \   sources: [#{ name: 'file', params: {} }],
     \ })
 
 " Start ddu with a simple source list and optional input.
@@ -88,4 +106,5 @@ call ddu#custom#patch_global(#{
 
 Notes:
 - For full documentation, read `:help ddu` or open `doc/ddu.txt`.
-- If you are unsure which UI or source to install first, see the community topic: https://github.com/topics/ddu-vim
+- If you are unsure which UI or source to install first, see the community
+  topic: https://github.com/topics/ddu-vim
