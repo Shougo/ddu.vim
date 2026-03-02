@@ -23,7 +23,7 @@ function ddu#util#print_log(name, entries) abort
 endfunction
 
 function ddu#util#get_logs(name) abort
-  return get(g:ddu#_logs, a:name, [])->copy()
+  return get(g:ddu#_logs, a:name, [])->deepcopy()
 endfunction
 
 function ddu#util#clear_logs(name) abort
@@ -33,7 +33,7 @@ function ddu#util#clear_logs(name) abort
 endfunction
 
 function ddu#util#get_all_logs() abort
-  return g:ddu#_logs->copy()
+  return g:ddu#_logs->deepcopy()
 endfunction
 
 function ddu#util#print_error(string, name = 'ddu') abort
