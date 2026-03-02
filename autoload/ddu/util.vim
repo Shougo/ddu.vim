@@ -1,5 +1,41 @@
 const s:is_windows = has('win32') || has('win64')
 
+" Profiling log storage
+if !exists('g:ddu#_logs')
+  let g:ddu#_logs = {}
+endif
+if !exists('g:ddu#_logs_max_entries')
+  let g:ddu#_logs_max_entries = 200
+endif
+
+function ddu#util#print_log(name, entries) abort
+  if !has_key(g:ddu#_logs, a:name)
+    let g:ddu#_logs[a:name] = []
+  endif
+  
+  " Append new entries
+  call extend(g:ddu#_logs[a:name], a:entries)
+  
+  " Cap the log size to max_entries
+  if len(g:ddu#_logs[a:name]) > g:ddu#_logs_max_entries
+    let g:ddu#_logs[a:name] = g:ddu#_logs[a:name][-g:ddu#_logs_max_entries:]
+  endif
+endfunction
+
+function ddu#util#get_logs(name) abort
+  return get(g:ddu#_logs, a:name, [])->copy()
+endfunction
+
+function ddu#util#clear_logs(name) abort
+  if has_key(g:ddu#_logs, a:name)
+    let g:ddu#_logs[a:name] = []
+  endif
+endfunction
+
+function ddu#util#get_all_logs() abort
+  return g:ddu#_logs->copy()
+endfunction
+
 function ddu#util#print_error(string, name = 'ddu') abort
   echohl Error
   for line in
