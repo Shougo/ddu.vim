@@ -346,7 +346,7 @@ export async function getSource(
     const exists = await loader.autoload(denops, "source", name);
 
     if (options.profile) {
-      await printError(denops, `Load ${name}: ${Date.now() - startTime} ms`);
+      await printLog(denops, `Load ${name}: ${Date.now() - startTime} ms`);
     }
 
     if (!exists) {
@@ -541,17 +541,13 @@ export async function callFilters(
   }
 
   if (options.profile && profiles.length > 0) {
-    // Transform profile data to match the ProfileEntry schema
-    const profileResults = profiles.map((p) => ({
-      name: p.name,
-      ms: p.elapsedMs,
-      itemsBefore: p.itemsBefore,
-      itemsAfter: p.itemsAfter,
-      inputChanged: p.inputChanged,
-      retType: p.retType,
-    }));
+    const lines = profiles.map((p) =>
+      `  ${p.name}: ${p.elapsedMs} ms` +
+      ` items: ${p.itemsBefore} -> ${p.itemsAfter}` +
+      ` inputChanged: ${p.inputChanged} retType: ${p.retType}`
+    );
 
-    await printLog(denops, options.name, profileResults);
+    await printLog(denops, lines);
   }
 
   return items;

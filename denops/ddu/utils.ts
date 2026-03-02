@@ -40,24 +40,20 @@ export async function printError(
 }
 
 export async function printLog(
-  denops: Denops | null,
-  name: string | undefined,
-  entries: unknown[],
+  denops: Denops,
+  ...messages: unknown[]
 ) {
-  if (!denops) {
-    return;
-  }
-
-  try {
-    await denops.call("ddu#util#print_log", name ?? "default", entries);
-  } catch (e: unknown) {
-    // Fallback to print_error if print_log fails
-    await printError(
-      denops,
-      `Failed to save profile logs for "${name ?? "default"}":`,
-      e,
-    );
-  }
+  const message = messages.map((v) => {
+    if (v instanceof Error) {
+      // NOTE: In Deno, Prefer `Error.stack` because it contains `Error.message`.
+      return `${v.stack ?? v}`;
+    } else if (typeof v === "object") {
+      return JSON.stringify(v);
+    } else {
+      return `${v}`;
+    }
+  }).join("\n");
+  await denops.call("ddu#util#print_log", message);
 }
 
 // See https://github.com/vim-denops/denops.vim/issues/358 for details

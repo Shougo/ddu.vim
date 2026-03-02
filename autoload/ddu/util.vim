@@ -5,10 +5,6 @@ if !exists('g:ddu#_logs')
   let g:ddu#_logs = {}
 endif
 
-if !exists('g:ddu#_logs_max_entries')
-  let g:ddu#_logs_max_entries = 200
-endif
-
 function ddu#util#print_error(string, name = 'ddu') abort
   echohl Error
   for line in
@@ -105,27 +101,24 @@ function s:expand(path) abort
         \ ->s:substitute_path_separator()
 endfunction
 
-function ddu#util#print_log(name, entries) abort
-  " Type check: entries must be a list
-  if a:entries->type() !=# v:t_list
-    call ddu#util#print_error(
-          \ printf('ddu#util#print_log: entries must be a list, got %s',
-          \        a:entries->type()->typename()))
-    return
-  endif
+function ddu#util#print_log(lines, name = 'ddu') abort
+  " Type check: lines must be a list
+  const lines =
+        \ (a:lines->type() ==# v:t_string ? a:lines : a:lines->string())
+        \ ->split("\n")->filter({ _, val -> val != ''})
 
   " Initialize log storage for this name if needed
   if !g:ddu#_logs->has_key(a:name)
     let g:ddu#_logs[a:name] = []
   endif
 
-  " Append entries
-  call extend(g:ddu#_logs[a:name], a:entries)
+  " Append lines
+  call extend(g:ddu#_logs[a:name], lines)
 
-  " Limit entries per name
-  const max_entries = g:ddu#_logs_max_entries
-  if g:ddu#_logs[a:name]->len() > max_entries
-    let g:ddu#_logs[a:name] = g:ddu#_logs[a:name][-max_entries:]
+  " Limit lines per name
+  const max_lines = 200
+  if g:ddu#_logs[a:name]->len() > max_lines
+    let g:ddu#_logs[a:name] = g:ddu#_logs[a:name][-max_lines]
   endif
 endfunction
 
