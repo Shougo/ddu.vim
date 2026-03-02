@@ -53,10 +53,10 @@ in `doc/ddu.txt` (`:h ddu-compatibility`).
 
 ### Requirements
 
-Please install both Deno 2.3.0+ and "denops.vim" v8.0+.
+Please install both Deno 2.3.0+ and denops.vim v8.0+ (see `doc/ddu.txt` for the latest requirements).
 
-- <https://deno.land/>
-- <https://github.com/vim-denops/denops.vim>
+- https://deno.land/
+- https://github.com/vim-denops/denops.vim
 
 **NOTE:** ddu.vim does not include any extra plugins. You must install them
 manually. You can search for ddu plugins
@@ -104,6 +104,20 @@ Plug 'Shougo/ddu-filter-matcher_substring'
 
 ```vim
 " Set the UI
+=======
+**NOTE:** ddu.vim does not include any UI, source, filter, column or kind
+plugins. Install the extensions you need separately (search for the `ddu-vim`
+topic on GitHub).
+
+### Quick Start
+
+A minimal runtime configuration example (no plugin-manager-specific instructions):
+
+```vim
+" Example: minimal settings to configure and start ddu.
+" Ensure ddu.vim and at least one UI and one source are installed beforehand.
+
+" Set a default UI and basic kind option.
 call ddu#custom#patch_global(#{
     \   ui: 'ff',
     \ })
@@ -130,4 +144,12 @@ call ddu#custom#patch_global(#{
 call ddu#start(#{
     \   sources: [#{ name: 'file', params: {} }],
     \ })
+
+" Start ddu with a simple source list and optional input.
+" Replace 'file' with any installed source name.
+:call ddu#start({'name': 'list', 'sources': ['file']})
 ```
+
+Notes:
+- For full documentation, read `:help ddu` or open `doc/ddu.txt`.
+- If you are unsure which UI or source to install first, see the community topic: https://github.com/topics/ddu-vim
