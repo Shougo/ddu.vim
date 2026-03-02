@@ -39,6 +39,27 @@ export async function printError(
   await denops.call("ddu#util#print_error", message);
 }
 
+export async function printLog(
+  denops: Denops | null,
+  name: string | undefined,
+  entries: unknown[],
+) {
+  if (!denops) {
+    return;
+  }
+
+  try {
+    await denops.call("ddu#util#print_log", name ?? "default", entries);
+  } catch (e: unknown) {
+    // Fallback to print_error if print_log fails
+    await printError(
+      denops,
+      `Failed to save profile logs for "${name ?? "default"}":`,
+      e,
+    );
+  }
+}
+
 // See https://github.com/vim-denops/denops.vim/issues/358 for details
 export function isDenoCacheIssueError(e: unknown): boolean {
   const expects = [

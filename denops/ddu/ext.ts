@@ -43,7 +43,7 @@ import type { BaseSource } from "./base/source.ts";
 import type { BaseUi } from "./base/ui.ts";
 import type { Loader } from "./loader.ts";
 import type { BaseAbortReason } from "./state.ts";
-import { convertUserString, printError } from "./utils.ts";
+import { convertUserString, printError, printLog } from "./utils.ts";
 
 import type { Denops } from "@denops/std";
 import * as fn from "@denops/std/function";
@@ -541,15 +541,17 @@ export async function callFilters(
   }
 
   if (options.profile && profiles.length > 0) {
-    const lines = profiles.map((p) =>
-      `  ${p.name}: ${p.elapsedMs} ms` +
-      ` items: ${p.itemsBefore} -> ${p.itemsAfter}` +
-      ` inputChanged: ${p.inputChanged} retType: ${p.retType}`
-    );
-    await printError(
-      denops,
-      `ddu: filter profiling results:\n${lines.join("\n")}`,
-    );
+    // Transform profile data to match the ProfileEntry schema
+    const profileResults = profiles.map((p) => ({
+      name: p.name,
+      ms: p.elapsedMs,
+      itemsBefore: p.itemsBefore,
+      itemsAfter: p.itemsAfter,
+      inputChanged: p.inputChanged,
+      retType: p.retType,
+    }));
+
+    await printLog(denops, options.name, profileResults);
   }
 
   return items;
