@@ -12,8 +12,8 @@ Please read [help](doc/ddu.txt) for details.
 **NOTE:** I have created a
 [Japanese article](https://zenn.dev/shougo/articles/ddu-vim-beta) for ddu.vim.
 
-Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible and
-asynchronous UI framework for Vim/Neovim.
+Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible
+and asynchronous UI framework for Vim/Neovim.
 
 The development is supported by
 [GitHub Sponsors](https://github.com/sponsors/Shougo/). Thank you!
@@ -51,17 +51,6 @@ Please see: https://github.com/Shougo/ddu.vim/issues/10
 **NOTE:** For the current version requirements, see the `COMPATIBILITY` section
 in `doc/ddu.txt` (`:h ddu-compatibility`).
 
-### Requirements
-
-Please install both Deno 2.3.0+ and denops.vim v8.0+ (see `doc/ddu.txt` for the latest requirements).
-
-- https://deno.land/
-- https://github.com/vim-denops/denops.vim
-
-**NOTE:** ddu.vim does not include any extra plugins. You must install them
-manually. You can search for ddu plugins
-[here](https://github.com/topics/ddu-vim).
-
 ## Quick Start
 
 Below is a minimal configuration to get started with ddu.vim.
@@ -73,41 +62,6 @@ uses the popular combination of
 [ddu-source-file](https://github.com/Shougo/ddu-source-file),
 [ddu-kind-file](https://github.com/Shougo/ddu-kind-file), and
 [ddu-filter-matcher_substring](https://github.com/Shougo/ddu-filter-matcher_substring).
-
-### vim-plug
-
-```vim
-Plug 'vim-denops/denops.vim'
-Plug 'Shougo/ddu.vim'
-Plug 'Shougo/ddu-ui-ff'
-Plug 'Shougo/ddu-source-file'
-Plug 'Shougo/ddu-kind-file'
-Plug 'Shougo/ddu-filter-matcher_substring'
-```
-
-### lazy.nvim
-
-```lua
-{
-  'Shougo/ddu.vim',
-  dependencies = {
-    'vim-denops/denops.vim',
-    'Shougo/ddu-ui-ff',
-    'Shougo/ddu-source-file',
-    'Shougo/ddu-kind-file',
-    'Shougo/ddu-filter-matcher_substring',
-  },
-}
-```
-
-### Minimal configuration
-
-```vim
-" Set the UI
-=======
-**NOTE:** ddu.vim does not include any UI, source, filter, column or kind
-plugins. Install the extensions you need separately (search for the `ddu-vim`
-topic on GitHub).
 
 ### Quick Start
 
@@ -152,4 +106,5 @@ call ddu#start(#{
 
 Notes:
 - For full documentation, read `:help ddu` or open `doc/ddu.txt`.
-- If you are unsure which UI or source to install first, see the community topic: https://github.com/topics/ddu-vim
+- If you are unsure which UI or source to install first, see the community
+  topic: https://github.com/topics/ddu-vim

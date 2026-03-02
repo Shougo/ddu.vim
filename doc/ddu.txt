@@ -1893,18 +1893,7 @@ It is not all users needed plugin and users can define the original commands.
 Q: Why is ddu.vim starting slowly?
 
 A:
-- Verify you have the recommended Deno and denops versions as listed in
-  COMPATIBILITY.
-- If you installed many extensions (UIs, sources, filters), try disabling some
-  to identify heavy ones.
-- Use lazy-loading for extensions where possible so they do not load at
-  startup.
-- Some plugin managers may run build steps on install; the first startup after
-  install or update can be slower.
-- If the startup is still slow, collect `:messages` output and your plugin
-  list and open an issue with reproduction steps.
 
-Other things to check:
 - Make sure you are using Deno 2.3.0+ and denops.vim v8.0+.  Older versions
   may be significantly slower.
 - Heavy extensions (e.g. sources that spawn external processes) can be
