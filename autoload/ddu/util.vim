@@ -1,5 +1,10 @@
 const s:is_windows = has('win32') || has('win64')
 
+" Initialize log storage
+if !exists('g:ddu#_logs')
+  let g:ddu#_logs = {}
+endif
+
 function ddu#util#print_error(string, name = 'ddu') abort
   echohl Error
   for line in
@@ -94,4 +99,42 @@ endfunction
 function s:expand(path) abort
   return ((a:path =~# '^\~') ? a:path->fnamemodify(':p') : a:path)
         \ ->s:substitute_path_separator()
+endfunction
+
+function ddu#util#print_log(lines, name = 'ddu') abort
+  " Type check: lines must be a list
+  const lines =
+        \ (a:lines->type() ==# v:t_string ? a:lines : a:lines->string())
+        \ ->split("\n")->filter({ _, val -> val != ''})
+
+  " Initialize log storage for this name if needed
+  if !g:ddu#_logs->has_key(a:name)
+    let g:ddu#_logs[a:name] = []
+  endif
+
+  " Append lines
+  call extend(g:ddu#_logs[a:name], lines)
+
+  " Limit lines per name
+  const max_lines = 200
+  if g:ddu#_logs[a:name]->len() > max_lines
+    let g:ddu#_logs[a:name] = g:ddu#_logs[a:name][-max_lines]
+  endif
+endfunction
+
+function ddu#util#get_logs(name) abort
+  if g:ddu#_logs->has_key(a:name)
+    return g:ddu#_logs[a:name]->copy()
+  endif
+  return []
+endfunction
+
+function ddu#util#clear_logs(name) abort
+  if g:ddu#_logs->has_key(a:name)
+    call remove(g:ddu#_logs, a:name)
+  endif
+endfunction
+
+function ddu#util#get_all_logs() abort
+  return g:ddu#_logs->copy()
 endfunction

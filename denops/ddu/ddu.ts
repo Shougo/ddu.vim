@@ -29,6 +29,7 @@ import {
   convertUserString,
   getFilters,
   printError,
+  printLog,
   treePath2Filename,
 } from "./utils.ts";
 import type {
@@ -789,7 +790,7 @@ export class Ddu {
     }));
 
     if (this.#context.done && this.#options.profile) {
-      await printError(
+      await printLog(
         denops,
         `Refresh all items: ${Date.now() - this.#startTime} ms`,
       );

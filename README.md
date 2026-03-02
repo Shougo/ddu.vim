@@ -12,8 +12,8 @@ Please read [help](doc/ddu.txt) for details.
 **NOTE:** I have created a
 [Japanese article](https://zenn.dev/shougo/articles/ddu-vim-beta) for ddu.vim.
 
-Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible
-and asynchronous UI framework for Vim/Neovim.
+Ddu is the abbreviation of "dark deno-powered UI". It provides an extensible and
+asynchronous UI framework for Vim/Neovim.
 
 The development is supported by
 [GitHub Sponsors](https://github.com/sponsors/Shougo/). Thank you!
@@ -53,8 +53,8 @@ in `doc/ddu.txt` (`:h ddu-compatibility`).
 
 ## Quick Start
 
-Below is a minimal configuration to get started with ddu.vim.
-For detailed documentation, see [doc/ddu.txt](doc/ddu.txt).
+Below is a minimal configuration to get started with ddu.vim. For detailed
+documentation, see [doc/ddu.txt](doc/ddu.txt).
 
 You will need a UI, at least one source, and a kind plugin. The example below
 uses the popular combination of
@@ -65,7 +65,8 @@ uses the popular combination of
 
 ### Quick Start
 
-A minimal runtime configuration example (no plugin-manager-specific instructions):
+A minimal runtime configuration example (no plugin-manager-specific
+instructions):
 
 ```vim
 " Example: minimal settings to configure and start ddu.
@@ -105,6 +106,7 @@ call ddu#start(#{
 ```
 
 Notes:
+
 - For full documentation, read `:help ddu` or open `doc/ddu.txt`.
 - If you are unsure which UI or source to install first, see the community
   topic: https://github.com/topics/ddu-vim

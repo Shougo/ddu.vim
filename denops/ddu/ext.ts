@@ -43,7 +43,7 @@ import type { BaseSource } from "./base/source.ts";
 import type { BaseUi } from "./base/ui.ts";
 import type { Loader } from "./loader.ts";
 import type { BaseAbortReason } from "./state.ts";
-import { convertUserString, printError } from "./utils.ts";
+import { convertUserString, printError, printLog } from "./utils.ts";
 
 import type { Denops } from "@denops/std";
 import * as fn from "@denops/std/function";
@@ -346,7 +346,7 @@ export async function getSource(
     const exists = await loader.autoload(denops, "source", name);
 
     if (options.profile) {
-      await printError(denops, `Load ${name}: ${Date.now() - startTime} ms`);
+      await printLog(denops, `Load ${name}: ${Date.now() - startTime} ms`);
     }
 
     if (!exists) {
@@ -546,10 +546,8 @@ export async function callFilters(
       ` items: ${p.itemsBefore} -> ${p.itemsAfter}` +
       ` inputChanged: ${p.inputChanged} retType: ${p.retType}`
     );
-    await printError(
-      denops,
-      `ddu: filter profiling results:\n${lines.join("\n")}`,
-    );
+
+    await printLog(denops, lines);
   }
 
   return items;
