@@ -177,6 +177,46 @@ export async function callCallback(
   }
 }
 
+export function cowifyItems(items: DduItem[]): DduItem[] {
+  return items.map((original) => {
+    let cloned: DduItem | null = null;
+    const getTarget = (): DduItem => cloned ?? original;
+    const ensureCloned = (): DduItem => {
+      if (!cloned) {
+        cloned = structuredClone(original) as DduItem;
+      }
+      return cloned;
+    };
+
+    return new Proxy(original, {
+      get(_target, prop, receiver) {
+        return Reflect.get(getTarget(), prop, receiver);
+      },
+      set(_target, prop, value) {
+        return Reflect.set(ensureCloned(), prop, value);
+      },
+      has(_target, prop) {
+        return Reflect.has(getTarget(), prop);
+      },
+      deleteProperty(_target, prop) {
+        return Reflect.deleteProperty(ensureCloned(), prop);
+      },
+      defineProperty(_target, prop, descriptor) {
+        return Reflect.defineProperty(ensureCloned(), prop, descriptor);
+      },
+      ownKeys(_target) {
+        return Reflect.ownKeys(getTarget());
+      },
+      getOwnPropertyDescriptor(_target, prop) {
+        return Reflect.getOwnPropertyDescriptor(getTarget(), prop);
+      },
+      getPrototypeOf(_target) {
+        return Reflect.getPrototypeOf(getTarget());
+      },
+    }) as DduItem;
+  });
+}
+
 export async function getFilters(
   denops: Denops,
   context: Context,

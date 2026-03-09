@@ -122,6 +122,7 @@ export type DduOptions = {
   uiOptions: Record<UiName, Partial<UiOptions>>;
   uiParams: Record<UiName, Partial<BaseParams>>;
   unique: boolean;
+  useCopyOnWrite?: boolean;
 };
 
 export type UserOptions = Record<string, unknown>;

@@ -27,6 +27,7 @@ import type { Loader } from "./loader.ts";
 import {
   convertTreePath,
   convertUserString,
+  cowifyItems,
   getFilters,
   printError,
   printLog,
@@ -1996,7 +1997,9 @@ export class Ddu {
     }
 
     // NOTE: Use deepcopy.  Because of filters may break original items.
-    let items = structuredClone(state.items) as DduItem[];
+    let items = this.#options.useCopyOnWrite
+      ? cowifyItems(state.items)
+      : structuredClone(state.items) as DduItem[];
     const allItems = items.length;
 
     // NOTE: Call columns before filters
