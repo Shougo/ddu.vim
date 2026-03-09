@@ -27,6 +27,7 @@ import type { Loader } from "./loader.ts";
 import {
   convertTreePath,
   convertUserString,
+  cowifyItems,
   getFilters,
   printError,
   printLog,
@@ -1996,7 +1997,17 @@ export class Ddu {
     }
 
     // NOTE: Use deepcopy.  Because of filters may break original items.
-    let items = structuredClone(state.items) as DduItem[];
+    // When useCopyOnWrite is enabled, wrap items in COW proxies instead of
+    // eagerly cloning the whole array; items are only cloned on first write.
+    let items: DduItem[];
+    let getCloneCount: (() => number) | undefined;
+    let resetCloneCount: (() => void) | undefined;
+
+    if (this.#options.useCopyOnWrite) {
+      [items, getCloneCount, resetCloneCount] = cowifyItems(state.items);
+    } else {
+      items = structuredClone(state.items) as DduItem[];
+    }
     const allItems = items.length;
 
     // NOTE: Call columns before filters
@@ -2010,12 +2021,18 @@ export class Ddu {
       items,
     );
 
-    // Save original items before filtering for parent preservation
-    // Only clone if we have tree items that might need parent preservation
+    // Save original items before filtering for parent preservation.
+    // When useCopyOnWrite is enabled, take a shallow snapshot of the proxied
+    // items array so #preserveParentItems can find parent candidates; writes to
+    // those proxy items will still trigger per-item lazy clones rather than
+    // mutating state.items.
+    // When disabled, clone only if tree items are present (as before).
     const hasTreeItems = items.some(
       (item) => item.treePath && item.isTree && item.isExpanded,
     );
-    const originalItems = hasTreeItems
+    const originalItems: DduItem[] = this.#options.useCopyOnWrite
+      ? (hasTreeItems ? [...items] : items)
+      : hasTreeItems
       ? structuredClone(items) as DduItem[]
       : items;
 
@@ -2036,6 +2053,8 @@ export class Ddu {
       [...filters.matchers, ...filters.sorters],
       input,
       items,
+      getCloneCount,
+      resetCloneCount,
     );
 
     // Preserve parent items with matching children
@@ -2057,6 +2076,8 @@ export class Ddu {
       filters.converters,
       input,
       items,
+      getCloneCount,
+      resetCloneCount,
     );
 
     return [state.isDone, allItems, items];

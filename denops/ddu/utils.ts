@@ -177,6 +177,109 @@ export async function callCallback(
   }
 }
 
+// Whether globalThis.structuredClone is available (Deno 1.14+, Node 18+)
+const structuredCloneAvailable = typeof (globalThis as Record<string, unknown>)
+  .structuredClone === "function";
+
+// Warn once if falling back to JSON-based deep clone
+let _cowFallbackWarned = false;
+
+/**
+ * Deep-clone a single item.
+ * Prefers structuredClone; falls back to JSON round-trip as last resort.
+ */
+function deepCloneItem<T>(item: T): T {
+  if (structuredCloneAvailable) {
+    return structuredClone(item);
+  }
+  if (!_cowFallbackWarned) {
+    _cowFallbackWarned = true;
+    // NOTE: JSON round-trip cannot handle undefined, Date, RegExp, etc.
+    console.warn(
+      "[ddu] structuredClone unavailable; COW falling back to JSON deep clone. " +
+        "Some item properties may be lost.",
+    );
+  }
+  return JSON.parse(JSON.stringify(item)) as T;
+}
+
+/**
+ * Wrap each item in a Proxy that clones on first write (Copy-On-Write).
+ *
+ * Returns a tuple:
+ *   [proxiedItems, getCloneCount, resetCloneCount]
+ *
+ * - proxiedItems    : array of COW-proxied DduItem values.
+ * - getCloneCount() : returns the total number of items actually cloned so far.
+ * - resetCloneCount(): resets the internal counter to 0.
+ */
+export function cowifyItems(
+  items: DduItem[],
+): [DduItem[], () => number, () => void] {
+  let cloneCount = 0;
+
+  const proxied = items.map((originalItem) => {
+    // clonedItem holds the lazy copy; null means not yet cloned.
+    let clonedItem: DduItem | null = null;
+
+    const ensureClone = () => {
+      if (!clonedItem) {
+        cloneCount++;
+        clonedItem = deepCloneItem(originalItem);
+      }
+    };
+
+    return new Proxy(originalItem, {
+      get(_target, prop, receiver) {
+        // Read from cloned copy when available, otherwise from original.
+        const source = clonedItem ?? originalItem;
+        return Reflect.get(source, prop, receiver);
+      },
+      set(_target, prop, value) {
+        ensureClone();
+        // Write directly to the cloned copy (use clonedItem as receiver to
+        // avoid re-entering this proxy through a possible inherited setter).
+        return Reflect.set(clonedItem!, prop, value, clonedItem!);
+      },
+      has(_target, prop) {
+        return Reflect.has(clonedItem ?? originalItem, prop);
+      },
+      deleteProperty(_target, prop) {
+        ensureClone();
+        return Reflect.deleteProperty(clonedItem!, prop);
+      },
+      defineProperty(_target, prop, descriptor) {
+        ensureClone();
+        return Reflect.defineProperty(clonedItem!, prop, descriptor);
+      },
+      ownKeys(_target) {
+        return Reflect.ownKeys(clonedItem ?? originalItem);
+      },
+      getOwnPropertyDescriptor(_target, prop) {
+        return Reflect.getOwnPropertyDescriptor(
+          clonedItem ?? originalItem,
+          prop,
+        );
+      },
+      getPrototypeOf(_target) {
+        return Reflect.getPrototypeOf(clonedItem ?? originalItem);
+      },
+      setPrototypeOf(_target, proto) {
+        ensureClone();
+        return Reflect.setPrototypeOf(clonedItem!, proto);
+      },
+    });
+  }) as DduItem[];
+
+  return [
+    proxied,
+    () => cloneCount,
+    () => {
+      cloneCount = 0;
+    },
+  ];
+}
+
 export async function getFilters(
   denops: Denops,
   context: Context,

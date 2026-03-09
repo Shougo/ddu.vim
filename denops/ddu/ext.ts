@@ -470,6 +470,8 @@ export async function callFilters(
   filters: UserFilter[],
   input: string,
   items: DduItem[],
+  getCloneCount?: () => number,
+  resetCloneCount?: () => void,
 ) {
   type FilterProfile = {
     name: string;
@@ -478,6 +480,7 @@ export async function callFilters(
     itemsAfter: number;
     inputChanged: boolean;
     retType: "array" | "object";
+    cloneDelta: number;
   };
   const profiles: FilterProfile[] = [];
 
@@ -495,6 +498,8 @@ export async function callFilters(
     try {
       const itemsBefore = items.length;
       const prevInput = input;
+      // Snapshot clone count before this filter runs
+      const cloneBefore = getCloneCount ? getCloneCount() : 0;
       const startTime = Date.now();
 
       const ret = await filter.filter({
@@ -509,6 +514,7 @@ export async function callFilters(
       });
 
       const elapsedMs = Date.now() - startTime;
+      const cloneAfter = getCloneCount ? getCloneCount() : 0;
       let retType: "array" | "object";
       let inputChanged = false;
 
@@ -533,6 +539,7 @@ export async function callFilters(
           itemsAfter: items.length,
           inputChanged,
           retType,
+          cloneDelta: cloneAfter - cloneBefore,
         });
       }
     } catch (e: unknown) {
@@ -544,10 +551,16 @@ export async function callFilters(
     const lines = profiles.map((p) =>
       `  ${p.name}: ${p.elapsedMs} ms` +
       ` items: ${p.itemsBefore} -> ${p.itemsAfter}` +
-      ` inputChanged: ${p.inputChanged} retType: ${p.retType}`
+      ` inputChanged: ${p.inputChanged} retType: ${p.retType}` +
+      ` cloneDelta: ${p.cloneDelta}`
     );
 
     await printLog(denops, lines);
+  }
+
+  // Reset clone counter after each callFilters run so counts are per-invocation
+  if (resetCloneCount) {
+    resetCloneCount();
   }
 
   return items;
