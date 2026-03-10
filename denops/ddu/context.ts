@@ -76,7 +76,7 @@ export function defaultDduOptions(): DduOptions {
     columnOptions: {},
     columnParams: {},
     converterCache: false,
-    converterCacheMaxEntries: 1000,
+    converterCacheMaxEntries: 5000,
     converterCacheTTL: 60000,
     expandInput: false,
     filterOptions: {},
