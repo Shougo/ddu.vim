@@ -139,6 +139,35 @@ columnParams		(dictionary)
 
 		Default: {}
 
+                                                   *ddu-option-converterCache*
+converterCache		(boolean)
+		Enable core-side converter result cache (opt-in).
+
+		It is useful when expensive converters repeatedly process the
+		same items.
+
+		Default: false
+
+                                         *ddu-option-converterCacheMaxEntries*
+converterCacheMaxEntries (number)
+		It is the maximum number of entries stored in the converter
+		cache (LRU).
+
+		This value controls the cache capacity. When the number of
+		stored entries exceeds this limit, the oldest entries are
+		evicted.
+
+		Default: 5000
+
+                                                *ddu-option-converterCacheTTL*
+converterCacheTTL	(number)
+		It is the cache entry time-to-live in milliseconds.
+
+		An entry older than this value (now - storedAt > TTL) is
+		considered expired and treated as a cache miss (and removed).
+
+		Default: 60000
+
                                                       *ddu-option-expandInput*
 expandInput		(boolean)
 		Expand user input by |expand()|.

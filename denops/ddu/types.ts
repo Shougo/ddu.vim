@@ -99,6 +99,9 @@ export type DduOptions = {
   actions: string[];
   columnOptions: Record<ColumnName, Partial<ColumnOptions>>;
   columnParams: Record<ColumnName, Partial<BaseParams>>;
+  converterCache: boolean;
+  converterCacheMaxEntries: number;
+  converterCacheTTL: number;
   expandInput: boolean;
   filterOptions: Record<FilterName, Partial<FilterOptions>>;
   filterParams: Record<FilterName, Partial<BaseParams>>;

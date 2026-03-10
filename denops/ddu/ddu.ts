@@ -59,6 +59,7 @@ import {
   uiRedraw,
   uiSearchItem,
 } from "./ext.ts";
+import { converterCache } from "./convert_cache.ts";
 
 import type { Denops } from "@denops/std";
 import * as fn from "@denops/std/function";
@@ -2048,16 +2049,77 @@ export class Ddu {
       items = items.slice(0, sourceOptions.maxItems);
     }
 
-    items = await callFilters(
-      denops,
-      this.#loader,
-      this.#context,
-      this.#options,
-      sourceOptions,
-      filters.converters,
-      input,
-      items,
-    );
+    if (this.#options.converterCache && filters.converters.length > 0) {
+      converterCache.reconfigure({
+        maxEntries: this.#options.converterCacheMaxEntries,
+        ttl: this.#options.converterCacheTTL,
+      });
+
+      // Partition items into cache hits (already mutated) and misses
+      const hitMask: boolean[] = new Array(items.length).fill(false);
+      const missItems: DduItem[] = [];
+      for (let i = 0; i < items.length; i++) {
+        const key = makeConverterCacheKey(items[i]);
+        if (key !== null) {
+          const cached = converterCache.get(key);
+          if (cached !== undefined) {
+            applyCachedItemTo(items[i], cached);
+            hitMask[i] = true;
+            continue;
+          }
+        }
+        missItems.push(items[i]);
+      }
+
+      // Run converters only on cache-miss items
+      const freshlyConverted = await callFilters(
+        denops,
+        this.#loader,
+        this.#context,
+        this.#options,
+        sourceOptions,
+        filters.converters,
+        input,
+        missItems,
+      );
+
+      // Cache newly converted items
+      for (const item of freshlyConverted) {
+        const key = makeConverterCacheKey(item);
+        if (key !== null) {
+          converterCache.set(key, serializeCacheItem(item));
+        }
+      }
+
+      if (this.#options.profile && this.#options.converterCache) {
+        await printLog(denops, this.#options.name, converterCache.stats());
+      }
+
+      // Reconstruct items preserving original order:
+      // cache-hit items stay at their positions; miss items are replaced by
+      // converter output in order (items removed by converters are dropped).
+      const result: DduItem[] = [];
+      let freshIdx = 0;
+      for (let i = 0; i < items.length; i++) {
+        if (hitMask[i]) {
+          result.push(items[i]);
+        } else if (freshIdx < freshlyConverted.length) {
+          result.push(freshlyConverted[freshIdx++]);
+        }
+      }
+      items = result;
+    } else {
+      items = await callFilters(
+        denops,
+        this.#loader,
+        this.#context,
+        this.#options,
+        sourceOptions,
+        filters.converters,
+        input,
+        items,
+      );
+    }
 
     return [state.isDone, allItems, items];
   }
@@ -2146,6 +2208,22 @@ function item2Key(item: DduItem) {
     ? item.treePath.join(pathsep)
     : item.word;
   return `${item.__sourceIndex}${item.__sourceName}:${treePath}`;
+}
+
+function makeConverterCacheKey(item: DduItem): string | null {
+  const action = item.action as Record<string, unknown> | undefined;
+  const id = (action?.["path"] as string | undefined) || item.word;
+  if (!id) return null;
+  const ver = action?.["mtime"] ?? action?.["version"] ?? "";
+  return `${id}::${ver}`;
+}
+
+function serializeCacheItem(item: DduItem): DduItem {
+  return structuredClone(item);
+}
+
+function applyCachedItemTo(item: DduItem, cached: DduItem): void {
+  Object.assign(item, structuredClone(cached));
 }
 
 Deno.test("isParentPath", () => {
