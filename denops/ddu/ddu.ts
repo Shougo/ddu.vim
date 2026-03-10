@@ -2091,6 +2091,10 @@ export class Ddu {
         }
       }
 
+      if (this.#options.profile && this.#options.converterCache) {
+        await printLog(denops, this.#options.name, converterCache.stats());
+      }
+
       // Reconstruct items preserving original order:
       // cache-hit items stay at their positions; miss items are replaced by
       // converter output in order (items removed by converters are dropped).
