@@ -8,6 +8,7 @@ import type {
   DduOptions,
   ExpandItem,
   Item,
+  ItemHighlight,
   SourceInfo,
   SourceOptions,
   TreePath,
@@ -25,6 +26,7 @@ import { defaultSourceOptions } from "./base/source.ts";
 import type { BaseSource } from "./base/source.ts";
 import type { Loader } from "./loader.ts";
 import {
+  assignProp,
   convertTreePath,
   convertUserString,
   getFilters,
@@ -2055,19 +2057,65 @@ export class Ddu {
         ttl: this.#options.converterCacheTTL,
       });
 
-      // Partition items into cache hits (already mutated) and misses
+      // Partition items into hits and misses.
+      // For misses with a key we record pre-existing highlights so we can
+      // compute converter-only highlights (after - before) to store in cache.
       const hitMask: boolean[] = new Array(items.length).fill(false);
       const missItems: DduItem[] = [];
+      const preHighlights = new Map<string, ItemHighlight[]>();
+
       for (let i = 0; i < items.length; i++) {
         const key = makeConverterCacheKey(items[i]);
         if (key !== null) {
           const cached = converterCache.get(key);
           if (cached !== undefined) {
-            applyCachedItemTo(items[i], cached);
+            // cached.highlights is expected to contain only converter-produced
+            // highlights (per new policy).
+            try {
+              const cachedHighlights = Array.isArray(cached.highlights)
+                ? cached.highlights as ItemHighlight[]
+                : [];
+              const existingHighlights = Array.isArray(items[i].highlights)
+                ? items[i].highlights as ItemHighlight[]
+                : [];
+
+              // Merge existing (matcher) highlights with cached (converter)
+              // highlights.
+              items[i].highlights = mergeHighlights(
+                existingHighlights,
+                cachedHighlights,
+              );
+
+              // Apply other cached fields (overwrite) except 'highlights'
+              // because we merged it.
+              for (const k of Object.keys(cached) as Array<keyof DduItem>) {
+                if (k === "highlights") continue;
+                const v = cached[k];
+                if (typeof v === "undefined") continue;
+                assignProp(items[i], k, v as DduItem[typeof k]);
+              }
+            } catch {
+              // If merge/apply fails, treat this item as a miss to avoid
+              // breaking display.
+              missItems.push(items[i]);
+              continue;
+            }
+
             hitMask[i] = true;
             continue;
+          } else {
+            // Cache miss but key exists: remember existing highlights (matcher
+            // produced)
+            preHighlights.set(
+              key,
+              Array.isArray(items[i].highlights)
+                ? (items[i].highlights as ItemHighlight[]).slice()
+                : [],
+            );
           }
         }
+
+        // key === null or no cached entry
         missItems.push(items[i]);
       }
 
@@ -2083,11 +2131,25 @@ export class Ddu {
         missItems,
       );
 
-      // Cache newly converted items
+      // Cache newly converted items, but store ONLY converter-produced
+      // highlights (after - before).
       for (const item of freshlyConverted) {
         const key = makeConverterCacheKey(item);
         if (key !== null) {
-          converterCache.set(key, serializeCacheItem(item));
+          try {
+            const before = preHighlights.get(key) ?? [];
+            const after = Array.isArray(item.highlights)
+              ? item.highlights as ItemHighlight[]
+              : [];
+            const converterOnly = diffHighlights(before, after);
+
+            const cacheVal = serializeCacheItem(item);
+            // Store converter-only highlights in cache value
+            cacheVal.highlights = converterOnly;
+            converterCache.set(key, cacheVal);
+          } catch {
+            // ignore cache failures
+          }
         }
       }
 
@@ -2222,8 +2284,64 @@ function serializeCacheItem(item: DduItem): DduItem {
   return structuredClone(item);
 }
 
-function applyCachedItemTo(item: DduItem, cached: DduItem): void {
-  Object.assign(item, structuredClone(cached));
+function highlightKey(h: ItemHighlight): string {
+  // Use name + hl_group + col + width to identify a highlight uniquely enough.
+  return `${h.name ?? ""}:${h.hl_group ?? ""}:${h.col ?? 0}:${h.width ?? 0}`;
+}
+
+// Merge two ItemHighlight arrays, preserving base (matcher) highlights and
+// appending converter highlights avoiding duplicates.
+function mergeHighlights(
+  base: ItemHighlight[] | undefined,
+  additions: ItemHighlight[] | undefined,
+): ItemHighlight[] {
+  const b = (base ?? []) as ItemHighlight[];
+  const a = (additions ?? []) as ItemHighlight[];
+  if (b.length === 0) return a.slice();
+  if (a.length === 0) return b.slice();
+
+  const seen = new Set<string>();
+  const out: ItemHighlight[] = [];
+
+  for (const h of b) {
+    const k = highlightKey(h);
+    seen.add(k);
+    out.push(h);
+  }
+  for (const h of a) {
+    const k = highlightKey(h);
+    if (!seen.has(k)) {
+      seen.add(k);
+      out.push(h);
+    }
+  }
+  return out;
+}
+
+// Return highlights that are in `after` but not in `before` (converter-only
+// highlights).
+function diffHighlights(
+  before: ItemHighlight[] | undefined,
+  after: ItemHighlight[] | undefined,
+): ItemHighlight[] {
+  const b = (before ?? []) as ItemHighlight[];
+  const a = (after ?? []) as ItemHighlight[];
+  if (a.length === 0) return [];
+  if (b.length === 0) return a.slice();
+
+  const seen = new Set<string>();
+  for (const h of b) {
+    seen.add(highlightKey(h));
+  }
+
+  const out: ItemHighlight[] = [];
+  for (const h of a) {
+    const k = highlightKey(h);
+    if (!seen.has(k)) {
+      out.push(h);
+    }
+  }
+  return out;
 }
 
 Deno.test("isParentPath", () => {
