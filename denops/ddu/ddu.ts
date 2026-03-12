@@ -61,7 +61,7 @@ import {
   uiRedraw,
   uiSearchItem,
 } from "./ext.ts";
-import { converterCache } from "./convert_cache.ts";
+import { ConverterCache } from "./convert_cache.ts";
 
 import type { Denops } from "@denops/std";
 import * as fn from "@denops/std/function";
@@ -106,6 +106,7 @@ export class Ddu {
   #searchPath: TreePath = "";
   #items: DduItem[] = [];
   readonly #expandedItems: Map<string, DduItem> = new Map();
+  #converterCache = new ConverterCache();
 
   constructor(loader: Loader, uiRedrawLock: Lock<number>) {
     this.#loader = loader;
@@ -2052,7 +2053,7 @@ export class Ddu {
     }
 
     if (this.#options.converterCache && filters.converters.length > 0) {
-      converterCache.reconfigure({
+      this.#converterCache.reconfigure({
         maxEntries: this.#options.converterCacheMaxEntries,
         ttl: this.#options.converterCacheTTL,
       });
@@ -2067,7 +2068,7 @@ export class Ddu {
       for (let i = 0; i < items.length; i++) {
         const key = makeConverterCacheKey(items[i]);
         if (key !== null) {
-          const cached = converterCache.get(key);
+          const cached = this.#converterCache.get(key);
           if (cached !== undefined) {
             // cached.highlights is expected to contain only converter-produced
             // highlights (per new policy).
@@ -2146,7 +2147,7 @@ export class Ddu {
             const cacheVal = serializeCacheItem(item);
             // Store converter-only highlights in cache value
             cacheVal.highlights = converterOnly;
-            converterCache.set(key, cacheVal);
+            this.#converterCache.set(key, cacheVal);
           } catch {
             // ignore cache failures
           }
@@ -2154,7 +2155,11 @@ export class Ddu {
       }
 
       if (this.#options.profile && this.#options.converterCache) {
-        await printLog(denops, this.#options.name, converterCache.stats());
+        await printLog(
+          denops,
+          this.#options.name,
+          this.#converterCache.stats(),
+        );
       }
 
       // Reconstruct items preserving original order:

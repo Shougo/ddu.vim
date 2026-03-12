@@ -89,5 +89,3 @@ export class ConverterCache {
     }
   }
 }
-
-export const converterCache = new ConverterCache();

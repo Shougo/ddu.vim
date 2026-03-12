@@ -218,6 +218,10 @@ export async function getFilters(
 }
 
 // Generic assign helper — no 'any' in the call site.
-export function assignProp<T, K extends keyof T>(obj: T, key: K, value: T[K]): void {
+export function assignProp<T, K extends keyof T>(
+  obj: T,
+  key: K,
+  value: T[K],
+): void {
   obj[key] = value;
 }
