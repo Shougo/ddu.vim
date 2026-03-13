@@ -84,6 +84,7 @@ export function defaultDduOptions(): DduOptions {
     kindOptions: {},
     kindParams: {},
     input: "",
+    matcherConcurrency: 1,
     name: "default",
     postFilters: [],
     profile: false,
@@ -470,4 +471,15 @@ Deno.test("mergeDduOptions", () => {
       uiParams: {},
     },
   );
+});
+
+Deno.test("defaultDduOptions includes matcherConcurrency", () => {
+  const opts = defaultDduOptions();
+  assertEquals(opts.matcherConcurrency, 1);
+});
+
+Deno.test("mergeDduOptions preserves matcherConcurrency", () => {
+  const base = defaultDduOptions();
+  const merged = mergeDduOptions(base, { matcherConcurrency: 4 });
+  assertEquals(merged.matcherConcurrency, 4);
 });

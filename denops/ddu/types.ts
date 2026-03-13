@@ -108,6 +108,7 @@ export type DduOptions = {
   input: string;
   kindOptions: Record<KindName, Partial<KindOptions>>;
   kindParams: Record<KindName, Partial<BaseParams>>;
+  matcherConcurrency: number;
   name: string;
   postFilters: UserFilter[];
   profile: boolean;

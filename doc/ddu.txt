@@ -212,6 +212,38 @@ kindParams		(dictionary)
 
 		Default: {}
 
+
+                                             *ddu-option-matcherConcurrency*
+matcherConcurrency	(number)
+		Maximum number of worker tasks used when running matchers in
+		parallel.
+
+		When this value is greater than 1, ddu splits the current item
+		list into (at most matcherConcurrency) equal-sized chunks and
+		runs all configured matchers on every chunk concurrently via
+		Promise.all.  The final result is the concatenation of the
+		per-chunk results, preserving the original item order.
+
+		Parallel execution is only activated when ALL of the following
+		conditions hold:
+		  1. matcherConcurrency > 1
+		  2. Every matcher in the active filter list has declared
+		     itself parallel-safe by setting the static class property
+		     `parallelSafe = true`.  See
+		     |ddu-filter-attribute-parallelSafe|.
+		  3. Every chunk returns exactly the same number of items as it
+		     received (i.e. no filter removes or adds items during
+		     the parallel pass).
+
+		If any condition is not met, or if any chunk throws an
+		exception, ddu falls back transparently to the normal
+		sequential matcher execution.
+
+		NOTE: The default value is 1, which preserves the existing
+		sequential behaviour completely.
+
+		Default: 1
+
                                                              *ddu-option-name*
 name			(string)
 		Specify the name.
@@ -1702,6 +1734,32 @@ onInit			(function)			(Optional)
                                          *ddu-filter-attribute-onRefreshItems*
 onRefreshItems		(function)			(Optional)
 		Called before refresh items.
+
+                                             *ddu-filter-attribute-parallelSafe*
+parallelSafe		(boolean)			(Optional)
+		A static class property that declares whether the filter can safely
+		be applied to independent item chunks in parallel.
+
+		Set this to `true` on a filter subclass when the filter processes
+		each item independently and does not rely on the order of items or
+		the total item count.  A typical use-case is a filter that only
+		annotates items with highlight information without removing any of
+		them.
+
+		Filters that may remove or add items (e.g. standard fuzzy/regex
+		matchers) should leave this property at its default value of
+		`false`, because the chunk-length validation performed by
+		|ddu-option-matcherConcurrency| will cause an automatic fallback
+		to sequential execution when items are removed.
+
+		Example: >typescript
+		  export class Filter extends BaseFilter<Params> {
+		    static override parallelSafe = true;
+		    // ...
+		  }
+		<
+
+		Default: false
 
                                                  *ddu-filter-attribute-params*
 params			(function)			(Required)
