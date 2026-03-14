@@ -40,26 +40,6 @@ export abstract class BaseFilter<Params extends BaseParams> {
   path = "";
   isInitialized = false;
 
-  /**
-   * Set to `true` on a filter subclass to declare that the filter can safely
-   * run on independent item-chunks in parallel.
-   *
-   * A filter is considered parallel-safe when it processes every item
-   * independently (e.g. only annotates highlights) and never relies on the
-   * relative order of, or the total count of, items passed to it.  Typical
-   * filters that *remove* items (matchers) should leave this flag unset or
-   * set it to `false`.
-   *
-   * Example:
-   * ```ts
-   * export class Filter extends BaseFilter<Params> {
-   *   static override parallelSafe = true;
-   *   // ...
-   * }
-   * ```
-   */
-  static parallelSafe = false;
-
   onInit(_args: OnInitArguments<Params>): void | Promise<void> {}
 
   onRefreshItems(
@@ -76,5 +56,6 @@ export abstract class BaseFilter<Params extends BaseParams> {
 export function defaultFilterOptions(): FilterOptions {
   return {
     minInputLength: 0,
+    parallelSafe: false,
   };
 }

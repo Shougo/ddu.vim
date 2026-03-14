@@ -165,6 +165,7 @@ export type SourceOptions = {
 
 export type FilterOptions = {
   minInputLength: number;
+  parallelSafe: boolean;
 };
 
 export type ColumnOptions = {

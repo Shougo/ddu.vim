@@ -12,6 +12,7 @@ import type {
   SourceInfo,
   SourceOptions,
   TreePath,
+  UserFilter,
   UserOptions,
   UserSource,
 } from "./types.ts";
@@ -2009,10 +2010,8 @@ export class Ddu {
       ),
     );
     const allParallelSafe = resolvedFilters.every(
-      ([filter]) =>
-        filter !== undefined &&
-        // deno-lint-ignore no-explicit-any
-        (filter.constructor as any).parallelSafe === true,
+      ([filter, filterOptions]) =>
+        filter !== undefined && filterOptions.parallelSafe,
     );
 
     if (!allParallelSafe) {
