@@ -56,5 +56,6 @@ export abstract class BaseFilter<Params extends BaseParams> {
 export function defaultFilterOptions(): FilterOptions {
   return {
     minInputLength: 0,
+    parallelSafe: false,
   };
 }

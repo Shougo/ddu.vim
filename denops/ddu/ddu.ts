@@ -12,6 +12,7 @@ import type {
   SourceInfo,
   SourceOptions,
   TreePath,
+  UserFilter,
   UserOptions,
   UserSource,
 } from "./types.ts";
@@ -107,6 +108,7 @@ export class Ddu {
   #items: DduItem[] = [];
   readonly #expandedItems: Map<string, DduItem> = new Map();
   #converterCache = new ConverterCache();
+  #latestMatcherRunId = 0;
 
   constructor(loader: Loader, uiRedrawLock: Lock<number>) {
     this.#loader = loader;
@@ -1978,6 +1980,129 @@ export class Ddu {
     });
   }
 
+  async #runMatchersConcurrently(
+    denops: Denops,
+    sourceOptions: SourceOptions,
+    matcherFilters: UserFilter[],
+    input: string,
+    items: DduItem[],
+  ): Promise<DduItem[]> {
+    const concurrency = this.#options.matcherConcurrency;
+
+    // Fast path: no matchers, or concurrency is 1 (sequential mode)
+    if (matcherFilters.length === 0 || concurrency <= 1) {
+      return callFilters(
+        denops,
+        this.#loader,
+        this.#context,
+        this.#options,
+        sourceOptions,
+        matcherFilters,
+        input,
+        items,
+      );
+    }
+
+    // Check whether every matcher has opted in to parallel execution
+    const resolvedFilters = await Promise.all(
+      matcherFilters.map((uf) =>
+        getFilter(denops, this.#loader, this.#options, uf)
+      ),
+    );
+    const allParallelSafe = resolvedFilters.every(
+      ([filter, filterOptions]) =>
+        filter !== undefined && filterOptions.parallelSafe,
+    );
+
+    if (!allParallelSafe) {
+      return callFilters(
+        denops,
+        this.#loader,
+        this.#context,
+        this.#options,
+        sourceOptions,
+        matcherFilters,
+        input,
+        items,
+      );
+    }
+
+    // Record this run so we can detect stale results later
+    const runId = ++this.#latestMatcherRunId;
+
+    // Split items into (at most concurrency) equal-sized chunks
+    const chunkSize = Math.max(1, Math.ceil(items.length / concurrency));
+    const chunks: DduItem[][] = [];
+    for (let i = 0; i < items.length; i += chunkSize) {
+      chunks.push(items.slice(i, i + chunkSize));
+    }
+
+    let parallelResults: DduItem[][] | null = null;
+    try {
+      const startTime = Date.now();
+
+      parallelResults = await Promise.all(
+        chunks.map((chunk) =>
+          callFilters(
+            denops,
+            this.#loader,
+            this.#context,
+            this.#options,
+            sourceOptions,
+            matcherFilters,
+            input,
+            chunk,
+          )
+        ),
+      );
+
+      if (this.#options.profile) {
+        await printLog(denops, [
+          `  runMatchersConcurrently: ${Date.now() - startTime} ms` +
+          ` chunks: ${chunks.length} concurrency: ${concurrency}`,
+        ]);
+      }
+    } catch (_e) {
+      parallelResults = null;
+    }
+
+    // Discard results if a newer run has started in the meantime
+    if (runId !== this.#latestMatcherRunId) {
+      return callFilters(
+        denops,
+        this.#loader,
+        this.#context,
+        this.#options,
+        sourceOptions,
+        matcherFilters,
+        input,
+        items,
+      );
+    }
+
+    // Safety check: each chunk result must have the same length as its input
+    // chunk.  If any filter removed or added items the chunks are no longer
+    // independent and we must fall back to a sequential run.
+    if (
+      parallelResults !== null &&
+      parallelResults.every((res, i) => res.length === chunks[i].length)
+    ) {
+      return parallelResults.flat();
+    }
+
+    // Fallback: sequential execution
+    return callFilters(
+      denops,
+      this.#loader,
+      this.#context,
+      this.#options,
+      sourceOptions,
+      matcherFilters,
+      input,
+      items,
+    );
+  }
+
   async #filterItems(
     denops: Denops,
     userSource: UserSource,
@@ -2031,13 +2156,20 @@ export class Ddu {
       input,
       items,
     );
+    items = await this.#runMatchersConcurrently(
+      denops,
+      sourceOptions,
+      filters.matchers,
+      input,
+      items,
+    );
     items = await callFilters(
       denops,
       this.#loader,
       this.#context,
       this.#options,
       sourceOptions,
-      [...filters.matchers, ...filters.sorters],
+      filters.sorters,
       input,
       items,
     );
