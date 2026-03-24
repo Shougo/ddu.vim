@@ -654,7 +654,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const tabNr = ensure(arg2, is.Number);
 
       const ddu = getDdu(name);
-      return await ddu.uiVisible(denops, tabNr);
+      return ddu.uiVisible(denops, tabNr);
     },
     async uiWinids(
       arg1: unknown,
@@ -662,7 +662,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const name = ensure(arg1, is.String);
 
       const ddu = getDdu(name);
-      return await ddu.uiWinids(denops);
+      return ddu.uiWinids(denops);
     },
     async uiUpdateCursor(
       arg1: unknown,
@@ -670,7 +670,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const name = ensure(arg1, is.String);
 
       const ddu = getDdu(name);
-      await ddu.uiUpdateCursor(denops);
+      return ddu.uiUpdateCursor(denops);
     },
   };
 };
