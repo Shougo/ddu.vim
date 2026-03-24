@@ -646,7 +646,7 @@ export const main: Entrypoint = (denops: Denops) => {
       );
       return [filter?.path ?? "", filterOptions, filterParams];
     },
-    async uiVisible(
+    uiVisible(
       arg1: unknown,
       arg2: unknown,
     ): Promise<boolean> {
@@ -656,7 +656,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const ddu = getDdu(name);
       return ddu.uiVisible(denops, tabNr);
     },
-    async uiWinids(
+    uiWinids(
       arg1: unknown,
     ): Promise<number[]> {
       const name = ensure(arg1, is.String);
@@ -664,7 +664,7 @@ export const main: Entrypoint = (denops: Denops) => {
       const ddu = getDdu(name);
       return ddu.uiWinids(denops);
     },
-    async uiUpdateCursor(
+    uiUpdateCursor(
       arg1: unknown,
     ): Promise<void> {
       const name = ensure(arg1, is.String);

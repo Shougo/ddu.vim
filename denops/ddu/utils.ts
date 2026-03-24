@@ -28,7 +28,8 @@ export async function printError(
 ) {
   const message = messages.map((v) => {
     if (v instanceof Error) {
-      // NOTE: In Deno, Prefer `Error.stack` because it contains `Error.message`.
+      // NOTE: In Deno, Prefer `Error.stack` because it contains
+      // `Error.message`.
       return `${v.stack ?? v}`;
     } else if (typeof v === "object") {
       return JSON.stringify(v);
@@ -45,7 +46,8 @@ export async function printLog(
 ) {
   const message = messages.map((v) => {
     if (v instanceof Error) {
-      // NOTE: In Deno, Prefer `Error.stack` because it contains `Error.message`.
+      // NOTE: In Deno, Prefer `Error.stack` because it contains
+      // `Error.message`.
       return `${v.stack ?? v}`;
     } else if (typeof v === "object") {
       return JSON.stringify(v);
