@@ -1650,7 +1650,7 @@ export class Ddu {
       return false;
     }
 
-    return await ui.visible({
+    return ui.visible({
       denops,
       context: this.#context,
       options: this.#options,
@@ -1672,7 +1672,7 @@ export class Ddu {
       return [];
     }
 
-    return await ui.winIds({
+    return ui.winIds({
       denops,
       context: this.#context,
       options: this.#options,
@@ -1693,7 +1693,7 @@ export class Ddu {
       return;
     }
 
-    await ui.updateCursor({
+    return ui.updateCursor({
       denops,
       context: this.#context,
       options: this.#options,
