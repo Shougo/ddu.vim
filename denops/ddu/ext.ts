@@ -300,7 +300,7 @@ export async function getUi(
     BaseParams,
   ]
 > {
-  const userUi = convertUserString(options.ui) as UserUi;
+  const userUi = convertUserString(options.ui);
   const name = userUi.name;
 
   if (name.length === 0) {
@@ -700,23 +700,23 @@ function uiArgs<
 >(
   options: DduOptions,
   ui: BaseUi<Params>,
-  userUi?: UserUi,
+  userUi: UserUi,
 ): [UiOptions, BaseParams] {
-  const u = convertUserString(userUi);
+  userUi = convertUserString(userUi);
   const o = foldMerge(
     mergeUiOptions,
     defaultUiOptions,
     [
       options.uiOptions["_"],
       options.uiOptions[ui.name],
-      u?.options,
+      userUi.options,
     ],
   );
   const p = foldMerge(mergeParams, defaultDummy, [
     ui.params(),
     options.uiParams["_"],
     options.uiParams[ui.name],
-    u?.params,
+    userUi.params,
   ]);
   return [o, p];
 }
