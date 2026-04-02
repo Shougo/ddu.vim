@@ -18,6 +18,7 @@ import {
   type UserColumn,
   type UserFilter,
   type UserSource,
+  type UserUi,
 } from "./types.ts";
 import {
   defaultDummy,
@@ -299,7 +300,8 @@ export async function getUi(
     BaseParams,
   ]
 > {
-  const name = convertUserString(options.ui).name;
+  const userUi = convertUserString(options.ui) as UserUi;
+  const name = userUi.name;
 
   if (name.length === 0) {
     return [
@@ -320,7 +322,7 @@ export async function getUi(
     ];
   }
 
-  const [uiOptions, uiParams] = uiArgs(options, ui);
+  const [uiOptions, uiParams] = uiArgs(options, ui, userUi);
 
   await checkUiOnInit(ui, denops, uiOptions, uiParams);
 
@@ -698,19 +700,23 @@ function uiArgs<
 >(
   options: DduOptions,
   ui: BaseUi<Params>,
+  userUi?: UserUi,
 ): [UiOptions, BaseParams] {
+  const u = convertUserString(userUi);
   const o = foldMerge(
     mergeUiOptions,
     defaultUiOptions,
     [
       options.uiOptions["_"],
       options.uiOptions[ui.name],
+      u?.options,
     ],
   );
   const p = foldMerge(mergeParams, defaultDummy, [
     ui.params(),
     options.uiParams["_"],
     options.uiParams[ui.name],
+    u?.params,
   ]);
   return [o, p];
 }
