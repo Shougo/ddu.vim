@@ -16,12 +16,6 @@ import { join } from "@std/path/join";
 import { parse } from "@std/path/parse";
 import { Lock } from "@core/asyncutil/lock";
 
-type Mod = {
-  // deno-lint-ignore no-explicit-any
-  mod: any;
-  path: string;
-};
-
 type Ext = {
   ui: Record<string, BaseUi<BaseParams>>;
   source: Record<string, BaseSource<BaseParams>>;
@@ -93,23 +87,115 @@ export class Loader {
   }
 
   async registerPath(type: DduExtType, path: string): Promise<void> {
-    await this.#registerLock.lock(async () => {
-      try {
-        await this.#register(type, path);
-      } catch (e) {
-        if (isDenoCacheIssueError(e)) {
-          console.warn("*".repeat(80));
-          console.warn(`Deno module cache issue is detected.`);
-          console.warn(
-            `Execute '!deno cache --reload "${path}"' and restart Vim/Neovim.`,
-          );
-          console.warn("*".repeat(80));
-        }
+    // Fast-path: skip I/O if already registered.
+    if (path in this.#checkPaths) {
+      return;
+    }
 
-        console.error(`Failed to load file '${path}': ${e}`);
-        throw e;
+    const name = parse(path).name;
+
+    // Perform I/O outside the lock so concurrent calls run in parallel.
+    // NOTE: We intentionally use Deno.stat instead of safeStat here. We expect
+    // errors to be thrown when paths don't exist or are inaccessible.
+    // deno-lint-ignore no-explicit-any
+    let importedMod: any;
+    try {
+      const fileInfo = await Deno.stat(path);
+      const entryPoint = fileInfo.isDirectory
+        ? join(path, EXT_ENTRY_POINT_FILE)
+        : path;
+      importedMod = await importPlugin(entryPoint);
+    } catch (e) {
+      if (isDenoCacheIssueError(e)) {
+        console.warn("*".repeat(80));
+        console.warn(`Deno module cache issue is detected.`);
+        console.warn(
+          `Execute '!deno cache --reload "${path}"' and restart Vim/Neovim.`,
+        );
+        console.warn("*".repeat(80));
       }
+
+      console.error(`Failed to load file '${path}': ${e}`);
+      throw e;
+    }
+
+    // Update shared state under lock; re-check to avoid duplicate registration
+    // by concurrent calls that passed the fast-path check simultaneously.
+    await this.#registerLock.lock(() => {
+      if (path in this.#checkPaths) {
+        return;
+      }
+
+      const typeExt = this.#exts[type];
+      let add: (name: string) => void;
+      switch (type) {
+        case "ui":
+          add = (name: string) => {
+            const ext = new importedMod.Ui();
+            ext.name = name;
+            ext.path = path;
+            typeExt[name] = ext;
+          };
+          break;
+        case "source":
+          add = (name: string) => {
+            const ext = new importedMod.Source();
+            ext.name = name;
+            ext.path = path;
+            typeExt[name] = ext;
+          };
+          break;
+        case "filter":
+          add = (name: string) => {
+            const ext = new importedMod.Filter();
+            ext.name = name;
+            ext.path = path;
+            typeExt[name] = ext;
+          };
+          break;
+        case "kind":
+          add = (name: string) => {
+            const ext = new importedMod.Kind();
+            ext.name = name;
+            ext.path = path;
+            typeExt[name] = ext;
+          };
+          break;
+        case "column":
+          add = (name: string) => {
+            const ext = new importedMod.Column();
+            ext.name = name;
+            ext.path = path;
+            typeExt[name] = ext;
+          };
+          break;
+      }
+
+      add!(name);
+
+      // Check alias
+      const aliases = this.getAliasNames(type).filter(
+        (k) => this.getAlias(type, k) === name,
+      );
+      for (const alias of aliases) {
+        add!(alias);
+      }
+
+      this.#checkPaths[path] = true;
     });
+  }
+
+  async registerPaths(type: DduExtType, paths: string[]): Promise<void> {
+    const results = await Promise.allSettled(
+      paths.map((path) => this.registerPath(type, path)),
+    );
+    for (const result of results) {
+      if (result.status === "rejected") {
+        console.error(
+          `registerPaths: failed to register a path: ${result.reason}`,
+        );
+      }
+    }
   }
 
   registerExtension(type: "ui", name: string, ext: BaseUi<BaseParams>): void;
@@ -200,89 +286,6 @@ export class Loader {
   }
   getSourceNames(): string[] {
     return Object.keys(this.#exts.source);
-  }
-
-  async #register(type: DduExtType, path: string) {
-    if (path in this.#checkPaths) {
-      return;
-    }
-
-    const name = parse(path).name;
-
-    const mod: Mod = {
-      mod: undefined,
-      path,
-    };
-
-    // NOTE: We intentionally use Deno.stat instead of safeStat here. We expect
-    // errors to be thrown when paths don't exist or are inaccessible.
-    const fileInfo = await Deno.stat(path);
-
-    if (fileInfo.isDirectory) {
-      // Load structured extension module
-      const entryPoint = join(path, EXT_ENTRY_POINT_FILE);
-      mod.mod = await importPlugin(entryPoint);
-    } else {
-      // Load single-file extension module
-      mod.mod = await importPlugin(path);
-    }
-
-    const typeExt = this.#exts[type];
-    let add;
-    switch (type) {
-      case "ui":
-        add = (name: string) => {
-          const ext = new mod.mod.Ui();
-          ext.name = name;
-          ext.path = mod.path;
-          typeExt[name] = ext;
-        };
-        break;
-      case "source":
-        add = (name: string) => {
-          const ext = new mod.mod.Source();
-          ext.name = name;
-          ext.path = mod.path;
-          typeExt[name] = ext;
-        };
-        break;
-      case "filter":
-        add = (name: string) => {
-          const ext = new mod.mod.Filter();
-          ext.name = name;
-          ext.path = mod.path;
-          typeExt[name] = ext;
-        };
-        break;
-      case "kind":
-        add = (name: string) => {
-          const ext = new mod.mod.Kind();
-          ext.name = name;
-          ext.path = mod.path;
-          typeExt[name] = ext;
-        };
-        break;
-      case "column":
-        add = (name: string) => {
-          const ext = new mod.mod.Column();
-          ext.name = name;
-          ext.path = mod.path;
-          typeExt[name] = ext;
-        };
-        break;
-    }
-
-    add(name);
-
-    // Check alias
-    const aliases = this.getAliasNames(type).filter(
-      (k) => this.getAlias(type, k) === name,
-    );
-    for (const alias of aliases) {
-      add(alias);
-    }
-
-    this.#checkPaths[path] = true;
   }
 }
 
