@@ -169,16 +169,18 @@ export class Loader {
             typeExt[name] = ext;
           };
           break;
+        default:
+          throw new Error(`Unexpected extension type: ${type}`);
       }
 
-      add!(name);
+      add(name);
 
       // Check alias
       const aliases = this.getAliasNames(type).filter(
         (k) => this.getAlias(type, k) === name,
       );
       for (const alias of aliases) {
-        add!(alias);
+        add(alias);
       }
 
       this.#checkPaths[path] = true;
