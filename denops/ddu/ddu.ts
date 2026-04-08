@@ -1020,8 +1020,25 @@ export class Ddu {
         this.#options,
       );
 
-      // Check UI is really quit
-      if ((await this.uiWinids(denops)).length > 0) {
+      // Wait for UI windows to disappear with small polling (total ~200ms)
+      const waitUntilZeroWinids = async (timeoutMs = 200, intervalMs = 20) => {
+        const deadline = Date.now() + timeoutMs;
+        while (Date.now() < deadline) {
+          try {
+            const ids = await this.uiWinids(denops);
+            if (ids.length === 0) {
+              return true;
+            }
+          } catch {
+            // ignore transient errors and retry
+          }
+          await new Promise((r) => setTimeout(r, intervalMs));
+        }
+        return (await this.uiWinids(denops)).length === 0;
+      };
+
+      const closed = await waitUntilZeroWinids();
+      if (!closed) {
         await printError(denops, `ui: "quit()" failed`);
         return;
       }
