@@ -110,7 +110,7 @@ export class Ddu {
   readonly #expandedItems: Map<string, DduItem> = new Map();
   #converterCache = new ConverterCache();
   #latestMatcherRunId = 0;
-  #redrawThrottleTimer?: ReturnType<typeof setTimeout>;
+  #redrawThrottleTimer?: number;
   #redrawThrottleOptions?: RedrawOptions;
   #lastRedrawTime = 0;
   #redrawThrottleTime = REDRAW_THROTTLE_MS;
@@ -2616,5 +2616,12 @@ Deno.test("mergeRedrawOptions", () => {
       { signal: signalB, restoreItemState: false },
     ),
     { signal: signalB, restoreItemState: false, restoreTree: false },
+  );
+  assertEquals(
+    mergeRedrawOptions(
+      { restoreTree: true },
+      { restoreTree: false },
+    ),
+    { restoreTree: true, restoreItemState: false },
   );
 });
