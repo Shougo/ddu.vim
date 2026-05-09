@@ -2471,8 +2471,7 @@ function mergeRedrawOptions(
   return {
     ...prevOpts,
     ...nextOpts,
-    restoreItemState:
-      (prevOpts.restoreItemState ?? false) ||
+    restoreItemState: (prevOpts.restoreItemState ?? false) ||
       (nextOpts.restoreItemState ?? false),
     restoreTree: (prevOpts.restoreTree ?? false) ||
       (nextOpts.restoreTree ?? false),
