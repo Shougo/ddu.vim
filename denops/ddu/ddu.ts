@@ -109,6 +109,10 @@ export class Ddu {
   readonly #expandedItems: Map<string, DduItem> = new Map();
   #converterCache = new ConverterCache();
   #latestMatcherRunId = 0;
+  #redrawThrottleTimer?: number;
+  #redrawThrottleOptions?: RedrawOptions;
+  #lastRedrawTime = 0;
+  #redrawThrottleTime = 50;
 
   constructor(loader: Loader, uiRedrawLock: Lock<number>) {
     this.#loader = loader;
@@ -428,6 +432,14 @@ export class Ddu {
       { signal: refreshErrorHandler.signal },
     );
 
+    const throttledOpts = this.#takeRedrawThrottleOptions();
+    if (throttledOpts) {
+      await this.redraw(
+        denops,
+        mergeRedrawOptions(throttledOpts, redrawOpts),
+      );
+    }
+
     if (redrawOpts.signal.aborted) {
       // Redraw is aborted, so do nothing
     } else if (!this.#context.done) {
@@ -472,9 +484,53 @@ export class Ddu {
       }
 
       if (this.#checkSync() && newItems.length > 0) {
-        /* no await */ this.redraw(denops, opts);
+        this.#redrawThrottled(denops, opts);
       }
     }
+  }
+
+  #redrawThrottled(
+    denops: Denops,
+    opts?: RedrawOptions,
+  ) {
+    this.#redrawThrottleOptions = mergeRedrawOptions(
+      this.#redrawThrottleOptions,
+      opts,
+    );
+
+    const wait = this.#lastRedrawTime + this.#redrawThrottleTime - Date.now();
+    if (wait <= 0) {
+      this.#flushRedrawThrottle(denops);
+      return;
+    }
+
+    if (this.#redrawThrottleTimer !== undefined) {
+      return;
+    }
+
+    this.#redrawThrottleTimer = setTimeout(() => {
+      this.#redrawThrottleTimer = undefined;
+      this.#flushRedrawThrottle(denops);
+    }, wait);
+  }
+
+  #flushRedrawThrottle(
+    denops: Denops,
+  ) {
+    const opts = this.#takeRedrawThrottleOptions();
+    this.#lastRedrawTime = Date.now();
+    /* no await */ this.redraw(denops, opts);
+  }
+
+  #takeRedrawThrottleOptions(): RedrawOptions | undefined {
+    if (this.#redrawThrottleTimer !== undefined) {
+      clearTimeout(this.#redrawThrottleTimer);
+      this.#redrawThrottleTimer = undefined;
+    }
+
+    const opts = this.#redrawThrottleOptions;
+    this.#redrawThrottleOptions = undefined;
+    return opts;
   }
 
   #newDduItem<
@@ -893,6 +949,8 @@ export class Ddu {
   }
 
   quit() {
+    this.#takeRedrawThrottleOptions();
+
     // NOTE: quitted flag must be called after ui.quit().
     this.#quitted = true;
     const reason = new QuitAbortReason();
@@ -909,6 +967,8 @@ export class Ddu {
   async cancelToRefresh(
     refreshIndexes: number[] = [],
   ): Promise<void> {
+    this.#takeRedrawThrottleOptions();
+
     const reason = new RefreshAbortReason(refreshIndexes);
     this.#aborter.abort(reason);
     await this.#cancelGatherStates(refreshIndexes, reason);
@@ -2391,6 +2451,28 @@ export class Ddu {
   }
 }
 
+function mergeRedrawOptions(
+  prevOpts?: RedrawOptions,
+  nextOpts?: RedrawOptions,
+): RedrawOptions | undefined {
+  if (!prevOpts) {
+    return nextOpts;
+  }
+  if (!nextOpts) {
+    return prevOpts;
+  }
+
+  return {
+    ...prevOpts,
+    ...nextOpts,
+    restoreItemState:
+      (prevOpts.restoreItemState ?? false) ||
+      (nextOpts.restoreItemState ?? false),
+    restoreTree: (prevOpts.restoreTree ?? false) ||
+      (nextOpts.restoreTree ?? false),
+  };
+}
+
 function chompTreePath(treePath?: TreePath): TreePath {
   if (!treePath) {
     return [];
@@ -2513,4 +2595,25 @@ Deno.test("isParentPath", () => {
   assertEquals(false, isParentPath("hoge".split("/"), "/home".split("/")));
   assertEquals([], chompTreePath(undefined));
   assertEquals(["hoge"], chompTreePath("hoge/".split("/")));
+});
+
+Deno.test("mergeRedrawOptions", () => {
+  assertEquals(mergeRedrawOptions(undefined, undefined), undefined);
+  assertEquals(
+    mergeRedrawOptions(
+      { restoreItemState: true },
+      { restoreTree: true },
+    ),
+    { restoreItemState: true, restoreTree: true },
+  );
+
+  const signalA = new AbortController().signal;
+  const signalB = new AbortController().signal;
+  assertEquals(
+    mergeRedrawOptions(
+      { signal: signalA },
+      { signal: signalB, restoreItemState: false },
+    ),
+    { signal: signalB, restoreItemState: false, restoreTree: false },
+  );
 });
