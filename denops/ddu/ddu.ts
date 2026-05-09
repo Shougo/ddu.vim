@@ -86,6 +86,9 @@ type RedrawOptions = {
 
 type RefreshOptions = Omit<RedrawOptions, "signal">;
 const REDRAW_THROTTLE_MS = 50;
+// Skip streaming redraw for very large chunks and rely on final redraw.
+// This avoids long blocking recomputation bursts while candidates are arriving.
+const REDRAW_STREAMING_CHUNK_LIMIT = 5000;
 
 export class Ddu {
   #loader: Loader;
@@ -485,7 +488,9 @@ export class Ddu {
       }
 
       if (this.#checkSync() && newItems.length > 0) {
-        this.#redrawThrottled(denops, opts);
+        if (isStreamingRedrawTarget(newItems.length)) {
+          this.#redrawThrottled(denops, opts);
+        }
       }
     }
   }
@@ -2474,6 +2479,10 @@ function mergeRedrawOptions(
   };
 }
 
+function isStreamingRedrawTarget(chunkItemsLength: number): boolean {
+  return chunkItemsLength < REDRAW_STREAMING_CHUNK_LIMIT;
+}
+
 function chompTreePath(treePath?: TreePath): TreePath {
   if (!treePath) {
     return [];
@@ -2624,4 +2633,12 @@ Deno.test("mergeRedrawOptions", () => {
     ),
     { restoreTree: true, restoreItemState: false },
   );
+});
+
+Deno.test("isStreamingRedrawTarget", () => {
+  assertEquals(isStreamingRedrawTarget(0), true);
+  assertEquals(isStreamingRedrawTarget(1), true);
+  assertEquals(isStreamingRedrawTarget(4999), true);
+  assertEquals(isStreamingRedrawTarget(5000), false);
+  assertEquals(isStreamingRedrawTarget(10000), false);
 });
