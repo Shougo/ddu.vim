@@ -85,6 +85,7 @@ type RedrawOptions = {
 };
 
 type RefreshOptions = Omit<RedrawOptions, "signal">;
+const REDRAW_THROTTLE_MS = 50;
 
 export class Ddu {
   #loader: Loader;
@@ -109,10 +110,10 @@ export class Ddu {
   readonly #expandedItems: Map<string, DduItem> = new Map();
   #converterCache = new ConverterCache();
   #latestMatcherRunId = 0;
-  #redrawThrottleTimer?: number;
+  #redrawThrottleTimer?: ReturnType<typeof setTimeout>;
   #redrawThrottleOptions?: RedrawOptions;
   #lastRedrawTime = 0;
-  #redrawThrottleTime = 50;
+  #redrawThrottleTime = REDRAW_THROTTLE_MS;
 
   constructor(loader: Loader, uiRedrawLock: Lock<number>) {
     this.#loader = loader;
