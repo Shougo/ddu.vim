@@ -113,7 +113,7 @@ export class Ddu {
   readonly #expandedItems: Map<string, DduItem> = new Map();
   #converterCache = new ConverterCache();
   #latestMatcherRunId = 0;
-  #redrawThrottleTimer?: number;
+  #redrawThrottleTimer?: ReturnType<typeof setTimeout>;
   #redrawThrottleOptions?: RedrawOptions;
   #lastRedrawTime = 0;
   #redrawThrottleTime = REDRAW_THROTTLE_MS;
