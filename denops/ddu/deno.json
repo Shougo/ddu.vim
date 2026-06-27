@@ -18,7 +18,7 @@
     ]
   },
   "imports": {
-    "@core/asyncutil": "jsr:@core/asyncutil@~1.2.0",
+    "@core/asyncutil": "jsr:@core/asyncutil@~1.4.0",
     "@core/unknownutil": "jsr:@core/unknownutil@~4.3.0",
     "@denops/std": "jsr:@denops/std@~8.2.0",
     "@lambdalisue/import-map-importer": "jsr:@lambdalisue/import-map-importer@~0.5.1",
