@@ -94,16 +94,11 @@ function s:normalize_key_or_dict(key_or_dict, value) abort
     let base[a:key_or_dict] = a:value
     return base
   endif
-  return {}
-endfunction
 
-function s:normalize_string_or_list(string_or_list) abort
-  if a:string_or_list->type() == v:t_list
-    return a:string_or_list
-  elseif a:string_or_list->type() == v:t_string
-    return [a:string_or_list]
-  endif
-  return []
+  throw printf(
+        \   'ddu#custom: "key_or_dict" must be Dict or String, got %s',
+        \   type(a:key_or_dict)
+        \ )
 endfunction
 
 function s:notify(method, args) abort
