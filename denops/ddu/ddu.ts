@@ -1911,6 +1911,7 @@ export class Ddu {
       this.#options,
       userOptions,
     ]);
+    this.#userOptions = userOptions;
 
     if (userOptions.input) {
       await this.setInput(denops, this.#options.input);
