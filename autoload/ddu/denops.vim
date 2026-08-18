@@ -1,3 +1,5 @@
+let s:initializing = v:false
+
 function ddu#denops#_running() abort
   return 'g:loaded_denops'->exists()
         \ && denops#server#status() ==# 'running'
@@ -12,14 +14,11 @@ function ddu#denops#_request(method, args) abort
   if denops#server#status() !=# 'running'
     " Lazy call
     execute printf('autocmd User DenopsPluginPost:ddu ++nested call '
-          \ .. 's:notify("%s", %s)', a:method, a:args->string())
+          \ .. 's:request(%s, %s)', a:method->string(), a:args->string())
     return {}
   endif
 
-  if denops#plugin#wait('ddu')
-    return {}
-  endif
-  return denops#request('ddu', a:method, a:args)
+  return s:request(a:method, a:args)
 endfunction
 function ddu#denops#_notify(method, args) abort
   if s:init()
@@ -68,10 +67,21 @@ function s:notify(method, args) abort
   endif
 endfunction
 
+function s:request(method, args) abort
+  if denops#plugin#is_loaded('ddu')
+    return denops#request('ddu', a:method, a:args)
+  endif
+
+  return denops#plugin#wait_async('ddu',
+        \ { -> denops#request('ddu', a:method, a:args) })
+endfunction
+
 function s:init() abort
-  if 'g:ddu#_initialized'->exists()
+  if 'g:ddu#_initialized'->exists() || s:initializing
     return
   endif
+
+  let s:initializing = v:true
 
   if !has('patch-9.1.1646') && !has('nvim-0.11')
     call ddu#util#print_error(
