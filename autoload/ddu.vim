@@ -75,11 +75,12 @@ endfunction
 
 let s:lazy_redraw_timers = {}
 function s:_lazy_redraw_callback(name, args, timer) abort
-  const timer = s:lazy_redraw_timers->get(a:name, -1)
-  if timer ==# a:timer
-    call remove(s:lazy_redraw_timers, a:name)
+  const current_timer = s:lazy_redraw_timers->get(a:name, -1)
+  if current_timer !=# a:timer
+    return
   endif
 
+  call remove(s:lazy_redraw_timers, a:name)
   call ddu#redraw(a:name, a:args)
 endfunction
 function ddu#_lazy_redraw(name, args = {}) abort
