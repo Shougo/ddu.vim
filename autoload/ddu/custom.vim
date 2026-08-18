@@ -46,6 +46,11 @@ let s:custom_actions = #{
       \   kind: {},
       \ }
 function ddu#custom#action(type, source_kind_name, action_name, func) abort
+  if !s:custom_actions->has_key(a:type)
+    call ddu#util#print_error('Invalid custom action type: ' .. a:type)
+    return
+  endif
+
   let dict = s:custom_actions[a:type]
 
   for key in a:source_kind_name->split('\s*,\s*')
@@ -65,25 +70,25 @@ endfunction
 " This should be called manually, so wait until DenopsPluginPost:ddu by the
 " user himself.
 function ddu#custom#get_global() abort
-  return ddu#denops#_request('getGlobal', [])
+  return s:request('getGlobal', [])
 endfunction
 function ddu#custom#get_local() abort
-  return ddu#denops#_request('getLocal', [])
+  return s:request('getLocal', [])
 endfunction
 function ddu#custom#get_default_options() abort
-  return ddu#denops#_request('getDefaultOptions', [])
+  return s:request('getDefaultOptions', [])
 endfunction
 function ddu#custom#get_current(name = b:->get('ddu_ui_name', '')) abort
-  return a:name ==# '' ? {} : ddu#denops#_request('getCurrent', [a:name])
+  return a:name ==# '' ? {} : s:request('getCurrent', [a:name])
 endfunction
 function ddu#custom#get_names() abort
-  return ddu#denops#_request('getNames', [])
+  return s:request('getNames', [])
 endfunction
 function ddu#custom#get_source_names(name) abort
-  return ddu#denops#_request('getSourceNames', [a:name])
+  return s:request('getSourceNames', [a:name])
 endfunction
 function ddu#custom#get_alias_names(name, type) abort
-  return ddu#denops#_request('getAliasNames', [a:name, a:type])
+  return s:request('getAliasNames', [a:name, a:type])
 endfunction
 
 function s:normalize_key_or_dict(key_or_dict, value) abort
