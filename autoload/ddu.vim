@@ -53,6 +53,9 @@ function ddu#ui_sync_action(name, action, params = {}) abort
   call ddu#denops#_request('uiAction', [a:name, a:action, a:params])
 endfunction
 function ddu#item_action(name, action, items, params = {}) abort
+  if a:name ==# ''
+    return
+  endif
   call ddu#denops#_request(
         \ 'itemAction', [a:name, a:action, a:items, a:params])
 endfunction
