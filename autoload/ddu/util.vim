@@ -102,23 +102,23 @@ function s:expand(path) abort
 endfunction
 
 function ddu#util#print_log(lines, name = 'ddu') abort
-  " Type check: lines must be a list
   const lines =
-        \ (a:lines->type() ==# v:t_string ? a:lines : a:lines->string())
-        \ ->split("\n")->filter({ _, val -> val != ''})
+        \ a:lines->type() ==# v:t_list
+        \ ? a:lines->copy()
+        \ : a:lines->string()->split("\n")
 
-  " Initialize log storage for this name if needed
+  const filtered_lines = lines->filter({ _, val -> val !=# '' })
+
   if !g:ddu#_logs->has_key(a:name)
     let g:ddu#_logs[a:name] = []
   endif
 
-  " Append lines
-  call extend(g:ddu#_logs[a:name], lines)
+  call extend(g:ddu#_logs[a:name], filtered_lines)
 
-  " Limit lines per name
   const max_lines = 200
   if g:ddu#_logs[a:name]->len() > max_lines
-    let g:ddu#_logs[a:name] = g:ddu#_logs[a:name][-max_lines]
+    let g:ddu#_logs[a:name] =
+          \ g:ddu#_logs[a:name][-max_lines :]
   endif
 endfunction
 
