@@ -95,6 +95,10 @@ function s:normalize_key_or_dict(key_or_dict, value) abort
   if a:key_or_dict->type() == v:t_dict
     return a:key_or_dict
   elseif a:key_or_dict->type() == v:t_string
+    if a:key_or_dict ==# ''
+      throw 'ddu#custom: key must not be empty.'
+    endif
+
     let base = {}
     let base[a:key_or_dict] = a:value
     return base
