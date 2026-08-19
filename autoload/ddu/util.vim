@@ -136,5 +136,5 @@ function ddu#util#clear_logs(name) abort
 endfunction
 
 function ddu#util#get_all_logs() abort
-  return g:ddu#_logs->copy()
+  return g:ddu#_logs->deepcopy()
 endfunction
