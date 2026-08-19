@@ -19,11 +19,20 @@ function ddu#util#execute_path(command, path) abort
   const path = a:path->s:expand()
 
   const dir = path->s:path2directory()
-  " Auto make directory.
-  if dir !~# '^\a\+:' && !dir->isdirectory()
+  " Do not create directories for URI-like paths.
+  " Drive-letter paths such as "C:\foo" and UNC paths such as
+  " "\\server\share\foo" are treated as local paths.
+  if dir !~# '^\a\+://' && !dir->isdirectory()
         \ && ddu#util#input_yesno(
         \       printf('"%s" does not exist. Create?', dir))
-    call mkdir(dir, 'p')
+    try
+      call mkdir(dir, 'p')
+    catch
+      call ddu#util#print_error(
+            \ printf('Failed to create directory: "%s"', dir))
+      call ddu#util#print_error(v:exception)
+      return
+    endtry
   endif
 
   try
