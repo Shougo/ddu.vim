@@ -62,7 +62,7 @@ export type SourceInfo = {
   name: SourceName;
   index: number;
   path: TreePath;
-  kind: string;
+  kind: KindName;
 };
 
 export type Callback =
@@ -347,19 +347,24 @@ type BufferPreviewerBase = {
   kind: "buffer";
 } & PreviewerCommon;
 
-type NewBufferPreviewer = {
-  /**
-   * Buffer expression, which is the same as the arguments of `bufname()`
-   */
-  expr?: number | string;
+type NewBufferPreviewer =
+  & {
+    /**
+     * Buffer expression, which is the same as the arguments of `bufname()`
+     */
+    expr?: number | string;
 
-  /**
-   * Path of file to preview
-   */
-  path?: string;
+    /**
+     * Path of file to preview
+     */
+    path?: string;
 
-  useExisting?: false;
-};
+    useExisting?: false;
+  }
+  & (
+    | { expr: number | string }
+    | { path: string }
+  );
 
 type ExistingBufferPreviewer = {
   expr: number | string;
@@ -421,6 +426,10 @@ export type Clipboard = {
   action: ClipboardAction;
   items: DduItem[];
   mode: string;
+
+  /**
+   * `paster` is intentionally unsupported in the current API.
+   */
   paster?: never;
 };
 
