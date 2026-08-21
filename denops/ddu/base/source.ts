@@ -61,7 +61,7 @@ export abstract class BaseSource<
   onEvent(_args: OnEventArguments<Params>): void | Promise<void> {}
 
   abstract gather(
-    {}: GatherArguments<Params>,
+    _args: GatherArguments<Params>,
   ): ReadableStream<Item<UserData>[]>;
 
   checkUpdated(
