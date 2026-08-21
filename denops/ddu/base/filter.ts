@@ -47,7 +47,7 @@ export abstract class BaseFilter<Params extends BaseParams> {
   ): void | Promise<void> {}
 
   abstract filter(
-    {}: FilterArguments<Params>,
+    _args: FilterArguments<Params>,
   ): DduFilterItems | Promise<DduFilterItems>;
 
   abstract params(): Params;
