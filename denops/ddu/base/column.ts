@@ -60,7 +60,7 @@ export abstract class BaseColumn<Params extends BaseParams> {
   onInit(_args: OnInitArguments<Params>): void | Promise<void> {}
 
   abstract getBaseText(
-    {}: GetBaseTextArguments<Params>,
+    _args: GetBaseTextArguments<Params>,
   ): string | Promise<string>;
 
   abstract getLength({}: GetLengthArguments<Params>): number | Promise<number>;
@@ -73,7 +73,5 @@ export abstract class BaseColumn<Params extends BaseParams> {
 }
 
 export function defaultColumnOptions(): ColumnOptions {
-  return {
-    placeholder: undefined,
-  };
+  return {};
 }
