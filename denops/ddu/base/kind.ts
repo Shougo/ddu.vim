@@ -31,7 +31,7 @@ export abstract class BaseKind<Params extends BaseParams> {
   abstract params(): Params;
 
   getPreviewer(
-    {}: GetPreviewerArguments,
+    _args: GetPreviewerArguments,
   ): Promise<Previewer | undefined> {
     return Promise.resolve(undefined);
   }
