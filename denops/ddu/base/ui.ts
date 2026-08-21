@@ -80,7 +80,9 @@ export type VisibleArguments<Params extends BaseParams> =
     tabNr: number;
   };
 
-export type WinidArguments<Params extends BaseParams> = BaseUiArguments<Params>;
+export type WinidsArguments<Params extends BaseParams> = BaseUiArguments<
+  Params
+>;
 
 export type UpdateCursorArguments<Params extends BaseParams> = BaseUiArguments<
   Params
@@ -125,7 +127,7 @@ export abstract class BaseUi<Params extends BaseParams> {
     return false;
   }
 
-  winIds(_args: WinidArguments<Params>): number[] | Promise<number[]> {
+  winIds(_args: WinidsArguments<Params>): number[] | Promise<number[]> {
     return [];
   }
 
