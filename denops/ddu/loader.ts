@@ -62,11 +62,8 @@ export class Loader {
     if (runtimepath !== this.#prevRuntimepath) {
       const cachedPaths = await createPathCache(denops, runtimepath);
 
-      // NOTE: glob may be invalid.
-      if (cachedPaths.size > 0) {
-        this.#cachedPaths = cachedPaths;
-        this.#prevRuntimepath = runtimepath;
-      }
+      this.#cachedPaths = cachedPaths;
+      this.#prevRuntimepath = runtimepath;
     }
 
     const key = `${PLUGIN_PREFIX}-${type}s/${
@@ -83,7 +80,18 @@ export class Loader {
   }
 
   registerAlias(type: DduAliasType, alias: string, base: string) {
+    if (this.getAlias(type, base)) {
+      throw new Error("Alias chaining is not supported");
+    }
+
     this.#aliases[type][alias] = base;
+
+    if (type !== "action") {
+      const ext = this.#exts[type][base];
+      if (ext) {
+        this.#exts[type][alias] = ext;
+      }
+    }
   }
 
   async registerPath(type: DduExtType, path: string): Promise<void> {
@@ -238,7 +246,7 @@ export class Loader {
   async getUi(
     denops: Denops,
     name: string,
-  ): Promise<BaseUi<BaseParams> | null> {
+  ): Promise<BaseUi<BaseParams> | undefined> {
     if (!this.#exts.ui[name]) {
       await this.autoload(denops, "ui", name);
     }
@@ -252,7 +260,7 @@ export class Loader {
   async getFilter(
     denops: Denops,
     name: string,
-  ): Promise<BaseFilter<BaseParams> | null> {
+  ): Promise<BaseFilter<BaseParams> | undefined> {
     if (!this.#exts.filter[name]) {
       await this.autoload(denops, "filter", name);
     }
@@ -262,7 +270,7 @@ export class Loader {
   async getKind(
     denops: Denops,
     name: string,
-  ): Promise<BaseKind<BaseParams> | null> {
+  ): Promise<BaseKind<BaseParams> | undefined> {
     if (!this.#exts.kind[name]) {
       await this.autoload(denops, "kind", name);
     }
@@ -272,7 +280,7 @@ export class Loader {
   async getColumn(
     denops: Denops,
     name: string,
-  ): Promise<BaseColumn<BaseParams> | null> {
+  ): Promise<BaseColumn<BaseParams> | undefined> {
     if (!this.#exts.column[name]) {
       await this.autoload(denops, "column", name);
     }
