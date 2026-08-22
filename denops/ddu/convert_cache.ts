@@ -19,6 +19,11 @@ export class ConverterCache {
   }
 
   get(key: string): DduItem | undefined {
+    if (this.#maxEntries <= 0) {
+      this.#misses++;
+      return undefined;
+    }
+
     const entry = this.#map.get(key);
     if (!entry) {
       this.#misses++;
@@ -39,11 +44,14 @@ export class ConverterCache {
   }
 
   set(key: string, value: DduItem): void {
-    // Remove existing key to update its position in insertion order
+    if (this.#maxEntries <= 0) {
+      return;
+    }
+
     if (this.#map.has(key)) {
       this.#map.delete(key);
     }
-    // LRU eviction: remove oldest entry when at capacity
+
     if (this.#map.size >= this.#maxEntries) {
       const oldestKey = this.#map.keys().next().value;
       if (oldestKey !== undefined) {
@@ -51,6 +59,7 @@ export class ConverterCache {
         this.#evicted++;
       }
     }
+
     this.#map.set(key, { value, ts: Date.now() });
   }
 
