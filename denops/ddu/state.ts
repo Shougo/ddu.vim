@@ -63,7 +63,7 @@ export class GatherState<
   ): ReadableStream<DduItem[]> {
     const appendStream = new TransformStream<DduItem[], DduItem[]>({
       transform: (newItems, controller) => {
-        this.#items = [...this.#items, ...newItems];
+        this.#items.push(...newItems);
         controller.enqueue(newItems);
       },
       flush: () => {
@@ -75,15 +75,20 @@ export class GatherState<
     itemsStream
       .pipeTo(appendStream.writable, {
         signal: this.#aborter.signal,
-        // Do not abort output stream.
         preventAbort: true,
       })
-      .catch(() => {
-        appendStream.writable.close().catch(() => {
+      .catch(async () => {
+        const writer = appendStream.writable.getWriter();
+        try {
+          await writer.close();
+        } catch (_e: unknown) {
           // Prevent errors if already closed.
-        });
+        } finally {
+          writer.releaseLock();
+        }
       })
       .finally(() => {
+        this.#isDone = true;
         this.#waitDone.resolve();
       });
 
@@ -118,9 +123,7 @@ export class GatherState<
   }
 
   async readAll(): Promise<void> {
-    if (this.itemsStream != null) {
-      await Array.fromAsync(this.itemsStream);
-    }
+    await Array.fromAsync(this.itemsStream);
   }
 }
 
