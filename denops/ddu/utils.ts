@@ -121,7 +121,7 @@ export async function safeStat(path: string): Promise<Deno.FileInfo | null> {
 
 export function convertUserString<T>(
   user: string | T,
-): T | { name: string | (T & string) } {
+): T | { name: string } {
   return typeof user === "string" ? { name: user } : user;
 }
 
