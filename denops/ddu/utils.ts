@@ -47,21 +47,31 @@ export async function printError(
   await denops.call("ddu#util#print_error", message);
 }
 
+function stringifyLogValue(value: unknown): string {
+  if (value instanceof Error) {
+    return value.stack ?? String(value);
+  }
+
+  if (typeof value === "object" && value !== null) {
+    try {
+      return JSON.stringify(value);
+    } catch (_e: unknown) {
+      return String(value);
+    }
+  }
+
+  try {
+    return String(value);
+  } catch (_e: unknown) {
+    return "<unprintable>";
+  }
+}
+
 export async function printLog(
   denops: Denops,
   ...messages: unknown[]
 ) {
-  const message = messages.map((v) => {
-    if (v instanceof Error) {
-      // NOTE: In Deno, Prefer `Error.stack` because it contains
-      // `Error.message`.
-      return `${v.stack ?? v}`;
-    } else if (typeof v === "object") {
-      return JSON.stringify(v);
-    } else {
-      return `${v}`;
-    }
-  }).join("\n");
+  const message = messages.map(stringifyLogValue).join("\n");
   await denops.call("ddu#util#print_log", message);
 }
 
@@ -226,16 +236,22 @@ export async function getFilters(
       input,
       items,
     },
-  ) as Filters | null;
-  if (dynamicFilters) {
-    if (dynamicFilters.matchers) {
-      filters.matchers = dynamicFilters.matchers;
+  );
+
+  if (
+    dynamicFilters !== null &&
+    typeof dynamicFilters === "object"
+  ) {
+    const value = dynamicFilters as Partial<Filters>;
+
+    if (Array.isArray(value.matchers)) {
+      filters.matchers = value.matchers;
     }
-    if (dynamicFilters.sorters) {
-      filters.sorters = dynamicFilters.sorters;
+    if (Array.isArray(value.sorters)) {
+      filters.sorters = value.sorters;
     }
-    if (dynamicFilters.converters) {
-      filters.converters = dynamicFilters.converters;
+    if (Array.isArray(value.converters)) {
+      filters.converters = value.converters;
     }
   }
 
