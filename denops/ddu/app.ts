@@ -203,35 +203,31 @@ export const main: Entrypoint = (denops: Denops) => {
 
       return Promise.resolve();
     },
-    setGlobal(arg1: unknown): Promise<void> {
+    async setGlobal(arg1: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
-      lock.lock(() => {
+      await lock.lock(() => {
         contextBuilder.setGlobal(options);
       });
-      return Promise.resolve();
     },
-    setLocal(arg1: unknown, arg2: unknown): Promise<void> {
+    async setLocal(arg1: unknown, arg2: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       const name = ensure(arg2, is.String);
-      lock.lock(() => {
+      await lock.lock(() => {
         contextBuilder.setLocal(name, options);
       });
-      return Promise.resolve();
     },
-    patchGlobal(arg1: unknown): Promise<void> {
+    async patchGlobal(arg1: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
-      lock.lock(() => {
+      await lock.lock(() => {
         contextBuilder.patchGlobal(options);
       });
-      return Promise.resolve();
     },
-    patchLocal(arg1: unknown, arg2: unknown): Promise<void> {
+    async patchLocal(arg1: unknown, arg2: unknown): Promise<void> {
       const options = ensure(arg1, is.Record) as Partial<DduOptions>;
       const name = ensure(arg2, is.String);
-      lock.lock(() => {
+      await lock.lock(() => {
         contextBuilder.patchLocal(name, options);
       });
-      return Promise.resolve();
     },
     getGlobal(): Promise<Partial<DduOptions>> {
       return Promise.resolve(contextBuilder.getGlobal());
