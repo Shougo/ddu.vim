@@ -127,9 +127,12 @@ export const main: Entrypoint = (denops: Denops) => {
   ) => {
     if (name === "_") {
       globalAliases[type][alias] = base;
+
+      for (const loader of Object.values(loaders)) {
+        loader.registerAlias(type, alias, base);
+      }
     } else {
-      const loader = getLoader(name);
-      loader.registerAlias(type, alias, base);
+      getLoader(name).registerAlias(type, alias, base);
     }
   };
 
@@ -263,12 +266,15 @@ export const main: Entrypoint = (denops: Denops) => {
       return Promise.resolve(Array.from(names));
     },
     getSourceNames(arg1: unknown): Promise<string[]> {
-      const loader = getLoader(arg1 as string);
+      const name = ensure(arg1, is.String);
+      const loader = getLoader(name);
       return Promise.resolve(loader.getSourceNames());
     },
     getAliasNames(arg1: unknown, arg2: unknown): Promise<string[]> {
-      const loader = getLoader(arg1 as string);
-      return Promise.resolve(loader.getAliasNames(arg2 as DduAliasType));
+      const name = ensure(arg1, is.String);
+      const type = ensure(arg2, is.String);
+      const loader = getLoader(name);
+      return Promise.resolve(loader.getAliasNames(type as DduAliasType));
     },
     async loadConfig(arg1: unknown): Promise<void> {
       //const startTime = Date.now();
