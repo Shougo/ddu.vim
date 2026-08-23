@@ -114,22 +114,24 @@ function migrateEachKeys<T>(
   a: null | undefined | Record<string, Partial<T>>,
   b: null | undefined | Record<string, Partial<T>>,
 ): null | Record<string, Partial<T>> {
-  if (!a && !b) return null;
-  const ret: Record<string, Partial<T>> = {};
-  if (a) {
-    for (const key in a) {
-      ret[key] = a[key];
+  if (!a && !b) {
+    return null;
+  }
+
+  const ret: Record<string, Partial<T>> = Object.create(null);
+
+  for (const key of Object.keys(a ?? {})) {
+    ret[key] = a![key];
+  }
+
+  for (const key of Object.keys(b ?? {})) {
+    if (Object.hasOwn(ret, key)) {
+      ret[key] = merge(ret[key], b![key]);
+    } else {
+      ret[key] = b![key];
     }
   }
-  if (b) {
-    for (const key in b) {
-      if (key in ret) {
-        ret[key] = merge(ret[key], b[key]);
-      } else {
-        ret[key] = b[key];
-      }
-    }
-  }
+
   return ret;
 }
 
@@ -368,10 +370,11 @@ export class ContextBuilderImpl implements ContextBuilder {
   }
 
   getGlobal(): Partial<DduOptions> {
-    return this.#custom.global;
+    return { ...this.#custom.global };
   }
+
   getLocal(): Record<string, Partial<DduOptions>> {
-    return this.#custom.local;
+    return { ...this.#custom.local };
   }
 
   setGlobal(options: Partial<DduOptions>) {
