@@ -1257,7 +1257,9 @@ export class Ddu {
     },
   ): Promise<void> {
     const { preventRedraw, signal = this.#aborter.signal } = opts ?? {};
-    for (const item of items.sort((a, b) => a.item.__level - b.item.__level)) {
+    for (
+      const item of [...items].sort((a, b) => a.item.__level - b.item.__level)
+    ) {
       const maxLevel = item.maxLevel && item.maxLevel < 0
         ? -1
         : item.item.__level + (item.maxLevel ?? 0);
