@@ -637,7 +637,11 @@ export class Ddu {
           // Aborted by signal, so do nothing.
         } else {
           // Show error message
-          printError(denops, `source: ${source.name} "gather()" failed`, e);
+          await printError(
+            denops,
+            `source: ${source.name} "gather()" failed`,
+            e,
+          );
         }
       }
     })();
@@ -2354,16 +2358,20 @@ export class Ddu {
       }
 
       // Run converters only on cache-miss items
-      const freshlyConverted = await callFilters(
-        denops,
-        this.#loader,
-        this.#context,
-        this.#options,
-        sourceOptions,
-        filters.converters,
-        input,
-        missItems,
-      );
+      const freshlyConverted: DduItem[] = [];
+      for (const item of missItems) {
+        const converted = await callFilters(
+          denops,
+          this.#loader,
+          this.#context,
+          this.#options,
+          sourceOptions,
+          filters.converters,
+          input,
+          [item],
+        );
+        freshlyConverted.push(...converted);
+      }
 
       // Cache newly converted items, but store ONLY converter-produced
       // highlights (after - before).
