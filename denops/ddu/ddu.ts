@@ -520,12 +520,13 @@ export class Ddu {
     }, wait);
   }
 
-  #flushRedrawThrottle(
-    denops: Denops,
-  ) {
+  #flushRedrawThrottle(denops: Denops) {
     const opts = this.#takeRedrawThrottleOptions();
     this.#lastRedrawTime = Date.now();
-    /* no await */ this.redraw(denops, opts);
+
+    void this.redraw(denops, opts).catch((e: unknown) => {
+      void printError(denops, "redraw() failed", e);
+    });
   }
 
   #takeRedrawThrottleOptions(): RedrawOptions | undefined {
@@ -677,10 +678,12 @@ export class Ddu {
             this.#scheduledRedrawOptions = undefined;
             await this.#redrawInternal(denops, nextOpts);
           }
-          // All schedules completed
+
           this.#waitRedrawComplete = undefined;
           resolve();
         } catch (e: unknown) {
+          this.#waitRedrawComplete = undefined;
+          this.#scheduledRedrawOptions = undefined;
           reject(e);
         }
       })();
@@ -1927,7 +1930,7 @@ export class Ddu {
     ]);
     this.#userOptions = userOptions;
 
-    if (userOptions.input) {
+    if (Object.hasOwn(userOptions, "input")) {
       await this.setInput(denops, this.#options.input);
     }
   }
