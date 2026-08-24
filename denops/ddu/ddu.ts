@@ -1103,7 +1103,7 @@ export class Ddu {
               return true;
             }
           } catch {
-            // ignore transient errors and retry
+            return false;
           }
           await new Promise((r) => setTimeout(r, intervalMs));
         }
