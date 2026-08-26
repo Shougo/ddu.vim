@@ -1061,18 +1061,18 @@ export async function uiAction(
     return [undefined, uiOptions, uiParams, ActionFlags.None];
   }
 
+  const action = uiOptions.actions[actionName] ?? ui.actions[actionName];
+  if (!action) {
+    await printError(denops, `Not found UI action: ${actionName}`);
+    return [undefined, uiOptions, uiParams, ActionFlags.None];
+  }
+
   if (ui.onBeforeAction) {
     await ui.onBeforeAction({
       denops,
       uiOptions,
       uiParams,
     });
-  }
-
-  const action = uiOptions.actions[actionName] ?? ui.actions[actionName];
-  if (!action) {
-    await printError(denops, `Not found UI action: ${actionName}`);
-    return [undefined, uiOptions, uiParams, ActionFlags.None];
   }
 
   let ret;
