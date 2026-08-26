@@ -617,7 +617,10 @@ export async function callColumns(
         continue;
       }
 
-      if (!item.__columnTexts[index] && cachedColumn.column.getBaseText) {
+      if (
+        !Object.hasOwn(item.__columnTexts, index) &&
+        cachedColumn.column.getBaseText
+      ) {
         item.__columnTexts[index] = await cachedColumn.column.getBaseText({
           denops,
           context,
