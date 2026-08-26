@@ -874,13 +874,17 @@ export async function initSource<
   sourceOptions: SourceOptions,
   sourceParams: Params,
 ): Promise<void> {
-  source.isInitialized = false;
-  await source.onInit({
-    denops,
-    sourceOptions,
-    sourceParams,
-  });
-  source.isInitialized = true;
+  try {
+    await source.onInit({
+      denops,
+      sourceOptions,
+      sourceParams,
+    });
+
+    source.isInitialized = true;
+  } catch (e: unknown) {
+    await printError(denops, `source: ${source.name} "onInit()" failed`, e);
+  }
 }
 
 async function checkUiOnInit(
