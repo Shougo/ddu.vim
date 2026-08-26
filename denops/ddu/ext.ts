@@ -87,15 +87,12 @@ export async function getItemActions(
         ),
     ),
   ].filter((source) => source);
-  const indexes = [
-    ...new Set(items.map((item) => item.__sourceIndex)),
-  ];
-  if (sources.length > 1) {
+
+  const indexes = [...new Set(items.map((item) => item.__sourceIndex))];
+  if (indexes.length > 1) {
     await printError(
       denops,
-      `You must not mix multiple sources items: "${
-        sources.map((source) => source?.name)
-      }"`,
+      "You must not mix multiple source items",
     );
     return null;
   }
