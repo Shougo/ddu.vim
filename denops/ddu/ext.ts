@@ -55,7 +55,7 @@ import { is } from "@core/unknownutil/is";
 type ItemActions = {
   source: BaseSource<BaseParams, unknown> | null;
   kind: BaseKind<BaseParams>;
-  actions: Record<string, unknown>;
+  actions: Record<ActionName, ItemAction>;
 };
 
 type ItemActionInfo = {
@@ -129,7 +129,7 @@ export async function getItemActions(
     options.sources[indexes.length > 0 ? indexes[0] : 0],
   );
 
-  const actions = {
+  const actions: Record<ActionName, ItemAction> = {
     ...kind.actions,
     ...kindOptions.actions,
     ...(source?.actions ?? {}),
