@@ -129,12 +129,12 @@ export async function getItemActions(
     options.sources[indexes.length > 0 ? indexes[0] : 0],
   );
 
-  const actions = Object.assign(
-    kind.actions,
-    kindOptions.actions,
-    source?.actions,
-    sourceOptions.actions,
-  );
+  const actions = {
+    ...kind.actions,
+    ...kindOptions.actions,
+    ...(source?.actions ?? {}),
+    ...sourceOptions.actions,
+  };
 
   // Filter by options.actions
   const filteredActions = options.actions.length === 0
