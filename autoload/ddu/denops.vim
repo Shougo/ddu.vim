@@ -51,6 +51,7 @@ function s:register() abort
 endfunction
 function s:stopped() abort
   unlet! g:ddu#_initialized
+  let s:initializing = v:false
 
   " Restore custom config
   for custom in g:->get('ddu#_notifies', [])
