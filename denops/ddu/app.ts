@@ -36,6 +36,7 @@ import { type BaseColumn, defaultColumnOptions } from "./base/column.ts";
 import { defaultActionOptions } from "./base/action.ts";
 
 import type { Denops, Entrypoint } from "@denops/std";
+import * as fn from "@denops/std/function";
 
 import { Lock } from "@core/asyncutil/lock";
 import { is } from "@core/unknownutil/is";
@@ -99,6 +100,35 @@ export const main: Entrypoint = (denops: Denops) => {
     }
 
     return ddus[name].slice(-1)[0];
+  };
+  // NOTE: Started from the UI window of another ddu (its mapping pressed
+  // twice, say): the window and the buffer that one was started from are
+  // those of this one. Else the item action goes to the UI window, which
+  // stays. A floating window of it, which would cover them, is closed.
+  const startedFromUi = async (context: Context, name: string) => {
+    const uiName = await fn.getbufvar(denops, context.bufNr, "ddu_ui_name");
+    if (
+      !is.String(uiName) || uiName === "" || uiName === name ||
+      !checkDdu(uiName)
+    ) {
+      return;
+    }
+
+    const other = getDdu(uiName);
+    const otherContext = other.getContext();
+    const winId = context.winId;
+    context.winId = otherContext.winId;
+    context.bufNr = otherContext.bufNr;
+    context.bufName = otherContext.bufName;
+
+    if (
+      denops.meta.host === "nvim" &&
+      (await denops.call("nvim_win_get_config", winId) as {
+        relative?: string;
+      }).relative
+    ) {
+      await other.uiAction(denops, "quit", {});
+    }
   };
   const pushDdu = (name: string) => {
     checkDdu(name);
@@ -361,6 +391,8 @@ export const main: Entrypoint = (denops: Denops) => {
         context.winId = prevDdu.getContext().winId;
       } else {
         ddu = getDdu(options.name);
+
+        await startedFromUi(context, options.name);
       }
 
       await ddu.start(denops, context, options, userOptions);
