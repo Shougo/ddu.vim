@@ -63,7 +63,10 @@ export class GatherState<
   ): ReadableStream<DduItem[]> {
     const appendStream = new TransformStream<DduItem[], DduItem[]>({
       transform: (newItems, controller) => {
-        this.#items.push(...newItems);
+        // Large source chunks can exceed the argument limit of a single push.
+        for (const item of newItems) {
+          this.#items.push(item);
+        }
         controller.enqueue(newItems);
       },
       flush: () => {
